@@ -15,7 +15,7 @@
     "clean": "rm -rf node_modules && rm -rf package-lock.json &&  rm -rf .expo && rm -rf .expo-shared  && npm install && expo start -c",
     "verify": "npx expo-doctor",
     "review": "npx expo install --check",
-    "publish": "npx expo publish"
+    "publish": "eas update --branch main"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
@@ -47,7 +47,8 @@
     "react-native-screens": "~4.11.1",
     "react-native-svg": "15.11.2",
     "react-native-web": "~0.20.0",
-    "react-native-webview": "13.13.5"
+    "react-native-webview": "13.13.5",
+    "expo-updates": "~0.28.17"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

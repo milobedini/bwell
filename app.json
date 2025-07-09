@@ -44,6 +44,12 @@
         "projectId": "2bff059e-0e09-4d11-8414-e062119c44a5"
       }
     },
-    "owner": "milobedini"
+    "owner": "milobedini",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/2bff059e-0e09-4d11-8414-e062119c44a5"
+    }
   }
 }
