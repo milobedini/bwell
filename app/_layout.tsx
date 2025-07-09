@@ -44,7 +44,7 @@ export default function RootLayout() {
         router.replace('/(auth)/login');
       }
     }
-  }, [layoutMounted]);
+  }, [layoutMounted, loggedIn, router]);
 
   if (!fontsLoaded) return null;
 
