@@ -14,7 +14,8 @@
     "prepare": "husky",
     "clean": "rm -rf node_modules && rm -rf package-lock.json &&  rm -rf .expo && rm -rf .expo-shared  && npm install && expo start -c",
     "verify": "npx expo-doctor",
-    "review": "npx expo install --check"
+    "review": "npx expo install --check",
+    "publish": "npx expo publish"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
