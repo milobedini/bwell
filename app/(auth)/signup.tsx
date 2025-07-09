@@ -5,7 +5,7 @@ export default function Signup() {
   return (
     <View>
       <Text>Signup Screen</Text>
-      <Button title="Back to login" onPress={() => router.back()} />
+      <Button title="Back to login" onPress={() => router.replace('/(auth)/login')} />
     </View>
   );
 }

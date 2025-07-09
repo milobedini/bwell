@@ -1,8 +1,28 @@
-import type { ReactNode } from 'react';
-import { View } from 'react-native';
+import { Platform, SafeAreaView, StatusBar } from 'react-native';
+import { SafeAreaProvider, SafeAreaViewProps } from 'react-native-safe-area-context';
+import { clsx } from 'clsx';
 
-const Container = ({ children }: { children: ReactNode }) => {
-  return <View className="flex-1 gap-4 bg-background p-4">{children}</View>;
+type ContainerProps = SafeAreaViewProps & {
+  centered?: boolean;
+};
+
+const Container = ({ children, className, centered, ...rest }: ContainerProps) => {
+  return (
+    <SafeAreaProvider>
+      <SafeAreaView
+        edges={['top']}
+        className={clsx(
+          `p-t-[${StatusBar.currentHeight}] flex-1 bg-background`,
+          className,
+          centered && 'items-center',
+          Platform.OS === 'web' && 'pt-4'
+        )}
+        {...rest}
+      >
+        {children}
+      </SafeAreaView>
+    </SafeAreaProvider>
+  );
 };
 
 export default Container;

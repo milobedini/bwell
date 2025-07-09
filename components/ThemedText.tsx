@@ -1,8 +1,8 @@
-import { StyleSheet, Text, type TextProps } from 'react-native';
+import { Platform, StyleSheet, Text, type TextProps } from 'react-native';
 import { Fonts } from '@/constants/Typography';
 
 export type ThemedTextProps = TextProps & {
-  type?: 'default' | 'title' | 'subtitle' | 'link' | 'small' | 'italic' | 'smallTitle';
+  type?: 'default' | 'title' | 'subtitle' | 'link' | 'small' | 'italic' | 'smallTitle' | 'button';
 };
 
 export function ThemedText({ style, type = 'default', ...rest }: ThemedTextProps) {
@@ -16,6 +16,7 @@ export function ThemedText({ style, type = 'default', ...rest }: ThemedTextProps
         type === 'link' && styles.link,
         type === 'small' && styles.small,
         type === 'italic' && styles.italic,
+        type === 'button' && styles.button,
         style
       ]}
       {...rest}
@@ -25,42 +26,46 @@ export function ThemedText({ style, type = 'default', ...rest }: ThemedTextProps
 
 const styles = StyleSheet.create({
   default: {
-    fontSize: 18,
-    lineHeight: 24,
+    fontSize: Platform.select({ ios: 16, android: 16, default: 18 }),
+    lineHeight: Platform.select({ ios: 22, android: 22, default: 24 }),
     fontFamily: Fonts.Regular
   },
   title: {
-    fontSize: 70,
-    lineHeight: 72,
+    fontSize: Platform.select({ ios: 60, android: 60, default: 70 }),
+    lineHeight: Platform.select({ ios: 62, android: 62, default: 72 }),
     fontFamily: Fonts.Bold,
     marginVertical: 8
   },
   subtitle: {
-    fontSize: 50,
-    lineHeight: 50,
+    fontSize: Platform.select({ ios: 40, android: 40, default: 50 }),
+    lineHeight: Platform.select({ ios: 42, android: 42, default: 50 }),
     fontFamily: Fonts.Bold,
     marginBottom: 8
   },
   smallTitle: {
-    fontSize: 30,
-    lineHeight: 30,
+    fontSize: Platform.select({ ios: 24, android: 24, default: 30 }),
+    lineHeight: Platform.select({ ios: 26, android: 26, default: 30 }),
     fontFamily: Fonts.Black,
     marginBottom: 8
   },
   link: {
-    lineHeight: 18,
-    fontSize: 15,
+    fontSize: Platform.select({ ios: 13, android: 13, default: 15 }),
+    lineHeight: Platform.select({ ios: 16, android: 16, default: 18 }),
     fontFamily: Fonts.Regular,
     textTransform: 'uppercase'
   },
   small: {
-    fontSize: 14,
-    lineHeight: 24,
+    fontSize: Platform.select({ ios: 12, android: 12, default: 14 }),
+    lineHeight: Platform.select({ ios: 20, android: 20, default: 24 }),
     fontFamily: Fonts.Regular
   },
   italic: {
-    fontSize: 14,
-    lineHeight: 24,
+    fontSize: Platform.select({ ios: 12, android: 12, default: 14 }),
+    lineHeight: Platform.select({ ios: 20, android: 20, default: 24 }),
     fontFamily: Fonts.Italic
+  },
+  button: {
+    fontSize: Platform.select({ ios: 18, android: 18, default: 22 }),
+    fontFamily: Fonts.Bold
   }
 });

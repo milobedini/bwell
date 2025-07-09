@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useFonts } from 'expo-font';
 import { Slot, SplashScreen, useRouter } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 
 import 'react-native-reanimated';
 
@@ -26,6 +25,7 @@ export default function RootLayout() {
   const [loggedIn, _setLoggedIn] = useState(false);
 
   const [layoutMounted, setLayoutMounted] = useState(false);
+  const [onboarded, _setOnboarded] = useState(false);
 
   const router = useRouter();
 
@@ -41,17 +41,16 @@ export default function RootLayout() {
       if (loggedIn) {
         router.replace('/(main)/(tabs)/home');
       } else {
-        router.replace('/(auth)/login');
+        if (onboarded) {
+          router.replace('/(auth)/login');
+        } else {
+          router.replace('/(welcome)/ready');
+        }
       }
     }
-  }, [layoutMounted, loggedIn, router]);
+  }, [layoutMounted, loggedIn, onboarded, router]);
 
   if (!fontsLoaded) return null;
 
-  return (
-    <>
-      <StatusBar style="auto" />
-      <Slot />
-    </>
-  );
+  return <Slot />;
 }
