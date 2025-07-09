@@ -15,7 +15,7 @@
     "clean": "rm -rf node_modules && rm -rf package-lock.json &&  rm -rf .expo && rm -rf .expo-shared  && npm install && expo start -c",
     "verify": "npx expo-doctor",
     "review": "npx expo install --check",
-    "publish": "eas update --branch main"
+    "publish": "eas update --branch main && npx expo export --platform web && eas deploy"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",

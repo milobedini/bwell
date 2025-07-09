@@ -8,6 +8,8 @@ import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 
+import logo from '../../assets/images/logo.png';
+
 const styles = StyleSheet.create({
   image: {
     height: 450,
@@ -30,11 +32,7 @@ const ReadyScreen = () => {
   if (!started) {
     return (
       <Container centered className="gap-2">
-        <Image
-          source={{ uri: 'https://picsum.photos/450/800' }}
-          style={styles.image}
-          onLoad={() => SplashScreen.hideAsync()}
-        />
+        <Image source={logo} style={styles.image} onLoad={() => SplashScreen.hideAsync()} />
         <ThemedText type="title" className="text-center">
           Welcome to BWell
         </ThemedText>
