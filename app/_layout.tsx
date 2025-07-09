@@ -1,13 +1,16 @@
+import { useEffect, useState } from 'react';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Slot, SplashScreen, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 import 'react-native-reanimated';
 
 import '../global.css';
 
+SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
-  const [loaded] = useFonts({
+  const [fontsLoaded] = useFonts({
     'Lato-Regular': require('../assets/fonts/Lato-Regular.ttf'),
     'Lato-Bold': require('../assets/fonts/Lato-Bold.ttf'),
     'Lato-Black': require('../assets/fonts/Lato-Black.ttf'),
@@ -20,19 +23,35 @@ export default function RootLayout() {
     'Lato-ThinItalic': require('../assets/fonts/Lato-ThinItalic.ttf')
   });
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
+  const [loggedIn, _setLoggedIn] = useState(false);
+
+  const [layoutMounted, setLayoutMounted] = useState(false);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+      setLayoutMounted(true);
+    }
+  }, [fontsLoaded]);
+
+  useEffect(() => {
+    if (layoutMounted) {
+      if (loggedIn) {
+        router.replace('/(main)/(tabs)/home');
+      } else {
+        router.replace('/(auth)/login');
+      }
+    }
+  }, [layoutMounted]);
+
+  if (!fontsLoaded) return null;
 
   return (
-    // <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
     <>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
       <StatusBar style="auto" />
+      <Slot />
     </>
   );
 }
