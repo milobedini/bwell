@@ -15,7 +15,7 @@
       "distribution": "internal",
       "env": {
         "NODE_ENV": "preview",
-        "EXPO_PUBLIC_BACKEND_BASE_URL": "https://staging.yourdomain.com/api"
+        "EXPO_PUBLIC_BACKEND_BASE_URL": "https://cbt-sl8z.onrender.com/api"
       }
     },
     "production": {
