@@ -1,5 +1,3 @@
-import 'dotenv/config';
-
 export default {
   expo: {
     name: 'bwell',
@@ -45,7 +43,6 @@ export default {
       typedRoutes: true
     },
     extra: {
-      apiUrl: process.env.EXPO_PUBLIC_BACKEND_BASE_URL,
       eas: {
         projectId: '2bff059e-0e09-4d11-8414-e062119c44a5'
       }

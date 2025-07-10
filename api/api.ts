@@ -1,8 +1,7 @@
 // src/lib/api.ts (or wherever you store it)
 import axios from 'axios';
-import Constants from 'expo-constants';
 
-const apiUrl = Constants.expoConfig?.extra?.apiUrl;
+const apiUrl = process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
 
 export const api = axios.create({
   baseURL: apiUrl,
