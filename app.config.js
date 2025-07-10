@@ -45,8 +45,7 @@ export default {
       typedRoutes: true
     },
     extra: {
-      // ✅ Read directly from env — EAS injects this during build
-      EXPO_PUBLIC_BACKEND_BASE_URL: process.env.EXPO_PUBLIC_BACKEND_BASE_URL,
+      apiUrl: process.env.EXPO_PUBLIC_BACKEND_BASE_URL,
       eas: {
         projectId: '2bff059e-0e09-4d11-8414-e062119c44a5'
       }

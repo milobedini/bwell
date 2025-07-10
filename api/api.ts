@@ -1,12 +1,15 @@
 // src/lib/api.ts (or wherever you store it)
 import axios from 'axios';
+import Constants from 'expo-constants';
+
+const apiUrl = Constants.expoConfig?.extra?.apiUrl;
 
 export const api = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_BACKEND_BASE_URL,
+  baseURL: apiUrl,
   withCredentials: true
 });
 
-console.log('We are using', process.env.EXPO_PUBLIC_BACKEND_BASE_URL, 'API Base URL'); // Debugging: Log the base URL
+console.log('We are using', apiUrl, 'API Base URL'); // Debugging: Log the base URL
 
 // 🔍 Log every request
 api.interceptors.request.use(
