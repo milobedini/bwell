@@ -1,7 +1,31 @@
 {
-  "production": {
-    "env": {
-      "NODE_ENV": "production"
+  "cli": {
+    "version": ">=3.0.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "NODE_ENV": "development",
+        "EXPO_PUBLIC_BACKEND_BASE_URL": "http://localhost:3000/api"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "NODE_ENV": "preview",
+        "EXPO_PUBLIC_BACKEND_BASE_URL": "https://staging.yourdomain.com/api"
+      }
+    },
+    "production": {
+      "env": {
+        "NODE_ENV": "production",
+        "EXPO_PUBLIC_BACKEND_BASE_URL": "https://cbt-sl8z.onrender.com/api"
+      }
     }
+  },
+  "submit": {
+    "production": {}
   }
 }
