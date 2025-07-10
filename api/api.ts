@@ -1,4 +1,3 @@
-// src/lib/api.ts (or wherever you store it)
 import axios from 'axios';
 
 const apiUrl = process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
