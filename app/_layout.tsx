@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useFonts } from 'expo-font';
 import { Slot, SplashScreen, useRouter } from 'expo-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import 'react-native-reanimated';
 
@@ -21,6 +22,8 @@ export default function RootLayout() {
     'Lato-Thin': require('../assets/fonts/Lato-Thin.ttf'),
     'Lato-ThinItalic': require('../assets/fonts/Lato-ThinItalic.ttf')
   });
+
+  const queryClient = new QueryClient();
 
   const [loggedIn, _setLoggedIn] = useState(false);
 
@@ -52,5 +55,9 @@ export default function RootLayout() {
 
   if (!fontsLoaded) return null;
 
-  return <Slot />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Slot />
+    </QueryClientProvider>
+  );
 }

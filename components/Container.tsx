@@ -12,7 +12,7 @@ const Container = ({ children, className, centered, ...rest }: ContainerProps) =
       <SafeAreaView
         edges={['top']}
         className={clsx(
-          `p-t-[${StatusBar.currentHeight}] flex-1 bg-background`,
+          `p-t-[${StatusBar.currentHeight ? StatusBar.currentHeight + 8 : 12}] flex-1 bg-background px-3`,
           className,
           centered && 'items-center',
           Platform.OS === 'web' && 'pt-4'
