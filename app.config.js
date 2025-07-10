@@ -48,7 +48,7 @@ export default {
       router: {},
       BACKEND_BASE_URL: process.env.BACKEND_BASE_URL,
       eas: {
-        projectId: '2bff059e-0e09-4d11-8414-e062119c44a5' // ✅ copy this from your current app.json
+        projectId: '2bff059e-0e09-4d11-8414-e062119c44a5'
       }
     },
     updates: {
