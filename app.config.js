@@ -1,7 +1,5 @@
 import 'dotenv/config';
 
-const isProd = process.env.NODE_ENV === 'production';
-
 export default {
   expo: {
     name: 'bwell',
@@ -47,10 +45,8 @@ export default {
       typedRoutes: true
     },
     extra: {
-      router: {},
-      BACKEND_BASE_URL: isProd
-        ? 'https://cbt-sl8z.onrender.com/api' // ✅ Production
-        : 'http://localhost:3000/api', // ✅ Local Dev
+      // ✅ Read directly from env — EAS injects this during build
+      EXPO_PUBLIC_BACKEND_BASE_URL: process.env.EXPO_PUBLIC_BACKEND_BASE_URL,
       eas: {
         projectId: '2bff059e-0e09-4d11-8414-e062119c44a5'
       }

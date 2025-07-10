@@ -7,14 +7,14 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "NODE_ENV": "production",
+        "NODE_ENV": "development",
         "EXPO_PUBLIC_BACKEND_BASE_URL": "https://cbt-sl8z.onrender.com/api"
       }
     },
     "preview": {
       "distribution": "internal",
       "env": {
-        "NODE_ENV": "production",
+        "NODE_ENV": "preview",
         "EXPO_PUBLIC_BACKEND_BASE_URL": "https://cbt-sl8z.onrender.com/api"
       }
     },
