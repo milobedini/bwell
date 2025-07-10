@@ -7,16 +7,19 @@ type ContainerProps = SafeAreaViewProps & {
 };
 
 const Container = ({ children, className, centered, ...rest }: ContainerProps) => {
+  const topPadding = StatusBar.currentHeight ? StatusBar.currentHeight + 8 : 12;
+
   return (
     <SafeAreaProvider>
       <SafeAreaView
         edges={['top']}
         className={clsx(
-          `p-t-[${StatusBar.currentHeight ? StatusBar.currentHeight + 8 : 12}] flex-1 bg-background px-3`,
-          className,
+          'flex-1 bg-background px-3',
           centered && 'items-center',
-          Platform.OS === 'web' && 'pt-4'
+          Platform.OS === 'web' && 'pt-4',
+          className
         )}
+        style={{ paddingTop: topPadding }}
         {...rest}
       >
         {children}

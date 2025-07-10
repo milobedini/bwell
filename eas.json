@@ -1,0 +1,7 @@
+{
+  "production": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  }
+}

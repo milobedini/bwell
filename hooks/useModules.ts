@@ -1,13 +1,6 @@
-import axios from 'axios';
-import Constants from 'expo-constants';
+import { api } from '@/api/api';
 import type { CreateModuleInput, ModuleDTO, ModulesResponse } from '@milobedini/shared-types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-
-// Axios instance with credentials (cookie-based auth)
-const api = axios.create({
-  baseURL: Constants.expoConfig?.extra?.BACKEND_BASE_URL,
-  withCredentials: true
-});
 
 // --- API methods ---
 const fetchModules = async (): Promise<ModuleDTO[]> => {
