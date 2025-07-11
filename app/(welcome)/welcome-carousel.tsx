@@ -53,17 +53,19 @@ const WelcomeCarousel = () => {
             width: welcomeConstants.buttonSize * 3,
             height: welcomeConstants.buttonSize,
             borderRadius: welcomeConstants.buttonSize / 2,
-            backgroundColor: Colors.primary.accent,
+            backgroundColor: Colors.sway.bright,
             justifyContent: 'center',
             alignItems: 'center',
             flexDirection: 'row'
           }}
         >
-          <ThemedText type="link">Create Account</ThemedText>
+          <ThemedText type="link" className="text-sway-dark">
+            Create Account
+          </ThemedText>
           <AntDesign
             name="arrowright"
             size={welcomeConstants.buttonSize / 2}
-            color={Colors.primary.black}
+            color={Colors.sway.dark}
             style={{ marginLeft: 4 }}
           />
         </TouchableOpacity>

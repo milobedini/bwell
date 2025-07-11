@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFonts } from 'expo-font';
 import { Slot, SplashScreen, useRouter } from 'expo-router';
+import { LoadingIndicator } from '@/components/LoadingScreen';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import 'react-native-reanimated';
@@ -53,11 +55,13 @@ export default function RootLayout() {
     }
   }, [layoutMounted, loggedIn, onboarded, router]);
 
-  if (!fontsLoaded) return null;
+  if (!fontsLoaded) return <LoadingIndicator marginBottom={0} />;
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Slot />
+      <GestureHandlerRootView>
+        <Slot />
+      </GestureHandlerRootView>
     </QueryClientProvider>
   );
 }

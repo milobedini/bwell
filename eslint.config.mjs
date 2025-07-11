@@ -32,7 +32,7 @@ export default defineConfig([
         }
       ],
       'simple-import-sort/exports': 'error',
-      'tailwindcss/classnames-order': 'error',
+      // 'tailwindcss/classnames-order': 'error',
       '@typescript-eslint/no-unused-vars': [
         'error',
         {

@@ -12,7 +12,7 @@ import logo from '../../assets/images/logo.png';
 
 const styles = StyleSheet.create({
   image: {
-    height: 450,
+    height: 500,
     width: 800,
     resizeMode: 'contain'
   },
@@ -31,11 +31,9 @@ const ReadyScreen = () => {
 
   if (!started) {
     return (
-      <Container centered className="gap-2">
+      <Container centered className=" bg-sway-dark gap-2">
         <Image source={logo} style={styles.image} onLoad={() => SplashScreen.hideAsync()} />
-        <ThemedText type="title" className="text-center">
-          Welcome to BWell
-        </ThemedText>
+        <ThemedText type="title">Welcome to BWell</ThemedText>
         <ThemedButton onPress={onGetStarted}>Get started!</ThemedButton>
       </Container>
     );

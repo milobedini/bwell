@@ -12,7 +12,7 @@ const ScrollContainer = ({ children, className, contentClassName, centered, ...r
     <SafeAreaProvider>
       <SafeAreaView edges={['top']} style={{ flex: 1 }}>
         <ScrollView
-          className={clsx('flex-1 bg-background px-3', className)}
+          className={clsx('bg-sway-dark flex-1 px-3', className)}
           contentContainerStyle={{
             paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 8 : 12
           }}

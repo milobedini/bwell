@@ -11,9 +11,15 @@ module.exports = {
       success: '#76AB70',
       accent: '#FFB0C0',
       error: '#FF6D5E',
+      sway: {
+        dark: '#0c1527',
+        background: '#F4F2EB',
+        lightGrey: '#e0e9f3',
+        bright: '#18cdba'
+      }
     },
-    extend: {},
+    extend: {}
   },
   presets: [require('nativewind/preset')],
-  plugins: [],
-}
+  plugins: []
+};

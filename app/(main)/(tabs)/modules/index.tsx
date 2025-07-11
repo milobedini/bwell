@@ -1,15 +1,21 @@
-import { Button, Image, View } from 'react-native';
-import { router } from 'expo-router';
+import { Image, View } from 'react-native';
+import ErrorStates, { ErrorTypes } from '@/components/ErrorStates';
+import { LoadingIndicator } from '@/components/LoadingScreen';
 import ScrollContainer from '@/components/ScrollContainer';
 import { ThemedText } from '@/components/ThemedText';
 import { useModules } from '@/hooks/useModules';
 
 export default function ModuleList() {
-  const { data: modules } = useModules();
+  const { data: modules, isPending } = useModules();
+
+  if (!modules || !modules.length) {
+    return <ErrorStates errorType={ErrorTypes.NO_CONTENT} />;
+  }
 
   return (
     <ScrollContainer centered contentClassName="gap-4">
       <ThemedText type="subtitle">Modules List</ThemedText>
+      {isPending && <LoadingIndicator marginBottom={0} />}
       {modules?.map((module) => (
         <View key={module._id}>
           <ThemedText type="smallTitle">{module.title}</ThemedText>
@@ -17,7 +23,6 @@ export default function ModuleList() {
           <Image source={{ uri: module.imageUrl }} style={{ width: 300, height: 300 }} resizeMode="cover" />
         </View>
       ))}
-      <Button title="Open Module 1" onPress={() => router.push('/(main)/(tabs)/modules/1')} />
     </ScrollContainer>
   );
 }

@@ -5,7 +5,7 @@ import { ThemedText } from './ThemedText';
 const ThemedButton = (props: TouchableOpacityProps) => {
   const { children, ...rest } = props;
   return (
-    <TouchableOpacity className="rounded-md bg-accent p-4" {...rest}>
+    <TouchableOpacity className="bg-sway-bright rounded-md p-4" {...rest}>
       <ThemedText type="button" className="text-center">
         {children}
       </ThemedText>

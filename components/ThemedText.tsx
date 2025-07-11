@@ -1,8 +1,9 @@
 import { Platform, StyleSheet, Text, type TextProps } from 'react-native';
+import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 
 export type ThemedTextProps = TextProps & {
-  type?: 'default' | 'title' | 'subtitle' | 'link' | 'small' | 'italic' | 'smallTitle' | 'button';
+  type?: 'default' | 'title' | 'subtitle' | 'link' | 'small' | 'italic' | 'smallTitle' | 'button' | 'error';
 };
 
 export function ThemedText({ style, type = 'default', ...rest }: ThemedTextProps) {
@@ -17,6 +18,7 @@ export function ThemedText({ style, type = 'default', ...rest }: ThemedTextProps
         type === 'small' && styles.small,
         type === 'italic' && styles.italic,
         type === 'button' && styles.button,
+        type === 'error' && styles.error,
         style
       ]}
       {...rest}
@@ -28,19 +30,23 @@ const styles = StyleSheet.create({
   default: {
     fontSize: Platform.select({ ios: 16, android: 16, default: 18 }),
     lineHeight: Platform.select({ ios: 22, android: 22, default: 24 }),
-    fontFamily: Fonts.Regular
+    fontFamily: Fonts.Regular,
+    marginVertical: 6,
+    color: Colors.sway.white
   },
   title: {
-    fontSize: Platform.select({ ios: 60, android: 60, default: 70 }),
-    lineHeight: Platform.select({ ios: 62, android: 62, default: 72 }),
+    fontSize: Platform.select({ ios: 32, android: 32, default: 70 }),
+    lineHeight: Platform.select({ ios: 36, android: 36, default: 72 }),
     fontFamily: Fonts.Bold,
-    marginVertical: 8
+    marginVertical: 6,
+    color: Colors.sway.lightGrey
   },
   subtitle: {
-    fontSize: Platform.select({ ios: 40, android: 40, default: 50 }),
-    lineHeight: Platform.select({ ios: 42, android: 42, default: 50 }),
-    fontFamily: Fonts.Bold,
-    marginBottom: 8
+    fontSize: Platform.select({ ios: 24, android: 24, default: 50 }),
+    lineHeight: Platform.select({ ios: 24, android: 24, default: 50 }),
+    fontFamily: Fonts.Black,
+    marginBottom: 8,
+    color: Colors.sway.white
   },
   smallTitle: {
     fontSize: Platform.select({ ios: 24, android: 24, default: 30 }),
@@ -66,6 +72,13 @@ const styles = StyleSheet.create({
   },
   button: {
     fontSize: Platform.select({ ios: 18, android: 18, default: 22 }),
-    fontFamily: Fonts.Bold
+    fontFamily: Fonts.Bold,
+    lineHeight: 24
+  },
+  error: {
+    fontSize: Platform.select({ ios: 12, android: 12, default: 14 }),
+    lineHeight: Platform.select({ ios: 20, android: 20, default: 24 }),
+    fontFamily: Fonts.Italic,
+    color: Colors.primary.error
   }
 });

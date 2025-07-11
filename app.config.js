@@ -37,6 +37,13 @@ export default {
           resizeMode: 'contain',
           backgroundColor: '#ffffff'
         }
+      ],
+      [
+        'expo-video',
+        {
+          supportsBackgroundPlayback: true,
+          supportsPictureInPicture: true
+        }
       ]
     ],
     experiments: {

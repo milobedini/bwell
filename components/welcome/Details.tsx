@@ -36,7 +36,7 @@ export const Details = ({ scrollY, item, index }: DetailsProps) => {
       <Animated.View style={stylez}>
         <Text
           style={{
-            color: Colors.primary.accent,
+            color: Colors.sway.bright,
             fontFamily: Fonts.BoldItalic,
             fontSize: 40,
             marginBottom: welcomeConstants.spacing / 2,
@@ -59,7 +59,7 @@ export const Details = ({ scrollY, item, index }: DetailsProps) => {
           style={{
             color: '#fff',
             fontSize: 18,
-            fontFamily: Fonts.Regular,
+            fontFamily: Fonts.Bold,
             textTransform: 'uppercase'
           }}
         >
