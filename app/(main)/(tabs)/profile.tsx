@@ -19,14 +19,14 @@ export default function Profile() {
   }, [logout]);
 
   useEffect(() => {
-    if (logoutSuccess) {
+    if (logoutSuccess || isError) {
       router.replace('/(auth)/login');
     }
-  }, [logoutSuccess, router]);
+  }, [logoutSuccess, router, isError]);
 
   if (isPending) return <LoadingIndicator marginBottom={0} />;
 
-  if (isError) return <ErrorComponent errorType={ErrorTypes.NOT_FOUND} />;
+  if (!data) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
     <Container>

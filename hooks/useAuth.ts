@@ -49,6 +49,7 @@ export const useProfile = () => {
     queryFn: async () => {
       const { data } = await api.get<AuthUser>('/user');
       return data;
-    }
+    },
+    retry: 2
   });
 };

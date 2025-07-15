@@ -1,5 +1,4 @@
-import { View } from 'react-native';
-
+import Container from './Container';
 import { ThemedText } from './ThemedText';
 
 enum ErrorTypes {
@@ -13,33 +12,33 @@ const ErrorComponent = ({ errorType }: { errorType: ErrorTypes }) => {
   switch (errorType) {
     case ErrorTypes.NO_CONTENT:
       return (
-        <View>
+        <Container>
           <ThemedText>No content available</ThemedText>
-        </View>
+        </Container>
       );
     case ErrorTypes.NOT_FOUND:
       return (
-        <View>
+        <Container>
           <ThemedText>Resource not found</ThemedText>
-        </View>
+        </Container>
       );
     case ErrorTypes.UNAUTHORIZED:
       return (
-        <View>
+        <Container>
           <ThemedText>Unauthorized access</ThemedText>
-        </View>
+        </Container>
       );
     case ErrorTypes.VALIDATION_ERROR:
       return (
-        <View>
+        <Container>
           <ThemedText>Validation error occurred</ThemedText>
-        </View>
+        </Container>
       );
     default:
       return (
-        <View>
+        <Container>
           <ThemedText>Unknown error occurred</ThemedText>
-        </View>
+        </Container>
       );
   }
 };

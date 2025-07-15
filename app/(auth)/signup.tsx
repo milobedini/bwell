@@ -70,7 +70,7 @@ const AnimatedText = motify(Text)();
 export default function Signup() {
   const [apiError, setApiError] = useState('');
 
-  const player = useVideoPlayer(require('../../components/sign-in/waves.mp4'), (player) => {
+  const player = useVideoPlayer(require('../../components/sign-up/leaves.mp4'), (player) => {
     player.loop = true;
     player.play();
   });
