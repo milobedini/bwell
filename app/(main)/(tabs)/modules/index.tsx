@@ -1,5 +1,5 @@
 import { Image, View } from 'react-native';
-import ErrorStates, { ErrorTypes } from '@/components/ErrorStates';
+import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import ScrollContainer from '@/components/ScrollContainer';
 import { ThemedText } from '@/components/ThemedText';
@@ -9,7 +9,7 @@ export default function ModuleList() {
   const { data: modules, isPending } = useModules();
 
   if (!modules || !modules.length) {
-    return <ErrorStates errorType={ErrorTypes.NO_CONTENT} />;
+    return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
   }
 
   return (

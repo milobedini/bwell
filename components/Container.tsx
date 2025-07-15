@@ -14,7 +14,7 @@ const Container = ({ children, className, centered, ...rest }: ContainerProps) =
       <SafeAreaView
         edges={['top']}
         className={clsx(
-          'bg-sway-dark flex-1 px-3',
+          'flex-1 bg-sway-dark px-3',
           centered && 'items-center',
           Platform.OS === 'web' && 'pt-4',
           className

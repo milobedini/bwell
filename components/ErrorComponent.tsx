@@ -9,7 +9,7 @@ enum ErrorTypes {
   VALIDATION_ERROR = 'ValidationError'
 }
 
-const ErrorStates = ({ errorType }: { errorType: ErrorTypes }) => {
+const ErrorComponent = ({ errorType }: { errorType: ErrorTypes }) => {
   switch (errorType) {
     case ErrorTypes.NO_CONTENT:
       return (
@@ -44,5 +44,5 @@ const ErrorStates = ({ errorType }: { errorType: ErrorTypes }) => {
   }
 };
 
-export default ErrorStates;
+export default ErrorComponent;
 export { ErrorTypes };

@@ -49,7 +49,8 @@ export default function RootLayout() {
         if (onboarded) {
           router.replace('/(auth)/login');
         } else {
-          router.replace('/(welcome)/ready');
+          // router.replace('/(welcome)/ready');
+          router.replace('/home');
         }
       }
     }

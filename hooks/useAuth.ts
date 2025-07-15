@@ -1,6 +1,6 @@
 import { api } from '@/api/api';
-import type { AuthResponse, LoginInput, RegisterInput, VerifyInput } from '@milobedini/shared-types';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { AuthResponse, AuthUser, LoginInput, RegisterInput, VerifyInput } from '@milobedini/shared-types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const useRegister = () => {
   return useMutation<AuthResponse, Error, RegisterInput>({
@@ -38,6 +38,16 @@ export const useVerify = () => {
   return useMutation<AuthResponse, Error, VerifyInput>({
     mutationFn: async (body) => {
       const { data } = await api.post<AuthResponse>('/verify-email', body);
+      return data;
+    }
+  });
+};
+
+export const useProfile = () => {
+  return useQuery<AuthUser>({
+    queryKey: ['user'],
+    queryFn: async () => {
+      const { data } = await api.get<AuthUser>('/user');
       return data;
     }
   });
