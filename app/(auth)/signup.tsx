@@ -82,8 +82,6 @@ export default function Signup() {
 
   const initialValues: RegisterInput = { username: '', email: '', password: '' };
 
-  const [inProgress, _setInProgress] = useState(false);
-
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const dynamicAnimation = useDynamicAnimation(() => ({
     opacity: 0,
@@ -223,7 +221,7 @@ export default function Signup() {
                     setApiError('');
                     register.mutate(values, {
                       onSuccess: () => {
-                        router.replace('/home');
+                        router.replace('/(auth)/verify');
                       },
                       onError: (error) => {
                         setApiError(axiosErrorString(error));
@@ -238,7 +236,7 @@ export default function Signup() {
                         autoCorrect={false}
                         autoFocus
                         clearButtonMode="while-editing"
-                        editable={!inProgress}
+                        editable={!isPending}
                         placeholder="Email"
                         returnKeyType="send"
                         onSubmitEditing={() => handleSubmit()}
@@ -253,7 +251,7 @@ export default function Signup() {
                         autoCapitalize="none"
                         autoCorrect={false}
                         clearButtonMode="while-editing"
-                        editable={!inProgress}
+                        editable={!isPending}
                         placeholder="Username"
                         returnKeyType="send"
                         onSubmitEditing={() => handleSubmit()}
@@ -267,7 +265,7 @@ export default function Signup() {
                         autoCapitalize="none"
                         autoCorrect={false}
                         clearButtonMode="while-editing"
-                        editable={!inProgress}
+                        editable={!isPending}
                         enablesReturnKeyAutomatically
                         placeholder="Password"
                         returnKeyType="send"

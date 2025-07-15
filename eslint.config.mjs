@@ -1,4 +1,3 @@
-// eslint.config.js
 import expoConfig from 'eslint-config-expo/flat.js';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import tailwindcss from 'eslint-plugin-tailwindcss';
@@ -16,7 +15,7 @@ export default defineConfig([
       'no-undef': 'error',
       'react/react-in-jsx-scope': 'off',
       'tailwindcss/no-custom-classname': 'off',
-
+      'no-console': 'warn',
       'simple-import-sort/imports': [
         'error',
         {

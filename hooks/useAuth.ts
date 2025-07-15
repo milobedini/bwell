@@ -1,5 +1,5 @@
 import { api } from '@/api/api';
-import { AuthResponse, LoginInput, RegisterInput } from '@milobedini/shared-types';
+import type { AuthResponse, LoginInput, RegisterInput, VerifyInput } from '@milobedini/shared-types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const useRegister = () => {
@@ -30,6 +30,15 @@ export const useLogout = () => {
     },
     onSuccess: () => {
       queryClient.clear();
+    }
+  });
+};
+
+export const useVerify = () => {
+  return useMutation<AuthResponse, Error, VerifyInput>({
+    mutationFn: async (body) => {
+      const { data } = await api.post<AuthResponse>('/verify-email', body);
+      return data;
     }
   });
 };

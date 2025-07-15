@@ -81,8 +81,6 @@ export default function Login() {
 
   const initialValues: LoginInput = { identifier: '', password: '' };
 
-  const [inProgress, _setInProgress] = useState(false);
-
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const dynamicAnimation = useDynamicAnimation(() => ({
     opacity: 0,
@@ -237,7 +235,7 @@ export default function Login() {
                         autoCorrect={false}
                         autoFocus
                         clearButtonMode="while-editing"
-                        editable={!inProgress}
+                        editable={!isPending}
                         placeholder="Email or Username"
                         returnKeyType="send"
                         onSubmitEditing={() => handleSubmit()}
@@ -253,7 +251,7 @@ export default function Login() {
                         autoCapitalize="none"
                         autoCorrect={false}
                         clearButtonMode="while-editing"
-                        editable={!inProgress}
+                        editable={!isPending}
                         enablesReturnKeyAutomatically
                         placeholder="Password"
                         returnKeyType="send"

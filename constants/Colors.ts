@@ -17,6 +17,7 @@ export const Colors = {
   sway: {
     dark: '#0c1527',
     lightGrey: '#e0e9f3',
+    darkGrey: '#a6adbb',
     bright: '#18cdba',
     white: '#eef6ff'
   }

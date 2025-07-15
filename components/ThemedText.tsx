@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     lineHeight: 24
   },
   error: {
-    fontSize: Platform.select({ ios: 12, android: 12, default: 14 }),
+    fontSize: Platform.select({ ios: 14, android: 14, default: 16 }),
     lineHeight: Platform.select({ ios: 20, android: 20, default: 24 }),
     fontFamily: Fonts.Italic,
     color: Colors.primary.error
