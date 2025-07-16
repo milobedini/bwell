@@ -3,6 +3,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFonts } from 'expo-font';
 import { Slot, SplashScreen, useRouter } from 'expo-router';
 import { LoadingIndicator } from '@/components/LoadingScreen';
+import { useAuthStore } from '@/stores/authStore';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import 'react-native-reanimated';
@@ -27,10 +28,10 @@ export default function RootLayout() {
 
   const queryClient = new QueryClient();
 
-  const [loggedIn, _setLoggedIn] = useState(false);
-
   const [layoutMounted, setLayoutMounted] = useState(false);
-  const [onboarded, _setOnboarded] = useState(false);
+  const [onboarded, _setOnboarded] = useState(true);
+
+  const user = useAuthStore((s) => s.user);
 
   const router = useRouter();
 
@@ -43,18 +44,17 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (layoutMounted) {
-      if (loggedIn) {
+      if (user) {
         router.replace('/(main)/(tabs)/home');
       } else {
         if (onboarded) {
           router.replace('/(auth)/login');
         } else {
-          // router.replace('/(welcome)/ready');
-          router.replace('/home');
+          router.replace('/(welcome)/ready');
         }
       }
     }
-  }, [layoutMounted, loggedIn, onboarded, router]);
+  }, [layoutMounted, user, onboarded, router]);
 
   if (!fontsLoaded) return <LoadingIndicator marginBottom={0} />;
 

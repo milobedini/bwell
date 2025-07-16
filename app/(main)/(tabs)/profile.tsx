@@ -6,10 +6,12 @@ import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
-import { useLogout, useProfile } from '@/hooks/useAuth';
+import { useLogout } from '@/hooks/useAuth';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function Profile() {
-  const { data, isPending, isError } = useProfile();
+  const user = useAuthStore((s) => s.user);
+
   const logout = useLogout();
   const { isSuccess: logoutSuccess } = logout;
   const router = useRouter();
@@ -19,23 +21,23 @@ export default function Profile() {
   }, [logout]);
 
   useEffect(() => {
-    if (logoutSuccess || isError) {
+    if (logoutSuccess) {
       router.replace('/(auth)/login');
     }
-  }, [logoutSuccess, router, isError]);
+  }, [logoutSuccess, router]);
 
-  if (isPending) return <LoadingIndicator marginBottom={0} />;
+  if (logout.isPending) return <LoadingIndicator marginBottom={0} />;
 
-  if (!data) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
+  if (!user) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
     <Container>
       <ThemedText type="title" className="text-center">
-        {data.username}
+        {user.username}
       </ThemedText>
       <View className="gap-2 p-4">
-        <ThemedText>Your registered email is {data.email}</ThemedText>
-        <ThemedButton onPress={handleLogout} disabled={isPending}>
+        <ThemedText>Your registered email is {user.email}</ThemedText>
+        <ThemedButton onPress={handleLogout} disabled={!user}>
           Log Out
         </ThemedButton>
       </View>
