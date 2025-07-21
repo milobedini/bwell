@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Dimensions, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { RadioButton } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useVideoPlayer, VideoView } from 'expo-video';
@@ -11,10 +12,11 @@ import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useRegister } from '@/hooks/useAuth';
+import { UserRole } from '@/types/types';
 import axiosErrorString from '@/utils/axiosErrorString';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
-import type { RegisterInput } from '@milobedini/shared-types';
+import { type RegisterInput } from '@milobedini/shared-types';
 
 const styles = StyleSheet.create({
   container: {
@@ -60,7 +62,10 @@ const styles = StyleSheet.create({
 const SignupSchema = Yup.object().shape({
   username: Yup.string().min(3, 'Username must be at least 3 characters').required('Username is required'),
   email: Yup.string().email('Please enter a valid email address').required('Email or username is required'),
-  password: Yup.string().min(8, 'Password must be at least 8 characters').required('Password is required')
+  password: Yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
+  roles: Yup.array()
+    .of(Yup.mixed<UserRole>().oneOf(Object.values(UserRole), 'Invalid role provided'))
+    .min(1, 'At least one role is required')
 });
 
 const { width, height } = Dimensions.get('screen');
@@ -80,7 +85,7 @@ export default function Signup() {
 
   const router = useRouter();
 
-  const initialValues: RegisterInput = { username: '', email: '', password: '' };
+  const initialValues: RegisterInput = { username: '', email: '', password: '', roles: [UserRole.PATIENT] };
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const dynamicAnimation = useDynamicAnimation(() => ({
@@ -229,7 +234,7 @@ export default function Signup() {
                     });
                   }}
                 >
-                  {({ handleSubmit, values, touched, errors, handleBlur, handleChange }) => (
+                  {({ handleSubmit, values, touched, errors, handleBlur, handleChange, setFieldValue }) => (
                     <>
                       <TextInput
                         autoCapitalize="none"
@@ -277,7 +282,29 @@ export default function Signup() {
                         className="h-[64px] rounded border-b-[1px] border-b-black"
                       />
                       {touched.password && errors.password && <ThemedText type="error">{errors.password}</ThemedText>}
-
+                      <RadioButton.Group
+                        onValueChange={(role) => {
+                          setFieldValue('roles', [role]);
+                        }}
+                        value={values.roles[0] || ''}
+                      >
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <RadioButton
+                            value={UserRole.PATIENT}
+                            color={Colors.sway.bright}
+                            uncheckedColor={Colors.sway.lightGrey}
+                          />
+                          <ThemedText type="link">Patient</ThemedText>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <RadioButton
+                            value={UserRole.THERAPIST}
+                            color={Colors.sway.bright}
+                            uncheckedColor={Colors.sway.lightGrey}
+                          />
+                          <ThemedText type="link">Therapist</ThemedText>
+                        </View>
+                      </RadioButton.Group>
                       <MotiView
                         state={dynamicAnimation}
                         delay={500}
