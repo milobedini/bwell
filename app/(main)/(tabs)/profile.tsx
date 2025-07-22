@@ -1,13 +1,14 @@
 import { useCallback, useEffect } from 'react';
-import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Container from '@/components/Container';
+import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import { useLogout } from '@/hooks/useAuth';
 import { useAuthStore } from '@/stores/authStore';
+import { displayUserRoles } from '@/utils/displayUserRoles';
 
 export default function Profile() {
   const user = useAuthStore((s) => s.user);
@@ -35,12 +36,13 @@ export default function Profile() {
       <ThemedText type="title" className="text-center">
         {user.username}
       </ThemedText>
-      <View className="gap-2 p-4">
-        <ThemedText>Your registered email is {user.email}</ThemedText>
+      <ContentContainer className="gap-2 p-4">
+        <ThemedText>Assigned roles: {displayUserRoles(user.roles)}</ThemedText>
+        <ThemedText>Your registered email is: {user.email}</ThemedText>
         <ThemedButton onPress={handleLogout} disabled={!user}>
           Log Out
         </ThemedButton>
-      </View>
+      </ContentContainer>
     </Container>
   );
 }

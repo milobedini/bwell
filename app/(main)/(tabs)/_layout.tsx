@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function MainTabsLayout() {
   return (
-    <Tabs>
+    <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
         name="home"
         options={{
@@ -12,9 +12,9 @@ export default function MainTabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="modules"
+        name="programs"
         options={{
-          title: 'Modules',
+          title: 'Programs',
           tabBarIcon: ({ color, size }) => <Ionicons name="albums" color={color} size={size} />
         }}
       />

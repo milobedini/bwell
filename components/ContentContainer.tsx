@@ -7,7 +7,7 @@ type ContentContainerProps = ViewProps & {
 
 const ContentContainer = ({ children, className, centered, ...rest }: ContentContainerProps) => {
   return (
-    <View className={clsx('w-full flex-1 px-2', centered && 'items-center', className)} {...rest}>
+    <View className={clsx('px-4', centered && 'items-center', className)} {...rest}>
       {children}
     </View>
   );

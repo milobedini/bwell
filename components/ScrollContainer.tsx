@@ -10,9 +10,9 @@ type ScrollContainerProps = SafeAreaViewProps & {
 const ScrollContainer = ({ children, className, contentClassName, centered, ...rest }: ScrollContainerProps) => {
   return (
     <SafeAreaProvider>
-      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+      <SafeAreaView edges={['top']} style={{ flex: 1 }} className="bg-sway-dark">
         <ScrollView
-          className={clsx('bg-sway-dark flex-1 px-3', className)}
+          className={clsx('flex-1 bg-sway-dark px-4', className)}
           contentContainerStyle={{
             paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 8 : 12
           }}
