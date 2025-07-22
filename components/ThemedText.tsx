@@ -52,7 +52,8 @@ const styles = StyleSheet.create({
     fontSize: Platform.select({ ios: 24, android: 24, default: 30 }),
     lineHeight: Platform.select({ ios: 26, android: 26, default: 30 }),
     fontFamily: Fonts.Black,
-    marginBottom: 8
+    marginBottom: 8,
+    color: Colors.sway.white
   },
   link: {
     fontSize: Platform.select({ ios: 13, android: 13, default: 15 }),

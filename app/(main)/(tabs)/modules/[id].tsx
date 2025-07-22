@@ -11,8 +11,3 @@ export default function ModuleDetail() {
     </Container>
   );
 }
-
-export const options = {
-  headerShown: true,
-  title: 'Module Detail'
-};

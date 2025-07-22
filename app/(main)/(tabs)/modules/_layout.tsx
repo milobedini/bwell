@@ -4,7 +4,7 @@ export default function ModulesStack() {
   return (
     <Stack
       screenOptions={{
-        headerShown: false // default hidden
+        headerShown: true // default hidden
       }}
     />
   );
