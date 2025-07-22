@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     lineHeight: Platform.select({ ios: 36, android: 36, default: 72 }),
     fontFamily: Fonts.Bold,
     marginVertical: 6,
-    color: Colors.sway.lightGrey
+    color: Colors.sway.white
   },
   subtitle: {
     fontSize: Platform.select({ ios: 24, android: 24, default: 50 }),
@@ -59,17 +59,20 @@ const styles = StyleSheet.create({
     fontSize: Platform.select({ ios: 13, android: 13, default: 15 }),
     lineHeight: Platform.select({ ios: 16, android: 16, default: 18 }),
     fontFamily: Fonts.Regular,
-    textTransform: 'uppercase'
+    textTransform: 'uppercase',
+    color: Colors.sway.white
   },
   small: {
     fontSize: Platform.select({ ios: 12, android: 12, default: 14 }),
     lineHeight: Platform.select({ ios: 20, android: 20, default: 24 }),
-    fontFamily: Fonts.Regular
+    fontFamily: Fonts.Regular,
+    color: Colors.sway.white
   },
   italic: {
     fontSize: Platform.select({ ios: 12, android: 12, default: 14 }),
     lineHeight: Platform.select({ ios: 20, android: 20, default: 24 }),
-    fontFamily: Fonts.Italic
+    fontFamily: Fonts.Italic,
+    color: Colors.sway.white
   },
   button: {
     fontSize: Platform.select({ ios: 18, android: 18, default: 22 }),

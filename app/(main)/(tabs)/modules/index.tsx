@@ -28,8 +28,9 @@ export default function ModuleList() {
       {isPending && <LoadingIndicator marginBottom={0} />}
       {modules?.map((module) => (
         <TouchableOpacity key={module._id} onPress={() => handleModulePress(module._id)}>
-          <ThemedText type="smallTitle">{module.title}</ThemedText>
-          <ThemedText type="italic">{module.description}</ThemedText>
+          <ThemedText type="title">Program ID: {module.program}</ThemedText>
+          <ThemedText type="smallTitle">Module Title: {module.title}</ThemedText>
+          <ThemedText type="italic">Module Description: {module.description}</ThemedText>
           <Image source={{ uri: module.imageUrl }} style={{ width: 300, height: 300 }} resizeMode="cover" />
         </TouchableOpacity>
       ))}
