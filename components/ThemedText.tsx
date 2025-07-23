@@ -4,9 +4,10 @@ import { Fonts } from '@/constants/Typography';
 
 export type ThemedTextProps = TextProps & {
   type?: 'default' | 'title' | 'subtitle' | 'link' | 'small' | 'italic' | 'smallTitle' | 'button' | 'error';
+  className?: string;
 };
 
-export function ThemedText({ style, type = 'default', ...rest }: ThemedTextProps) {
+export function ThemedText({ style, type = 'default', className, ...rest }: ThemedTextProps) {
   return (
     <Text
       style={[
@@ -21,6 +22,7 @@ export function ThemedText({ style, type = 'default', ...rest }: ThemedTextProps
         type === 'error' && styles.error,
         style
       ]}
+      className={className}
       {...rest}
     />
   );
@@ -59,8 +61,7 @@ const styles = StyleSheet.create({
     fontSize: Platform.select({ ios: 13, android: 13, default: 15 }),
     lineHeight: Platform.select({ ios: 16, android: 16, default: 18 }),
     fontFamily: Fonts.Regular,
-    textTransform: 'uppercase',
-    color: Colors.sway.white
+    textTransform: 'uppercase'
   },
   small: {
     fontSize: Platform.select({ ios: 12, android: 12, default: 14 }),

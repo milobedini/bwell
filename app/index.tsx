@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useRootNavigationState, useRouter } from 'expo-router';
+import { useHasOnboarded } from '@/hooks/useOnboarding';
 import { useAuthStore } from '@/stores/authStore';
 
 function IndexRedirect() {
@@ -8,10 +9,10 @@ function IndexRedirect() {
   const navigatorReady = rootNavigationState?.key != null;
 
   const user = useAuthStore((s) => s.user);
-  const onboarded = true;
+  const onboarded = useHasOnboarded();
 
   useEffect(() => {
-    if (!navigatorReady) return;
+    if (!navigatorReady || onboarded === null) return;
     if (user) {
       router.replace('/(main)/(tabs)/home');
     } else if (onboarded) {
