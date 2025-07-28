@@ -73,7 +73,8 @@ const styles = StyleSheet.create({
     fontSize: Platform.select({ ios: 12, android: 12, default: 14 }),
     lineHeight: Platform.select({ ios: 20, android: 20, default: 24 }),
     fontFamily: Fonts.Italic,
-    color: Colors.sway.white
+    color: Colors.sway.white,
+    marginVertical: 6
   },
   button: {
     fontSize: Platform.select({ ios: 18, android: 18, default: 22 }),

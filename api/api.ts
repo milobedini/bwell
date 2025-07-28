@@ -29,11 +29,11 @@ api.interceptors.request.use(
 // 🔍 Log every response
 api.interceptors.response.use(
   (response) => {
-    console.log('%c📥 [Response]', 'color: green', {
-      url: response.config.url,
-      status: response.status,
-      data: response.data
-    });
+    // console.log('%c📥 [Response]', 'color: green', {
+    //   url: response.config.url,
+    //   status: response.status,
+    //   data: response.data
+    // });
     return response;
   },
   (error) => {
