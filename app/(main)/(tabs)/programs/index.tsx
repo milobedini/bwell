@@ -18,15 +18,16 @@ export default function ProgramList() {
     [router]
   );
 
-  if (isError || !programs || !programs.length) {
-    return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
-  }
+  if (isPending) return <LoadingIndicator marginBottom={0} />;
+
+  if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
+
+  if (!programs || !programs.length) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
     <ScrollContainer contentClassName="gap-4">
       <ThemedText type="subtitle">Programs List</ThemedText>
-      {isPending && <LoadingIndicator marginBottom={0} />}
-      {programs?.map((program) => (
+      {programs.map((program) => (
         <TouchableOpacity key={program._id} onPress={() => handleProgramPress(program._id)}>
           <View className="border border-sway-lightGrey p-4">
             <ThemedText type="smallTitle">{program.title}</ThemedText>

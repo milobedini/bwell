@@ -3,62 +3,53 @@ import { View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
+import ModuleSummary from '@/components/module/ModuleSummary';
+import QuestionsPresenter from '@/components/module/QuestionsPresenter';
+import ScoreBandsPresenter from '@/components/module/ScoreBandsPresenter';
 import ScrollContainer from '@/components/ScrollContainer';
 import ScrollContentContainer from '@/components/ScrollContentContainer';
-import { ThemedText } from '@/components/ThemedText';
+import ThemedButton from '@/components/ThemedButton';
 import { useModuleById } from '@/hooks/useModules';
+import useToggle from '@/hooks/useToggle';
+import { ModuleType } from '@/types/types';
 
 const ModuleDetail = () => {
   const moduleId = useLocalSearchParams().moduleId;
   const { data, isPending, isError } = useModuleById(moduleId as string);
+  const [open, toggleOpen] = useToggle(false);
 
-  if (isPending) {
-    return <LoadingIndicator marginBottom={0} />;
-  }
+  if (isPending) return <LoadingIndicator marginBottom={0} />;
 
-  if (isError || !data) {
-    return <ErrorComponent errorType={ErrorTypes.NOT_FOUND} />;
-  }
+  if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
+
+  if (!data) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   const { module, questions, scoreBands } = data;
 
   return (
     <ScrollContainer>
       <ScrollContentContainer>
-        <View className="border-b border-b-white ">
-          <ThemedText>Module Detail: {module._id}</ThemedText>
-          <ThemedText type="title">{module.title}</ThemedText>
-          <ThemedText type="subtitle">{module.program.title} Program</ThemedText>
-          <ThemedText>{module.description}</ThemedText>
-          <ThemedText type="italic">{module.disclaimer}</ThemedText>
+        {/* Module Summary */}
+        <View className="gap-2">
+          <ModuleSummary module={module} />
+          <ThemedButton onPress={toggleOpen}>{open ? 'Close module' : 'Take module'}</ThemedButton>
         </View>
-        <View className="mt-4">
-          {questions &&
-            questions.map((question) => (
-              <View key={question._id} className="my-2">
-                <ThemedText type="smallTitle">
-                  {question.order}) {question.text}
-                </ThemedText>
-                <View>
-                  {question.choices.map((choice) => (
-                    <ThemedText key={choice.text}>{choice.text}</ThemedText>
-                  ))}
-                </View>
-              </View>
-            ))}
-        </View>
-        <View className="mt-4">
-          <ThemedText type="subtitle">Results meaning</ThemedText>
-          {scoreBands &&
-            scoreBands.map((band) => (
-              <View key={band._id} className="my-2 border-b border-b-sway-lightGrey">
-                <ThemedText>
-                  Score {band.min} to {band.max} - {band.label}
-                </ThemedText>
-                <ThemedText>{band.interpretation}</ThemedText>
-              </View>
-            ))}
-        </View>
+        {/* Button to actually begin module, for now just show and hide toggle. */}
+        {/* Todo - separate switch cases for module types, below is all questionnaire based. */}
+        {/* Main Content */}
+        {open && (
+          <>
+            <View className="mt-4">
+              {module.type === ModuleType.QUESTIONNAIRE && questions && !!questions.length && (
+                <QuestionsPresenter questions={questions} />
+              )}
+            </View>
+            {/* Helper Content */}
+            <View className="mt-4">
+              {scoreBands && !!scoreBands.length && <ScoreBandsPresenter scoreBands={scoreBands} />}
+            </View>
+          </>
+        )}
       </ScrollContentContainer>
     </ScrollContainer>
   );

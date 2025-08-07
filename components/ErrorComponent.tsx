@@ -5,7 +5,8 @@ enum ErrorTypes {
   NO_CONTENT = 'NoContentError',
   NOT_FOUND = 'NotFoundError',
   UNAUTHORIZED = 'UnauthorizedError',
-  VALIDATION_ERROR = 'ValidationError'
+  VALIDATION_ERROR = 'ValidationError',
+  GENERAL_ERROR = 'GeneralError'
 }
 
 const ErrorComponent = ({ errorType }: { errorType: ErrorTypes }) => {
@@ -32,6 +33,12 @@ const ErrorComponent = ({ errorType }: { errorType: ErrorTypes }) => {
       return (
         <Container>
           <ThemedText>Validation error occurred</ThemedText>
+        </Container>
+      );
+    case ErrorTypes.GENERAL_ERROR:
+      return (
+        <Container>
+          <ThemedText>Something went wrong</ThemedText>
         </Container>
       );
     default:

@@ -4,4 +4,10 @@ enum UserRole {
   ADMIN = 'admin'
 }
 
-export { UserRole };
+enum ModuleType {
+  QUESTIONNAIRE = 'questionnaire',
+  EXERCISE = 'exercise',
+  PSYCHO_EDUCATION = 'psychoeducation'
+}
+
+export { ModuleType, UserRole };
