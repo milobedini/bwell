@@ -27,8 +27,6 @@ export default function Profile() {
     }
   }, [logoutSuccess, router]);
 
-  console.log(user?.roles);
-
   if (logout.isPending) return <LoadingIndicator marginBottom={0} />;
 
   if (!user) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
