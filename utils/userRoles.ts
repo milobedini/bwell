@@ -4,4 +4,8 @@ const displayUserRoles = (roles: AuthUser['roles']): string => {
   return roles.join(', ');
 };
 
-export { displayUserRoles };
+const isTherapist = (roles: AuthUser['roles']): boolean => {
+  return roles.includes('therapist');
+};
+
+export { displayUserRoles, isTherapist };

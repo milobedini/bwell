@@ -8,7 +8,7 @@ import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import { useLogout } from '@/hooks/useAuth';
 import { useAuthStore } from '@/stores/authStore';
-import { displayUserRoles } from '@/utils/displayUserRoles';
+import { displayUserRoles, isTherapist } from '@/utils/userRoles';
 
 export default function Profile() {
   const user = useAuthStore((s) => s.user);
@@ -27,6 +27,8 @@ export default function Profile() {
     }
   }, [logoutSuccess, router]);
 
+  console.log(user?.roles);
+
   if (logout.isPending) return <LoadingIndicator marginBottom={0} />;
 
   if (!user) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
@@ -38,6 +40,13 @@ export default function Profile() {
       </ThemedText>
       <ContentContainer className="gap-2 p-4">
         <ThemedText>Assigned roles: {displayUserRoles(user.roles)}</ThemedText>
+        {isTherapist(user.roles) && (
+          <ThemedText>
+            {user.isVerifiedTherapist
+              ? 'You are an approved BWell therapist'
+              : 'Your therapist verification is pending'}
+          </ThemedText>
+        )}
         <ThemedText>Your registered email is: {user.email}</ThemedText>
         <ThemedButton onPress={handleLogout} disabled={!user}>
           Log Out
