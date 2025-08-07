@@ -1,11 +1,6 @@
 import { Stack } from 'expo-router';
+import { stackScreenOptions } from '@/utils/defaultScreenOptions';
 
 export default function ModuleDetailStack() {
-  return (
-    <Stack
-      screenOptions={{
-        headerShown: false // default hidden
-      }}
-    />
-  );
+  return <Stack screenOptions={stackScreenOptions} />;
 }
