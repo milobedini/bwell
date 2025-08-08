@@ -32,6 +32,10 @@ export const useModules = () => {
   return useQuery<Module[]>({
     queryKey: ['modules'],
     queryFn: fetchModules
+    // Cache for inactive data below, default is 5 mins.
+    // staleTime: 1000 * 60 * 60 * 24 * 7, // 7 days, use once in prod
+    // refetchOnWindowFocus: false,
+    // refetchOnMount: false
   });
 };
 

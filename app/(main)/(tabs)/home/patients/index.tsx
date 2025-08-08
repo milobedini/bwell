@@ -1,54 +1,63 @@
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { Menu } from 'react-native-paper';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import ScrollContainer from '@/components/ScrollContainer';
 import { ThemedText } from '@/components/ThemedText';
-import IconButton from '@/components/ui/IconButton';
-import { Colors } from '@/constants/Colors';
+import FabGroup from '@/components/ui/fab/FabGroup';
+import FabTrigger from '@/components/ui/fab/FabTrigger';
+import getPatientOptions from '@/components/ui/fab/getPatientOptions';
 import { useAllPatients } from '@/hooks/useUsers';
 
 const AllPatients = () => {
   const { data: patients, isPending, isError } = useAllPatients();
-  const [openMenuPatientId, setOpenMenuPatientId] = useState<string | null>(null);
+  const [openFab, setOpenFab] = useState(false);
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+
+  const selectedPatient = useMemo(
+    () => patients?.find((p) => p._id === selectedPatientId),
+    [patients, selectedPatientId]
+  );
+  const closeMenu = useCallback(() => {
+    setOpenFab(false);
+    setSelectedPatientId(null);
+  }, []);
+
+  const actions = useMemo(() => getPatientOptions(closeMenu, selectedPatient), [selectedPatient, closeMenu]);
 
   if (isPending) return <LoadingIndicator marginBottom={0} />;
-
   if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
-
   if (!patients || !patients.length) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
-    <ScrollContainer>
-      {patients?.map((patient) => (
-        <View key={patient._id} className="mb-4 border-b border-sway-lightGrey py-2">
-          <Menu
-            visible={openMenuPatientId === patient._id}
-            onDismiss={() => setOpenMenuPatientId(null)}
-            contentStyle={{
-              backgroundColor: Colors.sway.lightGrey,
-              left: '100%'
-            }}
-            anchor={
-              <>
-                <ThemedText type="smallTitle">{patient.email}</ThemedText>
-                <View className="w-full flex-row items-center justify-between">
-                  <ThemedText>{patient.username}</ThemedText>
-                  <IconButton name="chevron.down.circle.fill" onPress={() => setOpenMenuPatientId(patient._id)} />
-                </View>
-              </>
-            }
-            anchorPosition="top"
+    <>
+      <ScrollContainer>
+        {patients.map((patient) => (
+          <View
+            key={patient._id}
+            className="mb-4 flex-row items-center justify-between rounded-md border-b border-sway-lightGrey pb-4"
           >
-            <Menu.Item
-              title={`Accept ${patient.username}`}
-              // style={{ borderBottomWidth: 1 }}
+            <View>
+              <ThemedText type="smallTitle">{patient.email}</ThemedText>
+              <ThemedText>{patient.username}</ThemedText>
+            </View>
+            <FabTrigger
+              onPress={() => {
+                setSelectedPatientId(patient._id);
+                setOpenFab(true);
+              }}
             />
-          </Menu>
-        </View>
-      ))}
-    </ScrollContainer>
+          </View>
+        ))}
+      </ScrollContainer>
+      <FabGroup
+        visible={selectedPatientId !== null}
+        open={openFab}
+        onOpenChange={setOpenFab}
+        onDismiss={closeMenu}
+        actions={actions}
+      />
+    </>
   );
 };
 
