@@ -46,6 +46,7 @@ const AllPatients = () => {
                 setSelectedPatientId(patient._id);
                 setOpenFab(true);
               }}
+              icon="dots-horizontal"
             />
           </View>
         ))}

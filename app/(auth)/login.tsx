@@ -2,7 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { Dimensions, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useVideoPlayer, VideoView } from 'expo-video';
+import { useVideoPlayer, type VideoSource, VideoView } from 'expo-video';
 import { Formik } from 'formik';
 import { motify, MotiView, useDynamicAnimation } from 'moti';
 import * as Yup from 'yup';
@@ -15,6 +15,8 @@ import axiosErrorString from '@/utils/axiosErrorString';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
 import { LoginInput } from '@milobedini/shared-types';
+
+import assetId from '../../components/sign-in/waves.mp4';
 
 const styles = StyleSheet.create({
   container: {
@@ -69,7 +71,11 @@ const AnimatedText = motify(Text)();
 export default function Login() {
   const [apiError, setApiError] = useState('');
 
-  const player = useVideoPlayer(require('../../components/sign-in/waves.mp4'), (player) => {
+  const videoSource: VideoSource = { assetId, useCaching: true };
+
+  const player = useVideoPlayer(videoSource, (player) => {
+    player.audioMixingMode = 'mixWithOthers';
+    player.muted = true;
     player.loop = true;
     player.play();
   });
