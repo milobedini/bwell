@@ -1,5 +1,5 @@
 import { api } from '@/api/api';
-import type { AddRemoveClientInput, AddRemoveClientResponse, PatientsResponse } from '@milobedini/shared-types';
+import type { AddRemoveTherapistInput, AddRemoveTherapistResponse, PatientsResponse } from '@milobedini/shared-types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const useAllPatients = () => {
@@ -30,17 +30,17 @@ export const useClients = () => {
   });
 };
 
-export const useAddRemoveClient = () => {
+export const useAddRemoveTherapist = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<AddRemoveClientResponse, Error, AddRemoveClientInput>({
-    mutationFn: async (clientData): Promise<AddRemoveClientResponse> => {
-      const { data } = await api.post<AddRemoveClientResponse>('/user/clients', clientData);
+  return useMutation<AddRemoveTherapistResponse, Error, AddRemoveTherapistInput>({
+    mutationFn: async (clientData): Promise<AddRemoveTherapistResponse> => {
+      const { data } = await api.post<AddRemoveTherapistResponse>('/user/assign', clientData);
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['patients'] });
-      queryClient.invalidateQueries({ queryKey: ['clients'] });
+      queryClient.refetchQueries({ queryKey: ['patients'] });
+      queryClient.refetchQueries({ queryKey: ['clients'] });
     }
   });
 };

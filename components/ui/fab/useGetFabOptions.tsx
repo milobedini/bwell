@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { useAddRemoveClient } from '@/hooks/useUsers';
+import { useAddRemoveTherapist } from '@/hooks/useUsers';
+import { useAuthStore } from '@/stores/authStore';
 import type { AuthUser, User } from '@milobedini/shared-types';
 
 import { FabGroupAction } from './FabGroup';
@@ -17,12 +18,13 @@ type FabOptionsProps = {
 };
 
 const useGetFabOptions = ({ variant, closeMenu, selectedEntity, isClient }: FabOptionsProps): FabGroupAction[] => {
-  const addRemoveClient = useAddRemoveClient();
+  const user = useAuthStore((s) => s.user);
+  const addRemoveTherapist = useAddRemoveTherapist();
 
-  const handleAddRemoveClient = useCallback(() => {
-    if (selectedEntity?._id) {
-      addRemoveClient.mutate(
-        { clientId: selectedEntity._id },
+  const handleAddRemoveTherapist = useCallback(() => {
+    if (selectedEntity?._id && user?._id) {
+      addRemoveTherapist.mutate(
+        { patientId: selectedEntity._id, therapistId: user._id },
         {
           onSuccess: (data) => {
             console.log(data.message);
@@ -37,7 +39,7 @@ const useGetFabOptions = ({ variant, closeMenu, selectedEntity, isClient }: FabO
         }
       );
     }
-  }, [addRemoveClient, closeMenu, selectedEntity?._id]);
+  }, [addRemoveTherapist, closeMenu, selectedEntity?._id, user?._id]);
 
   switch (variant) {
     case FabOptionsVariant.PATIENTS:
@@ -48,7 +50,7 @@ const useGetFabOptions = ({ variant, closeMenu, selectedEntity, isClient }: FabO
           labelTextColor: 'white',
           // color: 'gold',
           style: { backgroundColor: 'white' },
-          onPress: handleAddRemoveClient
+          onPress: handleAddRemoveTherapist
         },
         {
           icon: 'email',
@@ -68,7 +70,7 @@ const useGetFabOptions = ({ variant, closeMenu, selectedEntity, isClient }: FabO
           labelTextColor: 'white',
           // color: 'gold',
           style: { backgroundColor: 'white' },
-          onPress: handleAddRemoveClient
+          onPress: handleAddRemoveTherapist
         },
         {
           icon: 'email',

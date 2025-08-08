@@ -9,11 +9,13 @@ import FabTrigger from '@/components/ui/fab/FabTrigger';
 import useGetFabOptions, { FabOptionsVariant } from '@/components/ui/fab/useGetFabOptions';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
-import { useAllPatients, useClients } from '@/hooks/useUsers';
+import { useAllPatients } from '@/hooks/useUsers';
+import { useAuthStore } from '@/stores/authStore';
 
 const AllPatients = () => {
+  const user = useAuthStore((s) => s.user);
+
   const { data: patients, isPending, isError } = useAllPatients();
-  const { data: clients } = useClients();
 
   const [openFab, setOpenFab] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
@@ -22,10 +24,7 @@ const AllPatients = () => {
     () => patients?.find((p) => p._id === selectedPatientId),
     [patients, selectedPatientId]
   );
-  const isClient = useMemo(() => {
-    if (!selectedPatient?._id || !clients) return false;
-    return clients.some((client) => client._id === selectedPatient._id);
-  }, [clients, selectedPatient]);
+  const isClient = selectedPatient?.therapist === user?._id;
 
   const closeMenu = useCallback(() => {
     setOpenFab(false);
@@ -47,7 +46,7 @@ const AllPatients = () => {
     <>
       <ScrollContainer>
         {patients.map((patient) => {
-          const isClient = clients?.some((client) => client._id === patient._id);
+          const isClient = patient?.therapist === user?._id;
 
           return (
             <View
