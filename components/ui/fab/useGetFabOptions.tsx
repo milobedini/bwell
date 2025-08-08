@@ -56,7 +56,6 @@ const useGetFabOptions = ({ variant, closeMenu, selectedEntity, isClient }: FabO
           labelTextColor: 'white',
           style: { backgroundColor: 'white' },
           onPress: () => {
-            console.log('Email to', selectedEntity?.email);
             closeMenu();
           }
         }
