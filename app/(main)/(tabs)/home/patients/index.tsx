@@ -28,8 +28,7 @@ const AllPatients = () => {
             onDismiss={() => setOpenMenuPatientId(null)}
             contentStyle={{
               backgroundColor: Colors.sway.lightGrey,
-              left: '100%',
-              top: -40
+              left: '100%'
             }}
             anchor={
               <>
