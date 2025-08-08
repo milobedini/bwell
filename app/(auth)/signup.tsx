@@ -282,6 +282,7 @@ export default function Signup() {
                         className="h-[64px] rounded border-b-[1px] border-b-black"
                       />
                       {touched.password && errors.password && <ThemedText type="error">{errors.password}</ThemedText>}
+                      {/* TODO - use Paper SegmentedButtons */}
                       <RadioButton.Group
                         onValueChange={(role) => {
                           setFieldValue('roles', [role]);

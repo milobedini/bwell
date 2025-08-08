@@ -7,6 +7,13 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 type IconMapping = Record<SymbolViewProps['name'], ComponentProps<typeof MaterialIcons>['name']>;
 type IconSymbolName = keyof typeof MAPPING;
+type IconSymbolProps = {
+  name: IconSymbolName;
+  size?: number;
+  color?: string | OpaqueColorValue;
+  style?: StyleProp<TextStyle>;
+  weight?: SymbolWeight;
+};
 
 /**
  * Add your SF Symbols to Material Icons mappings here.
@@ -25,17 +32,8 @@ const MAPPING = {
  * This ensures a consistent look across platforms, and optimal resource usage.
  * Icon `name`s are based on SF Symbols and require manual mapping to Material Icons.
  */
-export function IconSymbol({
-  name,
-  size = 24,
-  color,
-  style
-}: {
-  name: IconSymbolName;
-  size?: number;
-  color: string | OpaqueColorValue;
-  style?: StyleProp<TextStyle>;
-  weight?: SymbolWeight;
-}) {
+export function IconSymbol({ name, size = 24, color, style }: IconSymbolProps) {
   return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} />;
 }
+
+export type { IconSymbolProps };
