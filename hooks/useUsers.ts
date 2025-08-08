@@ -1,6 +1,25 @@
 import { api } from '@/api/api';
-import type { AddRemoveTherapistInput, AddRemoveTherapistResponse, PatientsResponse } from '@milobedini/shared-types';
+import type {
+  AddRemoveTherapistInput,
+  AddRemoveTherapistResponse,
+  PatientsResponse,
+  ProfileResponse
+} from '@milobedini/shared-types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+export const useProfile = () => {
+  return useQuery<ProfileResponse>({
+    queryKey: ['profile'],
+    queryFn: async (): Promise<ProfileResponse> => {
+      const { data } = await api.get<ProfileResponse>('/user');
+      return data;
+    },
+    staleTime: 1000 * 60 * 60, // 5 minutes
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false
+  });
+};
 
 export const useAllPatients = () => {
   return useQuery<PatientsResponse>({
@@ -41,6 +60,7 @@ export const useAddRemoveTherapist = () => {
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: ['patients'] });
       queryClient.refetchQueries({ queryKey: ['clients'] });
+      queryClient.refetchQueries({ queryKey: ['profile'] });
     }
   });
 };

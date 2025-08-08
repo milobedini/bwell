@@ -15,6 +15,11 @@ const isTherapist = (roles?: AuthUser['roles']): boolean => {
   return roles.includes(UserRole.THERAPIST);
 };
 
+const isPatient = (roles?: AuthUser['roles']): boolean => {
+  if (!roles) return false;
+  return roles.includes(UserRole.PATIENT);
+};
+
 const isVerifiedTherapist = (user: AuthUser | null): boolean => {
   if (!user) return false;
   if (!user.roles || !user.roles.length) return false;
@@ -27,4 +32,4 @@ const isAdminOrTherapist = (user: AuthUser | null): boolean => {
   return isAdmin(user.roles) || isTherapist(user.roles);
 };
 
-export { displayUserRoles, isAdmin, isAdminOrTherapist, isTherapist, isVerifiedTherapist };
+export { displayUserRoles, isAdmin, isAdminOrTherapist, isPatient, isTherapist, isVerifiedTherapist };

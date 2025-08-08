@@ -77,7 +77,10 @@ const AnimatedText = motify(Text)();
 export default function Signup() {
   const [apiError, setApiError] = useState('');
 
-  const videoSource: VideoSource = { assetId, useCaching: true };
+  const videoSource: VideoSource = {
+    assetId
+    //  useCaching: true
+  };
 
   const player = useVideoPlayer(videoSource, (player) => {
     player.audioMixingMode = 'mixWithOthers';
