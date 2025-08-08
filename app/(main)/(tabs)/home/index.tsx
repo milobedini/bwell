@@ -4,17 +4,17 @@ import ContentContainer from '@/components/ContentContainer';
 import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import { useAuthStore } from '@/stores/authStore';
-import { isTherapist } from '@/utils/userRoles';
+import { isVerifiedTherapist } from '@/utils/userRoles';
 
 export default function Home() {
   const user = useAuthStore((s) => s.user);
   const router = useRouter();
 
-  if (isTherapist(user?.roles))
+  if (isVerifiedTherapist(user))
     return (
       <Container>
         <ContentContainer>
-          <ThemedText>Therapist home</ThemedText>
+          <ThemedText>Verified therapist home</ThemedText>
           <ThemedButton onPress={() => router.push('/home/patients')}>All patients</ThemedButton>
         </ContentContainer>
       </Container>
