@@ -6,11 +6,15 @@ import ScrollContainer from '@/components/ScrollContainer';
 import { ThemedText } from '@/components/ThemedText';
 import FabGroup from '@/components/ui/fab/FabGroup';
 import FabTrigger from '@/components/ui/fab/FabTrigger';
-import getPatientOptions from '@/components/ui/fab/getPatientOptions';
-import { useAllPatients } from '@/hooks/useUsers';
+import useGetFabOptions, { FabOptionsVariant } from '@/components/ui/fab/useGetFabOptions';
+import { IconSymbol } from '@/components/ui/IconSymbol';
+import { Colors } from '@/constants/Colors';
+import { useAllPatients, useClients } from '@/hooks/useUsers';
 
 const AllPatients = () => {
   const { data: patients, isPending, isError } = useAllPatients();
+  const { data: clients } = useClients();
+
   const [openFab, setOpenFab] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
 
@@ -18,12 +22,22 @@ const AllPatients = () => {
     () => patients?.find((p) => p._id === selectedPatientId),
     [patients, selectedPatientId]
   );
+  const isClient = useMemo(() => {
+    if (!selectedPatient?._id || !clients) return false;
+    return clients.some((client) => client._id === selectedPatient._id);
+  }, [clients, selectedPatient]);
+
   const closeMenu = useCallback(() => {
     setOpenFab(false);
     setSelectedPatientId(null);
   }, []);
 
-  const actions = useMemo(() => getPatientOptions(closeMenu, selectedPatient), [selectedPatient, closeMenu]);
+  const actions = useGetFabOptions({
+    variant: FabOptionsVariant.PATIENTS,
+    closeMenu,
+    selectedEntity: selectedPatient,
+    isClient
+  });
 
   if (isPending) return <LoadingIndicator marginBottom={0} />;
   if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
@@ -32,24 +46,31 @@ const AllPatients = () => {
   return (
     <>
       <ScrollContainer>
-        {patients.map((patient) => (
-          <View
-            key={patient._id}
-            className="mb-4 flex-row items-center justify-between rounded-md border-b border-sway-lightGrey pb-4"
-          >
-            <View>
-              <ThemedText type="smallTitle">{patient.email}</ThemedText>
-              <ThemedText>{patient.username}</ThemedText>
+        {patients.map((patient) => {
+          const isClient = clients?.some((client) => client._id === patient._id);
+
+          return (
+            <View
+              key={patient._id}
+              className="mb-4 flex-row items-center justify-between rounded-md border-b border-sway-lightGrey pb-4"
+            >
+              <View className="mr-2 flex-1">
+                <ThemedText type="smallTitle">{patient.email}</ThemedText>
+                <View className="flex-row gap-2">
+                  <ThemedText>{patient.username}</ThemedText>
+                  {isClient && <IconSymbol name="star.fill" color={Colors.primary.info} />}
+                </View>
+              </View>
+              <FabTrigger
+                onPress={() => {
+                  setSelectedPatientId(patient._id);
+                  setOpenFab(true);
+                }}
+                icon="dots-horizontal"
+              />
             </View>
-            <FabTrigger
-              onPress={() => {
-                setSelectedPatientId(patient._id);
-                setOpenFab(true);
-              }}
-              icon="dots-horizontal"
-            />
-          </View>
-        ))}
+          );
+        })}
       </ScrollContainer>
       <FabGroup
         visible={selectedPatientId !== null}

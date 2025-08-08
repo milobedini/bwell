@@ -23,7 +23,11 @@ export const useModuleById = (id: string) => {
   return useQuery<ModuleDetailResponse>({
     queryKey: ['module', id],
     queryFn: () => fetchModuleById(id),
-    enabled: !!id // Only fetch if id is provided,
+    enabled: !!id, // Only fetch if id is provided
+    staleTime: 1000 * 60 * 60, // 1 hour
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false
   });
 };
 
@@ -31,11 +35,11 @@ export const useModuleById = (id: string) => {
 export const useModules = () => {
   return useQuery<Module[]>({
     queryKey: ['modules'],
-    queryFn: fetchModules
-    // Cache for inactive data below, default is 5 mins.
-    // staleTime: 1000 * 60 * 60 * 24 * 7, // 7 days, use once in prod
-    // refetchOnWindowFocus: false,
-    // refetchOnMount: false
+    queryFn: fetchModules,
+    staleTime: 1000 * 60 * 60, // 1 hour
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false
   });
 };
 

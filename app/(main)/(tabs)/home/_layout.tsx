@@ -6,6 +6,7 @@ export default function HomeStack() {
     <Stack screenOptions={stackScreenOptions}>
       <Stack.Screen name="index" />
       <Stack.Screen name="patients/index" options={nestedScreenOptionsWithTitle('All patients')} />
+      <Stack.Screen name="clients/index" options={nestedScreenOptionsWithTitle('Your clients')} />
     </Stack>
   );
 }
