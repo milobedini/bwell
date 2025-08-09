@@ -1,16 +1,16 @@
-import { Dimensions, ImageBackground } from 'react-native';
+import { Dimensions, ImageBackground, type ImageSourcePropType } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
 type ItemProp = {
   item: {
-    image: string;
+    image: ImageSourcePropType;
   };
 };
 
 export const Item = ({ item }: ItemProp) => (
   <ImageBackground
-    source={{ uri: item.image }}
+    source={item.image}
     style={{
       width,
       height,

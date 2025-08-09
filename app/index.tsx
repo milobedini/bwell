@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useRootNavigationState, useRouter } from 'expo-router';
-import { useHasOnboarded } from '@/hooks/useOnboarding';
+import Container from '@/components/Container';
+// import { useHasOnboarded } from '@/hooks/useOnboarding';
 import { useAuthStore } from '@/stores/authStore';
 
 function IndexRedirect() {
@@ -9,7 +10,8 @@ function IndexRedirect() {
   const navigatorReady = rootNavigationState?.key != null;
 
   const user = useAuthStore((s) => s.user);
-  const onboarded = useHasOnboarded();
+  // const onboarded = useHasOnboarded();
+  const onboarded = false;
 
   useEffect(() => {
     if (!navigatorReady || onboarded === null) return;
@@ -22,7 +24,7 @@ function IndexRedirect() {
     }
   }, [user, onboarded, navigatorReady, router]);
 
-  return null; // blank screen during redirect
+  return <Container />; // blank screen during redirect
 }
 
 export default IndexRedirect;

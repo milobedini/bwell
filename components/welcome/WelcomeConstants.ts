@@ -1,14 +1,16 @@
+import type { ImageSourcePropType } from 'react-native';
+
+import connectImage from './images/connect.png';
+import growImage from './images/grow.png';
+import reflectImage from './images/reflect.png';
+
 const titles = ['reflect', 'connect', 'grow'];
 const descriptions = [
-  'Track your thoughts, moods, and behaviours in one place. Built on proven CBT techniques, our app helps you identify patterns and gain self-awareness with daily check-ins and guided journaling.',
-  'Work collaboratively with your therapist. Share session notes, homework progress, and reflections between appointments — so nothing gets lost, and everything builds toward your goals.',
-  'Turn insights into action. Set personalized reminders, complete structured CBT exercises, and see your growth over time — all designed to help you build resilience, clarity, and control.'
+  'Understand yourself better. Log moods, thoughts, and daily patterns — and see how your experiences connect using simple CBT tools like the 5 Areas Model and thought diaries.',
+  'Work side-by-side with your therapist or wellbeing practitioner. Share your progress, complete weekly check-ins, and keep all your CBT homework in one secure, easy-to-use space.',
+  'Turn insights into action. Set goals, challenge unhelpful thoughts, and track your progress over time — building the resilience, clarity, and confidence to move forward.'
 ];
-const images = [
-  'https://picsum.photos/id/1011/900/1600', // abstract reflection / journal
-  'https://picsum.photos/id/1012/900/1600', // human connection / warm moment
-  'https://picsum.photos/id/1013/900/1600' // nature path / growth metaphor
-];
+const images = [reflectImage, connectImage, growImage];
 
 export const welcomeConstants = {
   indicatorSize: 12,
@@ -26,5 +28,5 @@ export type WelcomeDataType = {
   key: number;
   title: string;
   description: string;
-  image: string;
+  image: ImageSourcePropType;
 };
