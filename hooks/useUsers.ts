@@ -1,4 +1,5 @@
 import { api } from '@/api/api';
+import { useAuthStore } from '@/stores/authStore';
 import type {
   AddRemoveTherapistInput,
   AddRemoveTherapistResponse,
@@ -7,13 +8,18 @@ import type {
 } from '@milobedini/shared-types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+export const useIsLoggedIn = () => !!useAuthStore((s) => s.user?._id);
+
 export const useProfile = () => {
+  const isLoggedIn = useIsLoggedIn();
+
   return useQuery<ProfileResponse>({
     queryKey: ['profile'],
     queryFn: async (): Promise<ProfileResponse> => {
       const { data } = await api.get<ProfileResponse>('/user');
       return data;
     },
+    enabled: isLoggedIn,
     staleTime: 1000 * 60 * 60, // 5 minutes
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -22,12 +28,15 @@ export const useProfile = () => {
 };
 
 export const useAllPatients = () => {
+  const isLoggedIn = useIsLoggedIn();
+
   return useQuery<PatientsResponse>({
     queryKey: ['patients'],
     queryFn: async (): Promise<PatientsResponse> => {
       const { data } = await api.get<PatientsResponse>('/user/patients');
       return data;
     },
+    enabled: isLoggedIn,
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -36,12 +45,15 @@ export const useAllPatients = () => {
 };
 
 export const useClients = () => {
+  const isLoggedIn = useIsLoggedIn();
+
   return useQuery<PatientsResponse>({
     queryKey: ['clients'],
     queryFn: async (): Promise<PatientsResponse> => {
       const { data } = await api.get<PatientsResponse>('/user/clients');
       return data;
     },
+    enabled: isLoggedIn,
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnMount: false,
     refetchOnWindowFocus: false,

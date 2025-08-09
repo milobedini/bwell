@@ -21,7 +21,6 @@ const toastConfig = {
       </View>
     </View>
   ),
-
   error: (props: ToastConfigParams) => (
     <View
       className="elevation-lg w-4/5 flex-row items-center rounded-xl bg-error px-4 py-3 shadow-md shadow-error"

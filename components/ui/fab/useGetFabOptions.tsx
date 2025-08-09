@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Toast } from 'toastify-react-native';
+import { renderErrorToast, renderSuccessToast } from '@/components/toast/toastOptions';
 import { useAddRemoveTherapist } from '@/hooks/useUsers';
 import { useAuthStore } from '@/stores/authStore';
 import type { AuthUser, User } from '@milobedini/shared-types';
@@ -35,21 +35,11 @@ const useGetFabOptions = ({
         { patientId: selectedEntity._id, therapistId: user._id },
         {
           onSuccess: (data) => {
-            Toast.show({
-              type: 'success',
-              text1: data.message,
-              position: 'bottom',
-              autoHide: true
-            });
+            renderSuccessToast(data.message);
             closeMenu();
           },
           onError: (error) => {
-            Toast.show({
-              type: 'error',
-              text1: error.message,
-              position: 'bottom',
-              autoHide: true
-            });
+            renderErrorToast(error.message);
             closeMenu();
           }
         }

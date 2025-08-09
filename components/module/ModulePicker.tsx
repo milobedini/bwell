@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { Dialog, IconButton, List, Portal, TextInput } from 'react-native-paper';
-import { Toast } from 'toastify-react-native';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useEnrollUnenrollUser, useModules } from '@/hooks/useModules';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 import { ThemedText } from '../ThemedText';
+import { renderErrorToast, renderSuccessToast } from '../toast/toastOptions';
 
 type ModulePickerProps = {
   visible: boolean;
@@ -32,20 +32,10 @@ const ModulePicker = ({ visible, onDismiss, patientId }: ModulePickerProps) => {
       { patientId, moduleId },
       {
         onSuccess: (res) => {
-          Toast.show({
-            type: 'success',
-            text1: res.message,
-            position: 'bottom',
-            autoHide: true
-          });
+          renderSuccessToast(res.message);
         },
         onError: (err) => {
-          Toast.show({
-            type: 'error',
-            text1: err.message,
-            position: 'bottom',
-            autoHide: true
-          });
+          renderErrorToast(err.message);
         }
       }
     );
