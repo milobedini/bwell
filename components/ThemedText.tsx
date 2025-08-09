@@ -5,9 +5,10 @@ import { Fonts } from '@/constants/Typography';
 export type ThemedTextProps = TextProps & {
   type?: 'default' | 'title' | 'subtitle' | 'link' | 'small' | 'italic' | 'smallTitle' | 'button' | 'error';
   className?: string;
+  onLight?: boolean;
 };
 
-export function ThemedText({ style, type = 'default', className, ...rest }: ThemedTextProps) {
+export function ThemedText({ style, type = 'default', onLight = false, className, ...rest }: ThemedTextProps) {
   return (
     <Text
       style={[
@@ -20,6 +21,7 @@ export function ThemedText({ style, type = 'default', className, ...rest }: Them
         type === 'italic' && styles.italic,
         type === 'button' && styles.button,
         type === 'error' && styles.error,
+        onLight && { color: Colors.sway.dark },
         style
       ]}
       className={className}

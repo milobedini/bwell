@@ -1,5 +1,12 @@
 import { api } from '@/api/api';
-import type { CreateModuleInput, Module, ModuleDetailResponse, ModulesResponse } from '@milobedini/shared-types';
+import type {
+  CreateModuleInput,
+  EnrolInput,
+  EnrolResponse,
+  Module,
+  ModuleDetailResponse,
+  ModulesResponse
+} from '@milobedini/shared-types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 // --- API methods ---
@@ -51,6 +58,21 @@ export const useCreateModule = () => {
     mutationFn: createModule,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['modules'] });
+    }
+  });
+};
+
+export const useEnrollUnenrollUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation<EnrolResponse, Error, EnrolInput>({
+    mutationFn: async (enrolData: EnrolInput): Promise<EnrolResponse> => {
+      const { data } = await api.post<EnrolResponse>('/modules/assign', enrolData);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['modules'] });
+      queryClient.refetchQueries({ queryKey: ['modules'] });
+      queryClient.invalidateQueries({ queryKey: ['module'] });
     }
   });
 };

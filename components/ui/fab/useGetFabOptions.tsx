@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { Toast } from 'toastify-react-native';
 import { useAddRemoveTherapist } from '@/hooks/useUsers';
 import { useAuthStore } from '@/stores/authStore';
 import type { AuthUser, User } from '@milobedini/shared-types';
@@ -15,9 +16,16 @@ type FabOptionsProps = {
   closeMenu: () => void;
   selectedEntity?: User | AuthUser;
   isClient?: boolean;
+  openModulePicker?: (patentId: string) => void;
 };
 
-const useGetFabOptions = ({ variant, closeMenu, selectedEntity, isClient }: FabOptionsProps): FabGroupAction[] => {
+const useGetFabOptions = ({
+  variant,
+  closeMenu,
+  selectedEntity,
+  isClient,
+  openModulePicker
+}: FabOptionsProps): FabGroupAction[] => {
   const user = useAuthStore((s) => s.user);
   const addRemoveTherapist = useAddRemoveTherapist();
 
@@ -27,13 +35,21 @@ const useGetFabOptions = ({ variant, closeMenu, selectedEntity, isClient }: FabO
         { patientId: selectedEntity._id, therapistId: user._id },
         {
           onSuccess: (data) => {
-            console.log(data.message);
-            // Use toast for message
+            Toast.show({
+              type: 'success',
+              text1: data.message,
+              position: 'bottom',
+              autoHide: true
+            });
             closeMenu();
           },
           onError: (error) => {
-            console.log(error.message);
-            // Use toast for message
+            Toast.show({
+              type: 'error',
+              text1: error.message,
+              position: 'bottom',
+              autoHide: true
+            });
             closeMenu();
           }
         }
@@ -71,6 +87,16 @@ const useGetFabOptions = ({ variant, closeMenu, selectedEntity, isClient }: FabO
           // color: 'gold',
           style: { backgroundColor: 'white' },
           onPress: handleAddRemoveTherapist
+        },
+        {
+          icon: 'book-plus',
+          label: 'Manage modules',
+          labelTextColor: 'white',
+          style: { backgroundColor: 'white' },
+          onPress: () => {
+            const id = selectedEntity?._id;
+            if (id) openModulePicker?.(id);
+          }
         },
         {
           icon: 'email',

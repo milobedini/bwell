@@ -5,6 +5,7 @@ import Container from '@/components/Container';
 import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
+import ModulePicker from '@/components/module/ModulePicker';
 import ScrollContainer from '@/components/ScrollContainer';
 import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
@@ -19,6 +20,8 @@ const AllClients = () => {
 
   const [openFab, setOpenFab] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerPatientId, setPickerPatientId] = useState<string>('');
 
   const selectedClient = useMemo(() => clients?.find((p) => p._id === selectedClientId), [clients, selectedClientId]);
   const closeMenu = useCallback(() => {
@@ -29,7 +32,11 @@ const AllClients = () => {
   const actions = useGetFabOptions({
     variant: FabOptionsVariant.CLIENTS,
     closeMenu,
-    selectedEntity: selectedClient
+    selectedEntity: selectedClient,
+    openModulePicker: (id) => {
+      setPickerPatientId(id);
+      setPickerOpen(true);
+    }
   });
 
   if (isPending) return <LoadingIndicator marginBottom={0} />;
@@ -73,6 +80,14 @@ const AllClients = () => {
         onOpenChange={setOpenFab}
         onDismiss={closeMenu}
         actions={actions}
+      />
+      <ModulePicker
+        visible={pickerOpen}
+        onDismiss={() => {
+          setPickerOpen(false);
+          setSelectedClientId(null);
+        }}
+        patientId={pickerPatientId}
       />
     </>
   );
