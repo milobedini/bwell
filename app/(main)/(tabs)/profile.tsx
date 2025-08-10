@@ -31,9 +31,7 @@ export default function Profile() {
 
   if (logout.isPending || isPending) return <LoadingIndicator marginBottom={0} />;
 
-  if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
-
-  if (!profile) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
+  if (isError || !profile) return <ErrorComponent errorType={ErrorTypes.UNAUTHORIZED} redirectLogin />;
 
   return (
     <Container>

@@ -1,3 +1,5 @@
+import { useRouter } from 'expo-router';
+
 import Container from './Container';
 import { ThemedText } from './ThemedText';
 
@@ -9,7 +11,12 @@ enum ErrorTypes {
   GENERAL_ERROR = 'GeneralError'
 }
 
-const ErrorComponent = ({ errorType }: { errorType: ErrorTypes }) => {
+const ErrorComponent = ({ errorType, redirectLogin }: { errorType: ErrorTypes; redirectLogin?: boolean }) => {
+  const router = useRouter();
+  if (redirectLogin) {
+    router.replace('/(auth)/login');
+  }
+
   switch (errorType) {
     case ErrorTypes.NO_CONTENT:
       return (
