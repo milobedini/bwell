@@ -1,6 +1,6 @@
 import { api } from '@/api/api';
 import { useAuthStore } from '@/stores/authStore';
-import type { AuthResponse, LoginInput, RegisterInput, VerifyInput } from '@milobedini/shared-types';
+import type { AuthResponse, LoginInput, RegisterInput, UpdateNameInput, VerifyInput } from '@milobedini/shared-types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const useRegister = () => {
@@ -47,6 +47,21 @@ export const useVerify = () => {
     mutationFn: async (body) => {
       const { data } = await api.post<AuthResponse>('/verify-email', body);
       return data;
+    }
+  });
+};
+
+export const useUpdateName = () => {
+  const queryClient = useQueryClient();
+  return useMutation<AuthResponse, Error, UpdateNameInput>({
+    mutationFn: async (body) => {
+      const { data } = await api.put<AuthResponse>('/update-name', body);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['patients'] });
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
     }
   });
 };

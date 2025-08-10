@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Dimensions, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { RadioButton } from 'react-native-paper';
+import { SegmentedButtons } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useVideoPlayer, type VideoSource, VideoView } from 'expo-video';
@@ -234,8 +234,12 @@ export default function Signup() {
                   onSubmit={(values) => {
                     setApiError('');
                     register.mutate(values, {
-                      onSuccess: () => {
-                        router.replace('/(auth)/verify');
+                      onSuccess: (res) => {
+                        const id = String(res.user._id);
+                        router.replace({
+                          pathname: '/(auth)/verify',
+                          params: { userId: id }
+                        });
                       },
                       onError: (error) => {
                         setApiError(axiosErrorString(error));
@@ -292,29 +296,34 @@ export default function Signup() {
                       />
                       {touched.password && errors.password && <ThemedText type="error">{errors.password}</ThemedText>}
                       {/* TODO - use Paper SegmentedButtons */}
-                      <RadioButton.Group
+                      <SegmentedButtons
+                        value={values.roles[0] || ''}
                         onValueChange={(role) => {
                           setFieldValue('roles', [role]);
                         }}
-                        value={values.roles[0] || ''}
-                      >
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <RadioButton
-                            value={UserRole.PATIENT}
-                            color={Colors.sway.bright}
-                            uncheckedColor={Colors.sway.lightGrey}
-                          />
-                          <ThemedText type="link">Patient</ThemedText>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <RadioButton
-                            value={UserRole.THERAPIST}
-                            color={Colors.sway.bright}
-                            uncheckedColor={Colors.sway.lightGrey}
-                          />
-                          <ThemedText type="link">Therapist</ThemedText>
-                        </View>
-                      </RadioButton.Group>
+                        style={{ marginVertical: 16 }}
+                        buttons={[
+                          {
+                            value: 'patient',
+                            label: 'Patient',
+                            checkedColor: Colors.sway.dark,
+                            uncheckedColor: 'white',
+                            style: {
+                              backgroundColor: values.roles[0] === 'patient' ? Colors.sway.bright : Colors.sway.dark
+                            }
+                          },
+                          {
+                            value: 'therapist',
+                            label: 'Therapist',
+                            checkedColor: Colors.sway.dark,
+                            uncheckedColor: 'white',
+                            style: {
+                              backgroundColor: values.roles[0] === 'therapist' ? Colors.sway.bright : Colors.sway.dark
+                            }
+                          }
+                        ]}
+                      />
+
                       <MotiView
                         state={dynamicAnimation}
                         delay={500}
