@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useRouter } from 'expo-router';
 import Container from '@/components/Container';
 import ContentContainer from '@/components/ContentContainer';
@@ -16,6 +16,8 @@ export default function Profile() {
   const logout = useLogout();
   const { isSuccess: logoutSuccess } = logout;
   const router = useRouter();
+
+  const hasFullName = useMemo(() => !!profile?.name, [profile?.name]);
 
   const handleLogout = useCallback(() => {
     logout.mutate();
@@ -36,9 +38,10 @@ export default function Profile() {
   return (
     <Container>
       <ThemedText type="title" className="text-center">
-        {profile.username}
+        {hasFullName ? profile.name : profile.username}
       </ThemedText>
       <ContentContainer className="gap-4 p-4">
+        {hasFullName && <ThemedText>Username: {profile.username}</ThemedText>}
         <ThemedText>Assigned roles: {displayUserRoles(profile.roles)}</ThemedText>
         {isTherapist(profile.roles) && (
           <ThemedText>

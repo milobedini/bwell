@@ -43,10 +43,15 @@ export const useLogout = () => {
 };
 
 export const useVerify = () => {
+  const setUser = useAuthStore((s) => s.setUser);
+
   return useMutation<AuthResponse, Error, VerifyInput>({
     mutationFn: async (body) => {
       const { data } = await api.post<AuthResponse>('/verify-email', body);
       return data;
+    },
+    onSuccess: ({ user }) => {
+      setUser(user);
     }
   });
 };
@@ -59,7 +64,7 @@ export const useUpdateName = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.refetchQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['patients'] });
       queryClient.invalidateQueries({ queryKey: ['clients'] });
     }
