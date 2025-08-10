@@ -1,7 +1,11 @@
+import { Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Tabs } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
+
+import disabledIcon from '../../../assets/images/disabled-icon.png';
+import icon from '../../../assets/images/icon.png';
 
 export default function MainTabsLayout() {
   const { bottom } = useSafeAreaInsets();
@@ -30,7 +34,17 @@ export default function MainTabsLayout() {
         name="home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, size }) => <Ionicons name="home" color={color} size={size} />
+          tabBarIcon: ({ size, focused }) => (
+            <Image
+              source={focused ? icon : disabledIcon}
+              width={size * 2}
+              height={size & 2}
+              style={{
+                width: size * 2,
+                height: size * 2
+              }}
+            />
+          )
         }}
       />
       <Tabs.Screen

@@ -1,7 +1,7 @@
 import { Image, View } from 'react-native';
 import { Colors } from '@/constants/Colors';
 
-import imageSource from '../../assets/images/logo.png';
+import imageSource from '../../assets/images/icon.png';
 
 export const LoginLogo = () => (
   <View

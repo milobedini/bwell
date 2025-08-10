@@ -146,7 +146,7 @@ export default function Signup() {
           }}
         >
           <LoginLogo />
-          <Text style={[styles.light, styles.heading]}>Awaken {'\n'}to your true self</Text>
+          <Text style={[styles.light, styles.heading]}>Take back {'\n'}control</Text>
           <View
             style={{
               height: 2,

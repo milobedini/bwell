@@ -140,7 +140,7 @@ export default function Login() {
           }}
         >
           <LoginLogo />
-          <Text style={[styles.light, styles.heading]}>Awaken {'\n'}to your true self</Text>
+          <Text style={[styles.light, styles.heading]}>Keep building {'\n'}your momentum</Text>
           <View
             style={{
               height: 2,

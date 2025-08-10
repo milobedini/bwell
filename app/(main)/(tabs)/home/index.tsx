@@ -1,4 +1,6 @@
+import { View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { BWellLogo } from '@/components/brand/Imagery';
 import Container from '@/components/Container';
 import ContentContainer from '@/components/ContentContainer';
 import ThemedButton from '@/components/ThemedButton';
@@ -19,6 +21,9 @@ export default function Home() {
             Your clients
           </ThemedButton>
           <ThemedButton onPress={() => router.push('/home/patients')}>All patients</ThemedButton>
+          <View className="mt-auto items-center">
+            <BWellLogo />
+          </View>
         </ContentContainer>
       </Container>
     );
@@ -30,6 +35,9 @@ export default function Home() {
           <ThemedText type="title" className="mt-4">
             You are awaiting BWell verification
           </ThemedText>
+          <View className="mt-auto items-center">
+            <BWellLogo />
+          </View>
         </ContentContainer>
       </Container>
     );
@@ -38,6 +46,9 @@ export default function Home() {
     <Container>
       <ContentContainer>
         <ThemedText>Patient home</ThemedText>
+        <View className="mt-auto items-center">
+          <BWellLogo />
+        </View>
       </ContentContainer>
     </Container>
   );
