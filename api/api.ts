@@ -1,13 +1,25 @@
+import { Platform } from 'react-native';
 import axios from 'axios';
 
-const apiUrl = process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
+// const apiUrl = process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
+
+const getBaseUrl = () => {
+  if (__DEV__) {
+    return Platform.select({
+      ios: 'http://localhost:3000/api', // iOS simulator
+      android: 'http://10.0.2.2:3000/api' // Android emulator
+    });
+  }
+  // Production uses your env var
+  return process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
+};
 
 export const api = axios.create({
-  baseURL: apiUrl,
+  baseURL: getBaseUrl(),
   withCredentials: true
 });
 
-console.log('We are using', apiUrl, 'API Base URL'); // Debugging: Log the base URL
+console.log('We are using', getBaseUrl(), 'API Base URL'); // Debugging: Log the base URL
 
 // 🔍 Log every request
 api.interceptors.request.use(
