@@ -38,7 +38,7 @@ export default function Profile() {
       <ThemedText type="title" className="text-center">
         {profile.username}
       </ThemedText>
-      <ContentContainer className="gap-2 p-4">
+      <ContentContainer className="gap-4 p-4">
         <ThemedText>Assigned roles: {displayUserRoles(profile.roles)}</ThemedText>
         {isTherapist(profile.roles) && (
           <ThemedText>

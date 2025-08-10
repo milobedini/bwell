@@ -11,9 +11,13 @@ const ModuleSummary = ({ module }: ModuleSummaryProps) => {
   return (
     <View>
       <ThemedText type="title">{module.title}</ThemedText>
-      <ThemedText type="subtitle">{module.program.title} Program</ThemedText>
-      <ThemedText>{module.description}</ThemedText>
-      <ThemedText type="italic">{module.disclaimer}</ThemedText>
+      <ThemedText type="subtitle" className="my-2">
+        {module.program.title} Program
+      </ThemedText>
+      <ThemedText className="my-2">{module.description}</ThemedText>
+      <ThemedText type="italic" className="my-2">
+        {module.disclaimer}
+      </ThemedText>
     </View>
   );
 };

@@ -12,10 +12,10 @@ const QuestionsPresenter = ({ questions }: QuestionsPresenterProps) => {
     <View>
       {questions.map((question) => (
         <View key={question._id} className="my-2">
-          <ThemedText type="smallTitle">
+          <ThemedText type="smallTitle" className="mb-2">
             {question.order}) {question.text}
           </ThemedText>
-          <View>
+          <View className="mb-2 gap-2">
             {question.choices.map((choice) => (
               <ThemedText key={choice.text}>{choice.text}</ThemedText>
             ))}

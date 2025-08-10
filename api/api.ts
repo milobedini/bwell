@@ -1,8 +1,6 @@
 import { Platform } from 'react-native';
 import axios from 'axios';
 
-// const apiUrl = process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
-
 const getBaseUrl = () => {
   if (__DEV__) {
     return Platform.select({

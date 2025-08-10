@@ -10,13 +10,15 @@ type ScoreBandsPresenterProps = {
 const ScoreBandsPresenter = ({ scoreBands }: ScoreBandsPresenterProps) => {
   return (
     <View>
-      <ThemedText type="subtitle">Results meaning</ThemedText>
+      <ThemedText type="subtitle" className="mb-2">
+        Results meaning
+      </ThemedText>
       {scoreBands.map((band) => (
-        <View key={band._id} className="my-2 border-b border-b-sway-lightGrey">
+        <View key={band._id} className="my-2 gap-2 border-b border-b-sway-lightGrey">
           <ThemedText>
             Score {band.min} to {band.max} - {band.label}
           </ThemedText>
-          <ThemedText>{band.interpretation}</ThemedText>
+          <ThemedText className="mb-2">{band.interpretation}</ThemedText>
         </View>
       ))}
     </View>

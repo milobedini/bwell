@@ -12,7 +12,9 @@ export const Colors = {
     info: '#FFD15D',
     success: '#76AB70',
     accent: '#FFB0C0',
-    error: '#FF6D5E'
+    error: '#FF6D5E',
+    charcoal: '#111827',
+    rose: '#9F1239'
   },
   sway: {
     dark: '#0c1527',

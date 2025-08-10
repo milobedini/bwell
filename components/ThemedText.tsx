@@ -35,7 +35,6 @@ const styles = StyleSheet.create({
     fontSize: Platform.select({ ios: 16, android: 16, default: 18 }),
     lineHeight: Platform.select({ ios: 22, android: 22, default: 24 }),
     fontFamily: Fonts.Regular,
-    marginBottom: 6,
     color: Colors.sway.white
   },
   title: {
@@ -49,14 +48,12 @@ const styles = StyleSheet.create({
     fontSize: Platform.select({ ios: 24, android: 24, default: 50 }),
     lineHeight: Platform.select({ ios: 24, android: 24, default: 50 }),
     fontFamily: Fonts.Black,
-    marginBottom: 8,
     color: Colors.sway.white
   },
   smallTitle: {
     fontSize: Platform.select({ ios: 20, android: 20, default: 30 }),
-    lineHeight: Platform.select({ ios: 18, android: 18, default: 30 }),
+    lineHeight: Platform.select({ ios: 20, android: 20, default: 30 }),
     fontFamily: Fonts.Black,
-    marginBottom: 4,
     color: Colors.sway.white
   },
   link: {
@@ -75,8 +72,7 @@ const styles = StyleSheet.create({
     fontSize: Platform.select({ ios: 12, android: 12, default: 14 }),
     lineHeight: Platform.select({ ios: 20, android: 20, default: 24 }),
     fontFamily: Fonts.Italic,
-    color: Colors.sway.white,
-    marginBottom: 6
+    color: Colors.sway.white
   },
   button: {
     fontSize: Platform.select({ ios: 18, android: 18, default: 22 }),
