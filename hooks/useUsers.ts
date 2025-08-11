@@ -3,12 +3,17 @@ import { useAuthStore } from '@/stores/authStore';
 import type {
   AddRemoveTherapistInput,
   AddRemoveTherapistResponse,
+  AvailableModulesResponse,
   PatientsResponse,
-  ProfileResponse
+  ProfileResponse,
+  VerifyTherapistInput,
+  VerifyTherapistResponse
 } from '@milobedini/shared-types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const useIsLoggedIn = () => !!useAuthStore((s) => s.user?._id);
+
+// QUERIES
 
 export const useProfile = () => {
   const isLoggedIn = useIsLoggedIn();
@@ -61,6 +66,25 @@ export const useClients = () => {
   });
 };
 
+export const useGetAvailableModules = () => {
+  const isLoggedIn = useIsLoggedIn();
+
+  return useQuery<AvailableModulesResponse>({
+    queryKey: ['modules'],
+    queryFn: async (): Promise<AvailableModulesResponse> => {
+      const { data } = await api.get<AvailableModulesResponse>('/user/available');
+      return data;
+    },
+    enabled: isLoggedIn,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false
+  });
+};
+
+// MUTATIONS
+
 export const useAddRemoveTherapist = () => {
   const queryClient = useQueryClient();
 
@@ -72,6 +96,20 @@ export const useAddRemoveTherapist = () => {
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: ['patients'] });
       queryClient.refetchQueries({ queryKey: ['clients'] });
+      queryClient.refetchQueries({ queryKey: ['profile'] });
+    }
+  });
+};
+
+export const useAdminVerifyTherapist = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<VerifyTherapistResponse, Error, VerifyTherapistInput>({
+    mutationFn: async (therapistId): Promise<VerifyTherapistResponse> => {
+      const { data } = await api.post<VerifyTherapistResponse>('/user/verify', therapistId);
+      return data;
+    },
+    onSuccess: () => {
       queryClient.refetchQueries({ queryKey: ['profile'] });
     }
   });
