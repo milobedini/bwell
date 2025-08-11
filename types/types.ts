@@ -10,4 +10,10 @@ enum ModuleType {
   PSYCHO_EDUCATION = 'psychoeducation'
 }
 
-export { ModuleType, UserRole };
+enum AccessPolicy {
+  OPEN = 'open',
+  ENROLLED = 'enrolled',
+  ASSIGNED = 'assigned'
+}
+
+export { AccessPolicy, ModuleType, UserRole };
