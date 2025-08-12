@@ -1,11 +1,9 @@
-import { Divider } from 'react-native-paper';
 import { useLocalSearchParams } from 'expo-router';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import ModulesList from '@/components/module/ModulesList';
 import ScrollContainer from '@/components/ScrollContainer';
 import ScrollContentContainer from '@/components/ScrollContentContainer';
-import { ThemedText } from '@/components/ThemedText';
 import { useProgram } from '@/hooks/usePrograms';
 
 export default function ProgramDetail() {
@@ -21,8 +19,6 @@ export default function ProgramDetail() {
   return (
     <ScrollContainer>
       <ScrollContentContainer>
-        <ThemedText type="title">{program.title}</ThemedText>
-        <Divider bold />
         <ModulesList modules={program.modules} />
       </ScrollContentContainer>
     </ScrollContainer>

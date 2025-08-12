@@ -32,8 +32,8 @@ export function ThemedText({ style, type = 'default', onLight = false, className
 
 const styles = StyleSheet.create({
   default: {
-    fontSize: Platform.select({ ios: 16, android: 16, default: 18 }),
-    lineHeight: Platform.select({ ios: 22, android: 22, default: 24 }),
+    fontSize: Platform.select({ ios: 18, android: 18, default: 18 }),
+    lineHeight: Platform.select({ ios: 24, android: 24, default: 24 }),
     fontFamily: Fonts.Regular,
     color: Colors.sway.white
   },
