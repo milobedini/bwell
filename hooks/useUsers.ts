@@ -1,3 +1,4 @@
+import type { AxiosError } from 'axios';
 import { api } from '@/api/api';
 import { useAuthStore } from '@/stores/authStore';
 import type {
@@ -88,7 +89,7 @@ export const useGetAvailableModules = () => {
 export const useAddRemoveTherapist = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<AddRemoveTherapistResponse, Error, AddRemoveTherapistInput>({
+  return useMutation<AddRemoveTherapistResponse, AxiosError, AddRemoveTherapistInput>({
     mutationFn: async (clientData): Promise<AddRemoveTherapistResponse> => {
       const { data } = await api.post<AddRemoveTherapistResponse>('/user/assign', clientData);
       return data;
@@ -104,7 +105,7 @@ export const useAddRemoveTherapist = () => {
 export const useAdminVerifyTherapist = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<VerifyTherapistResponse, Error, VerifyTherapistInput>({
+  return useMutation<VerifyTherapistResponse, AxiosError, VerifyTherapistInput>({
     mutationFn: async (therapistId): Promise<VerifyTherapistResponse> => {
       const { data } = await api.post<VerifyTherapistResponse>('/user/verify', therapistId);
       return data;

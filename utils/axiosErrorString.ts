@@ -1,14 +1,35 @@
 import { isAxiosError } from 'axios';
 
+type ServerError = {
+  success?: boolean;
+  message?: string;
+  data?: {
+    success?: boolean;
+    message?: string;
+  };
+};
+
 const axiosErrorString = (error: unknown): string => {
-  if (isAxiosError(error)) {
-    // If it's an Axios error, return the response message or a generic message
-    return error.response?.data?.message || 'An error occurred while processing your request.';
-  } else if (error instanceof Error) {
-    // If it's a standard Error, return its message
+  if (isAxiosError<ServerError>(error)) {
+    return (
+      error.response?.data?.message ??
+      error.response?.data?.data?.message ??
+      'An error occurred while processing your request.'
+    );
+  }
+  if (error instanceof Error) {
     return error.message;
   }
-  // Fallback for any other type of error
   return 'An unknown error occurred.';
 };
+
+const getServerErrorMessage = (err: unknown): string => {
+  if (!isAxiosError<ServerError>(err)) {
+    return err instanceof Error ? err.message : 'Something went wrong';
+  }
+  const data = err.response?.data;
+  return data?.message ?? data?.data?.message ?? err.message ?? 'Something went wrong';
+};
+
+export { getServerErrorMessage };
 export default axiosErrorString;

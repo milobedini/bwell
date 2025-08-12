@@ -4,6 +4,7 @@ import { Dialog, IconButton, List, Portal, TextInput } from 'react-native-paper'
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useEnrollUnenrollUser, useModules } from '@/hooks/useModules';
+import { getServerErrorMessage } from '@/utils/axiosErrorString';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 import { ThemedText } from '../ThemedText';
@@ -35,7 +36,7 @@ const ModulePicker = ({ visible, onDismiss, patientId }: ModulePickerProps) => {
           renderSuccessToast(res.message);
         },
         onError: (err) => {
-          renderErrorToast(err.message);
+          renderErrorToast(getServerErrorMessage(err));
         }
       }
     );
@@ -63,6 +64,7 @@ const ModulePicker = ({ visible, onDismiss, patientId }: ModulePickerProps) => {
                 <List.Item title="No modules found" />
               ) : (
                 filtered.map((m) => {
+                  console.log(patientId, m.enrolled);
                   const isAssigned = m.enrolled?.includes(patientId);
                   return (
                     <List.Item

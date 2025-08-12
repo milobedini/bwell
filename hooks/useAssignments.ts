@@ -1,3 +1,4 @@
+import type { AxiosError } from 'axios';
 import { api } from '@/api/api';
 import {
   CreateAssignmentInput,
@@ -48,7 +49,7 @@ export const useViewMyAssignments = (status?: string) => {
 export const useCreateAssignment = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<CreateAssignmentResponse, Error, CreateAssignmentInput>({
+  return useMutation<CreateAssignmentResponse, AxiosError, CreateAssignmentInput>({
     mutationFn: async (assignmentData): Promise<CreateAssignmentResponse> => {
       const { data } = await api.post<CreateAssignmentResponse>('/assignments', assignmentData);
       return data;
@@ -64,7 +65,7 @@ export const useCreateAssignment = () => {
 export const useUpdateAssignmentStatus = (assignmentId: string) => {
   const queryClient = useQueryClient();
 
-  return useMutation<UpdateAssignmentStatusResponse, Error, UpdateAssignmentStatusInput>({
+  return useMutation<UpdateAssignmentStatusResponse, AxiosError, UpdateAssignmentStatusInput>({
     mutationFn: async (status): Promise<UpdateAssignmentStatusResponse> => {
       const { data } = await api.patch<UpdateAssignmentStatusResponse>(`assignments/${assignmentId}`, status);
       return data;

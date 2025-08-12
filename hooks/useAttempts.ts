@@ -1,3 +1,4 @@
+import type { AxiosError } from 'axios';
 import { api } from '@/api/api';
 import {
   MyAttemptsResponse,
@@ -78,7 +79,7 @@ export const useTherapistGetPatientsModuleAttempts = (patientId: string, moduleI
 export const useStartModuleAttempt = (moduleId: string) => {
   const queryClient = useQueryClient();
 
-  return useMutation<StartAttemptResponse, Error, { assignmentId: string }>({
+  return useMutation<StartAttemptResponse, AxiosError, { assignmentId: string }>({
     mutationFn: async (status): Promise<StartAttemptResponse> => {
       const { data } = await api.post<StartAttemptResponse>(`modules/${moduleId}/attempts`, status);
       return data;
@@ -93,7 +94,7 @@ export const useStartModuleAttempt = (moduleId: string) => {
 export const useSaveModuleAttempt = (attemptId: string) => {
   const queryClient = useQueryClient();
 
-  return useMutation<SaveProgressResponse, Error, SaveProgressInput>({
+  return useMutation<SaveProgressResponse, AxiosError, SaveProgressInput>({
     mutationFn: async (responses): Promise<SaveProgressResponse> => {
       const { data } = await api.patch<SaveProgressResponse>(`attempts/${attemptId}`, responses);
       return data;
@@ -108,7 +109,7 @@ export const useSaveModuleAttempt = (attemptId: string) => {
 export const useSubmitAttempt = (attemptId: string) => {
   const queryClient = useQueryClient();
 
-  return useMutation<SubmitAttemptResponse, Error, SubmitAttemptInput>({
+  return useMutation<SubmitAttemptResponse, AxiosError, SubmitAttemptInput>({
     mutationFn: async (responses): Promise<SubmitAttemptResponse> => {
       const { data } = await api.post<SubmitAttemptResponse>(`attempts/${attemptId}/submit`, responses);
       return data;

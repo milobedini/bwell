@@ -5,8 +5,8 @@ export const buildToast = (
   type: ToastType,
   title: string,
   description?: string,
-  position: ToastPosition = 'bottom',
-  visibilityTime: number = 900
+  visibilityTime: number = 900,
+  position: ToastPosition = 'bottom'
 ): ToastShowParams => ({
   type,
   text1: title,
@@ -20,7 +20,7 @@ export const successOptions = (title: string, description?: string): ToastShowPa
   buildToast('success', title, description);
 
 export const errorOptions = (title: string, description?: string): ToastShowParams =>
-  buildToast('error', title, description);
+  buildToast('error', title, description, 2000);
 
 export const renderSuccessToast = (title: string, description?: string) =>
   Toast.show(successOptions(title, description));

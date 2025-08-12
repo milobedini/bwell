@@ -1,3 +1,4 @@
+import type { AxiosError } from 'axios';
 import { api } from '@/api/api';
 import type {
   AvailableModulesItem,
@@ -12,17 +13,14 @@ import type {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 // --- API methods ---
-// const fetchModules = async (): Promise<ModulesResponse> => {
-//   const { data } = await api.get<ModulesResponse>('/modules');
-//   return data.modules;
-// };
-const fetchModulesPlain = async (): Promise<Module[]> => {
-  const { data } = await api.get<ModulesPlainResponse>('/modules');
+
+const fetchModulesPlain = async (programId?: string): Promise<Module[]> => {
+  const { data } = await api.get<ModulesPlainResponse>(`/modules?program=${programId}`);
   return data.modules;
 };
 
-const fetchModulesWithMeta = async (): Promise<AvailableModulesItem[]> => {
-  const { data } = await api.get<ModulesWithMetaResponse>('/modules?withMeta=true');
+const fetchModulesWithMeta = async (programId?: string): Promise<AvailableModulesItem[]> => {
+  const { data } = await api.get<ModulesWithMetaResponse>(`/modules?program=${programId}&withMeta=true`);
   return data.modules;
 };
 
@@ -51,20 +49,20 @@ export const useModuleById = (id: string) => {
 
 // --- Hook: Get all modules ---
 
-export const useModules = () =>
+export const useModules = (programId?: string) =>
   useQuery<Module[]>({
     queryKey: ['modules'],
-    queryFn: fetchModulesPlain,
+    queryFn: () => fetchModulesPlain(programId),
     staleTime: 1000 * 60 * 60, // 1 hour
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false
   });
 
-export const useModulesWithMeta = () =>
+export const useModulesWithMeta = (programId?: string) =>
   useQuery<AvailableModulesItem[]>({
     queryKey: ['modules'],
-    queryFn: fetchModulesWithMeta,
+    queryFn: () => fetchModulesWithMeta(programId),
     staleTime: 1000 * 60 * 60, // 1 hour
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -75,7 +73,7 @@ export const useModulesWithMeta = () =>
 export const useCreateModule = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<Module, Error, CreateModuleInput>({
+  return useMutation<Module, AxiosError, CreateModuleInput>({
     mutationFn: createModule,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['modules'] });
@@ -85,13 +83,12 @@ export const useCreateModule = () => {
 
 export const useEnrollUnenrollUser = () => {
   const queryClient = useQueryClient();
-  return useMutation<EnrolResponse, Error, EnrolInput>({
+  return useMutation<EnrolResponse, AxiosError, EnrolInput>({
     mutationFn: async (enrolData: EnrolInput): Promise<EnrolResponse> => {
       const { data } = await api.post<EnrolResponse>('/modules/assign', enrolData);
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['modules'] });
       queryClient.refetchQueries({ queryKey: ['modules'] });
       queryClient.invalidateQueries({ queryKey: ['module'] });
     }
