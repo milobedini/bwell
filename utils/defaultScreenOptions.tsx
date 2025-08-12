@@ -25,9 +25,9 @@ const nestedScreenOptionsWithTitle = (title?: string): NativeStackNavigationOpti
 
 type HeaderTitleParamsShape = { headerTitle?: string };
 
-export const withHeaderFromParams =
+const withHeaderFromParams =
   () =>
-  ({ route }: { route: RouteProp<ParamListBase, string>; navigation: any }) =>
+  ({ route }: { route: RouteProp<ParamListBase, string> }): NativeStackNavigationOptions =>
     nestedScreenOptionsWithTitle((route.params as HeaderTitleParamsShape | undefined)?.headerTitle);
 
-export { nestedScreenOptions, nestedScreenOptionsWithTitle, stackScreenOptions };
+export { nestedScreenOptions, nestedScreenOptionsWithTitle, stackScreenOptions, withHeaderFromParams };

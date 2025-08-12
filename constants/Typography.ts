@@ -8,5 +8,5 @@ export const Fonts = {
   BlackItalic: 'Lato-BlackItalic',
   LightItalic: 'Lato-LightItalic',
   Thin: 'Lato-Thin',
-  ThinItalic: 'Lato-ThinItalic',
-}
+  ThinItalic: 'Lato-ThinItalic'
+};

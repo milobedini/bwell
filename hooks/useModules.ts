@@ -1,17 +1,28 @@
 import { api } from '@/api/api';
 import type {
+  AvailableModulesItem,
   CreateModuleInput,
   EnrolInput,
   EnrolResponse,
   Module,
   ModuleDetailResponse,
-  ModulesResponse
+  ModulesPlainResponse,
+  ModulesWithMetaResponse
 } from '@milobedini/shared-types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 // --- API methods ---
-const fetchModules = async (): Promise<Module[]> => {
-  const { data } = await api.get<ModulesResponse>('/modules');
+// const fetchModules = async (): Promise<ModulesResponse> => {
+//   const { data } = await api.get<ModulesResponse>('/modules');
+//   return data.modules;
+// };
+const fetchModulesPlain = async (): Promise<Module[]> => {
+  const { data } = await api.get<ModulesPlainResponse>('/modules');
+  return data.modules;
+};
+
+const fetchModulesWithMeta = async (): Promise<AvailableModulesItem[]> => {
+  const { data } = await api.get<ModulesWithMetaResponse>('/modules?withMeta=true');
   return data.modules;
 };
 
@@ -39,16 +50,26 @@ export const useModuleById = (id: string) => {
 };
 
 // --- Hook: Get all modules ---
-export const useModules = () => {
-  return useQuery<Module[]>({
+
+export const useModules = () =>
+  useQuery<Module[]>({
     queryKey: ['modules'],
-    queryFn: fetchModules,
+    queryFn: fetchModulesPlain,
     staleTime: 1000 * 60 * 60, // 1 hour
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false
   });
-};
+
+export const useModulesWithMeta = () =>
+  useQuery<AvailableModulesItem[]>({
+    queryKey: ['modules'],
+    queryFn: fetchModulesWithMeta,
+    staleTime: 1000 * 60 * 60, // 1 hour
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false
+  });
 
 // --- Hook: Create a new module ---
 export const useCreateModule = () => {

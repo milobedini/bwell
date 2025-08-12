@@ -4,9 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const markOnboardingComplete = async () => {
   try {
     await AsyncStorage.setItem('hasSeenOnboarding', 'true');
-  } catch (error) {
-    console.error('Failed to store onboarding state', error);
-  }
+  } catch {}
 };
 
 export const useHasOnboarded = () => {
@@ -17,8 +15,7 @@ export const useHasOnboarded = () => {
       try {
         const value = await AsyncStorage.getItem('hasSeenOnboarding');
         setHasOnboarded(value === 'true');
-      } catch (error) {
-        console.error('Failed to read onboarding state', error);
+      } catch {
         setHasOnboarded(false); // fallback
       }
     };
