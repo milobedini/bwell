@@ -1,5 +1,5 @@
 import { UserRole } from '@/types/types';
-import { AuthUser } from '@milobedini/shared-types';
+import type { AuthUser, ProfileResponse } from '@milobedini/shared-types';
 
 const displayUserRoles = (roles: AuthUser['roles']): string => {
   return roles.join(', ');
@@ -20,14 +20,14 @@ const isPatient = (roles?: AuthUser['roles']): boolean => {
   return roles.includes(UserRole.PATIENT);
 };
 
-const isVerifiedTherapist = (user: AuthUser | null): boolean => {
+const isVerifiedTherapist = (user: AuthUser | ProfileResponse | null): boolean => {
   if (!user) return false;
   if (!user.roles || !user.roles.length) return false;
   if (user.roles.includes(UserRole.THERAPIST) && user.isVerifiedTherapist) return true;
   return false;
 };
 
-const isAdminOrTherapist = (user: AuthUser | null): boolean => {
+const isAdminOrTherapist = (user: AuthUser | ProfileResponse | null): boolean => {
   if (!user) return false;
   return isAdmin(user.roles) || isTherapist(user.roles);
 };

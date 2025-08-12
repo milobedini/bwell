@@ -48,6 +48,13 @@ export default function MainTabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="assignments"
+        options={{
+          title: 'Assignments',
+          tabBarIcon: ({ color, size }) => <Ionicons name="clipboard-outline" color={color} size={size} />
+        }}
+      />
+      <Tabs.Screen
         name="programs"
         options={{
           title: 'Programs',
