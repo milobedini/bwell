@@ -9,11 +9,12 @@ import { motify, MotiView, useDynamicAnimation } from 'moti';
 import * as Yup from 'yup';
 import { LoginLogo } from '@/components/sign-in/LoginLogo';
 import { ThemedText } from '@/components/ThemedText';
+import { renderErrorToast } from '@/components/toast/toastOptions';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useRegister } from '@/hooks/useAuth';
 import { UserRole } from '@/types/types';
-import axiosErrorString from '@/utils/axiosErrorString';
+import { getServerErrorMessage } from '@/utils/axiosErrorString';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
 import { type RegisterInput } from '@milobedini/shared-types';
@@ -241,9 +242,7 @@ export default function Signup() {
                           params: { userId: id }
                         });
                       },
-                      onError: (error) => {
-                        setApiError(axiosErrorString(error));
-                      }
+                      onError: (err) => renderErrorToast(getServerErrorMessage(err))
                     });
                   }}
                 >

@@ -7,14 +7,14 @@ import { ThemedText } from '../ThemedText';
 
 const toastConfig = {
   success: (props: ToastConfigParams) => (
-    <View className="elevation-lg w-4/5 flex-row items-center rounded-xl bg-sway-bright px-4 py-3 shadow-md shadow-sway-bright">
-      <MaterialCommunityIcons name="check-circle" size={22} color={Colors.sway.dark} style={{ marginRight: 10 }} />
-      <View className="flex-1">
-        <ThemedText onLight type="smallTitle" style={{ marginBottom: 2 }}>
+    <View className="elevation-lg w-4/5 flex-row items-center justify-center rounded-lg bg-sway-bright px-4 py-3 shadow-md shadow-sway-bright">
+      <MaterialCommunityIcons name="check-circle" size={22} color={Colors.sway.dark} style={{ paddingHorizontal: 8 }} />
+      <View className="mr-2 py-2">
+        <ThemedText onLight type="smallTitle">
           {props.text1}
         </ThemedText>
         {props.text2 && (
-          <ThemedText onLight style={{ marginBottom: 0 }}>
+          <ThemedText onLight style={{ marginTop: 12 }}>
             {props.text2}
           </ThemedText>
         )}
@@ -22,21 +22,17 @@ const toastConfig = {
     </View>
   ),
   error: (props: ToastConfigParams) => (
-    <View
-      className="elevation-lg w-4/5 flex-row items-center rounded-xl bg-error px-4 py-3 shadow-md shadow-error"
-      style={{
-        backgroundColor: Colors.primary.error,
-        elevation: 6,
-        shadowColor: '#000'
-      }}
-    >
-      <MaterialCommunityIcons name="alert-circle" size={22} color={Colors.primary.white} style={{ marginRight: 10 }} />
-      <View className="flex-1">
-        <ThemedText type="smallTitle" style={{ marginBottom: 2 }}>
-          {props.text1}
-        </ThemedText>
+    <View className="elevation-lg w-4/5 flex-row items-center justify-center gap-2 rounded-lg bg-error px-4 py-3 shadow-md shadow-error">
+      <MaterialCommunityIcons
+        name="alert-circle"
+        size={22}
+        color={Colors.primary.white}
+        style={{ paddingHorizontal: 8 }}
+      />
+      <View className="mr-2 py-2">
+        <ThemedText type="smallTitle">{props.text1}</ThemedText>
         {props.text2 && (
-          <ThemedText onLight style={{ marginBottom: 0 }}>
+          <ThemedText onLight style={{ marginTop: 12 }}>
             {props.text2}
           </ThemedText>
         )}

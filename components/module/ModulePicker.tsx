@@ -1,22 +1,28 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
-import { Dialog, IconButton, List, Portal, TextInput } from 'react-native-paper';
+import { FlatList, useWindowDimensions, View } from 'react-native';
+import { Dialog, Divider, IconButton, List, Portal, TextInput } from 'react-native-paper';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useEnrollUnenrollUser, useModules } from '@/hooks/useModules';
 import { getServerErrorMessage } from '@/utils/axiosErrorString';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import type { AuthUser, Module } from '@milobedini/shared-types';
 
+import { LoadingIndicator } from '../LoadingScreen';
 import { ThemedText } from '../ThemedText';
 import { renderErrorToast, renderSuccessToast } from '../toast/toastOptions';
 
 type ModulePickerProps = {
   visible: boolean;
   onDismiss: () => void;
-  patientId: string;
+  patient: AuthUser;
 };
 
-const ModulePicker = ({ visible, onDismiss, patientId }: ModulePickerProps) => {
+const ModulePicker = ({ visible, onDismiss, patient }: ModulePickerProps) => {
+  const { height: screenH } = useWindowDimensions();
+  const verticalMargin = 36;
+  const dialogHeight = (screenH - verticalMargin) * 0.9;
+
   const { data: modules, isPending, isError } = useModules();
   const enrollUnenroll = useEnrollUnenrollUser();
   const [query, setQuery] = useState('');
@@ -30,72 +36,95 @@ const ModulePicker = ({ visible, onDismiss, patientId }: ModulePickerProps) => {
 
   const handleSelect = (moduleId: string) => {
     enrollUnenroll.mutate(
-      { patientId, moduleId },
+      { patientId: patient._id, moduleId },
       {
-        onSuccess: (res) => {
-          renderSuccessToast(res.message);
-        },
-        onError: (err) => {
-          renderErrorToast(getServerErrorMessage(err));
-        }
+        onSuccess: (res) => renderSuccessToast(res.message),
+        onError: (err) => renderErrorToast(getServerErrorMessage(err))
       }
+    );
+  };
+
+  const renderRow = ({ item }: { item: Module }) => {
+    const isAssigned = item.enrolled?.includes(patient._id);
+    return (
+      <List.Item
+        key={item._id}
+        title={item.title}
+        description={item.description}
+        onPress={() => handleSelect(item._id)}
+        titleStyle={{ fontFamily: Fonts.Bold }}
+        descriptionStyle={{ fontFamily: Fonts.Regular }}
+        style={{ paddingLeft: 0, paddingRight: 0 }}
+        right={() => (
+          <MaterialCommunityIcons
+            name={isAssigned ? 'minus-circle' : 'plus-circle'}
+            size={36}
+            color={isAssigned ? Colors.primary.error : Colors.sway.bright}
+            style={{ alignSelf: 'center' }}
+          />
+        )}
+      />
     );
   };
 
   return (
     <Portal>
-      <Dialog visible={visible} onDismiss={onDismiss}>
+      <Dialog
+        visible={visible}
+        onDismiss={onDismiss}
+        style={{ height: dialogHeight, alignSelf: 'center', width: '90%', marginVertical: verticalMargin }}
+        dismissableBackButton
+      >
         <Dialog.Title>
-          <ThemedText type="title" onLight>
-            Assign a module
+          <ThemedText type="subtitle" className="text-center" onLight>
+            Enroll {patient.name || patient.username}
           </ThemedText>
         </Dialog.Title>
-        <Dialog.Content>
+
+        <Dialog.Content style={{ paddingBottom: 0 }}>
           {isPending ? (
-            <ActivityIndicator />
+            <View className="h-full">
+              <LoadingIndicator marginBottom={verticalMargin} transparent />
+            </View>
           ) : isError ? (
             <ThemedText type="error">
               <List.Item title="Failed to load modules" />
             </ThemedText>
           ) : (
-            <>
-              <TextInput placeholder="Search modules…" value={query} onChangeText={setQuery} />
-              {filtered.length === 0 ? (
-                <List.Item title="No modules found" />
-              ) : (
-                filtered.map((m) => {
-                  const isAssigned = m.enrolled?.includes(patientId);
-                  return (
-                    <List.Item
-                      key={m._id}
-                      title={m.title}
-                      description={m.description}
-                      onPress={() => handleSelect(m._id)}
-                      titleStyle={{
-                        fontFamily: Fonts.Bold
-                      }}
-                      descriptionStyle={{
-                        fontFamily: Fonts.Regular
-                      }}
-                      right={() => (
-                        <MaterialCommunityIcons
-                          name={isAssigned ? 'minus-circle' : 'plus-circle'}
-                          size={36}
-                          color={isAssigned ? Colors.primary.error : Colors.sway.bright}
-                          style={{ alignSelf: 'center' }}
-                        />
-                      )}
-                    />
-                  );
-                })
-              )}
-            </>
+            <View>
+              <TextInput
+                placeholder="Search modules…"
+                value={query}
+                onChangeText={setQuery}
+                clearButtonMode="while-editing"
+              />
+            </View>
           )}
         </Dialog.Content>
+
+        {!isPending && !isError && (
+          <Dialog.ScrollArea style={{ height: '100%' }}>
+            {filtered.length === 0 ? (
+              <List.Item title="No modules found" />
+            ) : (
+              <FlatList
+                data={filtered}
+                keyExtractor={(m) => m._id}
+                renderItem={renderRow}
+                keyboardShouldPersistTaps="handled"
+                contentContainerStyle={{ paddingBottom: 12 }}
+                ItemSeparatorComponent={() => <Divider bold />}
+                showsVerticalScrollIndicator={false}
+              />
+            )}
+          </Dialog.ScrollArea>
+        )}
+
         <Dialog.Actions>
           <IconButton
             icon={() => <MaterialIcons name="cancel" color={Colors.primary.error} size={36} />}
             onPress={onDismiss}
+            aria-label="cancel"
           />
         </Dialog.Actions>
       </Dialog>

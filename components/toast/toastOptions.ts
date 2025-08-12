@@ -20,7 +20,7 @@ export const successOptions = (title: string, description?: string): ToastShowPa
   buildToast('success', title, description);
 
 export const errorOptions = (title: string, description?: string): ToastShowParams =>
-  buildToast('error', title, description, 2000);
+  buildToast('error', title, description, 2500);
 
 export const renderSuccessToast = (title: string, description?: string) =>
   Toast.show(successOptions(title, description));

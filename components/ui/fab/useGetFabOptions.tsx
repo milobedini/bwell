@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { renderErrorToast, renderSuccessToast } from '@/components/toast/toastOptions';
 import { useAddRemoveTherapist } from '@/hooks/useUsers';
 import { useAuthStore } from '@/stores/authStore';
+import { getServerErrorMessage } from '@/utils/axiosErrorString';
 import type { AuthUser, User } from '@milobedini/shared-types';
 
 import { FabGroupAction } from './FabGroup';
@@ -38,8 +39,8 @@ const useGetFabOptions = ({
             renderSuccessToast(data.message);
             closeMenu();
           },
-          onError: (error) => {
-            renderErrorToast(error.message);
+          onError: (err) => {
+            renderErrorToast(getServerErrorMessage(err));
             closeMenu();
           }
         }

@@ -13,6 +13,7 @@ import FabGroup from '@/components/ui/fab/FabGroup';
 import FabTrigger from '@/components/ui/fab/FabTrigger';
 import useGetFabOptions, { FabOptionsVariant } from '@/components/ui/fab/useGetFabOptions';
 import { useClients } from '@/hooks/useUsers';
+import type { AuthUser } from '@milobedini/shared-types';
 
 const AllClients = () => {
   const { data: clients, isPending, isError } = useClients();
@@ -21,7 +22,7 @@ const AllClients = () => {
   const [openFab, setOpenFab] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [pickerPatientId, setPickerPatientId] = useState<string>('');
+  const [pickerPatient, setPickerPatient] = useState<AuthUser | null>();
 
   const selectedClient = useMemo(() => clients?.find((p) => p._id === selectedClientId), [clients, selectedClientId]);
   const closeMenu = useCallback(() => {
@@ -33,8 +34,8 @@ const AllClients = () => {
     variant: FabOptionsVariant.CLIENTS,
     closeMenu,
     selectedEntity: selectedClient,
-    openModulePicker: (id) => {
-      setPickerPatientId(id);
+    openModulePicker: () => {
+      setPickerPatient(selectedClient);
       setPickerOpen(true);
     }
   });
@@ -81,14 +82,16 @@ const AllClients = () => {
         onDismiss={closeMenu}
         actions={actions}
       />
-      <ModulePicker
-        visible={pickerOpen}
-        onDismiss={() => {
-          setPickerOpen(false);
-          setSelectedClientId(null);
-        }}
-        patientId={pickerPatientId}
-      />
+      {pickerPatient && (
+        <ModulePicker
+          visible={pickerOpen}
+          onDismiss={() => {
+            setPickerOpen(false);
+            setSelectedClientId(null);
+          }}
+          patient={pickerPatient}
+        />
+      )}
     </>
   );
 };

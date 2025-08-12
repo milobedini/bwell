@@ -2,12 +2,18 @@ import { View } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { Colors } from '@/constants/Colors';
 
-export const LoadingIndicator = ({ marginBottom }: { marginBottom: number }) => {
+export const LoadingIndicator = ({
+  marginBottom,
+  transparent = false
+}: {
+  marginBottom: number;
+  transparent?: boolean;
+}) => {
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: Colors.sway.dark,
+        backgroundColor: (!transparent && Colors.sway.dark) || 'inherit',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: marginBottom,
