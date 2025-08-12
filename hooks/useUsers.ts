@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/authStore';
 import type {
   AddRemoveTherapistInput,
   AddRemoveTherapistResponse,
+  AdminStats,
   AvailableModulesResponse,
   PatientsResponse,
   ProfileResponse,
@@ -83,6 +84,18 @@ export const useGetAvailableModules = () => {
     refetchOnReconnect: false
   });
 };
+export const useAdminStats = () => {
+  const isLoggedIn = useIsLoggedIn();
+
+  return useQuery<AdminStats>({
+    queryKey: ['users'],
+    queryFn: async (): Promise<AdminStats> => {
+      const { data } = await api.get<AdminStats>('/user/admin/stats');
+      return data;
+    },
+    enabled: isLoggedIn
+  });
+};
 
 // MUTATIONS
 
@@ -112,6 +125,7 @@ export const useAdminVerifyTherapist = () => {
     },
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: ['profile'] });
+      queryClient.refetchQueries({ queryKey: ['users'] });
     }
   });
 };
