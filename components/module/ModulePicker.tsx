@@ -64,7 +64,6 @@ const ModulePicker = ({ visible, onDismiss, patientId }: ModulePickerProps) => {
                 <List.Item title="No modules found" />
               ) : (
                 filtered.map((m) => {
-                  console.log(patientId, m.enrolled);
                   const isAssigned = m.enrolled?.includes(patientId);
                   return (
                     <List.Item
