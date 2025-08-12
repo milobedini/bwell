@@ -1,5 +1,6 @@
 import { Toast } from 'toastify-react-native';
 import type { ToastPosition, ToastShowParams, ToastType } from 'toastify-react-native/utils/interfaces';
+import { getServerErrorMessage } from '@/utils/axiosErrorString';
 
 export const buildToast = (
   type: ToastType,
@@ -25,4 +26,7 @@ export const errorOptions = (title: string, description?: string): ToastShowPara
 export const renderSuccessToast = (title: string, description?: string) =>
   Toast.show(successOptions(title, description));
 
-export const renderErrorToast = (title: string, description?: string) => Toast.show(errorOptions(title, description));
+export const renderCustomErrorToast = (title: string, description?: string) =>
+  Toast.show(errorOptions(title, description));
+
+export const renderErrorToast = (err: unknown) => Toast.show(errorOptions(getServerErrorMessage(err)));

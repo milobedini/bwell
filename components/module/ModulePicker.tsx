@@ -4,7 +4,6 @@ import { Dialog, Divider, IconButton, List, Portal, TextInput } from 'react-nati
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useEnrollUnenrollUser, useModules } from '@/hooks/useModules';
-import { getServerErrorMessage } from '@/utils/axiosErrorString';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import type { AuthUser, Module } from '@milobedini/shared-types';
 
@@ -39,7 +38,7 @@ const ModulePicker = ({ visible, onDismiss, patient }: ModulePickerProps) => {
       { patientId: patient._id, moduleId },
       {
         onSuccess: (res) => renderSuccessToast(res.message),
-        onError: (err) => renderErrorToast(getServerErrorMessage(err))
+        onError: (err) => renderErrorToast(err)
       }
     );
   };

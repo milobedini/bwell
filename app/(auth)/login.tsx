@@ -12,7 +12,6 @@ import { renderErrorToast } from '@/components/toast/toastOptions';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useLogin } from '@/hooks/useAuth';
-import { getServerErrorMessage } from '@/utils/axiosErrorString';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
 import { LoginInput } from '@milobedini/shared-types';
@@ -232,7 +231,7 @@ export default function Login() {
                       onSuccess: () => {
                         router.replace('/home');
                       },
-                      onError: (err) => renderErrorToast(getServerErrorMessage(err))
+                      onError: (err) => renderErrorToast(err)
                     });
                   }}
                 >

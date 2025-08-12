@@ -14,7 +14,6 @@ import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useRegister } from '@/hooks/useAuth';
 import { UserRole } from '@/types/types';
-import { getServerErrorMessage } from '@/utils/axiosErrorString';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
 import { type RegisterInput } from '@milobedini/shared-types';
@@ -242,7 +241,7 @@ export default function Signup() {
                           params: { userId: id }
                         });
                       },
-                      onError: (err) => renderErrorToast(getServerErrorMessage(err))
+                      onError: (err) => renderErrorToast(err)
                     });
                   }}
                 >
