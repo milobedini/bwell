@@ -13,7 +13,7 @@
     "type-check": "tsc --noEmit --incremental",
     "lint:eslint": "eslint \"**/*.*{ts,tsx,js,jsx}\"",
     "lint:prettier": "prettier --check .",
-    "lint": "expo lint && npm run lint:eslint && npm run lint:prettier && npm run type-check",
+    "lint": "expo lint && npm run lint:eslint  && npm run lint:prettier && npm run type-check",
     "prepare": "husky",
     "clean": "rm -rf node_modules && rm -rf package-lock.json &&  rm -rf .expo && rm -rf .expo-shared  && npm install && expo start -c",
     "verify": "npx expo-doctor",

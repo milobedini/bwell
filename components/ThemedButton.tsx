@@ -38,7 +38,7 @@ const PrimaryButton = ({ onPress, title, logo, className, textClasses, logoClass
     <TouchableOpacity
       onPress={onPress}
       className={clsx(
-        'bg-sway-buttonBackground  mt-5 w-[300] flex-row items-center justify-evenly self-center rounded-lg border border-sway-bright',
+        'mt-5  w-[300] flex-row items-center justify-evenly self-center rounded-lg border border-sway-bright bg-sway-buttonBackground',
         className
       )}
       activeOpacity={0.4}

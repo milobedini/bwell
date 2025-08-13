@@ -68,6 +68,11 @@ export default defineConfig([
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }
       ]
+    },
+    settings: {
+      tailwindcss: {
+        callees: ['clsx', 'cn', 'cva']
+      }
     }
   }
 ]);
