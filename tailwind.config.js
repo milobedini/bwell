@@ -16,8 +16,8 @@ module.exports = {
         background: '#F4F2EB',
         lightGrey: '#e0e9f3',
         darkGrey: '#a6adbb',
-
-        bright: '#18cdba'
+        bright: '#18cdba',
+        buttonBackground: 'rgba(43,59,91,0.4)'
       }
     },
     extend: {}

@@ -1,9 +1,8 @@
-import { useEffect, useMemo } from 'react';
-import { Image, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { type ReactNode, useEffect, useMemo } from 'react';
+import { Image, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { interpolate, useDerivedValue, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import Constants from 'expo-constants';
 import { Colors } from '@/constants/Colors';
-import { AntDesign } from '@expo/vector-icons';
 import {
   BackdropFilter,
   Blur,
@@ -17,15 +16,7 @@ import {
   vec
 } from '@shopify/react-native-skia';
 
-import { ThemedText } from '../ThemedText';
-
-import swayText from '../../assets/images/icon.png';
-// import { textStyles } from '../../../../components/text';
-// import { useAppSelector } from '../../../../lib/redux/hooks';
-// import { ThenThrow } from '../../../../lib/then-throw';
-// import { meditationGallery } from '../../../meditate/screens/meditation-menu/gallery/MeditationGallery';
-// import { HomeNavigatorParamsList } from '../../HomeNavigatorParamsList';
-// import meditationImage from './logo_black.png';
+import bWellLogo from '../../assets/images/logo.png';
 
 const styles = StyleSheet.create({
   container: {
@@ -38,7 +29,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingBottom: 22
   },
-  buttonContainer: {
+  contentContainer: {
     flex: 0.5
     // paddingTop: 80,
   },
@@ -66,7 +57,11 @@ const styles = StyleSheet.create({
   }
 });
 
-export const HomeScreen = () => {
+type HomeScreenProps = {
+  content: ReactNode;
+};
+
+export const HomeScreen = ({ content }: HomeScreenProps) => {
   const progress = useSharedValue(0);
   const { width, height } = useWindowDimensions();
   const c = vec(width / 2, height / 4);
@@ -85,9 +80,10 @@ export const HomeScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
-        <Image source={swayText} style={{ aspectRatio: 2000 / 1247, width: 80 }} />
+        {/* Icon and search */}
+        <Image source={bWellLogo} style={{ aspectRatio: 2000 / 1247, width: 140 }} />
       </View>
-      <AntDesign
+      {/* <AntDesign
         name="search1"
         size={40}
         color={Colors.sway.darkGrey}
@@ -97,14 +93,11 @@ export const HomeScreen = () => {
           right: 22
         }}
         onPress={() => {}}
-      />
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={() => {}} style={[styles.button]} activeOpacity={0.4}>
-          <ThemedText type="title" style={styles.imageTitle}>
-            Your Daily Meditation
-          </ThemedText>
-          <Image source={swayText} style={styles.image} />
-        </TouchableOpacity>
+      /> */}
+      {/* Buttons */}
+      <View style={styles.contentContainer}>
+        {/* <PrimaryButton title="Your daily meditation" logo onPress={() => {}} /> */}
+        {content}
       </View>
       <Canvas
         style={{
