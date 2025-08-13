@@ -1,6 +1,7 @@
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import AdminHome from '@/components/home/AdminHome';
 import PatientHome from '@/components/home/PatientHome';
+// import { HomeScreen } from '@/components/home/SwayHome';
 import UnverifiedTherapistHome from '@/components/home/UnverifiedTherapistHome';
 import VerifiedTherapistHome from '@/components/home/VerifiedTherapistHome';
 import { LoadingIndicator } from '@/components/LoadingScreen';
@@ -15,6 +16,8 @@ export default function Home() {
   if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
 
   if (!user && !isPending) return <ErrorComponent errorType={ErrorTypes.UNAUTHORIZED} redirectLogin />;
+
+  // return <HomeScreen />;
 
   if (isAdmin(user.roles)) return <AdminHome />;
 
