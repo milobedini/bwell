@@ -16,4 +16,16 @@ enum AccessPolicy {
   ASSIGNED = 'assigned'
 }
 
-export { AccessPolicy, ModuleType, UserRole };
+enum CanStartReason {
+  OK = 'ok',
+  NOT_ENROLLED = 'not_enrolled',
+  REQUIRES_ASSIGNMENT = 'requires_assignment',
+  UNAUTHENTICATED = 'unauthenticated'
+}
+
+enum AssignmentStatus {
+  ASSIGNED = 'assigned',
+  IN_PROGRESS = 'in_progress'
+}
+
+export { AccessPolicy, AssignmentStatus, CanStartReason, ModuleType, UserRole };
