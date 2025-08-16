@@ -1,7 +1,5 @@
 import type { AxiosError } from 'axios';
 import { api } from '@/api/api';
-import { useAuthStore } from '@/stores/authStore';
-import { isPatient, isTherapist } from '@/utils/userRoles';
 import type {
   CreateAssignmentInput,
   CreateAssignmentResponse,
@@ -17,7 +15,6 @@ import { useIsLoggedIn } from './useUsers';
 // QUERIES
 export const useViewTherapistOutstandingAssignments = () => {
   const isLoggedIn = useIsLoggedIn();
-  const user = useAuthStore((s) => s.user);
 
   return useQuery<MyAssignmentsResponse>({
     queryKey: ['assignments'],
@@ -25,7 +22,7 @@ export const useViewTherapistOutstandingAssignments = () => {
       const { data } = await api.get<MyAssignmentsResponse>('/assignments/mine');
       return data;
     },
-    enabled: isLoggedIn && isTherapist(user?.roles),
+    enabled: isLoggedIn,
     staleTime: 1000 * 60 * 60, // 5 minutes
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -34,7 +31,6 @@ export const useViewTherapistOutstandingAssignments = () => {
 };
 export const useViewMyAssignments = (status?: string) => {
   const isLoggedIn = useIsLoggedIn();
-  const user = useAuthStore((s) => s.user);
 
   return useQuery<MyAssignmentView[]>({
     queryKey: ['assignments'],
@@ -42,7 +38,7 @@ export const useViewMyAssignments = (status?: string) => {
       const { data } = await api.get<MyAssignmentsResponse>('/user/assignments', { params: status });
       return data.assignments;
     },
-    enabled: isLoggedIn && isPatient(user?.roles),
+    enabled: isLoggedIn,
     staleTime: 1000 * 60 * 60, // 5 minutes
     refetchOnMount: false,
     refetchOnWindowFocus: false,
