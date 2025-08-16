@@ -1,23 +1,20 @@
 import { View } from 'react-native';
 
-import { BWellLogo } from '../brand/Imagery';
-import Container from '../Container';
 import ContentContainer from '../ContentContainer';
-import { ThemedText } from '../ThemedText';
+import { PendingChip } from '../ui/Chip';
+
+import { HomeScreen } from './HomeScreen';
+
+const content = (
+  <ContentContainer>
+    <View className="items-center justify-center">
+      <PendingChip animate />
+    </View>
+  </ContentContainer>
+);
 
 const UnverifiedTherapistHome = () => {
-  return (
-    <Container>
-      <ContentContainer>
-        <ThemedText type="title" className="mt-4">
-          You are awaiting BWell verification
-        </ThemedText>
-        <View className="mt-auto items-center">
-          <BWellLogo />
-        </View>
-      </ContentContainer>
-    </Container>
-  );
+  return <HomeScreen content={content} />;
 };
 
 export default UnverifiedTherapistHome;

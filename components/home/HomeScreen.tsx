@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useMemo } from 'react';
-import { Image, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Image, useWindowDimensions, View } from 'react-native';
 import { interpolate, useDerivedValue, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import Constants from 'expo-constants';
 import { Colors } from '@/constants/Colors';
@@ -17,45 +17,6 @@ import {
 } from '@shopify/react-native-skia';
 
 import bWellLogo from '../../assets/images/logo.png';
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.sway.dark
-  },
-  topContainer: {
-    flexDirection: 'row',
-    marginTop: Constants.statusBarHeight + 22,
-    justifyContent: 'center',
-    paddingBottom: 22
-  },
-  contentContainer: {
-    flex: 0.5
-    // paddingTop: 80,
-  },
-  button: {
-    flexDirection: 'row',
-    width: 300,
-    alignSelf: 'center',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-    marginTop: 22,
-    backgroundColor: 'rgba(43, 59, 91, 0.4)',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: Colors.sway.bright
-  },
-  image: {
-    width: 120,
-    height: 120
-  },
-  imageTitle: {
-    textAlign: 'center',
-    fontSize: 20,
-    color: Colors.sway.lightGrey,
-    maxWidth: '50%'
-  }
-});
 
 type HomeScreenProps = {
   content: ReactNode;
@@ -78,27 +39,18 @@ export const HomeScreen = ({ content }: HomeScreenProps) => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.topContainer}>
+    <View className="flex-1 bg-sway-dark">
+      <View
+        className="flex-row justify-center pb-[22]"
+        style={{
+          marginTop: Constants.statusBarHeight + 22
+        }}
+      >
         {/* Icon and search */}
         <Image source={bWellLogo} style={{ aspectRatio: 2000 / 1247, width: 140 }} />
       </View>
-      {/* <AntDesign
-        name="search1"
-        size={40}
-        color={Colors.sway.darkGrey}
-        style={{
-          position: 'absolute',
-          top: Constants.statusBarHeight + 26,
-          right: 22
-        }}
-        onPress={() => {}}
-      /> */}
-      {/* Buttons */}
-      <View style={styles.contentContainer}>
-        {/* <PrimaryButton title="Your daily meditation" logo onPress={() => {}} /> */}
-        {content}
-      </View>
+      {/* Content */}
+      <View className=" flex-[0.5]">{content}</View>
       <Canvas
         style={{
           flex: 1
