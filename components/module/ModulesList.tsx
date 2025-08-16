@@ -3,17 +3,17 @@ import { View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAuthStore } from '@/stores/authStore';
 import { AccessPolicy } from '@/types/types';
-import type { Module } from '@milobedini/shared-types';
+import type { AvailableModulesItem, Module } from '@milobedini/shared-types';
 
 import ThemedButton from '../ThemedButton';
 import { ThemedText } from '../ThemedText';
-import { AccessPolicyChip, EnrolledChip } from '../ui/Chip';
+import { AccessPolicyChip, CanStartChip, EnrolledChip } from '../ui/Chip';
 
 type ModulesListProps = {
-  modules: Module[];
+  data: AvailableModulesItem[];
 };
 
-const ModulesList = ({ modules }: ModulesListProps) => {
+const ModulesList = ({ data }: ModulesListProps) => {
   const userId = useAuthStore((s) => s.user?._id);
   const { id: programId } = useLocalSearchParams();
   const router = useRouter();
@@ -30,7 +30,8 @@ const ModulesList = ({ modules }: ModulesListProps) => {
 
   return (
     <View>
-      {modules.map((module) => {
+      {data.map((item) => {
+        const { module, meta } = item;
         const isEnrolled = userId && module.enrolled?.includes(userId);
         return (
           <View key={module._id} className="mb-6 gap-2 border-b border-b-sway-lightGrey pb-6">
@@ -41,6 +42,7 @@ const ModulesList = ({ modules }: ModulesListProps) => {
             <View className="w-1/2">
               <AccessPolicyChip accessPolicy={module.accessPolicy as AccessPolicy} />
             </View>
+            <CanStartChip meta={meta} />
             <ThemedText className=" text-lg">{module.description}</ThemedText>
             <ThemedText className="capitalize">{module.type}</ThemedText>
             <ThemedButton onPress={() => handleModulePress(module)}>View Module</ThemedButton>

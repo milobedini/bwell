@@ -10,7 +10,7 @@ import type {
   ModulesPlainResponse,
   ModulesWithMetaResponse
 } from '@milobedini/shared-types';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 
 // --- API methods ---
 
@@ -49,25 +49,29 @@ export const useModuleById = (id: string) => {
 
 // --- Hook: Get all modules ---
 
-export const useModules = (programId?: string) =>
-  useQuery<Module[]>({
-    queryKey: ['modules'],
-    queryFn: () => fetchModulesPlain(programId),
-    staleTime: 1000 * 60 * 60, // 1 hour
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
-  });
+export type UseModuleOptions = {
+  programId?: string;
+  withMeta?: boolean;
+};
 
-export const useModulesWithMeta = (programId?: string) =>
-  useQuery<AvailableModulesItem[]>({
-    queryKey: ['modules'],
-    queryFn: () => fetchModulesWithMeta(programId),
+export function useModules(options: { programId?: string; withMeta: true }): UseQueryResult<AvailableModulesItem[]>;
+
+// Overload 2: withMeta omitted/false -> Module[]
+export function useModules(options?: { programId?: string; withMeta?: false }): UseQueryResult<Module[]>;
+
+export function useModules({ programId, withMeta }: UseModuleOptions = {}) {
+  return useQuery<Module[] | AvailableModulesItem[]>({
+    queryKey: ['modules', { programId, withMeta: !!withMeta }],
+    queryFn: () => {
+      if (withMeta) return fetchModulesWithMeta(programId);
+      return fetchModulesPlain(programId);
+    },
     staleTime: 1000 * 60 * 60, // 1 hour
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false
   });
+}
 
 // --- Hook: Create a new module ---
 export const useCreateModule = () => {

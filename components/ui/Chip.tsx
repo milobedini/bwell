@@ -1,10 +1,12 @@
-import { useEffect, useRef } from 'react';
-import { Animated, Easing, View } from 'react-native';
 import { Chip } from 'react-native-paper';
+import LottieView from 'lottie-react-native';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { AccessPolicy } from '@/types/types';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import type { AvailableModulesItem } from '@milobedini/shared-types';
+
+import hourglass from '@/assets/lotties/hourglass.json';
 
 const EnrolledChip = () => {
   return (
@@ -27,63 +29,7 @@ const EnrolledChip = () => {
 };
 
 const PendingChip = ({ animate }: { animate?: boolean }) => {
-  const topOpacity = useRef(new Animated.Value(1)).current;
-  const bottomOpacity = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    if (!animate) return;
-
-    const loop = Animated.loop(
-      Animated.sequence([
-        // fade to bottom (sand collects)
-        Animated.parallel([
-          Animated.timing(topOpacity, {
-            toValue: 0,
-            duration: 220,
-            easing: Easing.out(Easing.quad),
-            useNativeDriver: true
-          }),
-          Animated.timing(bottomOpacity, {
-            toValue: 1,
-            duration: 220,
-            easing: Easing.out(Easing.quad),
-            useNativeDriver: true
-          })
-        ]),
-        Animated.delay(800),
-        // flip back to top
-        Animated.parallel([
-          Animated.timing(topOpacity, {
-            toValue: 1,
-            duration: 220,
-            easing: Easing.out(Easing.quad),
-            useNativeDriver: true
-          }),
-          Animated.timing(bottomOpacity, {
-            toValue: 0,
-            duration: 220,
-            easing: Easing.out(Easing.quad),
-            useNativeDriver: true
-          })
-        ]),
-        Animated.delay(800)
-      ])
-    );
-
-    loop.start();
-    return () => loop.stop();
-  }, [bottomOpacity, topOpacity, animate]);
-
-  const animatedIcon = (
-    <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}>
-      <Animated.View style={{ position: 'absolute', opacity: topOpacity }}>
-        <MaterialIcons name="hourglass-top" size={24} color={Colors.primary.info} />
-      </Animated.View>
-      <Animated.View style={{ position: 'absolute', opacity: bottomOpacity }}>
-        <MaterialIcons name="hourglass-bottom" size={24} color={Colors.primary.info} />
-      </Animated.View>
-    </View>
-  );
+  const animatedIcon = <LottieView source={hourglass} autoPlay loop style={{ width: 42, height: 42 }} />;
 
   return (
     <Chip
@@ -174,4 +120,23 @@ const AccessPolicyChip = ({ accessPolicy }: AccessPolicyChipProps) => {
   }
 };
 
-export { AccessPolicyChip, EnrolledChip, PendingChip };
+type CanStartChipProps = {
+  meta: AvailableModulesItem['meta'];
+};
+const CanStartChip = ({ meta }: CanStartChipProps) => {
+  const { canStart, canStartReason, source } = meta;
+  if (canStart)
+    return (
+      <Chip>
+        Can start chip {canStart} {canStartReason} {source.map((x) => x)}
+      </Chip>
+    );
+
+  return (
+    <Chip>
+      Cannot start chip {canStart} {canStartReason} {source.map((x) => x)}
+    </Chip>
+  );
+};
+
+export { AccessPolicyChip, CanStartChip, EnrolledChip, PendingChip };
