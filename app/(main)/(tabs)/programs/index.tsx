@@ -30,7 +30,6 @@ export default function ProgramList() {
 
   return (
     <ScrollContainer contentClassName="gap-4">
-      <ThemedText type="subtitle">Programs List</ThemedText>
       {programs.map((program) => (
         <TouchableOpacity key={program._id} onPress={() => handleProgramPress(program)}>
           <View className="border border-sway-lightGrey p-4">

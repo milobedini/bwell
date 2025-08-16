@@ -5,14 +5,22 @@ import { clsx } from 'clsx';
 type ScrollContainerProps = SafeAreaViewProps & {
   centered?: boolean;
   contentClassName?: string;
+  noPadding?: boolean;
 };
 
-const ScrollContainer = ({ children, className, contentClassName, centered, ...rest }: ScrollContainerProps) => {
+const ScrollContainer = ({
+  children,
+  className,
+  contentClassName,
+  centered,
+  noPadding,
+  ...rest
+}: ScrollContainerProps) => {
   return (
     <SafeAreaProvider>
-      <SafeAreaView edges={['top']} style={{ flex: 1 }} className="bg-sway-dark">
+      <SafeAreaView edges={['top']} className="flex-1 bg-sway-dark">
         <ScrollView
-          className={clsx('flex-1 bg-sway-dark px-4', className)}
+          className={clsx('flex-1 bg-sway-dark', !noPadding && 'px-4', className)}
           contentContainerStyle={{
             paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 8 : 12
           }}

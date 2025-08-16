@@ -7,6 +7,16 @@ const stackScreenOptions: NativeStackNavigationOptions = {
   headerShown: false
 };
 
+const stackScreenOptionsWithTitle = (title?: string): NativeStackNavigationOptions => {
+  if (!title) return stackScreenOptions;
+  return {
+    headerShown: true,
+    headerTransparent: true,
+    headerTitle: title,
+    headerTitleStyle: { color: 'white', fontFamily: Fonts.Bold, fontSize: 24 }
+  };
+};
+
 const nestedScreenOptions: NativeStackNavigationOptions = {
   headerShown: true,
   headerTransparent: true,
@@ -30,4 +40,10 @@ const withHeaderFromParams =
   ({ route }: { route: RouteProp<ParamListBase, string> }): NativeStackNavigationOptions =>
     nestedScreenOptionsWithTitle((route.params as HeaderTitleParamsShape | undefined)?.headerTitle);
 
-export { nestedScreenOptions, nestedScreenOptionsWithTitle, stackScreenOptions, withHeaderFromParams };
+export {
+  nestedScreenOptions,
+  nestedScreenOptionsWithTitle,
+  stackScreenOptions,
+  stackScreenOptionsWithTitle,
+  withHeaderFromParams
+};

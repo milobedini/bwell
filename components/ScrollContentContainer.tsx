@@ -6,17 +6,18 @@ type ScrollContentContainerProps = {
   children: ReactNode;
   className?: string;
   centered?: boolean;
+  noPadding?: boolean;
 };
 
-const ScrollContentContainer = ({ children, className, centered }: ScrollContentContainerProps) => {
+const ScrollContentContainer = ({ children, className, centered, noPadding }: ScrollContentContainerProps) => {
+  const padding = noPadding ? {} : { paddingHorizontal: 16, paddingTop: 8 };
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
           justifyContent: centered ? 'center' : 'flex-start',
-          paddingHorizontal: 16,
-          paddingTop: 8
+          ...padding
         }}
         className={clsx('w-full', className)}
         keyboardShouldPersistTaps="handled"

@@ -1,9 +1,12 @@
 import type { AxiosError } from 'axios';
 import { api } from '@/api/api';
-import {
+import { useAuthStore } from '@/stores/authStore';
+import { isPatient, isTherapist } from '@/utils/userRoles';
+import type {
   CreateAssignmentInput,
   CreateAssignmentResponse,
   MyAssignmentsResponse,
+  MyAssignmentView,
   UpdateAssignmentStatusInput,
   UpdateAssignmentStatusResponse
 } from '@milobedini/shared-types';
@@ -14,6 +17,7 @@ import { useIsLoggedIn } from './useUsers';
 // QUERIES
 export const useViewTherapistOutstandingAssignments = () => {
   const isLoggedIn = useIsLoggedIn();
+  const user = useAuthStore((s) => s.user);
 
   return useQuery<MyAssignmentsResponse>({
     queryKey: ['assignments'],
@@ -21,7 +25,7 @@ export const useViewTherapistOutstandingAssignments = () => {
       const { data } = await api.get<MyAssignmentsResponse>('/assignments/mine');
       return data;
     },
-    enabled: isLoggedIn,
+    enabled: isLoggedIn && isTherapist(user?.roles),
     staleTime: 1000 * 60 * 60, // 5 minutes
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -30,14 +34,15 @@ export const useViewTherapistOutstandingAssignments = () => {
 };
 export const useViewMyAssignments = (status?: string) => {
   const isLoggedIn = useIsLoggedIn();
+  const user = useAuthStore((s) => s.user);
 
-  return useQuery<MyAssignmentsResponse>({
+  return useQuery<MyAssignmentView[]>({
     queryKey: ['assignments'],
-    queryFn: async (): Promise<MyAssignmentsResponse> => {
+    queryFn: async (): Promise<MyAssignmentView[]> => {
       const { data } = await api.get<MyAssignmentsResponse>('/user/assignments', { params: status });
-      return data;
+      return data.assignments;
     },
-    enabled: isLoggedIn,
+    enabled: isLoggedIn && isPatient(user?.roles),
     staleTime: 1000 * 60 * 60, // 5 minutes
     refetchOnMount: false,
     refetchOnWindowFocus: false,
