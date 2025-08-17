@@ -14,20 +14,20 @@ type ThemedButtonProps = TouchableOpacityProps & {
 };
 
 const ThemedButton = (props: ThemedButtonProps) => {
-  const { className, children, disabled, compact, ...rest } = props;
+  const { className, children, disabled, compact, title, ...rest } = props;
   return (
     <TouchableOpacity
       disabled={disabled}
       className={clsx(
         'rounded-md bg-sway-bright p-4',
         disabled && 'bg-sway-darkGrey',
-        compact && 'self-start p-3',
+        compact && 'self-start px-3 py-2',
         className
       )}
       {...rest}
     >
       <ThemedText type="button" className="text-center">
-        {children}
+        {title ? title : children}
       </ThemedText>
     </TouchableOpacity>
   );

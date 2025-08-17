@@ -4,6 +4,7 @@ import ScrollContentContainer from '@/components/ScrollContentContainer';
 import { ThemedText } from '@/components/ThemedText';
 
 const AssignmentDetail = () => {
+  // TODO: this actually becomes redundant. Takes you to patch, post, view attempts.
   const { id, user } = useLocalSearchParams();
 
   //   Todo - handle therapist and patient views (therapist read only, patient actions etc)

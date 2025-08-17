@@ -6,7 +6,9 @@ import {
   SaveProgressResponse,
   StartAttemptResponse,
   SubmitAttemptInput,
-  SubmitAttemptResponse
+  SubmitAttemptResponse,
+  TherapistLatestResponse,
+  TherapistLatestRow
 } from '@milobedini/shared-types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -38,15 +40,15 @@ export const useGetMyAttempts = (moduleId?: string, limit?: number, status?: str
 export const useTherapistGetLatestAttempts = (limit?: number) => {
   const isLoggedIn = useIsLoggedIn();
 
-  return useQuery<MyAttemptsResponse>({
+  return useQuery<TherapistLatestRow[]>({
     queryKey: ['attempts'],
-    queryFn: async (): Promise<MyAttemptsResponse> => {
-      const { data } = await api.get<MyAttemptsResponse>('/user/therapist/attempts/latest', {
+    queryFn: async (): Promise<TherapistLatestRow[]> => {
+      const { data } = await api.get<TherapistLatestResponse>('/user/therapist/attempts/latest', {
         params: {
-          limit
+          limit: limit ?? 200
         }
       });
-      return data;
+      return data.rows;
     },
     enabled: isLoggedIn,
     staleTime: 1000 * 60 * 60, // 5 minutes

@@ -2,7 +2,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PatientActiveAssignments from '@/components/assignments/PatientActiveAssignments';
 import PatientCompletedAssignments from '@/components/assignments/PatientCompletedAssignments';
 import TherapistActiveAssignments from '@/components/assignments/TherapistActiveAssignments';
-import TherapistLatesAttempts from '@/components/attempts/TherapistLatesAttempts';
+import TherapistLatestAttempts from '@/components/attempts/TherapistLatestAttempts';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
@@ -56,7 +56,7 @@ const AssignmentsHome = () => {
           />
           <Tab.Screen
             name="therapist-latest-attempts"
-            component={TherapistLatesAttempts}
+            component={TherapistLatestAttempts}
             options={{
               title: 'Submissions',
               tabBarIcon: ({ color }) => <Ionicons name="document-text" color={color} size={24} />

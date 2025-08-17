@@ -6,7 +6,7 @@ import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { AccessPolicy, AssignmentStatus, CanStartReason } from '@/types/types';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import type { AvailableModulesItem } from '@milobedini/shared-types';
+import type { AssignmentRecurrence, AvailableModulesItem } from '@milobedini/shared-types';
 
 import hourglass from '@/assets/lotties/hourglass.json';
 
@@ -262,40 +262,128 @@ const AssignmentStatusChip = ({ status }: AssignmentStatusChipProps) => {
   }
 };
 
-const DueChip = ({ dueAt }: { dueAt?: string }) => {
+const DueChip = ({ dueAt, completed }: { dueAt?: string; completed?: boolean }) => {
   if (!dueAt) return null;
   const due = new Date(dueAt);
-  const msLeft = +due - Date.now();
-  const hoursLeft = msLeft / 36e5;
 
-  let icon: string = 'calendar';
-  let color = '#E6E8EF';
-  let border = '#3B3F51';
-  let label = `Due ${due.toLocaleDateString()}`;
+  if (completed)
+    return (
+      <Chip
+        mode="outlined"
+        compact
+        icon={() => <MaterialCommunityIcons name="check-circle-outline" size={24} color="#34D399" />}
+        textStyle={{ color: '#34D399', fontFamily: Fonts.Black, fontSize: 16 }}
+        style={{ borderColor: '#065F46', backgroundColor: 'transparent', alignSelf: 'flex-start' }}
+      >
+        {`Completed ${due.toLocaleDateString()}`}
+      </Chip>
+    );
 
-  if (hoursLeft <= 0) {
+  return (
+    <Chip
+      mode="outlined"
+      compact
+      icon={() => <MaterialCommunityIcons name="calendar" size={24} color="#E6E8EF" />}
+      textStyle={{ color: '#E6E8EF', fontFamily: Fonts.Black, fontSize: 16 }}
+      style={{ borderColor: '#3B3F51', backgroundColor: 'transparent', alignSelf: 'flex-start' }}
+    >
+      {`Due ${due.toLocaleDateString()}`}
+    </Chip>
+  );
+};
+
+const TimeLeftChip = ({ dueAt }: { dueAt?: string }) => {
+  if (!dueAt) return null;
+
+  const due = new Date(dueAt);
+  if (Number.isNaN(due.getTime())) return null;
+
+  const diffMs = due.getTime() - Date.now();
+
+  // Defaults (used for the "days left" case)
+  let icon: IconProps['name'] = 'calendar-clock';
+  let color = '#93C5FD'; // info blue
+  let border = '#1E3A8A'; // deep blue border
+  let label = '';
+
+  if (diffMs <= 0) {
+    // Overdue
     icon = 'calendar-remove';
-    color = '#F87171';
-    border = '#7F1D1D';
+    color = '#F87171'; // red
+    border = '#7F1D1D'; // dark red border
     label = 'Overdue';
-  } else if (hoursLeft <= 48) {
-    icon = 'calendar-alert';
-    color = '#FBBF24';
-    border = '#7C5E12';
-    label = 'Due soon';
+  } else if (diffMs < 24 * 60 * 60 * 1000) {
+    // Under 24h → show hours (rounded to nearest hour, min 1h)
+    const hours = Math.max(1, Math.round(diffMs / 36e5));
+    icon = 'clock-alert';
+    color = '#FBBF24'; // amber
+    border = '#7C5E12'; // amber/dark border
+    label = `${hours} ${hours === 1 ? 'hour' : 'hours'} left`;
+  } else {
+    // 24h+ → show days (rounded up so 1.2d shows as 2 days)
+    const days = Math.ceil(diffMs / 86400000);
+    icon = 'calendar-clock';
+    color = '#93C5FD'; // info blue
+    border = '#1E3A8A'; // deep blue border
+    label = `${days} ${days === 1 ? 'day' : 'days'} left`;
   }
 
   return (
     <Chip
       mode="outlined"
       compact
-      icon={() => <MaterialCommunityIcons name={icon as IconProps['name']} size={18} color={color} />}
-      textStyle={{ color, fontFamily: Fonts.Black, fontSize: 12 }}
-      style={{ borderColor: border, backgroundColor: 'transparent' }}
+      icon={() => <MaterialCommunityIcons name={icon} size={24} color={color} />}
+      textStyle={{ color, fontFamily: Fonts.Black, fontSize: 16 }}
+      style={{ borderColor: border, backgroundColor: 'transparent', alignSelf: 'flex-start' }}
     >
       {label}
     </Chip>
   );
 };
 
-export { AccessPolicyChip, AssignmentStatusChip, CanStartChip, DueChip, EnrolledChip, PendingChip };
+const RecurrenceChip = ({ recurrence }: { recurrence: AssignmentRecurrence }) => {
+  if (!recurrence || !recurrence?.freq || recurrence.freq === 'none') return null;
+
+  const freq = recurrence.freq.toLowerCase();
+  const interval = recurrence.interval ?? 1;
+
+  let label = '';
+  let icon: IconProps['name'] = 'repeat';
+  const color = '#93C5FD'; // info blue (consistent with your "Assigned"/"In progress")
+  const border = '#1E3A8A'; // deep blue border (consistent)
+
+  if (freq === 'weekly') {
+    label =
+      interval === 1 ? 'Repeats weekly' : interval === 2 ? 'Repeats every 2 weeks' : `Repeats every ${interval} weeks`;
+    icon = 'calendar-week';
+  } else if (freq === 'monthly') {
+    label = interval === 1 ? 'Repeats monthly' : `Repeats every ${interval} months`;
+    icon = 'calendar-month';
+  } else {
+    // Not a supported recurrence → render nothing
+    return null;
+  }
+
+  return (
+    <Chip
+      mode="outlined"
+      compact
+      icon={() => <MaterialCommunityIcons name={icon} size={24} color={color} />}
+      textStyle={{ color, fontFamily: Fonts.Black, fontSize: 16 }}
+      style={{ borderColor: border, backgroundColor: 'transparent', alignSelf: 'flex-start' }}
+    >
+      {label}
+    </Chip>
+  );
+};
+
+export {
+  AccessPolicyChip,
+  AssignmentStatusChip,
+  CanStartChip,
+  DueChip,
+  EnrolledChip,
+  PendingChip,
+  RecurrenceChip,
+  TimeLeftChip
+};

@@ -69,8 +69,8 @@ const styles = StyleSheet.create({
     color: Colors.sway.white
   },
   italic: {
-    fontSize: Platform.select({ ios: 12, android: 12, default: 14 }),
-    lineHeight: Platform.select({ ios: 20, android: 20, default: 24 }),
+    fontSize: Platform.select({ ios: 18, android: 18, default: 20 }),
+    lineHeight: Platform.select({ ios: 24, android: 24, default: 24 }),
     fontFamily: Fonts.Italic,
     color: Colors.sway.white
   },
