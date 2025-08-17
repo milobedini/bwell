@@ -7,24 +7,22 @@ import { MyAssignmentView } from '@milobedini/shared-types';
 
 import { ThemedText } from '../ThemedText';
 
-type AssignmentsListPatientProps = {
+type AssignmentsListTherapistProps = {
   data: MyAssignmentView[];
-  completed?: boolean;
 };
 
-const AssignmentsListPatient = ({ data, completed }: AssignmentsListPatientProps) => {
+const AssignmentsListTherapist = ({ data }: AssignmentsListTherapistProps) => {
   const router = useRouter();
 
   const handleAssignmentPress = useCallback(
     (id: string, headerTitle: string) => {
       router.push({
         pathname: '/assignments/[id]',
-        params: { id, headerTitle, user: UserRole.PATIENT }
+        params: { id, headerTitle, user: UserRole.THERAPIST }
       });
     },
     [router]
   );
-
   return (
     <FlatList
       data={data}
@@ -32,17 +30,20 @@ const AssignmentsListPatient = ({ data, completed }: AssignmentsListPatientProps
       renderItem={({ item, index }) => {
         const bgColor = index % 2 === 0 ? '' : 'bg-sway-buttonBackground';
         const due = new Date(item.dueAt as string);
+        const created = new Date(item.createdAt as string);
         const hoursLeft = (+due - Date.now()) / 36e5;
         const dueLabel = hoursLeft <= 0 ? 'Overdue' : hoursLeft <= 48 ? 'Due soon' : `Due ${due.toLocaleDateString()}`;
 
         return (
           <TouchableOpacity
+            onPress={() => handleAssignmentPress(item._id, `${item.user.name}: ${item.module.title}`)}
             className={clsx('gap-1 p-4', bgColor)}
-            onPress={() => handleAssignmentPress(item._id, item.module.title)}
           >
             <ThemedText type="smallTitle">{item.module.title}</ThemedText>
-            <ThemedText>Assigned by {item.therapist.name}</ThemedText>
-            {completed ? <ThemedText>Completed {due.toDateString()}</ThemedText> : <ThemedText>{dueLabel}</ThemedText>}
+            <ThemedText>
+              Assigned to {item.user.name ?? item.user.username} on {created.toLocaleDateString()}
+            </ThemedText>
+            <ThemedText>{dueLabel}</ThemedText>
           </TouchableOpacity>
         );
       }}
@@ -50,4 +51,4 @@ const AssignmentsListPatient = ({ data, completed }: AssignmentsListPatientProps
   );
 };
 
-export default AssignmentsListPatient;
+export default AssignmentsListTherapist;

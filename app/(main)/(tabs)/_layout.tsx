@@ -2,12 +2,15 @@ import { Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Tabs } from 'expo-router';
 import { Colors } from '@/constants/Colors';
+import { useAuthStore } from '@/stores/authStore';
+import { isAdmin } from '@/utils/userRoles';
 import { Ionicons } from '@expo/vector-icons';
 
 import disabledIcon from '../../../assets/images/disabled-icon.png';
 import icon from '../../../assets/images/icon.png';
 
 export default function MainTabsLayout() {
+  const user = useAuthStore((s) => s.user);
   const { bottom } = useSafeAreaInsets();
 
   return (
@@ -51,9 +54,11 @@ export default function MainTabsLayout() {
         name="assignments"
         options={{
           title: 'Assignments',
-          tabBarIcon: ({ color, size }) => <Ionicons name="clipboard-outline" color={color} size={size} />
+          tabBarIcon: ({ color, size }) => <Ionicons name="clipboard-outline" color={color} size={size} />,
+          href: isAdmin(user?.roles) ? null : undefined
         }}
       />
+
       <Tabs.Screen
         name="programs"
         options={{

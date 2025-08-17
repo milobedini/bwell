@@ -1,5 +1,6 @@
 import type { AxiosError } from 'axios';
 import { api } from '@/api/api';
+import { AssignmentStatusSearchOptions } from '@/types/types';
 import type {
   CreateAssignmentInput,
   CreateAssignmentResponse,
@@ -16,11 +17,11 @@ import { useIsLoggedIn } from './useUsers';
 export const useViewTherapistOutstandingAssignments = () => {
   const isLoggedIn = useIsLoggedIn();
 
-  return useQuery<MyAssignmentsResponse>({
+  return useQuery<MyAssignmentView[]>({
     queryKey: ['assignments'],
-    queryFn: async (): Promise<MyAssignmentsResponse> => {
+    queryFn: async (): Promise<MyAssignmentView[]> => {
       const { data } = await api.get<MyAssignmentsResponse>('/assignments/mine');
-      return data;
+      return data.assignments;
     },
     enabled: isLoggedIn,
     staleTime: 1000 * 60 * 60, // 5 minutes
@@ -29,13 +30,13 @@ export const useViewTherapistOutstandingAssignments = () => {
     refetchOnReconnect: false
   });
 };
-export const useViewMyAssignments = (status?: string) => {
+export const useViewMyAssignments = ({ status }: { status: AssignmentStatusSearchOptions }) => {
   const isLoggedIn = useIsLoggedIn();
 
   return useQuery<MyAssignmentView[]>({
-    queryKey: ['assignments'],
+    queryKey: ['assignments', status],
     queryFn: async (): Promise<MyAssignmentView[]> => {
-      const { data } = await api.get<MyAssignmentsResponse>('/user/assignments', { params: status });
+      const { data } = await api.get<MyAssignmentsResponse>('/user/assignments', { params: { status } });
       return data.assignments;
     },
     enabled: isLoggedIn,

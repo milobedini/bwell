@@ -23,9 +23,15 @@ enum CanStartReason {
   UNAUTHENTICATED = 'unauthenticated'
 }
 
+enum AssignmentStatusSearchOptions {
+  ACTIVE = 'active',
+  COMPLETED = 'completed',
+  ALL = 'all'
+}
+
 enum AssignmentStatus {
   ASSIGNED = 'assigned',
   IN_PROGRESS = 'in_progress'
 }
 
-export { AccessPolicy, AssignmentStatus, CanStartReason, ModuleType, UserRole };
+export { AccessPolicy, AssignmentStatus, AssignmentStatusSearchOptions, CanStartReason, ModuleType, UserRole };

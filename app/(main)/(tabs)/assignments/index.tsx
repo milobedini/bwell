@@ -1,8 +1,13 @@
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ActiveAssignments from '@/components/assignments/ActiveAssignments';
-import CompletedAssignments from '@/components/assignments/CompletedAssignments';
+import PatientActiveAssignments from '@/components/assignments/PatientActiveAssignments';
+import PatientCompletedAssignments from '@/components/assignments/PatientCompletedAssignments';
+import TherapistActiveAssignments from '@/components/assignments/TherapistActiveAssignments';
+import TherapistLatesAttempts from '@/components/attempts/TherapistLatesAttempts';
+import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
+import { useAuthStore } from '@/stores/authStore';
+import { isPatient, isTherapist } from '@/utils/userRoles';
 import { Ionicons } from '@expo/vector-icons';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
@@ -10,6 +15,58 @@ const Tab = createMaterialTopTabNavigator();
 
 const AssignmentsHome = () => {
   const { top } = useSafeAreaInsets();
+  const user = useAuthStore((s) => s.user);
+
+  const renderedTabs = () => {
+    const therapist = isTherapist(user?.roles);
+    const patient = isPatient(user?.roles);
+
+    if (patient)
+      return (
+        <>
+          <Tab.Screen
+            name="patient-active-assignments"
+            component={PatientActiveAssignments}
+            options={{
+              title: 'Active',
+              tabBarIcon: ({ color }) => <Ionicons name="clipboard-outline" color={color} size={24} />
+            }}
+          />
+          <Tab.Screen
+            name="patient-completed-assignments"
+            component={PatientCompletedAssignments}
+            options={{
+              title: 'Completed',
+              tabBarIcon: ({ color }) => <Ionicons name="clipboard" color={color} size={24} />
+            }}
+          />
+        </>
+      );
+
+    if (therapist)
+      return (
+        <>
+          <Tab.Screen
+            name="therapist-active-assignments"
+            component={TherapistActiveAssignments}
+            options={{
+              title: 'Assignments',
+              tabBarIcon: ({ color }) => <Ionicons name="clipboard" color={color} size={24} />
+            }}
+          />
+          <Tab.Screen
+            name="therapist-latest-attempts"
+            component={TherapistLatesAttempts}
+            options={{
+              title: 'Submissions',
+              tabBarIcon: ({ color }) => <Ionicons name="document-text" color={color} size={24} />
+            }}
+          />
+        </>
+      );
+
+    return <Tab.Screen name="unauthorised">{() => <ErrorComponent errorType={ErrorTypes.UNAUTHORIZED} />}</Tab.Screen>;
+  };
 
   return (
     <Tab.Navigator
@@ -40,22 +97,7 @@ const AssignmentsHome = () => {
         tabBarInactiveTintColor: Colors.sway.lightGrey
       }}
     >
-      <Tab.Screen
-        name="active-assignments"
-        component={ActiveAssignments}
-        options={{
-          title: 'Active',
-          tabBarIcon: ({ color }) => <Ionicons name="clipboard-outline" color={color} size={24} />
-        }}
-      />
-      <Tab.Screen
-        name="completed-assignments"
-        component={CompletedAssignments}
-        options={{
-          title: 'Completed',
-          tabBarIcon: ({ color }) => <Ionicons name="clipboard" color={color} size={24} />
-        }}
-      />
+      {renderedTabs()}
     </Tab.Navigator>
   );
 };
