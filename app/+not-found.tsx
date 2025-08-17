@@ -12,7 +12,7 @@ export default function NotFoundScreen() {
   setTimeout(() => {
     setRedirecting(false);
     router.replace('/'); // Redirect to the home screen
-  }, 2000);
+  }, 3000);
 
   return (
     <Container centered>
