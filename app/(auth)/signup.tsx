@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { Dimensions, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Dimensions, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -10,12 +10,13 @@ import * as Yup from 'yup';
 import { LoginLogo } from '@/components/sign-in/LoginLogo';
 import { ThemedText } from '@/components/ThemedText';
 import { renderErrorToast } from '@/components/toast/toastOptions';
+import KeyboardAvoidingWrapper from '@/components/ui/KeyboardAvoidingWrapper';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useRegister } from '@/hooks/useAuth';
 import { UserRole } from '@/types/types';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
-import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal, BottomSheetModalProvider, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { type RegisterInput } from '@milobedini/shared-types';
 
 import assetId from '../../components/sign-up/leaves.mp4';
@@ -202,15 +203,14 @@ export default function Signup() {
             );
           }}
         >
-          <BottomSheetView
-            style={{
-              paddingHorizontal: 16 * 2,
-              paddingVertical: 16 * 2,
-              justifyContent: 'space-between',
-              flex: 1
-            }}
-          >
-            <ScrollView contentContainerStyle={{ paddingBottom: '100%' }}>
+          <KeyboardAvoidingWrapper>
+            <BottomSheetScrollView
+              contentContainerStyle={{
+                paddingHorizontal: 16 * 2,
+                paddingVertical: 16 * 2,
+                flex: 1
+              }}
+            >
               <AnimatedText
                 state={dynamicAnimation}
                 style={[
@@ -368,8 +368,8 @@ export default function Signup() {
                   )}
                 </Formik>
               </MotiView>
-            </ScrollView>
-          </BottomSheetView>
+            </BottomSheetScrollView>
+          </KeyboardAvoidingWrapper>
         </BottomSheetModal>
       </View>
     </BottomSheetModalProvider>

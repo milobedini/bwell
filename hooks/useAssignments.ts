@@ -57,6 +57,7 @@ export const useCreateAssignment = () => {
       return data;
     },
     onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: ['assignments'] });
       queryClient.invalidateQueries({ queryKey: ['patients'] });
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       queryClient.invalidateQueries({ queryKey: ['profile'] });

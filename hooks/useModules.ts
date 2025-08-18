@@ -12,6 +12,8 @@ import type {
 } from '@milobedini/shared-types';
 import { useMutation, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 
+import { useIsLoggedIn } from './useUsers';
+
 // --- API methods ---
 
 const fetchModulesPlain = async (programId?: string): Promise<Module[]> => {
@@ -36,10 +38,12 @@ const createModule = async (moduleData: CreateModuleInput): Promise<Module> => {
 
 // --- Hook: Get a module by ID ---
 export const useModuleById = (id: string) => {
+  const isLoggedIn = useIsLoggedIn();
+
   return useQuery<ModuleDetailResponse>({
     queryKey: ['module', id],
     queryFn: () => fetchModuleById(id),
-    enabled: !!id, // Only fetch if id is provided
+    enabled: !!id && isLoggedIn, // Only fetch if id is provided
     staleTime: 1000 * 60 * 60, // 1 hour
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -60,12 +64,16 @@ export function useModules(options: { programId?: string; withMeta: true }): Use
 export function useModules(options?: { programId?: string; withMeta?: false }): UseQueryResult<Module[]>;
 
 export function useModules({ programId, withMeta }: UseModuleOptions = {}) {
+  const isLoggedIn = useIsLoggedIn();
+
   return useQuery<Module[] | AvailableModulesItem[]>({
     queryKey: ['modules', { programId, withMeta: !!withMeta }],
     queryFn: () => {
       if (withMeta) return fetchModulesWithMeta(programId);
       return fetchModulesPlain(programId);
     },
+    enabled: isLoggedIn,
+
     staleTime: 1000 * 60 * 60, // 1 hour
     refetchOnMount: false,
     refetchOnWindowFocus: false,

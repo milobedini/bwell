@@ -3,7 +3,17 @@ import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 
 export type ThemedTextProps = TextProps & {
-  type?: 'default' | 'title' | 'subtitle' | 'link' | 'small' | 'italic' | 'smallTitle' | 'button' | 'error';
+  type?:
+    | 'default'
+    | 'title'
+    | 'subtitle'
+    | 'link'
+    | 'small'
+    | 'smallBold'
+    | 'italic'
+    | 'smallTitle'
+    | 'button'
+    | 'error';
   className?: string;
   onLight?: boolean;
 };
@@ -18,6 +28,7 @@ export function ThemedText({ style, type = 'default', onLight = false, className
         type === 'smallTitle' && styles.smallTitle,
         type === 'link' && styles.link,
         type === 'small' && styles.small,
+        type === 'smallBold' && styles.smallBold,
         type === 'italic' && styles.italic,
         type === 'button' && styles.button,
         type === 'error' && styles.error,
@@ -63,9 +74,15 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase'
   },
   small: {
-    fontSize: Platform.select({ ios: 12, android: 12, default: 14 }),
+    fontSize: Platform.select({ ios: 14, android: 14, default: 14 }),
     lineHeight: Platform.select({ ios: 20, android: 20, default: 24 }),
     fontFamily: Fonts.Regular,
+    color: Colors.sway.white
+  },
+  smallBold: {
+    fontSize: Platform.select({ ios: 14, android: 14, default: 14 }),
+    lineHeight: Platform.select({ ios: 20, android: 20, default: 24 }),
+    fontFamily: Fonts.Bold,
     color: Colors.sway.white
   },
   italic: {

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { Dimensions, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Dimensions, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useVideoPlayer, type VideoSource, VideoView } from 'expo-video';
@@ -9,11 +9,17 @@ import * as Yup from 'yup';
 import { LoginLogo } from '@/components/sign-in/LoginLogo';
 import { ThemedText } from '@/components/ThemedText';
 import { renderErrorToast } from '@/components/toast/toastOptions';
+import KeyboardAvoidingWrapper from '@/components/ui/KeyboardAvoidingWrapper';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useLogin } from '@/hooks/useAuth';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
-import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+  BottomSheetScrollView,
+  BottomSheetView
+} from '@gorhom/bottom-sheet';
 import { LoginInput } from '@milobedini/shared-types';
 
 import assetId from '../../components/sign-in/waves.mp4';
@@ -204,121 +210,124 @@ export default function Login() {
               flex: 1
             }}
           >
-            <ScrollView contentContainerStyle={{ paddingBottom: '100%' }}>
-              <AnimatedText
-                state={dynamicAnimation}
-                style={[
-                  styles.regular,
-                  {
-                    fontSize: 32,
-                    fontFamily: Fonts.Bold,
-                    color: Colors.sway.dark,
-                    marginBottom: 8
-                  }
-                ]}
-                onPress={() => router.replace('/home')}
-              >
-                Welcome Back
-              </AnimatedText>
-              <MotiView state={dynamicAnimation} delay={300}>
-                {apiError && <ThemedText type="error">{apiError}</ThemedText>}
-                <Formik
-                  initialValues={initialValues}
-                  validationSchema={LoginSchema}
-                  onSubmit={(values) => {
-                    setApiError('');
-                    login.mutate(values, {
-                      onSuccess: () => {
-                        router.replace('/home');
-                      },
-                      onError: (err) => renderErrorToast(err)
-                    });
-                  }}
+            <KeyboardAvoidingWrapper>
+              {/* Previously just paddingBottom: 100% to avoid keyboard */}
+              <BottomSheetScrollView contentContainerStyle={{ flex: 1, paddingBottom: 64 }}>
+                <AnimatedText
+                  state={dynamicAnimation}
+                  style={[
+                    styles.regular,
+                    {
+                      fontSize: 32,
+                      fontFamily: Fonts.Bold,
+                      color: Colors.sway.dark,
+                      marginBottom: 8
+                    }
+                  ]}
+                  onPress={() => router.replace('/home')}
                 >
-                  {({ handleSubmit, values, touched, errors, handleBlur, handleChange }) => (
-                    <>
-                      <TextInput
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        autoFocus
-                        clearButtonMode="while-editing"
-                        editable={!isPending}
-                        placeholder="Email or Username"
-                        returnKeyType="send"
-                        onSubmitEditing={() => handleSubmit()}
-                        value={values.identifier}
-                        onChangeText={handleChange('identifier')}
-                        onBlur={handleBlur('identifier')}
-                        className="h-[64px] rounded border-b-[1px] border-b-black"
-                      />
-                      {touched.identifier && errors.identifier && (
-                        <ThemedText type="error">{errors.identifier}</ThemedText>
-                      )}
-                      <TextInput
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        clearButtonMode="while-editing"
-                        editable={!isPending}
-                        enablesReturnKeyAutomatically
-                        placeholder="Password"
-                        returnKeyType="send"
-                        onSubmitEditing={() => handleSubmit()}
-                        secureTextEntry
-                        value={values.password}
-                        onChangeText={handleChange('password')}
-                        onBlur={handleBlur('password')}
-                        className="h-[64px] rounded border-b-[1px] border-b-black"
-                      />
-                      {touched.password && errors.password && <ThemedText type="error">{errors.password}</ThemedText>}
+                  Welcome Back
+                </AnimatedText>
+                <MotiView state={dynamicAnimation} delay={300}>
+                  {apiError && <ThemedText type="error">{apiError}</ThemedText>}
+                  <Formik
+                    initialValues={initialValues}
+                    validationSchema={LoginSchema}
+                    onSubmit={(values) => {
+                      setApiError('');
+                      login.mutate(values, {
+                        onSuccess: () => {
+                          router.replace('/home');
+                        },
+                        onError: (err) => renderErrorToast(err)
+                      });
+                    }}
+                  >
+                    {({ handleSubmit, values, touched, errors, handleBlur, handleChange }) => (
+                      <>
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          autoFocus
+                          clearButtonMode="while-editing"
+                          editable={!isPending}
+                          placeholder="Email or Username"
+                          returnKeyType="send"
+                          onSubmitEditing={() => handleSubmit()}
+                          value={values.identifier}
+                          onChangeText={handleChange('identifier')}
+                          onBlur={handleBlur('identifier')}
+                          className="h-[64px] rounded border-b-[1px] border-b-black"
+                        />
+                        {touched.identifier && errors.identifier && (
+                          <ThemedText type="error">{errors.identifier}</ThemedText>
+                        )}
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          clearButtonMode="while-editing"
+                          editable={!isPending}
+                          enablesReturnKeyAutomatically
+                          placeholder="Password"
+                          returnKeyType="send"
+                          onSubmitEditing={() => handleSubmit()}
+                          secureTextEntry
+                          value={values.password}
+                          onChangeText={handleChange('password')}
+                          onBlur={handleBlur('password')}
+                          className="h-[64px] rounded border-b-[1px] border-b-black"
+                        />
+                        {touched.password && errors.password && <ThemedText type="error">{errors.password}</ThemedText>}
 
-                      <MotiView
-                        state={dynamicAnimation}
-                        delay={500}
-                        style={{ justifyContent: 'center', marginTop: 16 }}
-                      >
-                        <Pressable style={{ marginBottom: 16 }} onPress={() => handleSubmit()} disabled={isPending}>
+                        <MotiView
+                          state={dynamicAnimation}
+                          delay={500}
+                          style={{ justifyContent: 'center', marginTop: 16 }}
+                        >
+                          <Pressable style={{ marginBottom: 16 }} onPress={() => handleSubmit()} disabled={isPending}>
+                            <View
+                              style={{
+                                backgroundColor: Colors.sway.dark,
+                                borderRadius: 16,
+                                paddingVertical: 16,
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <Text style={[styles.bold, { fontSize: 16, color: Colors.sway.bright }]}>
+                                {isPending ? 'Logging in...' : 'Login'}
+                              </Text>
+                            </View>
+                          </Pressable>
                           <View
                             style={{
-                              backgroundColor: Colors.sway.dark,
-                              borderRadius: 16,
-                              paddingVertical: 16,
                               alignItems: 'center',
-                              justifyContent: 'center'
+                              flexDirection: 'row',
+                              alignSelf: 'center'
                             }}
                           >
-                            <Text style={[styles.bold, { fontSize: 16, color: Colors.sway.bright }]}>
-                              {isPending ? 'Logging in...' : 'Login'}
-                            </Text>
+                            <Pressable onPress={() => router.replace('/(auth)/signup')}>
+                              <Text
+                                style={[
+                                  styles.bold,
+                                  {
+                                    fontSize: 16,
+                                    color: '#053eff',
+                                    marginLeft: 16 / 2
+                                  }
+                                ]}
+                              >
+                                Need an account?
+                              </Text>
+                            </Pressable>
                           </View>
-                        </Pressable>
-                        <View
-                          style={{
-                            alignItems: 'center',
-                            flexDirection: 'row',
-                            alignSelf: 'center'
-                          }}
-                        >
-                          <Pressable onPress={() => router.replace('/(auth)/signup')}>
-                            <Text
-                              style={[
-                                styles.bold,
-                                {
-                                  fontSize: 16,
-                                  color: '#053eff',
-                                  marginLeft: 16 / 2
-                                }
-                              ]}
-                            >
-                              Need an account?
-                            </Text>
-                          </Pressable>
-                        </View>
-                      </MotiView>
-                    </>
-                  )}
-                </Formik>
-              </MotiView>
-            </ScrollView>
+                        </MotiView>
+                      </>
+                    )}
+                  </Formik>
+                </MotiView>
+              </BottomSheetScrollView>
+            </KeyboardAvoidingWrapper>
           </BottomSheetView>
         </BottomSheetModal>
       </View>
