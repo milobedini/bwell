@@ -17,6 +17,8 @@ type ModulePickerProps = {
   patient: AuthUser;
 };
 
+// Todo - use generic picker.
+
 const ModulePicker = ({ visible, onDismiss, patient }: ModulePickerProps) => {
   const { height: screenH } = useWindowDimensions();
   const verticalMargin = 36;

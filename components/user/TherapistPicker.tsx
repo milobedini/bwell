@@ -17,6 +17,8 @@ type TherapistPickerProps = {
   therapists: AuthUser[];
 };
 
+// Todo - use generic picker.
+
 const TherapistPicker = ({ visible, onDismiss, therapists }: TherapistPickerProps) => {
   const { height: screenH } = useWindowDimensions();
   const verifyTherapist = useAdminVerifyTherapist();

@@ -293,7 +293,6 @@ export default function Signup() {
                         className="h-[64px] rounded border-b-[1px] border-b-black"
                       />
                       {touched.password && errors.password && <ThemedText type="error">{errors.password}</ThemedText>}
-                      {/* TODO - use Paper SegmentedButtons */}
                       <SegmentedButtons
                         value={values.roles[0] || ''}
                         onValueChange={(role) => {

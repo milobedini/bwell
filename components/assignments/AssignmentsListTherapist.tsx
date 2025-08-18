@@ -28,6 +28,14 @@ const AssignmentsListTherapist = ({ data }: AssignmentsListTherapistProps) => {
     },
     [router]
   );
+
+  const handleAddAssignmentPress = useCallback(() => {
+    router.push({
+      pathname: '/assignments/add',
+      params: { headerTitle: 'Create Assignment' }
+    });
+  }, [router]);
+
   return (
     <>
       <FlatList
@@ -72,12 +80,12 @@ const AssignmentsListTherapist = ({ data }: AssignmentsListTherapistProps) => {
         size="medium"
         style={{
           position: 'absolute',
-          right: 8,
-          bottom: 8,
+          right: 16,
+          bottom: 16,
           elevation: 2,
           backgroundColor: Colors.primary.accent
         }}
-        onPress={() => {}}
+        onPress={handleAddAssignmentPress}
       />
     </>
   );
