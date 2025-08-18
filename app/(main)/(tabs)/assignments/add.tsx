@@ -32,6 +32,7 @@ const AddAssignment = () => {
 
   const router = useRouter();
   const createAssignment = useCreateAssignment();
+  const { isPending: createPending } = createAssignment;
   const { data: clients, isPending: clientsPending, isError: clientsError } = useClients();
   const { data: modules, isPaused: modulesPending, isError: modulesError } = useModules();
 
@@ -122,7 +123,7 @@ const AddAssignment = () => {
       />
       <Divider />
       <ThemedButton
-        title="Create"
+        title={createPending ? 'Creating...' : 'Create'}
         onPress={handleSubmit}
         compact
         className="mt-2 w-[200] self-center"
