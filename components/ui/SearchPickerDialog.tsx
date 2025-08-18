@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { FlatList, useWindowDimensions, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { Dialog, Divider, IconButton, List, Portal, TextInput } from 'react-native-paper';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
+import usePickerConstants from '@/utils/usePickerConstants';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
@@ -34,9 +35,7 @@ export default function SearchPickerDialog<T extends BaseItem>({
   leftIcon,
   rightIcon
 }: SearchPickerDialogProps<T>) {
-  const { height: screenH } = useWindowDimensions();
-  const verticalMargin = 36;
-  const dialogHeight = (screenH - verticalMargin) * 0.8;
+  const { dialogHeight, verticalMargin } = usePickerConstants();
 
   const [query, setQuery] = useState('');
   const filtered = useMemo(() => {

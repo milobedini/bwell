@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Divider } from 'react-native-paper';
 import Container from '@/components/Container';
+import DueDateField from '@/components/ui/DueDateField';
 import SearchPickerDialog from '@/components/ui/SearchPickerDialog';
 import SelectField from '@/components/ui/SelectField';
 import { useModules } from '@/hooks/useModules';
@@ -18,6 +19,8 @@ const AddAssignment = () => {
   const [client, setClient] = useState<AuthUser>();
   const [modulePickerVisible, toggleModulePickerVisible] = useToggle(false);
   const [module, setModule] = useState<Module>();
+  const [dueAt, setDueAt] = useState<string | undefined>();
+
   const { data: clients, isPending: clientsPending, isError: clientsError } = useClients();
   const { data: modules, isPaused: modulesPending, isError: modulesError } = useModules();
 
@@ -65,6 +68,7 @@ const AddAssignment = () => {
         onClear={() => setModule(undefined)}
       />
       <Divider />
+      <DueDateField value={dueAt} onChange={setDueAt} label="Due date" />
 
       {/* Dialogs */}
       <SearchPickerDialog

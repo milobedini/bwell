@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
-import { FlatList, useWindowDimensions, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { Dialog, Divider, IconButton, List, Portal, TextInput } from 'react-native-paper';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useAdminVerifyTherapist } from '@/hooks/useUsers';
+import usePickerConstants from '@/utils/usePickerConstants';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import type { AuthUser } from '@milobedini/shared-types';
 
@@ -20,11 +21,8 @@ type TherapistPickerProps = {
 // Todo - use generic picker.
 
 const TherapistPicker = ({ visible, onDismiss, therapists }: TherapistPickerProps) => {
-  const { height: screenH } = useWindowDimensions();
   const verifyTherapist = useAdminVerifyTherapist();
-
-  const verticalMargin = 36;
-  const dialogHeight = useMemo(() => (screenH - verticalMargin) * 0.8, [screenH]);
+  const { dialogHeight, verticalMargin } = usePickerConstants();
 
   const { isPending, isError } = verifyTherapist;
   const [query, setQuery] = useState('');

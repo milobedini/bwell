@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
-import { FlatList, useWindowDimensions, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { Dialog, Divider, IconButton, List, Portal, TextInput } from 'react-native-paper';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useEnrollUnenrollUser, useModules } from '@/hooks/useModules';
+import usePickerConstants from '@/utils/usePickerConstants';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import type { AuthUser, Module } from '@milobedini/shared-types';
 
@@ -20,9 +21,7 @@ type ModulePickerProps = {
 // Todo - use generic picker.
 
 const ModulePicker = ({ visible, onDismiss, patient }: ModulePickerProps) => {
-  const { height: screenH } = useWindowDimensions();
-  const verticalMargin = 36;
-  const dialogHeight = (screenH - verticalMargin) * 0.8;
+  const { dialogHeight, verticalMargin } = usePickerConstants();
 
   const { data: modules, isPending, isError } = useModules();
   const enrollUnenroll = useEnrollUnenrollUser();

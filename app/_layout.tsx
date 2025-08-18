@@ -4,6 +4,7 @@ import { Slot } from 'expo-router';
 import ToastManager from 'toastify-react-native';
 import FontsContainer from '@/components/FontsContainer';
 import toastConfig from '@/components/toast/toastConfig';
+import { getDeviceDatesLocaleKey, registerDatesTranslations } from '@/utils/locales';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import 'react-native-reanimated';
@@ -11,6 +12,9 @@ import 'react-native-reanimated';
 import '../global.css';
 
 const queryClient = new QueryClient();
+
+const available = registerDatesTranslations();
+const deviceDatesLocaleKey = getDeviceDatesLocaleKey(available);
 
 export default function RootLayout() {
   return (
@@ -26,3 +30,5 @@ export default function RootLayout() {
     </QueryClientProvider>
   );
 }
+
+export { deviceDatesLocaleKey };
