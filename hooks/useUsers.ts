@@ -72,7 +72,7 @@ export const useGetAvailableModules = () => {
   const isLoggedIn = useIsLoggedIn();
 
   return useQuery<AvailableModulesResponse>({
-    queryKey: ['modules'],
+    queryKey: ['modules', 'available'],
     queryFn: async (): Promise<AvailableModulesResponse> => {
       const { data } = await api.get<AvailableModulesResponse>('/user/available');
       return data;
