@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { Dimensions, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useCallback, useRef, useState } from 'react';
+import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -16,7 +16,12 @@ import { Fonts } from '@/constants/Typography';
 import { useRegister } from '@/hooks/useAuth';
 import { UserRole } from '@/types/types';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
-import { BottomSheetModal, BottomSheetModalProvider, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+  BottomSheetScrollView,
+  BottomSheetTextInput
+} from '@gorhom/bottom-sheet';
 import { type RegisterInput } from '@milobedini/shared-types';
 
 import assetId from '../../components/sign-up/leaves.mp4';
@@ -103,9 +108,6 @@ export default function Signup() {
     translateY: 40
   }));
 
-  // variables
-  const snapPoints = useMemo(() => ['87%'], []);
-
   // callbacks
   const hideModal = useCallback(() => {
     bottomSheetModalRef.current?.dismiss();
@@ -176,7 +178,6 @@ export default function Signup() {
           ref={bottomSheetModalRef}
           keyboardBehavior="interactive"
           keyboardBlurBehavior="restore"
-          snapPoints={snapPoints}
           handleComponent={() => {
             return (
               <Pressable onPress={hideModal}>
@@ -210,6 +211,7 @@ export default function Signup() {
                 paddingVertical: 16 * 2,
                 flex: 1
               }}
+              keyboardShouldPersistTaps="handled"
             >
               <AnimatedText
                 state={dynamicAnimation}
@@ -245,127 +247,149 @@ export default function Signup() {
                     });
                   }}
                 >
-                  {({ handleSubmit, values, touched, errors, handleBlur, handleChange, setFieldValue }) => (
-                    <>
-                      <TextInput
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        autoFocus
-                        clearButtonMode="while-editing"
-                        editable={!isPending}
-                        placeholder="Email"
-                        returnKeyType="send"
-                        onSubmitEditing={() => handleSubmit()}
-                        value={values.email}
-                        keyboardType="email-address"
-                        onChangeText={handleChange('email')}
-                        onBlur={handleBlur('email')}
-                        className="h-[64px] rounded border-b-[1px] border-b-black"
-                      />
-                      {touched.email && errors.email && <ThemedText type="error">{errors.email}</ThemedText>}
-                      <TextInput
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        clearButtonMode="while-editing"
-                        editable={!isPending}
-                        placeholder="Username"
-                        returnKeyType="send"
-                        onSubmitEditing={() => handleSubmit()}
-                        value={values.username}
-                        onChangeText={handleChange('username')}
-                        onBlur={handleBlur('username')}
-                        className="h-[64px] rounded border-b-[1px] border-b-black"
-                      />
-                      {touched.username && errors.username && <ThemedText type="error">{errors.username}</ThemedText>}
-                      <TextInput
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        clearButtonMode="while-editing"
-                        editable={!isPending}
-                        enablesReturnKeyAutomatically
-                        placeholder="Password"
-                        returnKeyType="send"
-                        onSubmitEditing={() => handleSubmit()}
-                        secureTextEntry
-                        value={values.password}
-                        onChangeText={handleChange('password')}
-                        onBlur={handleBlur('password')}
-                        className="h-[64px] rounded border-b-[1px] border-b-black"
-                      />
-                      {touched.password && errors.password && <ThemedText type="error">{errors.password}</ThemedText>}
-                      <SegmentedButtons
-                        value={values.roles[0] || ''}
-                        onValueChange={(role) => {
-                          setFieldValue('roles', [role]);
-                        }}
-                        style={{ marginVertical: 16 }}
-                        buttons={[
-                          {
-                            value: 'patient',
-                            label: 'Patient',
-                            checkedColor: Colors.sway.dark,
-                            uncheckedColor: 'white',
-                            style: {
-                              backgroundColor: values.roles[0] === 'patient' ? Colors.sway.bright : Colors.sway.dark
+                  {({
+                    handleSubmit,
+                    values,
+                    touched,
+                    errors,
+                    handleBlur,
+                    handleChange,
+                    setFieldValue,
+                    isValid,
+                    isValidating
+                  }) => {
+                    const buttonDisabled = isPending || isValidating || !isValid;
+                    return (
+                      <>
+                        <BottomSheetTextInput
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          autoFocus
+                          clearButtonMode="while-editing"
+                          editable={!isPending}
+                          placeholder="Email"
+                          returnKeyType="send"
+                          onSubmitEditing={() => handleSubmit()}
+                          value={values.email}
+                          keyboardType="email-address"
+                          onChangeText={handleChange('email')}
+                          onBlur={handleBlur('email')}
+                          className="h-[64px] rounded border-b-[1px] border-b-black"
+                        />
+                        {touched.email && errors.email && <ThemedText type="error">{errors.email}</ThemedText>}
+                        <BottomSheetTextInput
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          clearButtonMode="while-editing"
+                          editable={!isPending}
+                          placeholder="Username"
+                          returnKeyType="send"
+                          onSubmitEditing={() => handleSubmit()}
+                          value={values.username}
+                          onChangeText={handleChange('username')}
+                          onBlur={handleBlur('username')}
+                          className="h-[64px] rounded border-b-[1px] border-b-black"
+                        />
+                        {touched.username && errors.username && <ThemedText type="error">{errors.username}</ThemedText>}
+                        <BottomSheetTextInput
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          clearButtonMode="while-editing"
+                          editable={!isPending}
+                          enablesReturnKeyAutomatically
+                          placeholder="Password"
+                          returnKeyType="send"
+                          onSubmitEditing={() => handleSubmit()}
+                          secureTextEntry
+                          value={values.password}
+                          onChangeText={handleChange('password')}
+                          onBlur={handleBlur('password')}
+                          className="h-[64px] rounded border-b-[1px] border-b-black"
+                        />
+                        {touched.password && errors.password && <ThemedText type="error">{errors.password}</ThemedText>}
+                        <SegmentedButtons
+                          value={values.roles[0] || ''}
+                          onValueChange={(role) => {
+                            setFieldValue('roles', [role]);
+                          }}
+                          style={{ marginTop: 16 }}
+                          buttons={[
+                            {
+                              value: 'patient',
+                              label: 'Patient',
+                              checkedColor: Colors.sway.dark,
+                              uncheckedColor: 'white',
+                              style: {
+                                backgroundColor: values.roles[0] === 'patient' ? Colors.sway.bright : Colors.sway.dark
+                              }
+                            },
+                            {
+                              value: 'therapist',
+                              label: 'Therapist',
+                              checkedColor: Colors.sway.dark,
+                              uncheckedColor: 'white',
+                              style: {
+                                backgroundColor: values.roles[0] === 'therapist' ? Colors.sway.bright : Colors.sway.dark
+                              }
                             }
-                          },
-                          {
-                            value: 'therapist',
-                            label: 'Therapist',
-                            checkedColor: Colors.sway.dark,
-                            uncheckedColor: 'white',
-                            style: {
-                              backgroundColor: values.roles[0] === 'therapist' ? Colors.sway.bright : Colors.sway.dark
-                            }
-                          }
-                        ]}
-                      />
+                          ]}
+                        />
 
-                      <MotiView
-                        state={dynamicAnimation}
-                        delay={500}
-                        style={{ justifyContent: 'center', marginTop: 16 }}
-                      >
-                        <Pressable style={{ marginBottom: 16 }} onPress={() => handleSubmit()} disabled={isPending}>
+                        <MotiView
+                          state={dynamicAnimation}
+                          delay={500}
+                          style={{ justifyContent: 'center', marginTop: 16 }}
+                        >
+                          <Pressable
+                            style={{ marginBottom: 16 }}
+                            onPress={() => handleSubmit()}
+                            disabled={buttonDisabled}
+                          >
+                            <View
+                              style={{
+                                backgroundColor: buttonDisabled ? Colors.sway.darkGrey : Colors.sway.dark,
+                                borderRadius: 16,
+                                paddingVertical: 16,
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <Text
+                                style={[
+                                  styles.bold,
+                                  { fontSize: 16, color: buttonDisabled ? Colors.sway.white : Colors.sway.bright }
+                                ]}
+                              >
+                                {isPending ? 'Signing up...' : 'Sign Up'}
+                              </Text>
+                            </View>
+                          </Pressable>
                           <View
                             style={{
-                              backgroundColor: Colors.sway.dark,
-                              borderRadius: 16,
-                              paddingVertical: 16,
                               alignItems: 'center',
-                              justifyContent: 'center'
+                              flexDirection: 'row',
+                              alignSelf: 'center'
                             }}
                           >
-                            <Text style={[styles.bold, { fontSize: 16, color: Colors.sway.bright }]}>
-                              {isPending ? 'Signing up...' : 'Sign Up'}
-                            </Text>
+                            <Pressable onPress={() => router.replace('/(auth)/login')}>
+                              <Text
+                                style={[
+                                  styles.bold,
+                                  {
+                                    fontSize: 16,
+                                    color: '#053eff',
+                                    marginLeft: 16 / 2
+                                  }
+                                ]}
+                              >
+                                Have an account?
+                              </Text>
+                            </Pressable>
                           </View>
-                        </Pressable>
-                        <View
-                          style={{
-                            alignItems: 'center',
-                            flexDirection: 'row',
-                            alignSelf: 'center'
-                          }}
-                        >
-                          <Pressable onPress={() => router.replace('/(auth)/login')}>
-                            <Text
-                              style={[
-                                styles.bold,
-                                {
-                                  fontSize: 16,
-                                  color: '#053eff',
-                                  marginLeft: 16 / 2
-                                }
-                              ]}
-                            >
-                              Have an account?
-                            </Text>
-                          </Pressable>
-                        </View>
-                      </MotiView>
-                    </>
-                  )}
+                        </MotiView>
+                      </>
+                    );
+                  }}
                 </Formik>
               </MotiView>
             </BottomSheetScrollView>
