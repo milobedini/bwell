@@ -34,4 +34,18 @@ enum AssignmentStatus {
   IN_PROGRESS = 'in_progress'
 }
 
-export { AccessPolicy, AssignmentStatus, AssignmentStatusSearchOptions, CanStartReason, ModuleType, UserRole };
+enum AttemptStatus {
+  STARTED = 'started',
+  SUBMITTED = 'submitted',
+  ABANDONED = 'abandoned'
+}
+
+export {
+  AccessPolicy,
+  AssignmentStatus,
+  AssignmentStatusSearchOptions,
+  AttemptStatus,
+  CanStartReason,
+  ModuleType,
+  UserRole
+};

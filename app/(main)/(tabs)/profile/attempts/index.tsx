@@ -4,7 +4,7 @@ import { ThemedText } from '@/components/ThemedText';
 const AttemptsList = () => {
   return (
     <Container>
-      <ThemedText>Patient Attemps List</ThemedText>
+      <ThemedText>Patient Attempts List</ThemedText>
     </Container>
   );
 };
