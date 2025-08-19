@@ -69,11 +69,10 @@ const QuestionSlide = ({ mode, question, onPick, colors }: QuestionSlideProps) =
         height: '100%'
       }}
     >
-      <Card.Content>
+      <Card.Content style={{ height: '100%', width: '100%', justifyContent: 'space-around' }}>
         <ThemedText type="smallTitle" className="mb-2">
           {questionText}
         </ThemedText>
-
         <View className="flex-row flex-wrap">{pills}</View>
       </Card.Content>
     </Card>

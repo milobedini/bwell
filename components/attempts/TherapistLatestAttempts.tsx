@@ -16,12 +16,11 @@ const TherapistLatestAttempts = () => {
 
   const handleAttemptPress = useCallback(
     (attempt: TherapistLatestRow) => {
-      router.replace({
-        pathname: '/(main)/(tabs)/profile/attempts/therapist/[id]',
+      router.push({
+        pathname: '/(main)/(tabs)/attempts/therapist/[id]',
         params: {
           id: attempt._id,
-          headerTitle: `${attempt.module.title} detail`,
-          backTo: '/(main)/(tabs)/profile'
+          headerTitle: `${attempt.module.title} detail`
         }
       });
     },
@@ -47,7 +46,9 @@ const TherapistLatestAttempts = () => {
               className={clsx('gap-1 p-4', bgColor)}
               onPress={() => handleAttemptPress(item)}
             >
-              <ThemedText>{item.module.title}</ThemedText>
+              <ThemedText>
+                {item.module.title} by {item.user.name}
+              </ThemedText>
               <ThemedText>
                 {item.totalScore} {item.scoreBandLabel}
               </ThemedText>

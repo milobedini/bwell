@@ -1,21 +1,19 @@
 import { useCallback } from 'react';
 import { Pressable } from 'react-native';
-import { type Href, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 
-export const BackButton = ({ backTo }: { backTo?: Href }) => {
+export const BackButton = () => {
   const router = useRouter();
 
   const onPress = useCallback(() => {
-    if (backTo) {
-      router.replace(backTo);
-    } else if (router.canGoBack()) {
+    if (router.canGoBack()) {
       router.back();
     } else {
       router.replace('/(main)/(tabs)/home');
     }
-  }, [backTo, router]);
+  }, [router]);
 
   return (
     <Pressable onPress={onPress}>

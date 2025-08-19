@@ -58,6 +58,14 @@ export default function MainTabsLayout() {
           href: isAdmin(user?.roles) ? null : undefined
         }}
       />
+      <Tabs.Screen
+        name="attempts"
+        options={{
+          title: 'Attempts',
+          tabBarIcon: ({ color, size }) => <Ionicons name="clipboard-outline" color={color} size={size} />
+          // href: isAdmin(user?.roles) ? null : undefined
+        }}
+      />
 
       <Tabs.Screen
         name="programs"

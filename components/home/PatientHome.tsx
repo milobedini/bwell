@@ -1,12 +1,23 @@
+import { useCallback } from 'react';
+import { useRouter } from 'expo-router';
+
 import ContentContainer from '../ContentContainer';
-import { ThemedText } from '../ThemedText';
+import { PrimaryButton } from '../ThemedButton';
 
 import { HomeScreen } from './HomeScreen';
 
 const PatientHome = () => {
+  const router = useRouter();
+
+  const handleNavigateActiveAttempts = useCallback(() => {
+    router.replace({
+      pathname: '/(main)/(tabs)/attempts'
+    });
+  }, [router]);
+
   const content = (
     <ContentContainer>
-      <ThemedText>Patient home</ThemedText>
+      <PrimaryButton title="Active attempts" onPress={handleNavigateActiveAttempts}></PrimaryButton>
     </ContentContainer>
   );
 
