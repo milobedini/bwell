@@ -55,5 +55,17 @@ const PrimaryButton = ({ onPress, title, logo, className, textClasses, logoClass
   );
 };
 
+const SecondaryButton = ({ onPress, title, children }: ThemedButtonProps) => {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.7}
+      className="my-2.5 w-full rounded-xl bg-sway-buttonBackground p-3"
+    >
+      <ThemedText type="profileButtonText">{title || children}</ThemedText>
+    </TouchableOpacity>
+  );
+};
+
 export default ThemedButton;
-export { PrimaryButton };
+export { PrimaryButton, SecondaryButton };

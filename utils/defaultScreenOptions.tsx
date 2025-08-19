@@ -1,3 +1,4 @@
+import type { Href } from 'expo-router';
 import { BackButton } from '@/components/ui/BackButton';
 import { Fonts } from '@/constants/Typography';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
@@ -33,12 +34,17 @@ const nestedScreenOptionsWithTitle = (title?: string): NativeStackNavigationOpti
   };
 };
 
-type HeaderTitleParamsShape = { headerTitle?: string };
+type HeaderParams = { headerTitle?: string; backTo?: Href };
 
 const withHeaderFromParams =
   () =>
-  ({ route }: { route: RouteProp<ParamListBase, string> }): NativeStackNavigationOptions =>
-    nestedScreenOptionsWithTitle((route.params as HeaderTitleParamsShape | undefined)?.headerTitle);
+  ({ route }: { route: RouteProp<ParamListBase, string> }): NativeStackNavigationOptions => {
+    const { headerTitle, backTo } = (route.params as HeaderParams | undefined) ?? {};
+    return {
+      ...nestedScreenOptionsWithTitle(headerTitle),
+      headerLeft: () => <BackButton backTo={backTo} />
+    };
+  };
 
 export {
   nestedScreenOptions,

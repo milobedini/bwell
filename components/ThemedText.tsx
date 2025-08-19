@@ -13,7 +13,8 @@ export type ThemedTextProps = TextProps & {
     | 'italic'
     | 'smallTitle'
     | 'button'
-    | 'error';
+    | 'error'
+    | 'profileButtonText';
   className?: string;
   onLight?: boolean;
 };
@@ -32,6 +33,7 @@ export function ThemedText({ style, type = 'default', onLight = false, className
         type === 'italic' && styles.italic,
         type === 'button' && styles.button,
         type === 'error' && styles.error,
+        type === 'profileButtonText' && styles.profileButtonText,
         onLight && { color: Colors.sway.dark },
         style
       ]}
@@ -101,5 +103,11 @@ const styles = StyleSheet.create({
     lineHeight: Platform.select({ ios: 20, android: 20, default: 24 }),
     fontFamily: Fonts.Italic,
     color: Colors.primary.error
+  },
+  profileButtonText: {
+    fontFamily: Fonts.Bold,
+    fontSize: 20,
+    color: Colors.sway.white,
+    marginVertical: 10
   }
 });

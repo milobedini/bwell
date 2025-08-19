@@ -17,10 +17,11 @@ const TherapistLatestAttempts = () => {
   const handleAttemptPress = useCallback(
     (attempt: TherapistLatestRow) => {
       router.replace({
-        pathname: '/(main)/attempts/therapist/[id]',
+        pathname: '/(main)/(tabs)/profile/attempts/therapist/[id]',
         params: {
           id: attempt._id,
-          headerTitle: `${attempt.module.title} detail`
+          headerTitle: `${attempt.module.title} detail`,
+          backTo: '/(main)/(tabs)/profile'
         }
       });
     },
