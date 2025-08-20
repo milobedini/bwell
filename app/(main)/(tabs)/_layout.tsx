@@ -51,6 +51,14 @@ export default function MainTabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="all-users"
+        options={{
+          title: 'All Users',
+          tabBarIcon: ({ color, size }) => <Ionicons name="person" color={color} size={size} />,
+          href: isAdmin(user?.roles) ? undefined : null
+        }}
+      />
+      <Tabs.Screen
         name="assignments"
         options={{
           title: 'Assignments',
@@ -62,7 +70,8 @@ export default function MainTabsLayout() {
         name="attempts"
         options={{
           title: 'Attempts',
-          tabBarIcon: ({ color, size }) => <Ionicons name="document-text" color={color} size={size} />
+          tabBarIcon: ({ color, size }) => <Ionicons name="document-text" color={color} size={size} />,
+          href: isAdmin(user?.roles) ? null : undefined
         }}
       />
 

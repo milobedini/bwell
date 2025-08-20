@@ -5,13 +5,85 @@ import type {
   AddRemoveTherapistInput,
   AddRemoveTherapistResponse,
   AdminStats,
+  ApiError,
   AvailableModulesResponse,
+  GetUsersQuery,
+  GetUsersResponse,
   PatientsResponse,
   ProfileResponse,
+  UserRole,
   VerifyTherapistInput,
   VerifyTherapistResponse
 } from '@milobedini/shared-types';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
+
+// Helpers
+const isDefined = <T>(v: T | undefined): v is T => v !== undefined;
+
+const toCsvIfArray = (v?: string | string[]): string | undefined => {
+  if (!isDefined(v)) return undefined;
+  return Array.isArray(v) ? v.join(',') : v;
+};
+
+const toCsvIfRoleArray = (v?: UserRole[] | string): string | undefined => {
+  if (!isDefined(v)) return undefined;
+  return Array.isArray(v) ? v.join(',') : v;
+};
+
+type ParamValue = string | number | boolean;
+type Params = Record<string, ParamValue>;
+
+/** Build axios params object without using `any`. */
+const buildParams = (q?: GetUsersQuery): Params => {
+  const params: Params = {};
+  if (!q) return params;
+
+  const {
+    page,
+    limit,
+    q: search,
+    roles,
+    ids,
+    isVerified,
+    isVerifiedTherapist,
+    hasTherapist,
+    therapistId,
+    createdFrom,
+    createdTo,
+    lastLoginFrom,
+    lastLoginTo,
+    sort,
+    select
+  } = q;
+
+  if (isDefined(page)) params.page = page;
+  if (isDefined(limit)) params.limit = limit;
+  if (search) params.q = search;
+
+  const rolesCsv = toCsvIfRoleArray(roles);
+  if (rolesCsv) params.roles = rolesCsv;
+
+  const idsCsv = toCsvIfArray(ids);
+  if (idsCsv) params.ids = idsCsv;
+
+  if (isDefined(isVerified)) params.isVerified = isVerified;
+  if (isDefined(isVerifiedTherapist)) params.isVerifiedTherapist = isVerifiedTherapist;
+  if (isDefined(hasTherapist)) params.hasTherapist = hasTherapist;
+
+  if (therapistId) params.therapistId = therapistId;
+
+  if (createdFrom) params.createdFrom = createdFrom;
+  if (createdTo) params.createdTo = createdTo;
+  if (lastLoginFrom) params.lastLoginFrom = lastLoginFrom;
+  if (lastLoginTo) params.lastLoginTo = lastLoginTo;
+
+  if (sort) params.sort = sort;
+
+  const selectCsv = toCsvIfArray(select);
+  if (selectCsv) params.select = selectCsv;
+
+  return params;
+};
 
 export const useIsLoggedIn = () => !!useAuthStore((s) => s.user?._id);
 
@@ -63,6 +135,24 @@ export const useClients = () => {
     enabled: isLoggedIn,
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false
+  });
+};
+
+export const useAllUsers = (query?: GetUsersQuery): UseQueryResult<GetUsersResponse, AxiosError<ApiError>> => {
+  const isLoggedIn = useIsLoggedIn();
+
+  return useQuery<GetUsersResponse, AxiosError<ApiError>>({
+    queryKey: ['admin', 'users', query ?? {}],
+    queryFn: async () => {
+      const { data } = await api.get<GetUsersResponse>('/user/users', {
+        params: buildParams(query)
+      });
+      return data;
+    },
+    enabled: isLoggedIn,
+    staleTime: 1000 * 60 * 2, // 2 minutes
     refetchOnWindowFocus: false,
     refetchOnReconnect: false
   });
