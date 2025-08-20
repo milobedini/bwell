@@ -119,12 +119,16 @@ export const useTherapistGetAttemptDetail = (attemptId: string) => {
 
 // MUTATIONS
 
-export const useStartModuleAttempt = (moduleId: string) => {
+export const useStartModuleAttempt = () => {
   const qc = useQueryClient();
+  type StartAttemptInput = { moduleId: string; assignmentId?: string };
 
-  return useMutation<StartAttemptResponse, AxiosError, { assignmentId: string }>({
-    mutationFn: async (status): Promise<StartAttemptResponse> => {
-      const { data } = await api.post<StartAttemptResponse>(`modules/${moduleId}/attempts`, status);
+  return useMutation<StartAttemptResponse, AxiosError, StartAttemptInput>({
+    mutationFn: async ({ moduleId, assignmentId }): Promise<StartAttemptResponse> => {
+      const { data } = await api.post<StartAttemptResponse>(
+        `modules/${moduleId}/attempts`,
+        assignmentId ? { assignmentId } : {}
+      );
       return data;
     },
     onSuccess: () => {

@@ -3,10 +3,9 @@ import { FAB } from 'react-native-paper';
 import { clsx } from 'clsx';
 import { Link } from 'expo-router';
 import { Colors } from '@/constants/Colors';
-import { AssignmentStatus, UserRole } from '@/types/types';
-import { MyAssignmentView } from '@milobedini/shared-types';
+import { UserRole } from '@/types/types';
+import type { MyAssignmentView } from '@milobedini/shared-types';
 
-import ThemedButton from '../ThemedButton';
 import { ThemedText } from '../ThemedText';
 import { DueChip, RecurrenceChip, TimeLeftChip } from '../ui/Chip';
 
@@ -50,12 +49,6 @@ const AssignmentsListTherapist = ({ data }: AssignmentsListTherapistProps) => {
                       <TimeLeftChip dueAt={item.dueAt} />
                       {item.recurrence && <RecurrenceChip recurrence={item.recurrence} />}
                     </View>
-                    <ThemedButton
-                      title={item.status === AssignmentStatus.IN_PROGRESS ? 'View' : 'Review'}
-                      compact
-                      className="mt-4 w-1/3"
-                      onPress={() => {}}
-                    />
                   </View>
                 )}
               </TouchableOpacity>

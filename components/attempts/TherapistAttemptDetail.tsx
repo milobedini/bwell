@@ -13,6 +13,7 @@ const TherapistAttemptDetail = () => {
   const { data, isPending, isError } = useTherapistGetAttemptDetail(id as string);
 
   const attempt = data?.attempt;
+  const patientName = attempt?.patient?.name;
 
   const answersMap = useRef<Map<string, AttemptAnswer>>(new Map());
 
@@ -37,7 +38,7 @@ const TherapistAttemptDetail = () => {
 
   return (
     <Container>
-      <AttemptPresenter attempt={attempt} mode="view" />
+      <AttemptPresenter attempt={attempt} mode="view" patientName={patientName} />
     </Container>
   );
 };

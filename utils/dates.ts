@@ -33,3 +33,8 @@ export const formatForField = (d: Date, hasTime: boolean) => {
     return hasTime ? `${y}-${m}-${day} ${hh}:${mm}` : `${y}-${m}-${day}`;
   }
 };
+
+export const dateString = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString();
+};

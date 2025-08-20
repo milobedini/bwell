@@ -19,6 +19,7 @@ type AttemptPresenterProps = {
   onSubmit?: () => void;
   isSaving?: boolean;
   saved?: boolean;
+  patientName?: string;
 };
 
 const { width } = Dimensions.get('window');
@@ -46,7 +47,15 @@ const Dots = ({ total, index }: { total: number; index: number }) => {
   );
 };
 
-const AttemptPresenter = ({ attempt, mode, onAnswer, onSubmit, isSaving, saved }: AttemptPresenterProps) => {
+const AttemptPresenter = ({
+  attempt,
+  mode,
+  onAnswer,
+  onSubmit,
+  isSaving,
+  saved,
+  patientName
+}: AttemptPresenterProps) => {
   const flatRef = useRef<FlatList<AttemptDetailItem>>(null);
   const [index, setIndex] = useState(0);
   const router = useRouter();
@@ -166,7 +175,9 @@ const AttemptPresenter = ({ attempt, mode, onAnswer, onSubmit, isSaving, saved }
     <ScrollView className="flex-1">
       {/* Header Summary */}
       <View className="gap-2 px-4 pt-1">
-        <ThemedText type="title">{title}</ThemedText>
+        <ThemedText type="title">
+          {title} by {patientName}
+        </ThemedText>
         {moduleSnapshot?.disclaimer && <ThemedText>{moduleSnapshot.disclaimer}</ThemedText>}
         <View className="mt-2 gap-1.5">
           <ProgressBar progress={progress} color={Colors.sway.bright} />

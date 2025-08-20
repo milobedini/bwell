@@ -5,13 +5,14 @@ import Container from '@/components/Container';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import { useGetMyAttemptDetail, useSaveModuleAttempt, useSubmitAttempt } from '@/hooks/useAttempts';
-import { AttemptStatus } from '@/types/types';
+import { AttemptStatus, ModuleType } from '@/types/types';
 import type { AttemptAnswer, AttemptDetailItem } from '@milobedini/shared-types';
 
+import { ThemedText } from '../ThemedText';
 import { renderErrorToast, renderSuccessToast } from '../toast/toastOptions';
 
 const PatientAttemptDetail = () => {
-  const { id } = useLocalSearchParams();
+  const { id, assignmentId } = useLocalSearchParams();
   const router = useRouter();
   const {
     mutate: saveModuleAttempt,
@@ -21,6 +22,7 @@ const PatientAttemptDetail = () => {
   const { mutate: submitModuleAttempt } = useSubmitAttempt(id as string);
 
   const { data, isPending, isError } = useGetMyAttemptDetail(id as string);
+
   // TODO - get assignment id somehow.
   const attempt = data?.attempt;
 
@@ -67,21 +69,17 @@ const PatientAttemptDetail = () => {
           renderErrorToast(err);
         },
         onSuccess: () => {
-          //   submitModuleAttempt(assignmentId ? { assignmentId } : {})
-          submitModuleAttempt(
-            {},
-            {
-              onError: (err) => renderErrorToast(err),
-              onSuccess: () => {
-                renderSuccessToast('Successfully completed module');
-                router.back();
-              }
+          submitModuleAttempt(assignmentId ? { assignmentId: assignmentId as string } : {}, {
+            onError: (err) => renderErrorToast(err),
+            onSuccess: () => {
+              renderSuccessToast('Successfully completed module');
+              router.back();
             }
-          );
+          });
         }
       }
     );
-  }, [currentAnswersArray, saveModuleAttempt, submitModuleAttempt, router]);
+  }, [currentAnswersArray, saveModuleAttempt, submitModuleAttempt, router, assignmentId]);
 
   const mode = useMemo(() => {
     if (attempt?.status === AttemptStatus.STARTED) return 'edit';
@@ -92,6 +90,13 @@ const PatientAttemptDetail = () => {
   if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
 
   if (!attempt || !data) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
+
+  if (attempt.moduleType !== ModuleType.QUESTIONNAIRE)
+    return (
+      <Container>
+        <ThemedText className="p-4">Not a questionnaire - handle differently.</ThemedText>
+      </Container>
+    );
 
   return (
     <Container>

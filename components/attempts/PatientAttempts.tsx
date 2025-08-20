@@ -59,7 +59,7 @@ const PatientAttempts = () => {
       </View>
       {!attempts?.length ? (
         <View className="px-8">
-          <ThemedText>No {view} assignments</ThemedText>
+          <ThemedText>No {view} attempts</ThemedText>
         </View>
       ) : (
         <FlatList
@@ -88,7 +88,7 @@ const PatientAttempts = () => {
                   )}
                   {/* Todo - it becomes started when you create it. Fine? */}
                   <View className="flex-row items-center gap-4">
-                    <DateChip prefix={item.status} dateString={item.lastInteractionAt || item.completedAt || ''} />
+                    <DateChip prefix={item.status} dateString={item.completedAt || item.lastInteractionAt || ''} />
                   </View>
                 </TouchableOpacity>
               </Link>
