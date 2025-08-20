@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useVideoPlayer, type VideoSource, VideoView } from 'expo-video';
 import { Formik } from 'formik';
@@ -224,7 +224,6 @@ export default function Signup() {
                     marginBottom: 8
                   }
                 ]}
-                onPress={() => router.replace('/home')}
               >
                 Sign Up
               </AnimatedText>
@@ -371,20 +370,22 @@ export default function Signup() {
                               alignSelf: 'center'
                             }}
                           >
-                            <Pressable onPress={() => router.replace('/(auth)/login')}>
-                              <Text
-                                style={[
-                                  styles.bold,
-                                  {
-                                    fontSize: 16,
-                                    color: '#053eff',
-                                    marginLeft: 16 / 2
-                                  }
-                                ]}
-                              >
-                                Have an account?
-                              </Text>
-                            </Pressable>
+                            <Link asChild href={'/(auth)/login'}>
+                              <Pressable>
+                                <Text
+                                  style={[
+                                    styles.bold,
+                                    {
+                                      fontSize: 16,
+                                      color: '#053eff',
+                                      marginLeft: 16 / 2
+                                    }
+                                  ]}
+                                >
+                                  Have an account?
+                                </Text>
+                              </Pressable>
+                            </Link>
                           </View>
                         </MotiView>
                       </>

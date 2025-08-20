@@ -8,7 +8,7 @@ import { useSaveModuleAttempt, useSubmitAttempt, useTherapistGetAttemptDetail } 
 import { AttemptStatus } from '@/types/types';
 import type { AttemptAnswer, AttemptDetailItem } from '@milobedini/shared-types';
 
-const AttemptTherapistDetail = () => {
+const TherapistAttemptDetail = () => {
   const { id } = useLocalSearchParams();
   const { mutate: saveModuleAttempt } = useSaveModuleAttempt(id as string);
   const { mutate: submitModuleAttempt } = useSubmitAttempt(id as string);
@@ -92,4 +92,4 @@ const AttemptTherapistDetail = () => {
   );
 };
 
-export default AttemptTherapistDetail;
+export default TherapistAttemptDetail;

@@ -4,10 +4,9 @@ import { stackScreenOptions, stackScreenOptionsWithTitle, withHeaderFromParams }
 export default function AttemptsStack() {
   return (
     <Stack screenOptions={stackScreenOptions}>
-      <Stack.Screen name="index" options={stackScreenOptionsWithTitle('Completed Attempts')} />
+      {/* Both routes should be the same, then the route index handles the rendering. */}
+      <Stack.Screen name="index" options={stackScreenOptionsWithTitle('Attempts')} />
       <Stack.Screen name="[id]/index" options={withHeaderFromParams()} />
-      <Stack.Screen name="therapist/index" options={withHeaderFromParams()} />
-      <Stack.Screen name="therapist/[id]/index" options={withHeaderFromParams()} />
     </Stack>
   );
 }

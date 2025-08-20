@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 
 import ContentContainer from '../ContentContainer';
 import { PrimaryButton } from '../ThemedButton';
@@ -6,12 +6,14 @@ import { PrimaryButton } from '../ThemedButton';
 import { HomeScreen } from './HomeScreen';
 
 const VerifiedTherapistHome = () => {
-  const router = useRouter();
-
   const content = (
     <ContentContainer>
-      <PrimaryButton title="Your clients" onPress={() => router.push('/home/clients')} />
-      <PrimaryButton title="All patients" onPress={() => router.push('/home/patients')} />
+      <Link asChild href={'/home/clients'}>
+        <PrimaryButton title="Your clients" />
+      </Link>
+      <Link asChild href={'/home/patients'}>
+        <PrimaryButton title="All patients" />
+      </Link>
     </ContentContainer>
   );
 

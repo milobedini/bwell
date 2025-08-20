@@ -1,4 +1,3 @@
-import { BackButton } from '@/components/ui/BackButton';
 import { Fonts } from '@/constants/Typography';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
@@ -20,7 +19,7 @@ const stackScreenOptionsWithTitle = (title?: string): NativeStackNavigationOptio
 const nestedScreenOptions: NativeStackNavigationOptions = {
   headerShown: true,
   headerTransparent: true,
-  headerLeft: () => <BackButton />,
+  headerBackButtonDisplayMode: 'minimal',
   headerTitle: ''
 };
 
@@ -40,8 +39,8 @@ const withHeaderFromParams =
   ({ route }: { route: RouteProp<ParamListBase, string> }): NativeStackNavigationOptions => {
     const { headerTitle } = (route.params as HeaderParams | undefined) ?? {};
     return {
-      ...nestedScreenOptionsWithTitle(headerTitle),
-      headerLeft: () => <BackButton />
+      ...nestedScreenOptionsWithTitle(headerTitle)
+      // headerLeft: () => <BackButton />
     };
   };
 

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { ScrollView } from 'react-native';
 import { Divider } from 'react-native-paper';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { MotiView, SafeAreaView } from 'moti';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
@@ -61,7 +61,9 @@ export default function Profile() {
           {/* End of Profile View */}
 
           {/* Menu View */}
-          <SecondaryButton title="Patient history" onPress={() => router.push('/(main)/(tabs)/attempts')} />
+          <Link href={'/(main)/(tabs)/attempts'} asChild>
+            <SecondaryButton title="Patient history" />
+          </Link>
           <SecondaryButton title="Another button" />
           <SecondaryButton onPress={handleLogout} disabled={!profile} title="Log Out" />
         </MotiView>

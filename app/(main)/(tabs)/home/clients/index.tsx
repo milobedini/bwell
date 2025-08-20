@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import Container from '@/components/Container';
 import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
@@ -17,7 +17,6 @@ import type { AuthUser } from '@milobedini/shared-types';
 
 const AllClients = () => {
   const { data: clients, isPending, isError } = useClients();
-  const router = useRouter();
 
   const [openFab, setOpenFab] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
@@ -48,7 +47,9 @@ const AllClients = () => {
       <Container>
         <ContentContainer className="mt-4 gap-4">
           <ThemedText type="subtitle">You have no clients (yet!)</ThemedText>
-          <ThemedButton onPress={() => router.replace('/home/patients')}>View all patients</ThemedButton>
+          <Link asChild href={'/home/patients'}>
+            <ThemedButton>View all patients</ThemedButton>
+          </Link>
         </ContentContainer>
       </Container>
     );

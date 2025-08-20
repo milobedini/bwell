@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useVideoPlayer, type VideoSource, VideoView } from 'expo-video';
 import { Formik } from 'formik';
@@ -216,7 +216,6 @@ export default function Login() {
                   marginBottom: 8
                 }
               ]}
-              onPress={() => router.replace('/home')}
             >
               Welcome Back
             </AnimatedText>
@@ -306,20 +305,22 @@ export default function Login() {
                             alignSelf: 'center'
                           }}
                         >
-                          <Pressable onPress={() => router.replace('/(auth)/signup')}>
-                            <Text
-                              style={[
-                                styles.bold,
-                                {
-                                  fontSize: 16,
-                                  color: '#053eff',
-                                  marginLeft: 16 / 2
-                                }
-                              ]}
-                            >
-                              Need an account?
-                            </Text>
-                          </Pressable>
+                          <Link href={'/(auth)/signup'} asChild>
+                            <Pressable>
+                              <Text
+                                style={[
+                                  styles.bold,
+                                  {
+                                    fontSize: 16,
+                                    color: '#053eff',
+                                    marginLeft: 16 / 2
+                                  }
+                                ]}
+                              >
+                                Need an account?
+                              </Text>
+                            </Pressable>
+                          </Link>
                         </View>
                       </MotiView>
                     </>

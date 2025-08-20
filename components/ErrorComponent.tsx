@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { Redirect } from 'expo-router';
 
 import Container from './Container';
 import { ThemedText } from './ThemedText';
@@ -12,9 +12,8 @@ enum ErrorTypes {
 }
 
 const ErrorComponent = ({ errorType, redirectLogin }: { errorType: ErrorTypes; redirectLogin?: boolean }) => {
-  const router = useRouter();
   if (redirectLogin) {
-    router.replace('/(auth)/login');
+    return <Redirect href={'/(auth)/login'} />;
   }
 
   switch (errorType) {

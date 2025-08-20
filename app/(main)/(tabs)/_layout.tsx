@@ -62,8 +62,7 @@ export default function MainTabsLayout() {
         name="attempts"
         options={{
           title: 'Attempts',
-          tabBarIcon: ({ color, size }) => <Ionicons name="clipboard-outline" color={color} size={size} />
-          // href: isAdmin(user?.roles) ? null : undefined
+          tabBarIcon: ({ color, size }) => <Ionicons name="document-text" color={color} size={size} />
         }}
       />
 

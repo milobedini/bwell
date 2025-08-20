@@ -71,7 +71,7 @@ const AddAssignment = () => {
     createAssignment.mutate(input, {
       onSuccess: () => {
         renderSuccessToast('Created assignment');
-        router.push('/(main)/(tabs)/assignments');
+        router.navigate('/(main)/(tabs)/assignments');
       },
       onError: (err) => renderErrorToast(err)
     });

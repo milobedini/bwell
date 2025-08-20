@@ -1,9 +1,8 @@
-import { useCallback } from 'react';
 import { View } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Link, useLocalSearchParams } from 'expo-router';
 import { useAuthStore } from '@/stores/authStore';
 import { AccessPolicy, AssignmentStatus } from '@/types/types';
-import type { AvailableModulesItem, Module } from '@milobedini/shared-types';
+import type { AvailableModulesItem } from '@milobedini/shared-types';
 
 import ThemedButton from '../ThemedButton';
 import { ThemedText } from '../ThemedText';
@@ -16,17 +15,6 @@ type ModulesListProps = {
 const ModulesList = ({ data }: ModulesListProps) => {
   const userId = useAuthStore((s) => s.user?._id);
   const { id: programId } = useLocalSearchParams();
-  const router = useRouter();
-
-  const handleModulePress = useCallback(
-    (module: Module) => {
-      router.push({
-        pathname: '/programs/[id]/modules/[moduleId]',
-        params: { id: programId as string, moduleId: module._id, headerTitle: module.title }
-      });
-    },
-    [router, programId]
-  );
 
   return (
     <View>
@@ -48,7 +36,16 @@ const ModulesList = ({ data }: ModulesListProps) => {
             </View>
             <ThemedText className=" text-lg">{module.description}</ThemedText>
             <ThemedText className="capitalize">{module.type}</ThemedText>
-            <ThemedButton onPress={() => handleModulePress(module)}>View Module</ThemedButton>
+            <Link
+              asChild
+              push
+              href={{
+                pathname: '/programs/[id]/modules/[moduleId]',
+                params: { id: programId as string, moduleId: module._id, headerTitle: module.title }
+              }}
+            >
+              <ThemedButton>View Module</ThemedButton>
+            </Link>
           </View>
         );
       })}

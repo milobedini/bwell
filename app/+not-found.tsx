@@ -1,17 +1,16 @@
 import { useState } from 'react';
-import { useRouter } from 'expo-router';
+import { Redirect } from 'expo-router';
 import Container from '@/components/Container';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import { ThemedText } from '@/components/ThemedText';
 
 export default function NotFoundScreen() {
   const [redirecting, setRedirecting] = useState(true);
-  const router = useRouter();
 
   // Simulate a redirect after a short delay
   setTimeout(() => {
     setRedirecting(false);
-    router.replace('/'); // Redirect to the home screen
+    return <Redirect href={'/'} />;
   }, 3000);
 
   return (
