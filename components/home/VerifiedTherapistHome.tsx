@@ -14,6 +14,17 @@ const VerifiedTherapistHome = () => {
       <Link asChild href={'/home/patients'}>
         <PrimaryButton title="All patients" />
       </Link>
+      {/* Test navigation to nested route */}
+      {/* <Link
+        asChild
+        href={{
+          pathname: '/programs/[id]',
+          params: { id: '6899a2977019be5802ba1b1d', headerTitle: 'Depression' }
+        }}
+        withAnchor
+      >
+        <PrimaryButton title="Deep program link" />
+      </Link> */}
     </ContentContainer>
   );
 

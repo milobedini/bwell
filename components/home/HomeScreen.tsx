@@ -50,7 +50,7 @@ export const HomeScreen = ({ content }: HomeScreenProps) => {
         <Image source={bWellLogo} style={{ aspectRatio: 2000 / 1247, width: 140 }} />
       </View>
       {/* Content */}
-      <View className=" flex-[0.5]">{content}</View>
+      <View className="z-10 flex-[0.5]">{content}</View>
       <Canvas
         style={{
           flex: 1
