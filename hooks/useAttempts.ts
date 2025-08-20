@@ -1,5 +1,6 @@
 import type { AxiosError } from 'axios';
 import { api } from '@/api/api';
+import { AttemptStatusInput } from '@/types/types';
 import {
   AttemptDetailResponse,
   MyAttemptsResponse,
@@ -16,7 +17,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useIsLoggedIn } from './useUsers';
 
 // QUERIES
-export const useGetMyAttempts = (moduleId?: string, limit?: number, status?: string) => {
+export type MyAttemptOptions = {
+  moduleId?: string;
+  limit?: number;
+  status?: AttemptStatusInput;
+};
+export const useGetMyAttempts = ({ moduleId, limit, status }: MyAttemptOptions) => {
   const isLoggedIn = useIsLoggedIn();
 
   return useQuery<MyAttemptsResponse>({

@@ -1,7 +1,6 @@
-import { View } from 'react-native';
+import PatientAttempts from '@/components/attempts/PatientAttempts';
 import TherapistLatestAttempts from '@/components/attempts/TherapistLatestAttempts';
 import Container from '@/components/Container';
-import { ThemedText } from '@/components/ThemedText';
 import { useAuthStore } from '@/stores/authStore';
 import { isPatient, isTherapist } from '@/utils/userRoles';
 
@@ -12,11 +11,7 @@ const AttemptsList = () => {
   return (
     <Container>
       {isTherapist(user?.roles) && <TherapistLatestAttempts />}
-      {isPatient(user?.roles) && (
-        <View>
-          <ThemedText>Patient Attempts list</ThemedText>
-        </View>
-      )}
+      {isPatient(user?.roles) && <PatientAttempts />}
     </Container>
   );
 };

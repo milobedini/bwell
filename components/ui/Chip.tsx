@@ -377,10 +377,26 @@ const RecurrenceChip = ({ recurrence }: { recurrence: AssignmentRecurrence }) =>
   );
 };
 
+const DateChip = ({ dateString, prefix }: { dateString: string; prefix?: string }) => {
+  const date = new Date(dateString);
+
+  return (
+    <Chip
+      mode="outlined"
+      icon={() => <MaterialCommunityIcons name="calendar" size={24} color="#E6E8EF" />}
+      textStyle={{ color: '#E6E8EF', fontFamily: Fonts.Black, fontSize: 16, textTransform: 'capitalize' }}
+      style={{ borderColor: '#3B3F51', backgroundColor: 'transparent', alignSelf: 'flex-start' }}
+    >
+      {`${prefix ? `${prefix} ` : ''}${date.toLocaleDateString()}`}
+    </Chip>
+  );
+};
+
 export {
   AccessPolicyChip,
   AssignmentStatusChip,
   CanStartChip,
+  DateChip,
   DueChip,
   EnrolledChip,
   PendingChip,

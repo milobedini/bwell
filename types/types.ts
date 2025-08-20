@@ -40,11 +40,17 @@ enum AttemptStatus {
   ABANDONED = 'abandoned'
 }
 
+enum AttemptStatusInput {
+  COMPLETED = 'completed',
+  ACTIVE = 'active'
+}
+
 export {
   AccessPolicy,
   AssignmentStatus,
   AssignmentStatusSearchOptions,
   AttemptStatus,
+  AttemptStatusInput,
   CanStartReason,
   ModuleType,
   UserRole

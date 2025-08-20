@@ -1,6 +1,6 @@
+import PatientAttemptDetail from '@/components/attempts/PatientAttemptDetail';
 import TherapistAttemptDetail from '@/components/attempts/TherapistAttemptDetail';
 import Container from '@/components/Container';
-import { ThemedText } from '@/components/ThemedText';
 import { useAuthStore } from '@/stores/authStore';
 import { isPatient, isTherapist } from '@/utils/userRoles';
 
@@ -9,7 +9,7 @@ const AttemptDetail = () => {
   return (
     <Container>
       {isTherapist(user?.roles) && <TherapistAttemptDetail />}
-      {isPatient(user?.roles) && <ThemedText>Patient Attempt Detail</ThemedText>}
+      {isPatient(user?.roles) && <PatientAttemptDetail />}
     </Container>
   );
 };

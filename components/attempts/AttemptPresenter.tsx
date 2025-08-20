@@ -1,12 +1,15 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Dimensions, FlatList, ListRenderItemInfo, ScrollView, View, ViewToken } from 'react-native';
-import { Card, Chip, Divider, ProgressBar } from 'react-native-paper';
+import { ActivityIndicator, Card, Chip, Divider, ProgressBar } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
+import { Fonts } from '@/constants/Typography';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { AttemptAnswer, AttemptDetailItem, AttemptDetailResponseItem } from '@milobedini/shared-types';
 
 import QuestionSlide from '../questions/QuestionSlide';
-import ThemedButton from '../ThemedButton';
+import { PrimaryButton } from '../ThemedButton';
 import { ThemedText } from '../ThemedText';
 
 type AttemptPresenterProps = {
@@ -14,6 +17,8 @@ type AttemptPresenterProps = {
   mode: 'view' | 'edit';
   onAnswer?: (payload: AttemptAnswer) => void;
   onSubmit?: () => void;
+  isSaving?: boolean;
+  saved?: boolean;
 };
 
 const { width } = Dimensions.get('window');
@@ -41,9 +46,10 @@ const Dots = ({ total, index }: { total: number; index: number }) => {
   );
 };
 
-const AttemptPresenter = ({ attempt, mode, onAnswer, onSubmit }: AttemptPresenterProps) => {
+const AttemptPresenter = ({ attempt, mode, onAnswer, onSubmit, isSaving, saved }: AttemptPresenterProps) => {
   const flatRef = useRef<FlatList<AttemptDetailItem>>(null);
   const [index, setIndex] = useState(0);
+  const router = useRouter();
 
   const {
     detail: { items, answeredCount, totalQuestions, percentComplete },
@@ -147,6 +153,15 @@ const AttemptPresenter = ({ attempt, mode, onAnswer, onSubmit }: AttemptPresente
     return `${m}m ${s}s`;
   }, [durationSecs]);
 
+  const allAnswered = useMemo(() => {
+    return answeredCount === totalQuestions;
+  }, [answeredCount, totalQuestions]);
+
+  const handleSubmit = useCallback(() => {
+    if (allAnswered) onSubmit?.();
+    else router.back();
+  }, [router, onSubmit, allAnswered]);
+
   return (
     <ScrollView className="flex-1">
       {/* Header Summary */}
@@ -212,18 +227,50 @@ const AttemptPresenter = ({ attempt, mode, onAnswer, onSubmit }: AttemptPresente
       {/* Pagination dots */}
       <Dots total={items.length} index={index} />
 
+      {saved && (
+        <Chip
+          icon={() => <MaterialCommunityIcons name="check-circle-outline" size={24} color={'#34D399'} />}
+          mode="outlined"
+          textStyle={{
+            fontFamily: Fonts.Black,
+            color: '#34D399'
+          }}
+          style={{
+            backgroundColor: Colors.sway.buttonBackground,
+            borderColor: '#065F46',
+            alignSelf: 'center',
+            marginTop: 8
+          }}
+        >
+          Saved
+        </Chip>
+      )}
+      {isSaving && (
+        <Chip
+          textStyle={{
+            fontFamily: Fonts.Black,
+            color: '#34D399'
+          }}
+          style={{
+            backgroundColor: Colors.sway.dark,
+            alignSelf: 'center',
+            marginTop: 8
+          }}
+          icon={() => <ActivityIndicator animating={isSaving} color={Colors.sway.bright} style={{ marginRight: 12 }} />}
+        >
+          Saving
+        </Chip>
+      )}
       {/* Footer actions */}
-      <View className="p-4 pt-2">
-        {mode === 'edit' ? (
-          <ThemedButton onPress={onSubmit} disabled={answeredCount < totalQuestions}>
-            Submit
-          </ThemedButton>
-        ) : (
-          <ThemedButton onPress={onSubmit} disabled={answeredCount < totalQuestions}>
-            Submit
-          </ThemedButton>
-        )}
-      </View>
+      {mode === 'edit' && (
+        <View className="p-4 pt-2">
+          <PrimaryButton
+            onPress={handleSubmit}
+            disabled={answeredCount === 0}
+            title={allAnswered ? 'Submit' : 'Exit'}
+          />
+        </View>
+      )}
     </ScrollView>
   );
 };
