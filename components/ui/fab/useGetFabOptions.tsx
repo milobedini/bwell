@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useRouter } from 'expo-router';
 import { renderErrorToast, renderSuccessToast } from '@/components/toast/toastOptions';
 import { useAddRemoveTherapist } from '@/hooks/useUsers';
 import { useAuthStore } from '@/stores/authStore';
@@ -28,6 +29,7 @@ const useGetFabOptions = ({
 }: FabOptionsProps): FabGroupAction[] => {
   const user = useAuthStore((s) => s.user);
   const addRemoveTherapist = useAddRemoveTherapist();
+  const router = useRouter();
 
   const handleAddRemoveTherapist = useCallback(() => {
     if (selectedEntity?._id && user?._id) {
@@ -77,6 +79,19 @@ const useGetFabOptions = ({
           // color: 'gold',
           style: { backgroundColor: 'white' },
           onPress: handleAddRemoveTherapist
+        },
+        {
+          icon: 'clipboard-outline',
+          label: 'Create assignment',
+          labelTextColor: 'white',
+          style: { backgroundColor: 'white' },
+          onPress: () =>
+            router.navigate({
+              pathname: '/assignments/add',
+              params: {
+                headerTitle: 'Create Assignment'
+              }
+            })
         },
         {
           icon: 'book-plus',

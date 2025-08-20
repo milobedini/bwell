@@ -51,7 +51,7 @@ const AddAssignment = () => {
       (modules || []).map((c) => ({
         _id: c._id,
         title: c.title,
-        subtitle: c.program.title,
+        subtitle: `${c.program.title} (${c.type})`,
         raw: c
       })),
     [modules]
