@@ -10,26 +10,6 @@ import type { AssignmentRecurrence, AvailableModulesItem } from '@milobedini/sha
 
 import hourglass from '@/assets/lotties/hourglass.json';
 
-const EnrolledChip = () => {
-  return (
-    <Chip
-      icon={() => <MaterialCommunityIcons name="bookmark-check" size={24} color={Colors.primary.charcoal} />}
-      mode="outlined"
-      compact
-      textStyle={{
-        fontFamily: Fonts.Black,
-        color: Colors.primary.charcoal
-      }}
-      style={{
-        backgroundColor: Colors.primary.accent,
-        borderColor: Colors.primary.rose
-      }}
-    >
-      Enrolled
-    </Chip>
-  );
-};
-
 const PendingChip = ({ animate }: { animate?: boolean }) => {
   const animatedIcon = <LottieView source={hourglass} autoPlay loop style={{ width: 42, height: 42 }} />;
 
@@ -79,25 +59,6 @@ const AccessPolicyChip = ({ accessPolicy }: AccessPolicyChipProps) => {
         </Chip>
       );
 
-    case AccessPolicy.ENROLLED:
-      return (
-        <Chip
-          icon={() => <MaterialCommunityIcons name="account-star" size={24} color="#C4B5FD" />}
-          mode="outlined"
-          compact
-          textStyle={{
-            fontFamily: Fonts.Black,
-            color: '#C4B5FD'
-          }}
-          style={{
-            backgroundColor: Colors.sway.buttonBackground,
-            borderColor: '#1E3A8A',
-            alignSelf: 'flex-start'
-          }}
-        >
-          Enrolled only
-        </Chip>
-      );
     case AccessPolicy.OPEN:
       return (
         <Chip
@@ -148,25 +109,7 @@ const BlockedChip = (reason: CanStartReason): ReactNode => {
           Awaiting assignment
         </Chip>
       );
-    case CanStartReason.NOT_ENROLLED:
-      return (
-        <Chip
-          icon={() => <MaterialCommunityIcons name="account-plus-outline" size={24} color="#FBBF24" />}
-          mode="outlined"
-          compact
-          textStyle={{
-            fontFamily: Fonts.Black,
-            color: '#FBBF24'
-          }}
-          style={{
-            backgroundColor: Colors.sway.buttonBackground,
-            borderColor: '#7C5E12',
-            alignSelf: 'flex-start'
-          }}
-        >
-          Awaiting enrollment
-        </Chip>
-      );
+
     default:
       return (
         <Chip
@@ -398,7 +341,6 @@ export {
   CanStartChip,
   DateChip,
   DueChip,
-  EnrolledChip,
   PendingChip,
   RecurrenceChip,
   TimeLeftChip

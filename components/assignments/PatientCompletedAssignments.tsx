@@ -4,6 +4,7 @@ import { AssignmentStatusSearchOptions } from '@/types/types';
 import Container from '../Container';
 import ErrorComponent, { ErrorTypes } from '../ErrorComponent';
 import { LoadingIndicator } from '../LoadingScreen';
+import { ThemedText } from '../ThemedText';
 
 import AssignmentsListPatient from './AssignmentsListPatient';
 
@@ -12,11 +13,15 @@ const PatientCompletedAssignments = () => {
 
   if (isPending) return <LoadingIndicator marginBottom={0} />;
   if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
-  if (!data || !data.length) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
+  if (!data) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
     <Container>
-      <AssignmentsListPatient data={data} completed />
+      {data.length ? (
+        <AssignmentsListPatient data={data} completed />
+      ) : (
+        <ThemedText className="p-4">No completed assignments...</ThemedText>
+      )}
     </Container>
   );
 };

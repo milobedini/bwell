@@ -12,13 +12,11 @@ enum ModuleType {
 
 enum AccessPolicy {
   OPEN = 'open',
-  ENROLLED = 'enrolled',
   ASSIGNED = 'assigned'
 }
 
 enum CanStartReason {
   OK = 'ok',
-  NOT_ENROLLED = 'not_enrolled',
   REQUIRES_ASSIGNMENT = 'requires_assignment',
   UNAUTHENTICATED = 'unauthenticated'
 }

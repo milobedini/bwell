@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
@@ -21,11 +20,6 @@ const ModuleDetail = () => {
   const { data, isPending, isError } = useModuleById(moduleId as string);
   const [open, toggleOpen] = useToggle(false);
 
-  const userEnrolled = useMemo(() => {
-    if (!user?._id) return false;
-    return data?.module.enrolled?.includes(user._id);
-  }, [data?.module.enrolled, user?._id]);
-
   if (isPending) return <LoadingIndicator marginBottom={0} />;
 
   if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
@@ -40,12 +34,10 @@ const ModuleDetail = () => {
         {/* Module Summary */}
         <View className="gap-2">
           <ModuleSummary module={module} />
-          {userEnrolled ? (
-            <ThemedButton onPress={toggleOpen}>{open ? 'Close module' : 'Take module'}</ThemedButton>
-          ) : isAdminOrTherapist(user) ? (
+          {isAdminOrTherapist(user) ? (
             <ThemedButton onPress={toggleOpen}>{open ? 'Close module' : 'Expand module'}</ThemedButton>
           ) : (
-            <ThemedButton disabled>Not enrolled</ThemedButton>
+            <ThemedButton disabled>Check for assignments placeholder</ThemedButton>
           )}
         </View>
         {/* Todo - separate switch cases for module types, below is all questionnaire based. */}
