@@ -94,7 +94,7 @@ const AssignmentsListPatient = ({ data, completed }: AssignmentsListPatientProps
                   }}
                   withAnchor
                 >
-                  <ThemedButton title={'View attempt'} compact className="mt-4 w-1/2" />
+                  <ThemedButton title={'View attempt'} compact className="mt-4 self-start" />
                 </Link>
               )}
               {!completed && item.dueAt && (

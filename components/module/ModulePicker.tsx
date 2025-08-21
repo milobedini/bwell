@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { FlatList, View } from 'react-native';
 import { Dialog, Divider, IconButton, List, Portal, TextInput } from 'react-native-paper';
+import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useModules } from '@/hooks/useModules';
@@ -22,6 +23,7 @@ type ModulePickerProps = {
 const ModulePicker = ({ visible, onDismiss, patient }: ModulePickerProps) => {
   const { dialogHeight, verticalMargin } = usePickerConstants();
 
+  const router = useRouter();
   const { data: modules, isPending, isError } = useModules();
   const [query, setQuery] = useState('');
 
@@ -32,9 +34,18 @@ const ModulePicker = ({ visible, onDismiss, patient }: ModulePickerProps) => {
     return modules.filter((m) => m.title.toLowerCase().includes(q) || m.description?.toLowerCase().includes(q));
   }, [modules, query]);
 
-  const handleSelect = (_moduleId: string) => {
-    // Handle assigning. Success and failure toast.
-    // Maybe just go to add assignment screen but with user and module in params.
+  const handleSelect = (moduleId: string) => {
+    const chosen = modules?.find((m) => m._id === moduleId);
+    if (!chosen) return;
+    router.replace({
+      pathname: '/assignments/add', // your route
+      params: {
+        client: JSON.stringify(patient),
+        module: JSON.stringify(chosen),
+        headerTitle: 'Create Assignment'
+      }
+    });
+    onDismiss();
   };
 
   const renderRow = ({ item }: { item: Module }) => {

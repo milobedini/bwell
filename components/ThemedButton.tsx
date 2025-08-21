@@ -11,17 +11,22 @@ type ThemedButtonProps = TouchableOpacityProps & {
   logo?: boolean;
   textClasses?: string;
   logoClasses?: string;
+  variant?: 'default' | 'error';
+  centered?: boolean;
 };
 
 const ThemedButton = (props: ThemedButtonProps) => {
-  const { className, children, disabled, compact, title, ...rest } = props;
+  const { className, children, disabled, compact, title, variant = 'default', centered, ...rest } = props;
   return (
     <TouchableOpacity
       disabled={disabled}
       className={clsx(
-        'rounded-md bg-sway-bright p-4',
+        'rounded-md p-4',
         disabled && 'bg-sway-darkGrey',
-        compact && 'self-start px-3 py-2',
+        compact && `w-[200] px-3 py-2`,
+        variant === 'error' && 'bg-error',
+        variant === 'default' && 'bg-sway-bright',
+        centered && 'self-center',
         className
       )}
       {...rest}

@@ -247,6 +247,7 @@ export default function Login() {
                         editable={!isPending}
                         placeholder="Email or Username"
                         returnKeyType="send"
+                        placeholderTextColor={'black'}
                         onSubmitEditing={() => handleSubmit()}
                         value={values.identifier}
                         onChangeText={handleChange('identifier')}
@@ -263,6 +264,7 @@ export default function Login() {
                         editable={!isPending}
                         enablesReturnKeyAutomatically
                         placeholder="Password"
+                        placeholderTextColor={'black'}
                         returnKeyType="send"
                         onSubmitEditing={() => handleSubmit()}
                         secureTextEntry

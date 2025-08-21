@@ -267,6 +267,7 @@ export default function Signup() {
                           clearButtonMode="while-editing"
                           editable={!isPending}
                           placeholder="Email"
+                          placeholderTextColor={'black'}
                           returnKeyType="send"
                           onSubmitEditing={() => handleSubmit()}
                           value={values.email}
@@ -282,6 +283,7 @@ export default function Signup() {
                           clearButtonMode="while-editing"
                           editable={!isPending}
                           placeholder="Username"
+                          placeholderTextColor={'black'}
                           returnKeyType="send"
                           onSubmitEditing={() => handleSubmit()}
                           value={values.username}
@@ -297,6 +299,7 @@ export default function Signup() {
                           editable={!isPending}
                           enablesReturnKeyAutomatically
                           placeholder="Password"
+                          placeholderTextColor={'black'}
                           returnKeyType="send"
                           onSubmitEditing={() => handleSubmit()}
                           secureTextEntry

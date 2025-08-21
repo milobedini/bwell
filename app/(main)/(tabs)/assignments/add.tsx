@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
-import { TextInput } from 'react-native';
+import { TextInput, View } from 'react-native';
 import { Divider } from 'react-native-paper';
-import { useRouter } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import Container from '@/components/Container';
 import ThemedButton from '@/components/ThemedButton';
 import { renderErrorToast, renderSuccessToast } from '@/components/toast/toastOptions';
@@ -22,10 +22,24 @@ const AddAssignment = () => {
   // ToggleButton for recurrence.
   // Notes interface for notes (see Sway). https://github.com/milobedini/sway-app/blob/main/navigators/learn/screens/notes/NotesScreen.tsx
 
+  const params = useLocalSearchParams<{
+    client?: string;
+    module?: string;
+  }>();
+
+  const initialClient = useMemo(
+    () => (params.client ? (JSON.parse(params.client) as AuthUser) : undefined),
+    [params.client]
+  );
+  const initialModule = useMemo(
+    () => (params.module ? (JSON.parse(params.module) as Module) : undefined),
+    [params.module]
+  );
+
   const [clientPickerVisible, toggleClientPickerVisible] = useToggle(false);
-  const [client, setClient] = useState<AuthUser>();
+  const [client, setClient] = useState<AuthUser | undefined>(initialClient);
   const [modulePickerVisible, toggleModulePickerVisible] = useToggle(false);
-  const [module, setModule] = useState<Module>();
+  const [module, setModule] = useState<Module | undefined>(initialModule);
   const [dueAt, setDueAt] = useState<string | undefined>();
   const [recurrence, setRecurrence] = useState<AssignmentRecurrence | undefined>({ freq: 'none' });
   const [notes, setNotes] = useState('');
@@ -88,6 +102,7 @@ const AddAssignment = () => {
         leftIcon="account-circle-outline"
         onPress={() => toggleClientPickerVisible()}
         onClear={() => setClient(undefined)}
+        disabled={!!params.client}
       />
       <Divider />
       <SelectField
@@ -98,6 +113,7 @@ const AddAssignment = () => {
         leftIcon="book-open-page-variant-outline"
         onPress={() => toggleModulePickerVisible()}
         onClear={() => setModule(undefined)}
+        disabled={!!params.module}
       />
       <Divider />
       <DueDateField value={dueAt} onChange={setDueAt} label="Due date" />
@@ -122,13 +138,18 @@ const AddAssignment = () => {
         style={{ fontFamily: Fonts.Regular }}
       />
       <Divider />
-      <ThemedButton
-        title={createPending ? 'Creating...' : 'Create'}
-        onPress={handleSubmit}
-        compact
-        className="mt-2 w-[200] self-center"
-        disabled={!client?._id || !module?._id}
-      />
+      <View className="mt-4 gap-4">
+        <ThemedButton
+          title={createPending ? 'Creating...' : 'Create'}
+          onPress={handleSubmit}
+          compact
+          centered
+          disabled={!client?._id || !module?._id}
+        />
+        <Link asChild href={'/assignments'}>
+          <ThemedButton title="Cancel" compact variant="error" centered />
+        </Link>
+      </View>
 
       {/* Dialogs */}
       <SearchPickerDialog
