@@ -41,7 +41,7 @@ const ModulesList = ({ data }: ModulesListProps) => {
                 params: { id: programId as string, moduleId: module._id, headerTitle: module.title }
               }}
             >
-              <ThemedButton>View Module</ThemedButton>
+              <ThemedButton>Preview</ThemedButton>
             </Link>
           </View>
         );

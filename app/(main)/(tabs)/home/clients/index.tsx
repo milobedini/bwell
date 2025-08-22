@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { Link } from 'expo-router';
 import Container from '@/components/Container';
 import ContentContainer from '@/components/ContentContainer';
@@ -58,22 +58,32 @@ const AllClients = () => {
     <>
       <ScrollContainer>
         {clients.map((client) => (
-          <View
+          <Link
             key={client._id}
-            className="mb-4 flex-row items-center justify-between rounded-md border-b border-sway-lightGrey pb-4"
+            href={{
+              pathname: '/home/clients/[id]',
+              params: {
+                id: client._id,
+                headerTitle: client.name || client.username
+              }
+            }}
+            push
+            asChild
           >
-            <View>
-              <ThemedText type="smallTitle">{client.email}</ThemedText>
-              <ThemedText>{client.username}</ThemedText>
-            </View>
-            <FabTrigger
-              onPress={() => {
-                setSelectedClientId(client._id);
-                setOpenFab(true);
-              }}
-              icon="dots-horizontal"
-            />
-          </View>
+            <TouchableOpacity className="mb-4 flex-row items-center justify-between rounded-md border-b border-sway-lightGrey pb-4">
+              <View>
+                <ThemedText type="smallTitle">{client.email}</ThemedText>
+                <ThemedText>{client.username}</ThemedText>
+              </View>
+              <FabTrigger
+                onPress={() => {
+                  setSelectedClientId(client._id);
+                  setOpenFab(true);
+                }}
+                icon="dots-horizontal"
+              />
+            </TouchableOpacity>
+          </Link>
         ))}
       </ScrollContainer>
       <FabGroup

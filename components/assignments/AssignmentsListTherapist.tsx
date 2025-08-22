@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import { Link } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { UserRole } from '@/types/types';
+import { dateString } from '@/utils/dates';
 import type { MyAssignmentView } from '@milobedini/shared-types';
 
 import { ThemedText } from '../ThemedText';
@@ -21,8 +22,6 @@ const AssignmentsListTherapist = ({ data }: AssignmentsListTherapistProps) => {
         keyExtractor={(item) => item._id}
         renderItem={({ item, index }) => {
           const bgColor = index % 2 === 0 ? '' : 'bg-sway-buttonBackground';
-          const created = new Date(item.createdAt as string);
-
           return (
             <Link
               asChild
@@ -39,7 +38,7 @@ const AssignmentsListTherapist = ({ data }: AssignmentsListTherapistProps) => {
               <TouchableOpacity className={clsx('gap-1 p-4', bgColor)}>
                 <ThemedText type="smallTitle">{item.module.title}</ThemedText>
                 <ThemedText>
-                  Assigned to {item.user.name ?? item.user.username} on {created.toLocaleDateString()}
+                  Assigned to {item.user.name ?? item.user.username} on {dateString(item.createdAt)}
                 </ThemedText>
                 {item.notes && <ThemedText type="italic">&quot;{item.notes}&quot;</ThemedText>}
                 {item.dueAt && (

@@ -1,9 +1,10 @@
 import type { AxiosError } from 'axios';
 import { api } from '@/api/api';
 import { AttemptStatusInput } from '@/types/types';
-import {
+import type {
   AttemptDetailResponse,
   MyAttemptsResponse,
+  PatientModuleTimelineResponse,
   SaveProgressInput,
   SaveProgressResponse,
   StartAttemptResponse,
@@ -12,7 +13,7 @@ import {
   TherapistLatestResponse,
   TherapistLatestRow
 } from '@milobedini/shared-types';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useIsLoggedIn } from './useUsers';
 
@@ -64,23 +65,82 @@ export const useTherapistGetLatestAttempts = (limit?: number) => {
     refetchOnReconnect: false
   });
 };
-export const useTherapistGetPatientsModuleAttempts = (patientId: string, moduleId: string) => {
+
+export type PatientTimelineOptions = {
+  patientId: string;
+  moduleId?: string;
+  limit?: number;
+  status?: AttemptStatusInput | 'all' | string;
+  enabled?: boolean;
+};
+
+// What the hook returns in data
+type PatientTimelineSelected = {
+  pages: PatientModuleTimelineResponse[];
+  attempts: PatientModuleTimelineResponse['attempts']; // flattened
+  nextCursor: string | null; // from the last page
+};
+
+export const useGetPatientTimeline = ({
+  patientId,
+  moduleId,
+  limit = 20,
+  status = 'submitted',
+  enabled = true
+}: PatientTimelineOptions) => {
   const isLoggedIn = useIsLoggedIn();
 
-  return useQuery<MyAttemptsResponse>({
-    queryKey: ['attempts', 'therapist', 'patientModule', { patientId, moduleId }],
-    queryFn: async (): Promise<MyAttemptsResponse> => {
-      const { data } = await api.get<MyAttemptsResponse>(
-        `/user/therapist/patients/${patientId}/modules/${moduleId}/attempts`
-      );
+  const query = useInfiniteQuery<
+    PatientModuleTimelineResponse, // TQueryFnData (server page)
+    AxiosError, // TError
+    PatientTimelineSelected, // TData (after select)
+    readonly [
+      'attempts',
+      'therapist',
+      'patient-timeline',
+      { patientId: string; moduleId?: string; limit: number; status: string }
+    ], // TQueryKey
+    string | null // TPageParam
+  >({
+    queryKey: ['attempts', 'therapist', 'patient-timeline', { patientId, moduleId, limit, status }],
+    initialPageParam: null,
+    queryFn: async ({ pageParam }): Promise<PatientModuleTimelineResponse> => {
+      const { data } = await api.get<PatientModuleTimelineResponse>(`/user/therapist/patients/${patientId}/timeline`, {
+        params: {
+          moduleId,
+          limit,
+          status,
+          cursor: pageParam ?? undefined
+        }
+      });
       return data;
     },
-    enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 60, // 5 minutes
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+
+    // Flatten the data here -> avoids "pages" typing issues in components
+    select: (infinite: InfiniteData<PatientModuleTimelineResponse, string | null>): PatientTimelineSelected => {
+      const pages = infinite.pages;
+      const attempts = pages.flatMap((p) => p.attempts);
+      const nextCursor = pages.at(-1)?.nextCursor ?? null;
+      return { pages, attempts, nextCursor };
+    },
+
+    enabled: isLoggedIn && !!patientId && enabled,
+    staleTime: 1000 * 60 * 60,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false
   });
+
+  // expose a friendly shape
+  const attempts = query.data?.attempts ?? [];
+  const nextCursor = query.data?.nextCursor ?? null;
+
+  return {
+    ...query,
+    attempts,
+    nextCursor
+  };
 };
 
 export const useGetMyAttemptDetail = (attemptId: string) => {
@@ -150,6 +210,7 @@ export const useSaveModuleAttempt = (attemptId: string) => {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['attempts', 'detail'] });
       qc.invalidateQueries({ queryKey: ['attempts', 'mine'] });
+      qc.invalidateQueries({ queryKey: ['attempts', 'therapist', 'patient-timeline'] });
     }
   });
 };
@@ -167,6 +228,7 @@ export const useSubmitAttempt = (attemptId: string) => {
       qc.invalidateQueries({ queryKey: ['attempts', 'detail'] });
       qc.invalidateQueries({ queryKey: ['attempts', 'therapist'] });
       qc.invalidateQueries({ queryKey: ['clients'] });
+      qc.invalidateQueries({ queryKey: ['attempts', 'therapist', 'patient-timeline'] });
     }
   });
 };

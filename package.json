@@ -61,6 +61,7 @@
     "react-native": "0.79.5",
     "react-native-confirmation-code-field": "^8.0.1",
     "react-native-gesture-handler": "~2.24.0",
+    "react-native-pager-view": "6.7.1",
     "react-native-paper": "^5.14.5",
     "react-native-paper-dates": "^0.22.49",
     "react-native-reanimated": "~3.17.4",
@@ -75,7 +76,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@milobedini/shared-types": "^1.0.61",
+    "@milobedini/shared-types": "^1.0.62",
     "@tanstack/eslint-plugin-query": "^5.81.2",
     "@types/react": "~19.0.10",
     "eslint": "^9.25.0",

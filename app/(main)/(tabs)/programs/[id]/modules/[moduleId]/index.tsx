@@ -1,4 +1,5 @@
 import { View } from 'react-native';
+import { Divider } from 'react-native-paper';
 import { useLocalSearchParams } from 'expo-router';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
@@ -7,9 +8,8 @@ import QuestionsPresenter from '@/components/module/QuestionsPresenter';
 import ScoreBandsPresenter from '@/components/module/ScoreBandsPresenter';
 import ScrollContainer from '@/components/ScrollContainer';
 import ScrollContentContainer from '@/components/ScrollContentContainer';
-import ThemedButton from '@/components/ThemedButton';
+import { ThemedText } from '@/components/ThemedText';
 import { useModuleById } from '@/hooks/useModules';
-import useToggle from '@/hooks/useToggle';
 import { useAuthStore } from '@/stores/authStore';
 import { ModuleType } from '@/types/types';
 import { isAdminOrTherapist } from '@/utils/userRoles';
@@ -18,7 +18,6 @@ const ModuleDetail = () => {
   const moduleId = useLocalSearchParams().moduleId;
   const user = useAuthStore((s) => s.user);
   const { data, isPending, isError } = useModuleById(moduleId as string);
-  const [open, toggleOpen] = useToggle(false);
 
   if (isPending) return <LoadingIndicator marginBottom={0} />;
 
@@ -34,26 +33,20 @@ const ModuleDetail = () => {
         {/* Module Summary */}
         <View className="gap-2">
           <ModuleSummary module={module} />
-          {isAdminOrTherapist(user) ? (
-            <ThemedButton onPress={toggleOpen}>{open ? 'Close module' : 'Expand module'}</ThemedButton>
-          ) : (
-            <ThemedButton disabled>Check for assignments placeholder</ThemedButton>
-          )}
+          <Divider bold className="mb-4" />
         </View>
         {/* Todo - separate switch cases for module types, below is all questionnaire based. */}
         {/* Main Content */}
-        {open && (
-          <>
-            <View className="mt-4">
+        {isAdminOrTherapist(user) && (
+          <View className="gap-4">
+            <ThemedText type="title">Contents</ThemedText>
+            <View>
               {module.type === ModuleType.QUESTIONNAIRE && questions && !!questions.length && (
                 <QuestionsPresenter questions={questions} />
               )}
             </View>
-            {/* Helper Content */}
-            <View className="mt-4">
-              {scoreBands && !!scoreBands.length && <ScoreBandsPresenter scoreBands={scoreBands} />}
-            </View>
-          </>
+            <View>{scoreBands && !!scoreBands.length && <ScoreBandsPresenter scoreBands={scoreBands} />}</View>
+          </View>
         )}
       </ScrollContentContainer>
     </ScrollContainer>

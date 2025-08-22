@@ -1,32 +1,34 @@
 import { FlatList, TouchableOpacity, View } from 'react-native';
 import { clsx } from 'clsx';
-import { Link } from 'expo-router';
-import { useTherapistGetLatestAttempts } from '@/hooks/useAttempts';
+import { Link, useLocalSearchParams } from 'expo-router';
+import Container from '@/components/Container';
+import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
+import { LoadingIndicator } from '@/components/LoadingScreen';
+import { ThemedText } from '@/components/ThemedText';
+import { DateChip } from '@/components/ui/Chip';
+import { useGetPatientTimeline } from '@/hooks/useAttempts';
 import { dateString } from '@/utils/dates';
 
-import Container from '../Container';
-import ErrorComponent, { ErrorTypes } from '../ErrorComponent';
-import { LoadingIndicator } from '../LoadingScreen';
-import { ThemedText } from '../ThemedText';
-import { DateChip } from '../ui/Chip';
+const ClientDetail = () => {
+  const { id } = useLocalSearchParams();
 
-const TherapistLatestAttempts = () => {
-  const { data, isPending, isError } = useTherapistGetLatestAttempts();
+  const { data, isPending, isError } = useGetPatientTimeline({ patientId: id as string });
+  // Defaults to completed attempts
 
   if (isPending) return <LoadingIndicator marginBottom={0} />;
   if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
-
   if (!data) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
+
+  const { attempts } = data;
 
   return (
     <Container>
-      {data.length ? (
+      {attempts.length ? (
         <FlatList
-          data={data}
+          data={attempts}
           keyExtractor={(item) => item._id}
           renderItem={({ item, index }) => {
             const bgColor = index % 2 === 0 ? '' : 'bg-sway-buttonBackground';
-
             return (
               <Link
                 asChild
@@ -41,9 +43,7 @@ const TherapistLatestAttempts = () => {
                 withAnchor
               >
                 <TouchableOpacity key={item._id} className={clsx('gap-2 p-4', bgColor)}>
-                  <ThemedText type="subtitle">
-                    {item.module.title} by {item.user.name}
-                  </ThemedText>
+                  <ThemedText type="subtitle">{item.module.title}</ThemedText>
                   <ThemedText>
                     {item.totalScore} {item.scoreBandLabel}
                   </ThemedText>
@@ -62,4 +62,4 @@ const TherapistLatestAttempts = () => {
   );
 };
 
-export default TherapistLatestAttempts;
+export default ClientDetail;
