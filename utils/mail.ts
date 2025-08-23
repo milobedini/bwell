@@ -1,6 +1,6 @@
-import { ActionSheetIOS, Alert, Platform } from 'react-native';
+import { ActionSheetIOS, Alert, Linking, Platform } from 'react-native';
 import * as MailComposer from 'expo-mail-composer';
-import { renderCustomErrorToast } from '@/components/toast/toastOptions';
+import { renderErrorToast } from '@/components/toast/toastOptions';
 
 export async function pickClientAndCompose(
   options: MailComposer.MailComposerOptions
@@ -8,7 +8,19 @@ export async function pickClientAndCompose(
   // 1) Check availability
   const available = await MailComposer.isAvailableAsync();
   if (!available) {
-    return renderCustomErrorToast('Mail composer not available on this device.');
+    // Fallback to mailto: (useful on iOS simulator or if no mail client exists)
+    const to = options.recipients?.join(',') ?? '';
+    const subject = encodeURIComponent(options.subject ?? '');
+    const body = encodeURIComponent(options.body ?? '');
+
+    const mailtoUrl = `mailto:${to}?subject=${subject}&body=${body}`;
+
+    try {
+      await Linking.openURL(mailtoUrl);
+      return; // no MailComposerResult here, since it's just a URL open
+    } catch (err) {
+      return renderErrorToast(err);
+    }
   }
   // 2) (Optional) Let the user pick a client (UX only; OS chooses the actual handler)
   const clients = MailComposer.getClients(); // MailClient[]
