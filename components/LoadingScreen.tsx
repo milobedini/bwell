@@ -2,6 +2,8 @@ import { View } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { Colors } from '@/constants/Colors';
 
+import loading from '@/assets/lotties/loading.json';
+
 export const LoadingIndicator = ({
   marginBottom,
   transparent = false
@@ -22,13 +24,7 @@ export const LoadingIndicator = ({
         padding: 0
       }}
     >
-      <LottieView
-        style={{ alignSelf: 'center', width: 260, height: 260 }}
-        source={require('../assets/loading.json')}
-        autoPlay
-        loop
-        speed={0.7}
-      />
+      <LottieView style={{ alignSelf: 'center', width: 260, height: 260 }} source={loading} autoPlay loop speed={0.7} />
     </View>
   );
 };
