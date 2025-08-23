@@ -1,6 +1,10 @@
 import { Redirect, useRootNavigationState } from 'expo-router';
+import * as SystemUI from 'expo-system-ui';
+import { Colors } from '@/constants/Colors';
 import { useHasOnboarded } from '@/hooks/useOnboarding';
 import { useAuthStore } from '@/stores/authStore';
+
+SystemUI.setBackgroundColorAsync(Colors.sway.dark);
 
 function IndexRedirect() {
   const rootNavigationState = useRootNavigationState();
