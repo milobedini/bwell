@@ -1,65 +1,61 @@
-import { ActionSheetIOS, Alert, Linking, Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
+import * as IntentLauncher from 'expo-intent-launcher';
 import * as MailComposer from 'expo-mail-composer';
 import { renderErrorToast } from '@/components/toast/toastOptions';
+
+async function tryOpenGmail(to: string, subject: string, body: string) {
+  if (Platform.OS === 'ios') {
+    const gmailUrl = `googlegmail://co?to=${encodeURIComponent(to)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const can = await Linking.canOpenURL(gmailUrl);
+    if (can) {
+      await Linking.openURL(gmailUrl);
+      return true;
+    }
+  } else if (Platform.OS === 'android') {
+    try {
+      await IntentLauncher.startActivityAsync('android.intent.action.SENDTO', {
+        data: `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+        packageName: 'com.google.android.gm'
+      });
+      return true;
+    } catch {
+      // Gmail not available
+    }
+  }
+  return false;
+}
 
 export async function pickClientAndCompose(
   options: MailComposer.MailComposerOptions
 ): Promise<MailComposer.MailComposerResult | void> {
-  // 1) Check availability
   const available = await MailComposer.isAvailableAsync();
   if (!available) {
-    // Fallback to mailto: (useful on iOS simulator or if no mail client exists)
-    const to = options.recipients?.join(',') ?? '';
-    const subject = encodeURIComponent(options.subject ?? '');
-    const body = encodeURIComponent(options.body ?? '');
+    const to = options.recipients?.[0] ?? '';
+    const subject = options.subject ?? '';
+    const body = options.body ?? '';
 
-    const mailtoUrl = `mailto:${to}?subject=${subject}&body=${body}`;
+    // 1) Gmail app?
+    const openedGmail = await tryOpenGmail(to, subject, body);
+    if (openedGmail) return;
 
-    try {
+    // 2) mailto: handler?
+    const mailtoUrl = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    if (await Linking.canOpenURL(mailtoUrl)) {
       await Linking.openURL(mailtoUrl);
-      return; // no MailComposerResult here, since it's just a URL open
-    } catch (err) {
-      return renderErrorToast(err);
+      return;
     }
-  }
-  // 2) (Optional) Let the user pick a client (UX only; OS chooses the actual handler)
-  const clients = MailComposer.getClients(); // MailClient[]
-  if (clients.length > 1) {
-    if (Platform.OS === 'ios') {
-      const labels = clients.map((c) => c.label);
-      return new Promise((resolve) => {
-        ActionSheetIOS.showActionSheetWithOptions(
-          { options: [...labels, 'Cancel'], cancelButtonIndex: labels.length, title: 'Send with' },
-          async (idx) => {
-            if (idx === labels.length) return resolve(undefined); // cancelled
-            const result = await MailComposer.composeAsync(options); // prefills subject/body/etc
-            resolve(result);
-          }
-        );
-      });
-    } else {
-      // Minimal Android picker; replace with your own modal if you prefer
-      return new Promise((resolve) => {
-        const first = clients[0];
-        Alert.alert(
-          'Send with',
-          `Use ${first.label}?`,
-          [
-            { text: 'Choose another', onPress: () => resolve(undefined), style: 'cancel' },
-            {
-              text: 'OK',
-              onPress: async () => {
-                const result = await MailComposer.composeAsync(options);
-                resolve(result);
-              }
-            }
-          ],
-          { cancelable: true }
-        );
-      });
+
+    // 3) Web Gmail
+    const webUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    if (await Linking.canOpenURL(webUrl)) {
+      await Linking.openURL(webUrl);
+      return;
     }
+
+    // 4) Last resort
+    return renderErrorToast('No email app or Gmail found.');
   }
 
-  // 3) If only one (or zero) client is listed, just compose with your options
+  // ... (your same client picker + composeAsync code here)
   return MailComposer.composeAsync(options);
 }

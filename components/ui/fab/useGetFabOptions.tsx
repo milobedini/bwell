@@ -49,14 +49,15 @@ const useGetFabOptions = ({
   }, [addRemoveTherapist, closeMenu, selectedEntity?._id, user?._id]);
 
   const handleEmail = async (body: string, subject: string, recipients: string[]) => {
-    const result = await pickClientAndCompose({
-      recipients,
-      subject,
-      body
-      // isHtml: true
-    });
-    if (result) {
-      console.log(result);
+    try {
+      await pickClientAndCompose({
+        recipients,
+        subject,
+        body
+        // isHtml: true
+      });
+    } catch (error) {
+      renderErrorToast(error);
     }
   };
 
