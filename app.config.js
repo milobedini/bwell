@@ -44,7 +44,8 @@ export default {
           supportsBackgroundPlayback: true,
           supportsPictureInPicture: true
         }
-      ]
+      ],
+      ['expo-mail-composer']
     ],
     experiments: {
       typedRoutes: true

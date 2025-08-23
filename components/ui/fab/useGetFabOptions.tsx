@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { renderErrorToast, renderSuccessToast } from '@/components/toast/toastOptions';
 import { useAddRemoveTherapist } from '@/hooks/useUsers';
 import { useAuthStore } from '@/stores/authStore';
+import { pickClientAndCompose } from '@/utils/mail';
 import type { AuthUser, User } from '@milobedini/shared-types';
 
 import { FabGroupAction } from './FabGroup';
@@ -46,6 +47,18 @@ const useGetFabOptions = ({
       );
     }
   }, [addRemoveTherapist, closeMenu, selectedEntity?._id, user?._id]);
+
+  const handleEmail = async (body: string, subject: string, recipients: string[]) => {
+    const result = await pickClientAndCompose({
+      recipients,
+      subject,
+      body
+      // isHtml: true
+    });
+    if (result) {
+      console.log(result);
+    }
+  };
 
   switch (variant) {
     case FabOptionsVariant.PATIENTS:
@@ -93,8 +106,10 @@ const useGetFabOptions = ({
           label: 'Email client',
           labelTextColor: 'white',
           style: { backgroundColor: 'white' },
-          onPress: () => {
-            closeMenu();
+          onPress: async () => {
+            await handleEmail(`Test email from ${selectedEntity?.email}, ${selectedEntity?.username}`, 'Test email', [
+              'milobedini64@gmail.com'
+            ]).then(() => closeMenu());
           }
         }
       ];
