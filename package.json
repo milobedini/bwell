@@ -18,7 +18,7 @@
     "clean": "rm -rf node_modules && rm -rf package-lock.json &&  rm -rf .expo && rm -rf .expo-shared  && npm install && expo start -c",
     "verify": "npx expo-doctor",
     "review": "npx expo install --check",
-    "publish": "eas update --branch main --environment production -y",
+  "publish": "eas update --branch main --environment production -y --message \"update $(date)\"",
     "publish-web": "npx expo export --platform web && eas deploy --environment production",
     "update-types": "npm uninstall @milobedini/shared-types && npm i @milobedini/shared-types -D"
   },
