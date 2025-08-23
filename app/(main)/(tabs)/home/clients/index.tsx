@@ -1,12 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { FlatList, TouchableOpacity, View } from 'react-native';
 import { Link } from 'expo-router';
 import Container from '@/components/Container';
 import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import ModulePicker from '@/components/module/ModulePicker';
-import ScrollContainer from '@/components/ScrollContainer';
 import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import FabGroup from '@/components/ui/fab/FabGroup';
@@ -55,9 +54,12 @@ const AllClients = () => {
     );
 
   return (
-    <>
-      <ScrollContainer>
-        {clients.map((client) => (
+    <Container>
+      <FlatList
+        data={clients}
+        keyExtractor={(item) => item._id}
+        contentContainerClassName="px-2"
+        renderItem={({ item: client }) => (
           <Link
             key={client._id}
             href={{
@@ -84,8 +86,9 @@ const AllClients = () => {
               />
             </TouchableOpacity>
           </Link>
-        ))}
-      </ScrollContainer>
+        )}
+      ></FlatList>
+
       <FabGroup
         visible={selectedClientId !== null}
         open={openFab}
@@ -103,7 +106,7 @@ const AllClients = () => {
           patient={pickerPatient}
         />
       )}
-    </>
+    </Container>
   );
 };
 

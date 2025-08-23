@@ -176,7 +176,8 @@ const AttemptPresenter = ({
       {/* Header Summary */}
       <View className="gap-2 px-4 pt-1">
         <ThemedText type="title">
-          {title} by {patientName}
+          {title}
+          {patientName && ` by ${patientName}`}
         </ThemedText>
         {moduleSnapshot?.disclaimer && <ThemedText>{moduleSnapshot.disclaimer}</ThemedText>}
         <View className="mt-2 gap-1.5">

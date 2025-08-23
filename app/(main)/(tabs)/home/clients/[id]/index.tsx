@@ -8,12 +8,13 @@ import Container from '@/components/Container';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import { ThemedText } from '@/components/ThemedText';
-import { DateChip } from '@/components/ui/Chip';
+import { DateChip, DueChip } from '@/components/ui/Chip';
 import { FilterDrawer } from '@/components/ui/FilterDrawer';
 import { Colors } from '@/constants/Colors';
 import type { FilterDrawerValues } from '@/constants/Filters';
 import { useGetPatientTimeline } from '@/hooks/useAttempts';
 import { useModules } from '@/hooks/useModules';
+import { AttemptStatus, ModuleType } from '@/types/types';
 import { dateString } from '@/utils/dates';
 
 const defaultFilters: FilterDrawerValues = {
@@ -112,11 +113,15 @@ const ClientDetail = () => {
                 >
                   <TouchableOpacity key={item._id} className={clsx('gap-2 p-4', bgColor)}>
                     <ThemedText type="subtitle">{item.module.title}</ThemedText>
-                    <ThemedText>
-                      {item.totalScore} {item.scoreBandLabel}
-                    </ThemedText>
+                    {item.status === AttemptStatus.SUBMITTED && item.moduleType === ModuleType.QUESTIONNAIRE && (
+                      <ThemedText>
+                        {item.totalScore} {item.scoreBandLabel}
+                      </ThemedText>
+                    )}
+                    {/* Chips */}
                     <View className="flex-row items-center gap-4">
-                      <DateChip prefix={'Completed'} dateString={item.completedAt || ''} />
+                      {item.completedAt && <DateChip prefix={'Completed'} dateString={item.completedAt} />}
+                      {!item.completedAt && <DueChip dueAt={item.dueAt} />}
                     </View>
                   </TouchableOpacity>
                 </Link>

@@ -1,9 +1,8 @@
-import { FlatList, TouchableOpacity, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { FAB } from 'react-native-paper';
 import { clsx } from 'clsx';
 import { Link } from 'expo-router';
 import { Colors } from '@/constants/Colors';
-import { UserRole } from '@/types/types';
 import { dateString } from '@/utils/dates';
 import type { MyAssignmentView } from '@milobedini/shared-types';
 
@@ -23,35 +22,21 @@ const AssignmentsListTherapist = ({ data }: AssignmentsListTherapistProps) => {
         renderItem={({ item, index }) => {
           const bgColor = index % 2 === 0 ? '' : 'bg-sway-buttonBackground';
           return (
-            <Link
-              asChild
-              push
-              href={{
-                pathname: '/assignments/[id]',
-                params: {
-                  id: item._id,
-                  headerTitle: `${item.user.name}: ${item.module.title}`,
-                  user: UserRole.THERAPIST
-                }
-              }}
-            >
-              <TouchableOpacity className={clsx('gap-1 p-4', bgColor)}>
-                <ThemedText type="smallTitle">{item.module.title}</ThemedText>
-                <ThemedText>
-                  Assigned to {item.user.name ?? item.user.username} on {dateString(item.createdAt)}
-                </ThemedText>
-                {item.notes && <ThemedText type="italic">&quot;{item.notes}&quot;</ThemedText>}
-                {item.dueAt && (
-                  <View>
-                    <View className="flex-row flex-wrap gap-1">
-                      <DueChip dueAt={item.dueAt} />
-                      <TimeLeftChip dueAt={item.dueAt} />
-                      {item.recurrence && <RecurrenceChip recurrence={item.recurrence} />}
-                    </View>
-                  </View>
-                )}
-              </TouchableOpacity>
-            </Link>
+            <View className={clsx('gap-1 p-4', bgColor)}>
+              <ThemedText type="smallTitle">{item.module.title}</ThemedText>
+              <ThemedText>
+                Assigned to {item.user.name ?? item.user.username} on {dateString(item.createdAt)}
+              </ThemedText>
+              {item.notes && <ThemedText type="italic">&quot;{item.notes}&quot;</ThemedText>}
+
+              <View>
+                <View className="flex-row flex-wrap gap-1">
+                  <DueChip dueAt={item.dueAt} />
+                  {item.dueAt && <TimeLeftChip dueAt={item.dueAt} />}
+                  {item.recurrence && <RecurrenceChip recurrence={item.recurrence} />}
+                </View>
+              </View>
+            </View>
           );
         }}
       />

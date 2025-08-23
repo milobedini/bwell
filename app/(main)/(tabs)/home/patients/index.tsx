@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { FlatList, View } from 'react-native';
+import Container from '@/components/Container';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
-import ScrollContainer from '@/components/ScrollContainer';
 import { ThemedText } from '@/components/ThemedText';
 import FabGroup from '@/components/ui/fab/FabGroup';
 import FabTrigger from '@/components/ui/fab/FabTrigger';
@@ -43,9 +43,12 @@ const AllPatients = () => {
   if (!patients || !patients.length) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
-    <>
-      <ScrollContainer>
-        {patients.map((patient) => {
+    <Container>
+      <FlatList
+        data={patients}
+        keyExtractor={(item) => item._id}
+        contentContainerClassName="px-4"
+        renderItem={({ item: patient }) => {
           const isClient = patient?.therapist === user?._id;
 
           return (
@@ -69,8 +72,8 @@ const AllPatients = () => {
               />
             </View>
           );
-        })}
-      </ScrollContainer>
+        }}
+      />
       <FabGroup
         visible={selectedPatientId !== null}
         open={openFab}
@@ -78,7 +81,7 @@ const AllPatients = () => {
         onDismiss={closeMenu}
         actions={actions}
       />
-    </>
+    </Container>
   );
 };
 

@@ -1,16 +1,16 @@
 import { useCallback } from 'react';
-import { FlatList, TouchableOpacity, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { clsx } from 'clsx';
 import { Link, useRouter } from 'expo-router';
 import { useStartModuleAttempt } from '@/hooks/useAttempts';
-import { AssignmentStatus, UserRole } from '@/types/types';
+import { AssignmentStatus } from '@/types/types';
 import { dateString } from '@/utils/dates';
 import { MyAssignmentView } from '@milobedini/shared-types';
 
 import ThemedButton from '../ThemedButton';
 import { ThemedText } from '../ThemedText';
-import { renderCustomErrorToast, renderErrorToast } from '../toast/toastOptions';
-import { DueChip, RecurrenceChip, TimeLeftChip } from '../ui/Chip';
+import { renderErrorToast } from '../toast/toastOptions';
+import { AssignmentStatusChip, DueChip, RecurrenceChip, TimeLeftChip } from '../ui/Chip';
 
 type AssignmentsListPatientProps = {
   data: MyAssignmentView[];
@@ -43,21 +43,6 @@ const AssignmentsListPatient = ({ data, completed }: AssignmentsListPatientProps
     [router, startAttempt]
   );
 
-  const continueAttemptFromAssignment = useCallback(
-    (asg: MyAssignmentView) => {
-      const attemptId = asg.latestAttempt?._id;
-      if (!attemptId) return renderCustomErrorToast('No attempt id');
-      router.navigate({
-        pathname: '/attempts/[id]',
-        params: {
-          id: attemptId,
-          assignmentId: asg._id
-        }
-      });
-    },
-    [router]
-  );
-
   return (
     <FlatList
       data={data}
@@ -67,56 +52,64 @@ const AssignmentsListPatient = ({ data, completed }: AssignmentsListPatientProps
         const isInProgress = item.status === AssignmentStatus.IN_PROGRESS;
 
         return (
-          <Link
-            asChild
-            push
-            href={{
-              pathname: '/assignments/[id]',
-              params: { id: item._id, headerTitle: item.module.title, user: UserRole.PATIENT }
-            }}
-          >
-            <TouchableOpacity className={clsx('gap-1 p-4', bgColor)}>
+          <View className={clsx('gap-1 p-4', bgColor)}>
+            <View className="flex-row items-center gap-2">
               <ThemedText type="smallTitle">{item.module.title}</ThemedText>
-              <ThemedText>Assigned by {item.therapist.name}</ThemedText>
-              {item.notes && <ThemedText type="italic">&quot;{item.notes}&quot;</ThemedText>}
-              {item.recurrence && completed && <RecurrenceChip recurrence={item.recurrence} />}
-              {completed && <DueChip completed dueAt={item.latestAttempt?.completedAt} />}
-              {completed && (
-                <Link
-                  asChild
-                  href={{
-                    pathname: '/attempts/[id]',
-                    params: {
-                      id: item.latestAttempt?._id as string,
-                      assignmentId: item._id,
-                      headerTitle: `${item.module.title} (${dateString(item.updatedAt)})`
-                    }
-                  }}
-                  withAnchor
-                >
-                  <ThemedButton title={'View attempt'} compact className="mt-4 self-start" />
-                </Link>
-              )}
-              {!completed && item.dueAt && (
-                <View>
-                  <View className="flex-row flex-wrap gap-1">
-                    <DueChip dueAt={item.dueAt} />
-                    <TimeLeftChip dueAt={item.dueAt} />
-                    {item.recurrence && !completed && <RecurrenceChip recurrence={item.recurrence} />}
-                  </View>
-
+              {isInProgress && <AssignmentStatusChip status={item.status as AssignmentStatus} />}
+            </View>
+            <ThemedText>Assigned by {item.therapist.name}</ThemedText>
+            {item.notes && <ThemedText type="italic">&quot;{item.notes}&quot;</ThemedText>}
+            {item.recurrence && completed && <RecurrenceChip recurrence={item.recurrence} />}
+            {completed && <DueChip completed dueAt={item.latestAttempt?.completedAt} />}
+            {completed && (
+              <Link
+                asChild
+                href={{
+                  pathname: '/attempts/[id]',
+                  params: {
+                    id: item.latestAttempt?._id as string,
+                    assignmentId: item._id,
+                    headerTitle: `${item.module.title} (${dateString(item.updatedAt)})`
+                  }
+                }}
+                withAnchor
+              >
+                <ThemedButton title={'View attempt'} compact className="mt-4 self-start" />
+              </Link>
+            )}
+            {!completed && (
+              <View>
+                <View className="flex-row flex-wrap gap-1">
+                  <DueChip dueAt={item.dueAt} />
+                  {item.dueAt && <TimeLeftChip dueAt={item.dueAt} />}
+                  {item.recurrence && !completed && <RecurrenceChip recurrence={item.recurrence} />}
+                </View>
+                {isInProgress ? (
+                  <Link
+                    asChild
+                    withAnchor
+                    href={{
+                      pathname: '/attempts/[id]',
+                      params: {
+                        id: item.latestAttempt?._id as string,
+                        assignmentId: item._id,
+                        headerTitle: item.module.title
+                      }
+                    }}
+                  >
+                    <ThemedButton title="Continue" compact className="mt-4 w-1/3" />
+                  </Link>
+                ) : (
                   <ThemedButton
-                    title={isInProgress ? 'Continue' : 'Start'}
+                    title="Start"
                     compact
                     className="mt-4 w-1/3"
-                    onPress={() =>
-                      isInProgress ? continueAttemptFromAssignment(item) : createAttemptFromAssignment(item)
-                    }
+                    onPress={() => createAttemptFromAssignment(item)}
                   />
-                </View>
-              )}
-            </TouchableOpacity>
-          </Link>
+                )}
+              </View>
+            )}
+          </View>
         );
       }}
     />

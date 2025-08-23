@@ -41,7 +41,7 @@ export default function MainTabsLayout() {
             <Image
               source={focused ? icon : disabledIcon}
               width={size * 2}
-              height={size & 2}
+              height={size * 2}
               style={{
                 width: size * 2,
                 height: size * 2

@@ -1,5 +1,6 @@
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import AdminHome from '@/components/home/AdminHome';
+import { HomeScreen } from '@/components/home/HomeScreen';
 import PatientHome from '@/components/home/PatientHome';
 import UnverifiedTherapistHome from '@/components/home/UnverifiedTherapistHome';
 import VerifiedTherapistHome from '@/components/home/VerifiedTherapistHome';
@@ -10,7 +11,7 @@ import { isAdmin, isPatient, isTherapist, isVerifiedTherapist } from '@/utils/us
 export default function Home() {
   const { data: user, isPending, isError } = useProfile();
 
-  if (isPending) return <LoadingIndicator marginBottom={0} />;
+  if (isPending) return <HomeScreen content={<LoadingIndicator marginBottom={0} />}></HomeScreen>;
 
   if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
 

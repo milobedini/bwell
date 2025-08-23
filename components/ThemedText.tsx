@@ -37,8 +37,8 @@ export function ThemedText({ style, type = 'default', onLight = false, className
         onLight && { color: Colors.sway.dark },
         style
       ]}
-      className={className}
       {...rest}
+      className={className}
     />
   );
 }

@@ -10,6 +10,7 @@ export const Colors = {
     black: '#000000',
     background: '#F4F2EB',
     info: '#FFD15D',
+    warning: '#FFB300',
     success: '#76AB70',
     accent: '#FFB0C0',
     error: '#FF6D5E',

@@ -1,14 +1,15 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
 
-import { LoadingIndicator } from './LoadingScreen';
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 type FontsContainerProps = {
   children: ReactNode;
 };
 
 const FontsContainer = ({ children }: FontsContainerProps) => {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, error] = useFonts({
     'Lato-Regular': require('../assets/fonts/Lato-Regular.ttf'),
     'Lato-Bold': require('../assets/fonts/Lato-Bold.ttf'),
     'Lato-Black': require('../assets/fonts/Lato-Black.ttf'),
@@ -21,11 +22,15 @@ const FontsContainer = ({ children }: FontsContainerProps) => {
     'Lato-ThinItalic': require('../assets/fonts/Lato-ThinItalic.ttf')
   });
 
-  if (fontsLoaded) {
-    return <>{children}</>;
-  }
+  useEffect(() => {
+    if (fontsLoaded || error) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [fontsLoaded, error]);
 
-  return <LoadingIndicator marginBottom={0} />;
+  if (!fontsLoaded && !error) return null; // keep splash visible
+
+  return children;
 };
 
 export default FontsContainer;

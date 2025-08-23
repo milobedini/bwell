@@ -184,15 +184,15 @@ const AssignmentStatusChip = ({ status }: AssignmentStatusChipProps) => {
     case AssignmentStatus.IN_PROGRESS:
       return (
         <Chip
-          icon={() => <MaterialCommunityIcons name="progress-clock" size={24} color="#93C5FD" />}
+          icon={() => <MaterialCommunityIcons name="progress-clock" size={24} color="black" />}
           mode="outlined"
           textStyle={{
             fontFamily: Fonts.Black,
-            color: '#93C5FD'
+            color: 'black'
           }}
           compact
           style={{
-            backgroundColor: Colors.sway.buttonBackground,
+            backgroundColor: Colors.primary.warning,
             borderColor: '#1E3A8A',
             alignSelf: 'flex-start'
           }}
@@ -206,7 +206,18 @@ const AssignmentStatusChip = ({ status }: AssignmentStatusChipProps) => {
 };
 
 const DueChip = ({ dueAt, completed }: { dueAt?: string; completed?: boolean }) => {
-  if (!dueAt) return null;
+  if (!dueAt)
+    return (
+      <Chip
+        mode="outlined"
+        compact
+        icon={() => <MaterialCommunityIcons name="calendar" size={24} color="#E6E8EF" />}
+        textStyle={{ color: '#E6E8EF', fontFamily: Fonts.Black, fontSize: 16 }}
+        style={{ borderColor: '#3B3F51', backgroundColor: 'transparent', alignSelf: 'flex-start' }}
+      >
+        {`Open-ended`}
+      </Chip>
+    );
   const due = new Date(dueAt);
 
   if (completed)
@@ -235,9 +246,7 @@ const DueChip = ({ dueAt, completed }: { dueAt?: string; completed?: boolean }) 
   );
 };
 
-const TimeLeftChip = ({ dueAt }: { dueAt?: string }) => {
-  if (!dueAt) return null;
-
+const TimeLeftChip = ({ dueAt }: { dueAt: string }) => {
   const due = new Date(dueAt);
   if (Number.isNaN(due.getTime())) return null;
 

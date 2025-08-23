@@ -1,13 +1,13 @@
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { useLocalSearchParams } from 'expo-router';
+import Container from '@/components/Container';
+import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import ModuleSummary from '@/components/module/ModuleSummary';
 import QuestionsPresenter from '@/components/module/QuestionsPresenter';
 import ScoreBandsPresenter from '@/components/module/ScoreBandsPresenter';
-import ScrollContainer from '@/components/ScrollContainer';
-import ScrollContentContainer from '@/components/ScrollContentContainer';
 import { ThemedText } from '@/components/ThemedText';
 import { useModuleById } from '@/hooks/useModules';
 import { useAuthStore } from '@/stores/authStore';
@@ -28,28 +28,30 @@ const ModuleDetail = () => {
   const { module, questions, scoreBands } = data;
 
   return (
-    <ScrollContainer>
-      <ScrollContentContainer>
-        {/* Module Summary */}
-        <View className="gap-2">
-          <ModuleSummary module={module} />
-          <Divider bold className="mb-4" />
-        </View>
-        {/* Todo - separate switch cases for module types, below is all questionnaire based. */}
-        {/* Main Content */}
-        {isAdminOrTherapist(user) && (
-          <View className="gap-4">
-            <ThemedText type="title">Contents</ThemedText>
-            <View>
-              {module.type === ModuleType.QUESTIONNAIRE && questions && !!questions.length && (
-                <QuestionsPresenter questions={questions} />
-              )}
-            </View>
-            <View>{scoreBands && !!scoreBands.length && <ScoreBandsPresenter scoreBands={scoreBands} />}</View>
+    <Container>
+      <ContentContainer>
+        <ScrollView>
+          {/* Module Summary */}
+          <View className="gap-2">
+            <ModuleSummary module={module} />
+            <Divider bold className="mb-4" />
           </View>
-        )}
-      </ScrollContentContainer>
-    </ScrollContainer>
+          {/* Todo - separate switch cases for module types, below is all questionnaire based. */}
+          {/* Main Content */}
+          {isAdminOrTherapist(user) && (
+            <View className="gap-4">
+              <ThemedText type="title">Contents</ThemedText>
+              <View>
+                {module.type === ModuleType.QUESTIONNAIRE && questions && !!questions.length && (
+                  <QuestionsPresenter questions={questions} />
+                )}
+              </View>
+              <View>{scoreBands && !!scoreBands.length && <ScoreBandsPresenter scoreBands={scoreBands} />}</View>
+            </View>
+          )}
+        </ScrollView>
+      </ContentContainer>
+    </Container>
   );
 };
 

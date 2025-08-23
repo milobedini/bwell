@@ -1,4 +1,5 @@
-import { View } from 'react-native';
+import { FlatList, View } from 'react-native';
+import { Divider } from 'react-native-paper';
 import { Link, useLocalSearchParams } from 'expo-router';
 import { AccessPolicy, AssignmentStatus } from '@/types/types';
 import type { AvailableModulesItem } from '@milobedini/shared-types';
@@ -15,24 +16,30 @@ const ModulesList = ({ data }: ModulesListProps) => {
   const { id: programId } = useLocalSearchParams();
 
   return (
-    <View>
-      {data.map((item) => {
+    <FlatList
+      data={data}
+      keyExtractor={(item) => item.module._id}
+      ItemSeparatorComponent={() => <Divider bold className="my-4" />}
+      renderItem={({ item }) => {
         const { module, meta } = item;
-        // Todo, is assigned
         return (
-          <View key={module._id} className="mb-6 gap-2 border-b border-b-sway-lightGrey pb-6">
-            <View className="mb-4 flex-row items-center gap-2">
+          <View key={module._id} className="gap-4 px-4">
+            <View className="flex-row flex-wrap items-center gap-2">
               <ThemedText type="subtitle">{module.title}</ThemedText>
-              {/* Todo isAssigned Chip*/}
-            </View>
-            <View className="flex-row flex-wrap gap-2">
               <AssignmentStatusChip status={meta.assignmentStatus as AssignmentStatus} />
-              <DueChip dueAt={meta.dueAt} />
-              <AccessPolicyChip accessPolicy={module.accessPolicy as AccessPolicy} />
-              <CanStartChip meta={meta} />
+              {meta.dueAt && <DueChip dueAt={meta.dueAt} />}
             </View>
-            <ThemedText className=" text-lg">{module.description}</ThemedText>
-            <ThemedText className="capitalize">{module.type}</ThemedText>
+            <View className="gap-2">
+              <ThemedText className="uppercase">Access Policy</ThemedText>
+              <View className="flex-row flex-wrap gap-2">
+                <AccessPolicyChip accessPolicy={module.accessPolicy as AccessPolicy} />
+                <CanStartChip meta={meta} />
+              </View>
+            </View>
+            <ThemedText>{module.description}</ThemedText>
+            <ThemedText type="italic" className="capitalize">
+              {module.type}
+            </ThemedText>
             <Link
               asChild
               push
@@ -45,8 +52,8 @@ const ModulesList = ({ data }: ModulesListProps) => {
             </Link>
           </View>
         );
-      })}
-    </View>
+      }}
+    />
   );
 };
 

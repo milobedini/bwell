@@ -1,9 +1,8 @@
 import { useLocalSearchParams } from 'expo-router';
+import Container from '@/components/Container';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import ModulesList from '@/components/module/ModulesList';
-import ScrollContainer from '@/components/ScrollContainer';
-import ScrollContentContainer from '@/components/ScrollContentContainer';
 import { useModules } from '@/hooks/useModules';
 
 export default function ProgramDetail() {
@@ -17,10 +16,8 @@ export default function ProgramDetail() {
   if (!data || !data.length) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
-    <ScrollContainer>
-      <ScrollContentContainer>
-        <ModulesList data={data} />
-      </ScrollContentContainer>
-    </ScrollContainer>
+    <Container>
+      <ModulesList data={data} />
+    </Container>
   );
 }

@@ -1,9 +1,21 @@
+import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 
 const stackScreenOptions: NativeStackNavigationOptions = {
-  headerShown: false
+  headerShown: false,
+  contentStyle: { backgroundColor: Colors.sway.dark }
+};
+
+const nestedScreenOptions: NativeStackNavigationOptions = {
+  headerShown: true,
+  headerTransparent: true,
+  headerBackButtonDisplayMode: 'minimal',
+  headerTitle: '',
+  headerStyle: { backgroundColor: Colors.sway.dark },
+  headerShadowVisible: false,
+  headerTintColor: Colors.sway.bright
 };
 
 const stackScreenOptionsWithTitle = (title?: string): NativeStackNavigationOptions => {
@@ -12,19 +24,16 @@ const stackScreenOptionsWithTitle = (title?: string): NativeStackNavigationOptio
     headerShown: true,
     headerTransparent: true,
     headerTitle: title,
-    headerTitleStyle: { color: 'white', fontFamily: Fonts.Bold, fontSize: 24 }
+    headerTitleStyle: { color: 'white', fontFamily: Fonts.Bold, fontSize: 24 },
+    headerStyle: { backgroundColor: Colors.sway.dark },
+    headerShadowVisible: false,
+    headerTintColor: Colors.sway.bright,
+    contentStyle: { backgroundColor: Colors.sway.dark }
   };
 };
 
-const nestedScreenOptions: NativeStackNavigationOptions = {
-  headerShown: true,
-  headerTransparent: true,
-  headerBackButtonDisplayMode: 'minimal',
-  headerTitle: ''
-};
-
 const nestedScreenOptionsWithTitle = (title?: string): NativeStackNavigationOptions => {
-  if (!title) return stackScreenOptions;
+  if (!title) return nestedScreenOptions;
   return {
     ...nestedScreenOptions,
     headerTitle: title,
@@ -40,7 +49,6 @@ const withHeaderFromParams =
     const { headerTitle } = (route.params as HeaderParams | undefined) ?? {};
     return {
       ...nestedScreenOptionsWithTitle(headerTitle)
-      // headerLeft: () => <BackButton />
     };
   };
 
