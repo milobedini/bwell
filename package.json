@@ -18,7 +18,7 @@
     "clean": "rm -rf node_modules && rm -rf package-lock.json &&  rm -rf .expo && rm -rf .expo-shared  && npm install && expo start -c",
     "verify": "npx expo-doctor",
     "review": "npx expo install --check",
-    "publish": "eas update --branch main --environment production",
+    "publish": "eas update --branch main --environment production -y",
     "publish-web": "npx expo export --platform web && eas deploy --environment production",
     "update-types": "npm uninstall @milobedini/shared-types && npm i @milobedini/shared-types -D"
   },
@@ -76,7 +76,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@milobedini/shared-types": "^1.0.62",
+    "@milobedini/shared-types": "^1.0.63",
     "@tanstack/eslint-plugin-query": "^5.81.2",
     "@types/react": "~19.0.10",
     "eslint": "^9.25.0",

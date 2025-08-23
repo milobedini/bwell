@@ -1,4 +1,4 @@
-import { FAB } from 'react-native-paper';
+import { FAB, FABProps } from 'react-native-paper';
 import { Colors } from '@/constants/Colors';
 
 type FabTriggerProps = {
@@ -7,6 +7,7 @@ type FabTriggerProps = {
   backgroundColor?: string;
   elevation?: number;
   onPress: () => void;
+  size?: FABProps['size'];
 };
 
 const FabTrigger = ({
@@ -14,7 +15,8 @@ const FabTrigger = ({
   color = 'white',
   backgroundColor = Colors.sway.bright,
   elevation = 2,
-  onPress
+  onPress,
+  size = 'medium'
 }: FabTriggerProps) => {
   return (
     <FAB
@@ -25,6 +27,7 @@ const FabTrigger = ({
         backgroundColor,
         elevation
       }}
+      size={size}
     />
   );
 };
