@@ -1,10 +1,9 @@
 import { useMemo } from 'react';
 import { View } from 'react-native';
 import { Card, Chip } from 'react-native-paper';
+import { ThemedText } from '@/components/ThemedText';
 import { Fonts } from '@/constants/Typography';
 import type { AttemptDetailItem } from '@milobedini/shared-types';
-
-import { ThemedText } from '../ThemedText';
 
 type QuestionSlideProps = {
   mode: 'view' | 'edit';

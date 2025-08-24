@@ -81,7 +81,7 @@ const PatientAttempts = () => {
               >
                 <TouchableOpacity key={item._id} className={clsx('gap-1 p-4', bgColor)}>
                   <ThemedText type="smallTitle">{item.module.title}</ThemedText>
-                  {item.totalScore && (
+                  {!!item.totalScore && (
                     <ThemedText>
                       {item.totalScore} {item.scoreBandLabel}
                     </ThemedText>
