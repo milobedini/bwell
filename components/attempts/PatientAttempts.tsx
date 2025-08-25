@@ -74,7 +74,7 @@ const PatientAttempts = () => {
                   pathname: '/attempts/[id]',
                   params: {
                     id: item._id,
-                    headerTitle: `${item.module.title} detail`
+                    headerTitle: item.module.title
                   }
                 }}
                 push
@@ -86,7 +86,6 @@ const PatientAttempts = () => {
                       {item.totalScore} {item.scoreBandLabel}
                     </ThemedText>
                   )}
-                  {/* Todo - it becomes started when you create it. Fine? */}
                   <View className="flex-row items-center gap-4">
                     <DateChip prefix={item.status} dateString={item.completedAt || item.lastInteractionAt || ''} />
                   </View>

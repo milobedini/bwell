@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, ListRenderItemInfo, Platform, ScrollView, View } from 'react-native';
 import { Card, Chip, Divider, ProgressBar, TextInput } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
@@ -10,68 +10,28 @@ import { SaveProgressChip } from '@/components/ui/Chip';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useSaveModuleAttempt, useSubmitAttempt } from '@/hooks/useAttempts';
-import { clamp } from '@/utils/helpers';
+import {
+  buildDaySlots,
+  dateISO,
+  dayLabel,
+  SLOT_STEP_HOURS,
+  type SlotKey,
+  slotLabel,
+  type SlotValue,
+  startOfMonday
+} from '@/utils/activityHelpers';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { AttemptDetailResponseItem, DiaryDetail, DiaryEntryInput } from '@milobedini/shared-types';
 
-// Todo - review and clean up.
+import NumericField from './NumericField';
 
-type Props = {
+type ActivityDiaryPresenterProps = {
   attempt: AttemptDetailResponseItem & { diary: DiaryDetail };
   mode: 'view' | 'edit';
   patientName?: string;
 };
 
-const SLOT_START_HOUR = 6;
-const SLOT_END_HOUR = 24;
-const SLOT_STEP_HOURS = 2;
-
-const pad2 = (n: number) => String(n).padStart(2, '0');
-
-function startOfMonday(d: Date) {
-  const dt = new Date(d);
-  const day = dt.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  dt.setHours(0, 0, 0, 0);
-  dt.setDate(dt.getDate() + diff);
-  return dt;
-}
-function dayLabel(d: Date) {
-  return d.toLocaleDateString(undefined, { weekday: 'short' });
-}
-function dateISO(d: Date) {
-  return d.toISOString().slice(0, 10);
-}
-function slotLabel(h: number) {
-  const end = Math.min(24, h + SLOT_STEP_HOURS);
-  return `${pad2(h)}:00–${pad2(end)}:00`;
-}
-
-type SlotKey = string; // `${iso}|${label}`
-type SlotValue = {
-  at: Date;
-  label: string;
-  activity: string;
-  mood?: number;
-  achievement?: number;
-  closeness?: number;
-  enjoyment?: number;
-};
-
-function buildDaySlots(baseIso: string): { key: SlotKey; value: SlotValue }[] {
-  const base = new Date(`${baseIso}T00:00:00.000Z`);
-  const rows: { key: SlotKey; value: SlotValue }[] = [];
-  for (let h = SLOT_START_HOUR; h < SLOT_END_HOUR; h += SLOT_STEP_HOURS) {
-    const at = new Date(base);
-    at.setUTCHours(h, 0, 0, 0);
-    const label = slotLabel(h);
-    const key = `${dateISO(at)}|${label}`;
-    rows.push({ key, value: { at, label, activity: '' } });
-  }
-  return rows;
-}
-
-export default function ActivityDiaryPresenter({ attempt, mode, patientName }: Props) {
+const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPresenterProps) => {
   const [dirtyKeys, setDirtyKeys] = useState<Set<SlotKey>>(new Set());
 
   const router = useRouter();
@@ -81,9 +41,7 @@ export default function ActivityDiaryPresenter({ attempt, mode, patientName }: P
   const { mutate: submitAttempt } = useSubmitAttempt(attempt._id);
 
   const canEdit = mode === 'edit';
-  const { moduleSnapshot, weekStart, userNote, startedAt, completedAt, diary } = attempt;
-
-  const title = moduleSnapshot?.title ?? 'Activity Diary';
+  const { moduleSnapshot, weekStart, userNote, startedAt, completedAt, diary, updatedAt } = attempt;
 
   const markDirty = useCallback((k: SlotKey) => {
     setDirtyKeys((prev) => {
@@ -224,8 +182,8 @@ export default function ActivityDiaryPresenter({ attempt, mode, patientName }: P
             <TextInput
               mode="flat"
               disabled={disabled}
-              label="Activity"
-              placeholder="What did you do?"
+              label={mode === 'edit' ? 'Activity' : undefined}
+              placeholder={mode === 'edit' ? 'What did you do?' : undefined}
               placeholderTextColor={'white'}
               value={value.activity}
               onChangeText={(t) => updateSlot(key, { activity: t })}
@@ -237,11 +195,11 @@ export default function ActivityDiaryPresenter({ attempt, mode, patientName }: P
               underlineColor="transparent"
               activeUnderlineColor={Colors.sway.bright}
               theme={{ colors: { onSurfaceVariant: Colors.sway.lightGrey } }}
-              clearButtonMode="always"
+              clearButtonMode={mode === 'edit' ? 'always' : 'never'}
             />
             <NumericField
               label="Mood"
-              value={value.mood ?? 0}
+              value={value.mood}
               min={0}
               max={100}
               maxLength={3}
@@ -250,7 +208,7 @@ export default function ActivityDiaryPresenter({ attempt, mode, patientName }: P
             />
             <NumericField
               label="Achievement"
-              value={value.achievement ?? 0}
+              value={value.achievement}
               min={0}
               max={10}
               maxLength={2}
@@ -259,7 +217,7 @@ export default function ActivityDiaryPresenter({ attempt, mode, patientName }: P
             />
             <NumericField
               label="Closeness"
-              value={value.closeness ?? 0}
+              value={value.closeness}
               min={0}
               max={10}
               maxLength={2}
@@ -268,7 +226,7 @@ export default function ActivityDiaryPresenter({ attempt, mode, patientName }: P
             />
             <NumericField
               label="Enjoyment"
-              value={value.enjoyment ?? 0}
+              value={value.enjoyment}
               min={0}
               max={10}
               maxLength={2}
@@ -279,7 +237,7 @@ export default function ActivityDiaryPresenter({ attempt, mode, patientName }: P
         </Card>
       );
     },
-    [canEdit, updateSlot]
+    [canEdit, updateSlot, mode]
   );
 
   return (
@@ -300,10 +258,7 @@ export default function ActivityDiaryPresenter({ attempt, mode, patientName }: P
           <View>
             {/* Sticky header region */}
             <View className="z-20 gap-1 bg-sway-dark px-4 pt-1">
-              <ThemedText type="title">
-                {title}
-                {patientName && ` by ${patientName}`}
-              </ThemedText>
+              {patientName && <ThemedText type="subtitle">{patientName && `by ${patientName}`}</ThemedText>}
 
               {moduleSnapshot?.disclaimer ? <ThemedText>{moduleSnapshot.disclaimer}</ThemedText> : null}
 
@@ -315,12 +270,23 @@ export default function ActivityDiaryPresenter({ attempt, mode, patientName }: P
               <View className="flex-row flex-wrap items-center gap-2">
                 {mode === 'view' ? (
                   <Chip style={{ backgroundColor: '#262E42' }} textStyle={{ color: 'white' }}>
-                    Completed {completedAt ? new Date(completedAt).toLocaleDateString() : '—'}
+                    {completedAt
+                      ? `Completed ${new Date(completedAt).toLocaleDateString()}`
+                      : `Last Update ${new Date(updatedAt).toLocaleDateString()}`}
                   </Chip>
                 ) : (
-                  <Chip style={{ backgroundColor: '#262E42' }} textStyle={{ color: 'white' }}>
-                    In progress {startedAt ? `• ${new Date(startedAt).toLocaleDateString()}` : ''}
-                  </Chip>
+                  <>
+                    {startedAt && !dirtyKeys.size && (
+                      <Chip style={{ backgroundColor: '#262E42' }} textStyle={{ color: 'white' }}>
+                        {`Started ${new Date(startedAt).toLocaleDateString()}`}
+                      </Chip>
+                    )}
+                    {updatedAt && (
+                      <Chip style={{ backgroundColor: '#262E42' }} textStyle={{ color: 'white' }}>
+                        {`Updated ${new Date(startedAt).toLocaleDateString()}`}
+                      </Chip>
+                    )}
+                  </>
                 )}
                 <SaveProgressChip saved={saved} isSaving={isSaving} />
                 {!!dirtyKeys.size && (
@@ -379,8 +345,7 @@ export default function ActivityDiaryPresenter({ attempt, mode, patientName }: P
                   );
                 })}
               </ScrollView>
-
-              <View style={{ height: 12 }} />
+              <View className="h-3" />
             </View>
           </View>
         }
@@ -447,72 +412,7 @@ export default function ActivityDiaryPresenter({ attempt, mode, patientName }: P
       />
     </KeyboardAvoidingView>
   );
-}
+};
 
-const NumericField = memo(function NumericField({
-  label,
-  value,
-  min,
-  max,
-  disabled,
-  onChange,
-  maxLength = 3 // e.g. mood 0..100
-}: {
-  label: string;
-  value?: number;
-  min: number;
-  max: number;
-  disabled?: boolean;
-  onChange: (n: number) => void;
-  maxLength?: number;
-}) {
-  const [text, setText] = useState<string>(value == null ? '' : String(value));
-
-  // keep in sync if parent changes (e.g., after hydration)
-  useEffect(() => {
-    setText(value == null ? '' : String(value));
-  }, [value]);
-
-  const handleChange = useCallback(
-    (t: string) => {
-      // allow empty while typing; filter to digits only
-      const digits = t.replace(/[^\d]/g, '');
-      setText(digits);
-
-      if (digits === '') return; // user still typing
-      const parsed = clamp(parseInt(digits, 10) || 0, min, max);
-      if (parsed !== value) onChange(parsed);
-    },
-    [min, max, onChange, value]
-  );
-
-  return (
-    <View className="flex-row items-center justify-between">
-      <ThemedText style={{ width: 110 }}>{label}</ThemedText>
-      <View className="flex-row items-center gap-2">
-        <TextInput
-          mode="outlined"
-          value={text}
-          onChangeText={handleChange}
-          disabled={disabled}
-          keyboardType="number-pad"
-          inputMode="numeric"
-          maxLength={maxLength}
-          style={{
-            backgroundColor: 'transparent',
-            height: 32,
-            textAlign: 'center'
-          }}
-          contentStyle={{ color: 'white', textAlign: 'center' }}
-          outlineStyle={{ borderColor: Colors.sway.darkGrey }}
-          theme={{ colors: { onSurfaceVariant: Colors.sway.lightGrey } }}
-          placeholder={`${min}–${max}`}
-          placeholderTextColor={'#AEB7C7'}
-          returnKeyType="done"
-          submitBehavior="blurAndSubmit"
-        />
-        <ThemedText style={{ opacity: 0.8, width: 70 }}>{`(${min}–${max})`}</ThemedText>
-      </View>
-    </View>
-  );
-});
+export default ActivityDiaryPresenter;
+export { SLOT_STEP_HOURS };

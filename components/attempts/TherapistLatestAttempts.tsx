@@ -44,9 +44,11 @@ const TherapistLatestAttempts = () => {
                   <ThemedText type="subtitle">
                     {item.module.title} by {item.user.name}
                   </ThemedText>
-                  <ThemedText>
-                    {item.totalScore} {item.scoreBandLabel}
-                  </ThemedText>
+                  {!!item.totalScore && (
+                    <ThemedText>
+                      {item.totalScore} {item.scoreBandLabel}
+                    </ThemedText>
+                  )}
                   <View className="flex-row items-center gap-4">
                     <DateChip prefix={'Completed'} dateString={item.completedAt || ''} />
                   </View>

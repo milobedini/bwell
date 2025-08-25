@@ -105,7 +105,7 @@ const ClientDetail = () => {
                     pathname: '/attempts/[id]',
                     params: {
                       id: item._id,
-                      headerTitle: `${item.module.title} (${dateString(item.completedAt || '')})`
+                      headerTitle: `${item.module.title} (${dateString(item.completedAt || item.lastInteractionAt)})`
                     }
                   }}
                   push
