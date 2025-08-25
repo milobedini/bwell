@@ -7,7 +7,7 @@ import { HomeScreen } from './HomeScreen';
 
 const VerifiedTherapistHome = () => {
   const content = (
-    <ContentContainer>
+    <ContentContainer className="gap-6">
       <Link asChild href={'/home/clients'}>
         <PrimaryButton title="Your clients" />
       </Link>

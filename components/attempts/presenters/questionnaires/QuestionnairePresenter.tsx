@@ -1,15 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Dimensions, FlatList, ListRenderItemInfo, ScrollView, View, ViewToken } from 'react-native';
-import { ActivityIndicator, Card, Chip, Divider, ProgressBar } from 'react-native-paper';
+import { Card, Chip, Divider, ProgressBar } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { PrimaryButton } from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
+import { renderErrorToast, renderSuccessToast } from '@/components/toast/toastOptions';
+import { SaveProgressChip } from '@/components/ui/Chip';
 import { Colors } from '@/constants/Colors';
-import { Fonts } from '@/constants/Typography';
-import { isQuestionnaireAttempt } from '@/utils/types';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import type { AttemptAnswer, AttemptDetailItem, AttemptDetailResponseItem } from '@milobedini/shared-types';
+import { useSaveModuleAttempt, useSubmitAttempt } from '@/hooks/useAttempts';
+import type {
+  AttemptAnswer,
+  AttemptDetail,
+  AttemptDetailItem,
+  AttemptDetailResponseItem
+} from '@milobedini/shared-types';
 
 import Dots from './Dots';
 import QuestionSlide from './QuestionSlide';
@@ -17,55 +22,33 @@ import QuestionSlide from './QuestionSlide';
 const { width } = Dimensions.get('window');
 const PAGE_W = width;
 
-type DetailShape = {
-  items: AttemptDetailItem[];
-  answeredCount: number;
-  totalQuestions: number;
-  percentComplete: number;
-};
-
-type Props = {
+type QuestionnairePresenterProps = {
   attempt: AttemptDetailResponseItem;
+  detail: AttemptDetail;
   mode: 'view' | 'edit';
-  saveAnswers?(answers: AttemptAnswer[]): Promise<void>;
-  submitAttempt?(args?: { assignmentId?: string }): Promise<void>;
-  isSaving?: boolean;
-  saved?: boolean;
   patientName?: string;
 };
 
-export default function QuestionnairePresenter({
-  attempt,
-  mode,
-  saveAnswers,
-  submitAttempt,
-  isSaving,
-  saved,
-  patientName
-}: Props) {
+export default function QuestionnairePresenter({ attempt, detail, mode, patientName }: QuestionnairePresenterProps) {
   const router = useRouter();
+  const { assignmentId } = useLocalSearchParams<{ assignmentId?: string }>();
 
-  const isQ = isQuestionnaireAttempt(attempt);
-
-  // Provide a safe default detail so hooks/UI can rely on it
-  const detail: DetailShape = isQ
-    ? attempt.detail
-    : { items: [], answeredCount: 0, totalQuestions: 0, percentComplete: 0 };
+  const { mutate: saveAttempt, isPending: isSaving, isSuccess: saved } = useSaveModuleAttempt(attempt._id);
+  const { mutate: submitAttempt } = useSubmitAttempt(attempt._id);
 
   const { moduleSnapshot, totalScore, scoreBandLabel, band, durationSecs, userNote, startedAt, completedAt } = attempt;
-
   const title = moduleSnapshot?.title ?? 'Module';
   const progress = (detail.percentComplete || 0) / 100;
 
-  // Local answer cache (by questionId)
+  // local cache of answers
   const answersMap = useRef<Map<string, AttemptAnswer>>(new Map());
   const [index, setIndex] = useState(0);
   const flatRef = useRef<FlatList<AttemptDetailItem>>(null);
 
-  // Hydrate answersMap when attempt changes (safe even if detail.items is empty)
+  // hydrate from server
   useEffect(() => {
     const m = new Map<string, AttemptAnswer>();
-    detail.items.forEach((it) => {
+    for (const it of detail.items) {
       if (it.chosenScore != null) {
         m.set(it.questionId, {
           question: it.questionId,
@@ -74,7 +57,7 @@ export default function QuestionnairePresenter({
           chosenText: it.chosenText ?? undefined
         });
       }
-    });
+    }
     answersMap.current = m;
   }, [attempt._id, detail.items]);
 
@@ -85,14 +68,7 @@ export default function QuestionnairePresenter({
     setTimeout(() => flatRef.current?.scrollToIndex({ index: i, animated: true }), 50);
   }, []);
 
-  const getItemLayout = useCallback(
-    (_: unknown, i: number) => ({
-      length: PAGE_W,
-      offset: PAGE_W * i,
-      index: i
-    }),
-    []
-  );
+  const getItemLayout = useCallback((_: unknown, i: number) => ({ length: PAGE_W, offset: PAGE_W * i, index: i }), []);
 
   const handleAnswered = useCallback(
     async (q: AttemptDetailItem, pick: { score: number; index: number; text: string }) => {
@@ -105,7 +81,7 @@ export default function QuestionnairePresenter({
         chosenText: pick.text
       });
 
-      await saveAnswers?.(currentAnswersArray());
+      saveAttempt({ answers: currentAnswersArray() }, { onError: (err) => renderErrorToast(err) });
 
       if (index < detail.items.length - 1) {
         const next = index + 1;
@@ -113,7 +89,7 @@ export default function QuestionnairePresenter({
         setIndex(next);
       }
     },
-    [mode, index, detail.items.length, scrollTo, saveAnswers, currentAnswersArray]
+    [mode, index, detail.items.length, saveAttempt, currentAnswersArray, scrollTo]
   );
 
   const renderItem = useCallback(
@@ -162,18 +138,35 @@ export default function QuestionnairePresenter({
     return `${m}m ${s}s`;
   }, [durationSecs]);
 
-  const allAnswered = useMemo(() => {
-    return detail.answeredCount === detail.totalQuestions && detail.totalQuestions > 0;
-  }, [detail.answeredCount, detail.totalQuestions]);
+  const allAnswered = useMemo(
+    () => detail.totalQuestions > 0 && detail.answeredCount === detail.totalQuestions,
+    [detail.answeredCount, detail.totalQuestions]
+  );
 
-  const handleSubmit = useCallback(async () => {
-    await saveAnswers?.(currentAnswersArray());
-    await submitAttempt?.();
-  }, [saveAnswers, submitAttempt, currentAnswersArray]);
+  const handleSubmit = useCallback(() => {
+    if (mode !== 'edit') return router.back();
+
+    // last save, then submit
+    saveAttempt(
+      { answers: currentAnswersArray() },
+      {
+        onError: (err) => renderErrorToast(err),
+        onSuccess: () => {
+          submitAttempt(assignmentId ? { assignmentId: String(assignmentId) } : {}, {
+            onError: (err) => renderErrorToast(err),
+            onSuccess: () => {
+              renderSuccessToast('Submitted module attempt');
+              router.back();
+            }
+          });
+        }
+      }
+    );
+  }, [mode, saveAttempt, submitAttempt, currentAnswersArray, assignmentId, router]);
 
   return (
     <ScrollView className="flex-1">
-      {/* Header Summary */}
+      {/* Header */}
       <View className="gap-2 px-4 pt-1">
         <ThemedText type="title">
           {title}
@@ -217,70 +210,38 @@ export default function QuestionnairePresenter({
 
       <Divider className="my-4" bold />
 
-      {/* If someone routed here with a non-questionnaire attempt, show a helpful message */}
-      {!isQ ? (
-        <View style={{ padding: 16 }}>
-          <ThemedText>This attempt is not a questionnaire. Use the appropriate presenter.</ThemedText>
-        </View>
-      ) : (
-        <>
-          {/* Questions - horizontal pages */}
-          <FlatList
-            ref={flatRef}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={detail.items}
-            keyExtractor={(q) => q.questionId}
-            renderItem={renderItem}
-            onViewableItemsChanged={onViewableItemsChanged}
-            decelerationRate="fast"
-            snapToInterval={PAGE_W}
-            snapToAlignment="start"
-            getItemLayout={getItemLayout}
-            onMomentumScrollEnd={(e) => {
-              const i = Math.round(e.nativeEvent.contentOffset.x / PAGE_W);
-              if (i !== index) setIndex(i);
-            }}
-          />
+      {/* Questions pager */}
+      <FlatList
+        ref={flatRef}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        data={detail.items}
+        keyExtractor={(q) => q.questionId}
+        renderItem={renderItem}
+        onViewableItemsChanged={onViewableItemsChanged}
+        pagingEnabled
+        decelerationRate="fast"
+        snapToAlignment="start"
+        getItemLayout={getItemLayout}
+        initialScrollIndex={index}
+        onMomentumScrollEnd={(e) => {
+          const i = Math.round(e.nativeEvent.contentOffset.x / PAGE_W);
+          if (i !== index) setIndex(i);
+        }}
+      />
 
-          {/* Pagination dots */}
-          <Dots total={detail.items.length} index={index} />
-        </>
-      )}
+      <Dots total={detail.items.length} index={index} />
 
-      {/* Saved/Saving badges */}
-      {saved && (
-        <Chip
-          icon={() => <MaterialCommunityIcons name="check-circle-outline" size={24} color={'#34D399'} />}
-          mode="outlined"
-          textStyle={{ fontFamily: Fonts.Black, color: '#34D399' }}
-          style={{
-            backgroundColor: Colors.sway.buttonBackground,
-            borderColor: '#065F46',
-            alignSelf: 'center',
-            marginTop: 8
-          }}
-        >
-          Saved
-        </Chip>
-      )}
-      {isSaving && (
-        <Chip
-          textStyle={{ fontFamily: Fonts.Black, color: '#34D399' }}
-          style={{ backgroundColor: Colors.sway.dark, alignSelf: 'center', marginTop: 8 }}
-          icon={() => <ActivityIndicator animating={isSaving} color={Colors.sway.bright} style={{ marginRight: 12 }} />}
-        >
-          Saving
-        </Chip>
-      )}
+      {/* Save indicators (only meaningful when patient) */}
+      <SaveProgressChip saved={saved} isSaving={isSaving} />
 
-      {/* Footer actions (only meaningful for questionnaires) */}
+      {/* Footer (patient edit) */}
       {mode === 'edit' && (
         <View className="p-4 pt-2">
           <PrimaryButton
-            onPress={isQ ? (allAnswered ? handleSubmit : router.back) : router.back}
-            disabled={isQ ? detail.answeredCount === 0 : false}
-            title={isQ ? (allAnswered ? 'Submit' : 'Exit') : 'Back'}
+            onPress={allAnswered ? handleSubmit : () => router.back()}
+            disabled={detail.answeredCount === 0}
+            title={allAnswered ? 'Submit' : 'Exit'}
           />
         </View>
       )}

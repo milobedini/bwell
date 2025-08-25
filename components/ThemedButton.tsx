@@ -38,20 +38,23 @@ const ThemedButton = (props: ThemedButtonProps) => {
   );
 };
 
-const PrimaryButton = ({ onPress, title, logo, className, textClasses, logoClasses }: ThemedButtonProps) => {
+const PrimaryButton = ({ onPress, title, logo, className, textClasses, logoClasses, variant }: ThemedButtonProps) => {
   return (
     <TouchableOpacity
       onPress={onPress}
       className={clsx(
-        'mt-5 w-[300] flex-row items-center justify-evenly self-center rounded-lg border border-sway-bright bg-sway-buttonBackground',
+        'w-[300] flex-row items-center justify-evenly self-center rounded-lg border',
+        !variant && 'border-sway-bright bg-sway-buttonBackground',
+        variant === 'error' && 'bg-error text-black',
         className
       )}
       activeOpacity={0.4}
     >
       <ThemedText
         type="title"
-        className={clsx('max-w-[50%] text-center text-sway-lightGrey', textClasses)}
+        className={clsx('max-w-[50%] text-center', textClasses)}
         style={{ fontSize: 20 }}
+        onLight={variant === 'error'}
       >
         {title}
       </ThemedText>

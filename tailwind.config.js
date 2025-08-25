@@ -18,7 +18,8 @@ module.exports = {
         lightGrey: '#e0e9f3',
         darkGrey: '#a6adbb',
         bright: '#18cdba',
-        buttonBackground: 'rgba(43,59,91,0.4)'
+        buttonBackground: 'rgba(43,59,91,0.4)',
+        buttonBackgroundSolid: 'rgb(43,59,91)'
       }
     },
     extend: {}

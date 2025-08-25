@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Chip } from 'react-native-paper';
+import { ActivityIndicator, Chip } from 'react-native-paper';
 import type { IconProps } from 'react-native-paper/lib/typescript/components/MaterialCommunityIcon';
 import LottieView from 'lottie-react-native';
 import { Colors } from '@/constants/Colors';
@@ -344,6 +344,42 @@ const DateChip = ({ dateString, prefix }: { dateString: string; prefix?: string 
   );
 };
 
+type SaveProgressChipProps = {
+  isSaving: boolean;
+  saved: boolean;
+};
+
+const SaveProgressChip = ({ isSaving, saved }: SaveProgressChipProps) => {
+  if (!isSaving && !saved) return null;
+  if (isSaving)
+    return (
+      <Chip
+        textStyle={{ fontFamily: Fonts.Black, color: '#34D399' }}
+        style={{ backgroundColor: Colors.sway.dark, alignSelf: 'center', marginTop: 8 }}
+        icon={() => <ActivityIndicator animating color={Colors.sway.bright} style={{ marginRight: 12 }} />}
+      >
+        Saving
+      </Chip>
+    );
+  if (saved)
+    return (
+      <Chip
+        icon={() => <MaterialCommunityIcons name="check-circle-outline" size={24} color={'#34D399'} />}
+        mode="outlined"
+        textStyle={{ fontFamily: Fonts.Black, color: '#34D399' }}
+        style={{
+          backgroundColor: Colors.sway.buttonBackground,
+          borderColor: '#065F46',
+          alignSelf: 'center',
+          marginTop: 8
+        }}
+      >
+        Saved
+      </Chip>
+    );
+  return null;
+};
+
 export {
   AccessPolicyChip,
   AssignmentStatusChip,
@@ -352,5 +388,6 @@ export {
   DueChip,
   PendingChip,
   RecurrenceChip,
+  SaveProgressChip,
   TimeLeftChip
 };

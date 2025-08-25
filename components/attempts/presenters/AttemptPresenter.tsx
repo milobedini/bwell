@@ -1,41 +1,32 @@
-import { isQuestionnaireAttempt } from '@/utils/types';
-import type { AttemptAnswer, AttemptDetailResponseItem, DiaryEntryInput } from '@milobedini/shared-types';
+import Container from '@/components/Container';
+import { ThemedText } from '@/components/ThemedText';
+import { isDiaryAttempt, isQuestionnaireAttempt } from '@/utils/types';
+import { AttemptDetailResponseItem } from '@milobedini/shared-types';
 
 import ActivityDiaryPresenter from './diary/ActivityDiaryPresenter';
 import QuestionnairePresenter from './questionnaires/QuestionnairePresenter';
 
-type BaseProps = {
+export type AttemptPresenterProps = {
   attempt: AttemptDetailResponseItem;
   mode: 'view' | 'edit';
-  isSaving?: boolean;
-  saved?: boolean;
   patientName?: string;
-
-  // network actions provided by the screen:
-  submitAttempt?(args?: { assignmentId?: string }): Promise<void>;
 };
 
-type QuestionnaireProps = BaseProps & {
-  saveAnswers?(answers: AttemptAnswer[]): Promise<void>;
-};
-
-type DiaryProps = BaseProps & {
-  saveDiary?(entries: DiaryEntryInput[], merge?: boolean): Promise<void>;
-};
-
-export type AttemptPresenterProps = QuestionnaireProps & DiaryProps;
-
-export default function AttemptPresenter(props: AttemptPresenterProps) {
-  const { attempt } = props;
-
-  if (attempt.moduleType === 'questionnaire' && isQuestionnaireAttempt(attempt)) {
-    return <QuestionnairePresenter {...props} />;
+const AttemptPresenter = ({ attempt, mode, patientName }: AttemptPresenterProps) => {
+  if (attempt.moduleType === 'questionnaire' && isQuestionnaireAttempt(attempt) && attempt.detail) {
+    return <QuestionnairePresenter attempt={attempt} mode={mode} patientName={patientName} detail={attempt.detail} />;
   }
 
-  if (attempt.moduleType === 'activity_diary') {
-    return <ActivityDiaryPresenter {...props} />;
+  if (attempt.moduleType === 'activity_diary' && isDiaryAttempt(attempt)) {
+    return <ActivityDiaryPresenter attempt={attempt} mode={mode} patientName={patientName} />;
   }
 
   // TODO: add presenters for 'psychoeducation' and 'exercise'
-  return null;
-}
+  return (
+    <Container>
+      <ThemedText>No module type attempt presenter yet</ThemedText>
+    </Container>
+  );
+};
+
+export default AttemptPresenter;

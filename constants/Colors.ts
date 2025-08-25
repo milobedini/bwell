@@ -23,6 +23,7 @@ export const Colors = {
     darkGrey: '#a6adbb',
     bright: '#18cdba',
     white: '#eef6ff',
-    buttonBackground: 'rgba(43,59,91,0.4)'
+    buttonBackground: 'rgba(43,59,91,0.4)',
+    buttonBackgroundSolid: 'rgb(43,59,91)'
   }
 };
