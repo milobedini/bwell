@@ -78,7 +78,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@milobedini/shared-types": "^1.0.64",
+    "@milobedini/shared-types": "^1.0.72",
     "@tanstack/eslint-plugin-query": "^5.81.2",
     "@types/react": "~19.0.10",
     "eslint": "^9.25.0",

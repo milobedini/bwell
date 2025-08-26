@@ -1,6 +1,4 @@
-const SLOT_START_HOUR = 6;
-const SLOT_END_HOUR = 24;
-const SLOT_STEP_HOURS = 2;
+import { SLOT_END_HOUR, SLOT_START_HOUR, SLOT_STEP_HOURS } from '@milobedini/shared-types';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
@@ -46,15 +44,4 @@ function buildDaySlots(baseIso: string): { key: SlotKey; value: SlotValue }[] {
   return rows;
 }
 
-export {
-  buildDaySlots,
-  dateISO,
-  dayLabel,
-  SLOT_END_HOUR,
-  SLOT_START_HOUR,
-  SLOT_STEP_HOURS,
-  type SlotKey,
-  slotLabel,
-  type SlotValue,
-  startOfMonday
-};
+export { buildDaySlots, dateISO, dayLabel, type SlotKey, slotLabel, type SlotValue, startOfMonday };

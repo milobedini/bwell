@@ -14,7 +14,6 @@ import {
   buildDaySlots,
   dateISO,
   dayLabel,
-  SLOT_STEP_HOURS,
   type SlotKey,
   slotLabel,
   type SlotValue,
@@ -415,4 +414,3 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
 };
 
 export default ActivityDiaryPresenter;
-export { SLOT_STEP_HOURS };
