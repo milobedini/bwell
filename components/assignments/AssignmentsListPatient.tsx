@@ -56,6 +56,7 @@ const AssignmentsListPatient = ({ data, completed }: AssignmentsListPatientProps
             <View className="flex-row items-center gap-2">
               <ThemedText type="smallTitle">{item.module.title}</ThemedText>
               {isInProgress && <AssignmentStatusChip status={item.status as AssignmentStatus} />}
+              {/* Todo - below incorrect */}
               {item.percentComplete !== undefined && <ThemedText>{item.percentComplete}</ThemedText>}
             </View>
             <ThemedText>Assigned by {item.therapist.name}</ThemedText>
