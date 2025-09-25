@@ -7,8 +7,8 @@ import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useRemoveAssignment } from '@/hooks/useAssignments';
 import { dateString } from '@/utils/dates';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { MyAssignmentView } from '@milobedini/shared-types';
+import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
 import { ThemedText } from '../ThemedText';
 import { renderErrorToast, renderSuccessToast } from '../toast/toastOptions';

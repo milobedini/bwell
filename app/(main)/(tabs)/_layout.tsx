@@ -4,7 +4,7 @@ import { Tabs } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { useAuthStore } from '@/stores/authStore';
 import { isAdmin } from '@/utils/userRoles';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '@react-native-vector-icons/ionicons';
 
 import disabledIcon from '../../../assets/images/disabled-icon.png';
 import icon from '../../../assets/images/icon.png';

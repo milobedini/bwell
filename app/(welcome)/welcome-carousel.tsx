@@ -10,7 +10,7 @@ import { Pagination } from '@/components/welcome/Pagination';
 import { welcomeConstants } from '@/components/welcome/WelcomeConstants';
 import { Colors } from '@/constants/Colors';
 import { markOnboardingComplete } from '@/hooks/useOnboarding';
-import { AntDesign } from '@expo/vector-icons';
+import AntDesign from '@react-native-vector-icons/ant-design';
 
 const AnimatedFlatList = Animated.FlatList;
 
@@ -80,7 +80,7 @@ const WelcomeCarousel = () => {
             Create Account
           </ThemedText>
           <AntDesign
-            name="arrowright"
+            name="arrow-right"
             size={welcomeConstants.buttonSize / 2}
             color={Colors.sway.dark}
             style={{ marginLeft: 4 }}

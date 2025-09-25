@@ -12,7 +12,6 @@ import { renderErrorToast } from '@/components/toast/toastOptions';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useLogin } from '@/hooks/useAuth';
-import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
@@ -20,6 +19,8 @@ import {
   BottomSheetView
 } from '@gorhom/bottom-sheet';
 import { LoginInput } from '@milobedini/shared-types';
+import AntDesign from '@react-native-vector-icons/ant-design';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 import assetId from '../../components/sign-in/waves.mp4';
 
@@ -164,7 +165,7 @@ export default function Login() {
               borderRadius: 32
             }}
           >
-            <AntDesign name="lock1" size={32} color={Colors.sway.bright} />
+            <AntDesign name="unlock" size={32} color={Colors.sway.bright} />
           </View>
         </Pressable>
         <BottomSheetModal

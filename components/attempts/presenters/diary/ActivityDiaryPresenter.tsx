@@ -19,8 +19,8 @@ import {
   type SlotValue,
   startOfMonday
 } from '@/utils/activityHelpers';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { AttemptDetailResponseItem, DiaryDetail, DiaryEntryInput } from '@milobedini/shared-types';
+import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
 import NumericField from './NumericField';
 

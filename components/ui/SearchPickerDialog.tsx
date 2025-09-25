@@ -6,9 +6,11 @@ import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import usePickerConstants from '@/utils/usePickerConstants';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons as MaterialCommunityIconsBase } from '@expo/vector-icons';
+import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
-type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
+type IconName = keyof typeof MaterialCommunityIconsBase.glyphMap;
 
 type BaseItem = { _id: string; title: string; subtitle?: string };
 

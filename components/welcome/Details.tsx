@@ -2,7 +2,7 @@ import { Text, View } from 'react-native';
 import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
-import { AntDesign } from '@expo/vector-icons';
+import AntDesign from '@react-native-vector-icons/ant-design';
 
 import { welcomeConstants } from './WelcomeConstants';
 
@@ -64,7 +64,7 @@ export const Details = ({ scrollY, item, index }: DetailsProps) => {
           }}
         >
           {index !== 2 ? (
-            <AntDesign name="arrowdown" size={welcomeConstants.buttonSize} color={Colors.primary.accent} />
+            <AntDesign name="arrow-down" size={welcomeConstants.buttonSize} color={Colors.primary.accent} />
           ) : null}
         </Text>
       </Animated.View>

@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import type { ToastConfigParams } from 'toastify-react-native/utils/interfaces';
 import { Colors } from '@/constants/Colors';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
 import { ThemedText } from '../ThemedText';
 

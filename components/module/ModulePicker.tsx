@@ -6,8 +6,9 @@ import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useModules } from '@/hooks/useModules';
 import usePickerConstants from '@/utils/usePickerConstants';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import type { AuthUser, Module } from '@milobedini/shared-types';
+import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 import { LoadingIndicator } from '../LoadingScreen';
 import { ThemedText } from '../ThemedText';

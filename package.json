@@ -26,10 +26,13 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
-    "@expo/vector-icons": "^15.0.2",
     "@gorhom/bottom-sheet": "^5.1.6",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/datetimepicker": "8.4.4",
+    "@react-native-vector-icons/ant-design": "^12.3.0",
+    "@react-native-vector-icons/ionicons": "^12.3.0",
+    "@react-native-vector-icons/material-design-icons": "^12.3.0",
+    "@react-native-vector-icons/material-icons": "^12.3.0",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/material-top-tabs": "^7.3.6",
@@ -82,6 +85,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@expo/vector-icons": "^15.0.2",
     "@milobedini/shared-types": "^1.0.72",
     "@tanstack/eslint-plugin-query": "^5.81.2",
     "@types/react": "19.1.10",

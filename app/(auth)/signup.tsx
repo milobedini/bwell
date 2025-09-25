@@ -15,7 +15,6 @@ import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useRegister } from '@/hooks/useAuth';
 import { UserRole } from '@/types/types';
-import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
@@ -23,6 +22,8 @@ import {
   BottomSheetTextInput
 } from '@gorhom/bottom-sheet';
 import { type RegisterInput } from '@milobedini/shared-types';
+import AntDesign from '@react-native-vector-icons/ant-design';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 import assetId from '../../components/sign-up/leaves.mp4';
 
@@ -171,7 +172,7 @@ export default function Signup() {
               borderRadius: 32
             }}
           >
-            <AntDesign name="lock1" size={32} color={Colors.sway.bright} />
+            <AntDesign name="unlock" size={32} color={Colors.sway.bright} />
           </View>
         </Pressable>
         <BottomSheetModal
