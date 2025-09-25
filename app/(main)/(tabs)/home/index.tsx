@@ -13,9 +13,9 @@ export default function Home() {
 
   if (isPending) return <HomeScreen content={<LoadingIndicator marginBottom={0} />}></HomeScreen>;
 
-  if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
-
   if (!user && !isPending) return <ErrorComponent errorType={ErrorTypes.UNAUTHORIZED} redirectLogin />;
+
+  if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
 
   if (isAdmin(user.roles)) return <AdminHome />;
 
