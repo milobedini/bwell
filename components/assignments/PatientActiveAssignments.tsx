@@ -1,7 +1,7 @@
 import { useViewMyAssignments } from '@/hooks/useAssignments';
 import { AssignmentStatusSearchOptions } from '@/types/types';
 
-import Container from '../Container';
+import ContentContainer from '../ContentContainer';
 import ErrorComponent, { ErrorTypes } from '../ErrorComponent';
 import { LoadingIndicator } from '../LoadingScreen';
 import { ThemedText } from '../ThemedText';
@@ -16,13 +16,13 @@ const PatientActiveAssignments = () => {
   if (!data) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
-    <Container>
+    <ContentContainer>
       {!!data.length ? (
         <AssignmentsListPatient data={data} />
       ) : (
         <ThemedText className="p-4">No active assignments...</ThemedText>
       )}
-    </Container>
+    </ContentContainer>
   );
 };
 

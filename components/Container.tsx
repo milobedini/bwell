@@ -1,5 +1,5 @@
-import { Platform, SafeAreaView } from 'react-native';
-import { SafeAreaViewProps } from 'react-native-safe-area-context';
+import { Platform } from 'react-native';
+import { SafeAreaView, SafeAreaViewProps } from 'react-native-safe-area-context';
 import { clsx } from 'clsx';
 
 type ContainerProps = SafeAreaViewProps & {
