@@ -1,50 +1,127 @@
-# Welcome to your Expo app 👋
+# BWell
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+<p align="center">
+  <img src="assets/images/logo.png" alt="BWell Logo" width="120" />
+</p>
 
-## Get started
+<p align="center">
+  A cross-platform therapy app for delivering structured therapeutic programs to patients, with therapist oversight and admin management.
+</p>
 
-1. Install dependencies
+<p align="center">
+  <img src="https://img.shields.io/badge/Expo_SDK-54-blue?logo=expo" alt="Expo SDK 54" />
+  <img src="https://img.shields.io/badge/React_Native-0.81-61dafb?logo=react" alt="React Native" />
+  <img src="https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20%7C%20Web-lightgrey" alt="Platform" />
+</p>
 
-   ```bash
-   npm install
-   ```
+---
 
-2. Start the app
+## Overview
 
-   ```bash
-   npx expo start
-   ```
+BWell connects **patients**, **therapists**, and **admins** in a mental health platform. Therapists assign therapeutic modules (questionnaires, exercises, psychoeducation) to patients and track their progress. Admins oversee the system, verify therapists, and monitor platform-wide metrics.
 
-In the output, you'll find options to open the app in a
+## Features
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Patient
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- Browse programs and modules
+- Complete assigned questionnaires, exercises, and psychoeducation content
+- Track active and completed assignments
+- View attempt history
 
-## Get a fresh project
+### Therapist
 
-When you're ready, run:
+- Manage a client list from the patient pool
+- Assign and remove modules for each client
+- Review patient submissions and progress timelines
+- View latest attempt submissions across all clients
 
-```bash
-npm run reset-project
+### Admin
+
+- Dashboard with user counts, weekly completions, and platform stats
+- Verify new therapist accounts
+- Browse and filter all registered therapists
+
+## Tech Stack
+
+| Layer | Technology |
+| --- | --- |
+| Framework | Expo SDK 54, React Native 0.81, React 19 |
+| Routing | expo-router (file-based) |
+| Language | TypeScript (strict) |
+| Styling | NativeWind (Tailwind CSS for RN) |
+| Client State | Zustand (persisted to AsyncStorage) |
+| Server State | TanStack React Query |
+| Forms | Formik + Yup |
+| UI Components | React Native Paper, Bottom Sheet, Moti, Reanimated, Skia |
+| HTTP | Axios (cookie-based auth) |
+| Shared Types | `@milobedini/shared-types` |
+
+## Project Structure
+
+```
+app/
+├── (auth)/              # Login, signup, email verification
+├── (welcome)/           # Onboarding carousel
+└── (main)/(tabs)/       # Authenticated tab navigator
+    ├── home/            # Role-specific home screens
+    ├── assignments/     # View & create assignments
+    ├── attempts/        # View attempt history & details
+    ├── programs/        # Browse programs & modules
+    ├── all-users/       # Admin: manage therapists
+    └── profile/         # User profile & logout
+
+api/                     # Axios instance & interceptors
+components/              # Shared UI components
+hooks/                   # React Query data-fetching hooks
+stores/                  # Zustand auth store
+constants/               # Colors & typography
+types/                   # Enums & local type definitions
+utils/                   # Role checks, date helpers, etc.
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Getting Started
 
-## Learn more
+### Prerequisites
 
-To learn more about developing your project with Expo, look at the following resources:
+- Node.js >= 18
+- npm
+- [Expo CLI](https://docs.expo.dev/get-started/installation/)
+- iOS Simulator (macOS) or Android Emulator, or a physical device with [Expo Go](https://expo.dev/go)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Installation
 
-## Join the community
+```bash
+npm install
+```
 
-Join our community of developers creating universal apps.
+### Development
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+npx expo start
+```
+
+From the dev server, press **i** for iOS simulator, **a** for Android emulator, or **w** for web.
+
+### Scripts
+
+| Command | Description |
+| --- | --- |
+| `npx expo start` | Start the dev server |
+| `npx expo start -c` | Start with cache cleared |
+| `npx tsc --noEmit` | Type check |
+| `npx eslint .` | Lint |
+| `npx prettier --write .` | Format all files |
+| `npm run publish` | Publish OTA update via EAS |
+
+## Architecture
+
+- **Auth** is cookie-based (`withCredentials: true`). A 401 interceptor auto-clears the Zustand auth store and redirects to login.
+- **Query defaults** (1-hour stale time, no refetch on mount/focus) are centralized in the root layout. Individual hooks override only when fresher data is needed.
+- **Route protection** lives in the `(main)/_layout.tsx` guard. Role-based tab visibility uses expo-router's `href: null` pattern to hide tabs per role.
+- **Shared types** are published as an npm package (`@milobedini/shared-types`) to keep the frontend and backend in sync.
+
+## License
+
+This project is proprietary and not open source.
