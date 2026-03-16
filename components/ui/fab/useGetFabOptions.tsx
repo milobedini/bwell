@@ -54,7 +54,6 @@ const useGetFabOptions = ({
         recipients,
         subject,
         body
-        // isHtml: true
       });
     } catch (error) {
       renderErrorToast(error);
@@ -68,7 +67,6 @@ const useGetFabOptions = ({
           icon: 'star',
           label: isClient ? 'Remove as client' : 'Add as client',
           labelTextColor: 'white',
-          // color: 'gold',
           style: { backgroundColor: 'white' },
           onPress: handleAddRemoveTherapist
         },
@@ -88,7 +86,6 @@ const useGetFabOptions = ({
           icon: 'account-off',
           label: 'Remove as client',
           labelTextColor: 'white',
-          // color: 'gold',
           style: { backgroundColor: 'white' },
           onPress: handleAddRemoveTherapist
         },

@@ -14,7 +14,7 @@ const Dots = ({ total, index }: { total: number; index: number }) => {
               width: active ? 12 : 6,
               height: 6,
               borderRadius: 3,
-              backgroundColor: active ? Colors.sway.bright : '#3A496B'
+              backgroundColor: active ? Colors.sway.bright : Colors.chip.dotInactive
             }}
           />
         );

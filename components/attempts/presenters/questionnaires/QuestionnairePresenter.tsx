@@ -201,16 +201,16 @@ export default function QuestionnairePresenter({ attempt, detail, mode, patientN
         <View className="flex-row flex-wrap items-center gap-2">
           {bandChip}
           {mode === 'view' ? (
-            <Chip style={{ backgroundColor: '#262E42' }} textStyle={{ color: 'white' }}>
+            <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
               Completed {new Date(completedAt ?? '').toLocaleDateString()}
             </Chip>
           ) : (
-            <Chip style={{ backgroundColor: '#262E42' }} textStyle={{ color: 'white' }}>
+            <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
               In progress {startedAt ? `• ${new Date(startedAt).toLocaleDateString()}` : ''}
             </Chip>
           )}
           {durationText ? (
-            <Chip style={{ backgroundColor: '#262E42' }} textStyle={{ color: 'white' }}>
+            <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
               Duration {durationText}
             </Chip>
           ) : null}

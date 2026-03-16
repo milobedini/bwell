@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FlatList, View } from 'react-native';
 import { Dialog, Divider, IconButton, List, Portal, TextInput } from 'react-native-paper';
 import { LoadingIndicator } from '@/components/LoadingScreen';

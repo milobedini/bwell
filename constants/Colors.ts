@@ -26,5 +26,30 @@ export const Colors = {
     buttonBackground: 'rgba(43,59,91,0.4)',
     buttonBackgroundSolid: 'rgb(43,59,91)',
     authLink: '#053eff'
+  },
+  chip: {
+    infoBlue: '#93C5FD',
+    infoBlueBorder: '#1E3A8A',
+    teal: '#2DD4BF',
+    tealBorder: '#164E4E',
+    amber: '#FBBF24',
+    amberBorder: '#7C5E12',
+    red: '#F87171',
+    redBorder: '#7F1D1D',
+    green: '#34D399',
+    greenBorder: '#065F46',
+    neutral: '#E6E8EF',
+    neutralBorder: '#3B3F51',
+    darkCard: '#262E42',
+    darkCardAlt: '#334368',
+    darkCardDeep: '#0B1A2A',
+    dotInactive: '#3A496B'
+  },
+  overlay: {
+    light: 'rgba(0,0,0,0.32)',
+    medium: 'rgba(0,0,0,0.5)'
+  },
+  gradient: {
+    pink: '#E70696'
   }
 };

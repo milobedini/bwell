@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { View } from 'react-native';
 import { Card, Chip } from 'react-native-paper';
 import { ThemedText } from '@/components/ThemedText';
+import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import type { AttemptDetailItem } from '@milobedini/shared-types';
 
@@ -38,12 +39,12 @@ const QuestionSlide = ({ mode, question, onPick, colors }: QuestionSlideProps) =
             compact
             style={{
               backgroundColor: selectedPill ? colors?.accent : colors?.card,
-              borderColor: selectedPill ? colors?.accent : '#334368',
+              borderColor: selectedPill ? colors?.accent : Colors.chip.darkCardAlt,
               marginRight: 8,
               marginBottom: 8
             }}
             textStyle={{
-              color: selectedPill ? '#0B1A2A' : colors?.textOnDark,
+              color: selectedPill ? Colors.chip.darkCardDeep : colors?.textOnDark,
               fontFamily: selectedPill ? Fonts.Bold : Fonts.Regular,
               fontSize: 14
             }}

@@ -1,13 +1,15 @@
-import { useCallback, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { useCallback, useRef } from 'react';
+import { Text } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
-import { Link, useRouter } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useVideoPlayer, type VideoSource, VideoView } from 'expo-video';
+import { useRouter } from 'expo-router';
+import type { VideoSource } from 'expo-video';
 import { Formik } from 'formik';
 import { motify, MotiView, useDynamicAnimation } from 'moti';
 import * as Yup from 'yup';
-import { LoginLogo } from '@/components/sign-in/LoginLogo';
+import AuthLink from '@/components/auth/AuthLink';
+import AuthSheetHandle from '@/components/auth/AuthSheetHandle';
+import AuthSubmitButton from '@/components/auth/AuthSubmitButton';
+import AuthVideoBackground from '@/components/auth/AuthVideoBackground';
 import { ThemedText } from '@/components/ThemedText';
 import { renderErrorToast } from '@/components/toast/toastOptions';
 import KeyboardAvoidingWrapper from '@/components/ui/KeyboardAvoidingWrapper';
@@ -22,51 +24,10 @@ import {
   BottomSheetTextInput
 } from '@gorhom/bottom-sheet';
 import { type RegisterInput } from '@milobedini/shared-types';
-import AntDesign from '@react-native-vector-icons/ant-design';
-import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 import assetId from '../../components/sign-up/leaves.mp4';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.sway.dark
-  },
-  content: {
-    flex: 1
-  },
-  background: { flex: 0.7, marginTop: 20 },
-  title: {
-    textAlign: 'center',
-    color: Colors.sway.lightGrey
-  },
-  form: {
-    flexGrow: 1
-  },
-  image: {
-    height: 500,
-    width: 800,
-    resizeMode: 'contain',
-    alignSelf: 'center'
-  },
-  error: {
-    color: Colors.primary.error,
-    marginBottom: 8
-  },
-  light: {
-    color: Colors.sway.lightGrey
-  },
-  heading: {
-    fontSize: 36,
-    fontWeight: '600'
-  },
-  regular: {
-    fontWeight: '400'
-  },
-  bold: {
-    fontWeight: '700'
-  }
-});
+const videoSource: VideoSource = { assetId };
 
 const SignupSchema = Yup.object().shape({
   username: Yup.string().min(3, 'Username must be at least 3 characters').required('Username is required'),
@@ -80,24 +41,8 @@ const SignupSchema = Yup.object().shape({
 const AnimatedText = motify(Text)();
 
 export default function Signup() {
-  const { width, height } = useWindowDimensions();
-  const [apiError, setApiError] = useState('');
-
-  const videoSource: VideoSource = {
-    assetId
-    //  useCaching: true
-  };
-
-  const player = useVideoPlayer(videoSource, (player) => {
-    player.audioMixingMode = 'mixWithOthers';
-    player.muted = true;
-    player.loop = true;
-    player.play();
-  });
-
   const register = useRegister();
   const { isPending } = register;
-
   const router = useRouter();
 
   const initialValues: RegisterInput = { username: '', email: '', password: '', roles: [UserRole.PATIENT] };
@@ -108,7 +53,6 @@ export default function Signup() {
     translateY: 40
   }));
 
-  // callbacks
   const hideModal = useCallback(() => {
     bottomSheetModalRef.current?.dismiss();
     dynamicAnimation.animateTo((current) => ({
@@ -135,74 +79,12 @@ export default function Signup() {
 
   return (
     <BottomSheetModalProvider>
-      <StatusBar style="dark" />
-
-      <View style={styles.container}>
-        <VideoView style={[StyleSheet.absoluteFillObject, { opacity: 1 }]} player={player} nativeControls={false} />
-
-        <View
-          style={{
-            padding: 16,
-            flex: 1,
-            justifyContent: 'flex-end',
-            paddingBottom: height * 0.2
-          }}
-        >
-          <LoginLogo />
-          <Text style={[styles.light, styles.heading]}>Take back {'\n'}control</Text>
-          <View
-            style={{
-              height: 2,
-              width: width * 0.2,
-              backgroundColor: '#fff',
-              marginTop: 16 * 3
-            }}
-          />
-        </View>
-        <Pressable onPress={showModal}>
-          <View
-            style={{
-              paddingVertical: 16,
-              paddingBottom: 16 * 2,
-              width: '100%',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: Colors.sway.dark,
-              borderRadius: 32
-            }}
-          >
-            <AntDesign name="unlock" size={32} color={Colors.sway.bright} />
-          </View>
-        </Pressable>
+      <AuthVideoBackground videoSource={videoSource} heading={`Take back \ncontrol`} onUnlock={showModal}>
         <BottomSheetModal
           ref={bottomSheetModalRef}
           keyboardBehavior="interactive"
           keyboardBlurBehavior="restore"
-          handleComponent={() => {
-            return (
-              <Pressable onPress={hideModal}>
-                <View
-                  style={{
-                    height: 64,
-                    borderBottomWidth: 1,
-                    borderBottomColor: Colors.sway.bright,
-                    backgroundColor: Colors.sway.dark,
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <MaterialIcons
-                    name="keyboard-arrow-down"
-                    size={36}
-                    color={Colors.sway.bright}
-                    style={{
-                      transform: [{ scaleX: 1.4 }, { scaleY: 1.4 }]
-                    }}
-                  />
-                </View>
-              </Pressable>
-            );
-          }}
+          handleComponent={() => <AuthSheetHandle onPress={hideModal} />}
         >
           <KeyboardAvoidingWrapper>
             <BottomSheetScrollView
@@ -215,25 +97,21 @@ export default function Signup() {
             >
               <AnimatedText
                 state={dynamicAnimation}
-                style={[
-                  styles.regular,
-                  {
-                    fontSize: 32,
-                    fontFamily: Fonts.Bold,
-                    color: Colors.sway.dark,
-                    marginBottom: 8
-                  }
-                ]}
+                style={{
+                  fontWeight: '400',
+                  fontSize: 32,
+                  fontFamily: Fonts.Bold,
+                  color: Colors.sway.dark,
+                  marginBottom: 8
+                }}
               >
                 Sign Up
               </AnimatedText>
               <MotiView state={dynamicAnimation} delay={300}>
-                {apiError && <ThemedText type="error">{apiError}</ThemedText>}
                 <Formik
                   initialValues={initialValues}
                   validationSchema={SignupSchema}
                   onSubmit={(values) => {
-                    setApiError('');
                     register.mutate(values, {
                       onSuccess: (res) => {
                         const id = String(res.user._id);
@@ -342,54 +220,14 @@ export default function Signup() {
                           delay={500}
                           style={{ justifyContent: 'center', marginTop: 16 }}
                         >
-                          <Pressable
-                            style={{ marginBottom: 16 }}
-                            onPress={() => handleSubmit()}
+                          <AuthSubmitButton
+                            label="Sign Up"
+                            loadingLabel="Signing up..."
+                            isPending={isPending}
                             disabled={buttonDisabled}
-                          >
-                            <View
-                              style={{
-                                backgroundColor: buttonDisabled ? Colors.sway.darkGrey : Colors.sway.dark,
-                                borderRadius: 16,
-                                paddingVertical: 16,
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                              }}
-                            >
-                              <Text
-                                style={[
-                                  styles.bold,
-                                  { fontSize: 16, color: buttonDisabled ? Colors.sway.white : Colors.sway.bright }
-                                ]}
-                              >
-                                {isPending ? 'Signing up...' : 'Sign Up'}
-                              </Text>
-                            </View>
-                          </Pressable>
-                          <View
-                            style={{
-                              alignItems: 'center',
-                              flexDirection: 'row',
-                              alignSelf: 'center'
-                            }}
-                          >
-                            <Link asChild href={'/(auth)/login'}>
-                              <Pressable>
-                                <Text
-                                  style={[
-                                    styles.bold,
-                                    {
-                                      fontSize: 16,
-                                      color: Colors.sway.authLink,
-                                      marginLeft: 16 / 2
-                                    }
-                                  ]}
-                                >
-                                  Have an account?
-                                </Text>
-                              </Pressable>
-                            </Link>
-                          </View>
+                            onPress={() => handleSubmit()}
+                          />
+                          <AuthLink href="/(auth)/login" label="Have an account?" />
                         </MotiView>
                       </>
                     );
@@ -399,7 +237,7 @@ export default function Signup() {
             </BottomSheetScrollView>
           </KeyboardAvoidingWrapper>
         </BottomSheetModal>
-      </View>
+      </AuthVideoBackground>
     </BottomSheetModalProvider>
   );
 }

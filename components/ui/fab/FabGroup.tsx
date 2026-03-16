@@ -30,7 +30,7 @@ const FabGroup = ({ open, visible, onOpenChange, actions, onDismiss }: FabGroupP
       }}
       icon={open ? 'close' : 'plus'}
       actions={actions}
-      backdropColor="rgba(0,0,0,0.5)"
+      backdropColor={Colors.overlay.medium}
       onPress={() => {
         if (open) onDismiss();
       }}

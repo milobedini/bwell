@@ -4,6 +4,7 @@ import { Button, Chip, Dialog, Portal, SegmentedButtons, TextInput } from 'react
 import Constants from 'expo-constants';
 import SelectField from '@/components/ui/SelectField';
 import { Colors } from '@/constants/Colors';
+import { clamp } from '@/utils/helpers';
 
 import { ThemedText } from '../ThemedText';
 
@@ -17,8 +18,6 @@ type RecurrenceFieldProps = {
   onChange: (rec?: AssignmentRecurrence) => void;
   label?: string;
 };
-
-const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 const formatRecurrence = (r?: AssignmentRecurrence) => {
   if (!r || r.freq === 'none') return 'No recurrence';
   const n = r.interval ?? 1;

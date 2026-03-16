@@ -57,11 +57,11 @@ export const HomeScreen = ({ content }: HomeScreenProps) => {
         }}
       >
         <Circle c={c} r={radius}>
-          <LinearGradient start={start} end={end} colors={[Colors.sway.bright, '#E70696']} />
+          <LinearGradient start={start} end={end} colors={[Colors.sway.bright, Colors.gradient.pink]} />
         </Circle>
         <BackdropFilter filter={<Blur blur={10} />} clip={rect}>
           <Circle c={c} r={radius}>
-            <LinearGradient start={start} end={end} colors={[Colors.sway.bright, '#E70696']} />
+            <LinearGradient start={start} end={end} colors={[Colors.sway.bright, Colors.gradient.pink]} />
           </Circle>
           <Blur blur={1}>
             <Offset x={0} y={0}>

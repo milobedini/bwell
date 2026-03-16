@@ -1,4 +1,5 @@
 import { ImageBackground, type ImageSourcePropType, useWindowDimensions } from 'react-native';
+import { Colors } from '@/constants/Colors';
 
 type ItemProp = {
   item: {
@@ -15,7 +16,7 @@ export const Item = ({ item }: ItemProp) => {
       style={{
         width,
         height,
-        backgroundColor: '#000'
+        backgroundColor: Colors.primary.black
       }}
       imageStyle={{
         flex: 1,

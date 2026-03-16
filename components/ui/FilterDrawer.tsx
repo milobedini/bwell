@@ -194,7 +194,7 @@ export const FilterDrawer = ({
 const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.32)'
+    backgroundColor: Colors.overlay.light
   },
   drawerContainer: {
     position: 'absolute',

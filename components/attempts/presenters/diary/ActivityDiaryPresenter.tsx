@@ -268,7 +268,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
 
               <View className="flex-row flex-wrap items-center gap-2">
                 {mode === 'view' ? (
-                  <Chip style={{ backgroundColor: '#262E42' }} textStyle={{ color: 'white' }}>
+                  <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
                     {completedAt
                       ? `Completed ${new Date(completedAt).toLocaleDateString()}`
                       : `Last Update ${new Date(updatedAt).toLocaleDateString()}`}
@@ -276,13 +276,13 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                 ) : (
                   <>
                     {startedAt && !dirtyKeys.size && (
-                      <Chip style={{ backgroundColor: '#262E42' }} textStyle={{ color: 'white' }}>
+                      <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
                         {`Started ${new Date(startedAt).toLocaleDateString()}`}
                       </Chip>
                     )}
                     {updatedAt && (
-                      <Chip style={{ backgroundColor: '#262E42' }} textStyle={{ color: 'white' }}>
-                        {`Updated ${new Date(startedAt).toLocaleDateString()}`}
+                      <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
+                        {`Updated ${new Date(updatedAt).toLocaleDateString()}`}
                       </Chip>
                     )}
                   </>
@@ -290,12 +290,12 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                 <SaveProgressChip saved={saved} isSaving={isSaving} />
                 {!!dirtyKeys.size && (
                   <Chip
-                    icon={() => <MaterialCommunityIcons name="content-save" size={24} color={'#34D399'} />}
+                    icon={() => <MaterialCommunityIcons name="content-save" size={24} color={Colors.chip.green} />}
                     mode="outlined"
-                    textStyle={{ fontFamily: Fonts.Black, color: '#34D399' }}
+                    textStyle={{ fontFamily: Fonts.Black, color: Colors.chip.green }}
                     style={{
                       backgroundColor: Colors.sway.buttonBackground,
-                      borderColor: '#065F46',
+                      borderColor: Colors.chip.greenBorder,
                       alignSelf: 'center',
                       marginTop: 8
                     }}

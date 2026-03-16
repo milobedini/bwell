@@ -47,7 +47,7 @@ export const Details = ({ scrollY, item, index }: DetailsProps) => {
         </Text>
         <Text
           style={{
-            color: '#fff',
+            color: Colors.primary.white,
             fontFamily: Fonts.Regular,
             fontSize: 16,
             marginBottom: welcomeConstants.spacing / 2
@@ -57,7 +57,7 @@ export const Details = ({ scrollY, item, index }: DetailsProps) => {
         </Text>
         <Text
           style={{
-            color: '#fff',
+            color: Colors.primary.white,
             fontSize: 18,
             fontFamily: Fonts.Bold,
             textTransform: 'uppercase'

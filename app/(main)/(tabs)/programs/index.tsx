@@ -35,7 +35,6 @@ export default function ProgramList() {
               <View className="border border-sway-lightGrey p-4">
                 <ThemedText type="smallTitle">{program.title}</ThemedText>
               </View>
-              {/* <Image source={{ uri: program.imageUrl }} style={{ width: 300, height: 300 }} resizeMode="cover" /> */}
             </TouchableOpacity>
           </Link>
         )}
