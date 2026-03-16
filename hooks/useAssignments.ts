@@ -24,11 +24,7 @@ export const useViewTherapistOutstandingAssignments = () => {
       const { data } = await api.get<MyAssignmentsResponse>('/assignments/mine');
       return data.assignments;
     },
-    enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 60, // 5 minutes
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    enabled: isLoggedIn
   });
 };
 export const useViewMyAssignments = ({ status }: { status: AssignmentStatusSearchOptions }) => {
@@ -40,11 +36,7 @@ export const useViewMyAssignments = ({ status }: { status: AssignmentStatusSearc
       const { data } = await api.get<MyAssignmentsResponse>('/user/assignments', { params: { status } });
       return data.assignments;
     },
-    enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 60, // 5 minutes
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    enabled: isLoggedIn
   });
 };
 
@@ -58,7 +50,7 @@ export const useCreateAssignment = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['assignments'] });
+      queryClient.invalidateQueries({ queryKey: ['assignments'] });
       queryClient.invalidateQueries({ queryKey: ['patients'] });
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       queryClient.invalidateQueries({ queryKey: ['profile'] });

@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useVideoPlayer, type VideoSource, VideoView } from 'expo-video';
@@ -70,11 +70,10 @@ const LoginSchema = Yup.object().shape({
   password: Yup.string().min(8, 'Password must be at least 8 characters').required('Password is required')
 });
 
-const { width, height } = Dimensions.get('screen');
-
 const AnimatedText = motify(Text)();
 
 export default function Login() {
+  const { width, height } = useWindowDimensions();
   const [apiError, setApiError] = useState('');
 
   const videoSource: VideoSource = {
@@ -315,7 +314,7 @@ export default function Login() {
                                   styles.bold,
                                   {
                                     fontSize: 16,
-                                    color: '#053eff',
+                                    color: Colors.sway.authLink,
                                     marginLeft: 16 / 2
                                   }
                                 ]}

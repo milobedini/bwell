@@ -1,5 +1,6 @@
 import { Redirect, useRootNavigationState } from 'expo-router';
 import * as SystemUI from 'expo-system-ui';
+import { LoadingIndicator } from '@/components/LoadingScreen';
 import { Colors } from '@/constants/Colors';
 import { useHasOnboarded } from '@/hooks/useOnboarding';
 import { useAuthStore } from '@/stores/authStore';
@@ -13,7 +14,10 @@ function IndexRedirect() {
   const user = useAuthStore((s) => s.user);
   const onboarded = useHasOnboarded();
 
-  if (!navigatorReady || onboarded === null) return;
+  if (!navigatorReady || onboarded === null) {
+    return <LoadingIndicator marginBottom={0} />;
+  }
+
   if (user) {
     return <Redirect href={'/(main)/(tabs)/home'} />;
   } else if (onboarded) {

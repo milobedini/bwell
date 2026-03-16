@@ -38,11 +38,7 @@ export const useGetMyAttempts = ({ moduleId, limit, status }: MyAttemptOptions) 
       });
       return data;
     },
-    enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 60, // 5 minutes
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    enabled: isLoggedIn
   });
 };
 export const useTherapistGetLatestAttempts = (limit?: number) => {
@@ -58,11 +54,7 @@ export const useTherapistGetLatestAttempts = (limit?: number) => {
       });
       return data.rows;
     },
-    enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 60, // 5 minutes
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    enabled: isLoggedIn
   });
 };
 
@@ -125,11 +117,7 @@ export const useGetPatientTimeline = ({
       return { pages, attempts, nextCursor };
     },
 
-    enabled: isLoggedIn && !!patientId && enabled,
-    staleTime: 1000 * 60 * 60,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    enabled: isLoggedIn && !!patientId && enabled
   });
 
   // expose a friendly shape
@@ -152,11 +140,7 @@ export const useGetMyAttemptDetail = (attemptId: string) => {
       const { data } = await api.get<AttemptDetailResponse>(`/attempts/${attemptId}`);
       return data;
     },
-    enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 60, // 5 minutes
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    enabled: isLoggedIn
   });
 };
 
@@ -169,11 +153,7 @@ export const useTherapistGetAttemptDetail = (attemptId: string) => {
       const { data } = await api.get<AttemptDetailResponse>(`/attempts/therapist/${attemptId}`);
       return data;
     },
-    enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 60, // 5 minutes
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    enabled: isLoggedIn
   });
 };
 

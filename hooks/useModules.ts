@@ -41,11 +41,7 @@ export const useModuleById = (id: string) => {
   return useQuery<ModuleDetailResponse>({
     queryKey: ['module', id],
     queryFn: () => fetchModuleById(id),
-    enabled: !!id && isLoggedIn, // Only fetch if id is provided
-    staleTime: 1000 * 60 * 60, // 1 hour
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    enabled: !!id && isLoggedIn
   });
 };
 
@@ -70,12 +66,7 @@ export function useModules({ programId, withMeta }: UseModuleOptions = {}) {
       if (withMeta) return fetchModulesWithMeta(programId);
       return fetchModulesPlain(programId);
     },
-    enabled: isLoggedIn,
-
-    staleTime: 1000 * 60 * 60, // 1 hour
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    enabled: isLoggedIn
   });
 }
 

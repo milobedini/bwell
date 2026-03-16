@@ -15,21 +15,13 @@ const fetchProgramById = async (id: string): Promise<ProgramWithModules> => {
 export const usePrograms = () => {
   return useQuery<Program[]>({
     queryKey: ['programs'],
-    queryFn: fetchPrograms,
-    staleTime: 1000 * 60 * 60, // 1 hour
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    queryFn: fetchPrograms
   });
 };
 
 export const useProgram = (id: string) => {
   return useQuery<ProgramWithModules>({
     queryKey: ['program', id],
-    queryFn: () => fetchProgramById(id),
-    staleTime: 1000 * 60 * 60, // 1 hour
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    queryFn: () => fetchProgramById(id)
   });
 };

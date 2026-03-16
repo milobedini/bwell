@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
 import { Link, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -77,11 +77,10 @@ const SignupSchema = Yup.object().shape({
     .min(1, 'At least one role is required')
 });
 
-const { width, height } = Dimensions.get('screen');
-
 const AnimatedText = motify(Text)();
 
 export default function Signup() {
+  const { width, height } = useWindowDimensions();
   const [apiError, setApiError] = useState('');
 
   const videoSource: VideoSource = {
@@ -381,7 +380,7 @@ export default function Signup() {
                                     styles.bold,
                                     {
                                       fontSize: 16,
-                                      color: '#053eff',
+                                      color: Colors.sway.authLink,
                                       marginLeft: 16 / 2
                                     }
                                   ]}

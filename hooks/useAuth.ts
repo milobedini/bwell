@@ -36,7 +36,9 @@ export const useLogout = () => {
       const { data } = await api.post<{ message: string }>('/logout');
       return data;
     },
-    onSuccess: () => {
+    onSettled: () => {
+      // Clear local state regardless of server response —
+      // a failed logout call shouldn't trap the user in the app
       queryClient.clear();
       clearUser();
     }
@@ -65,7 +67,7 @@ export const useUpdateName = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['patients'] });
       queryClient.invalidateQueries({ queryKey: ['clients'] });
     }

@@ -98,11 +98,7 @@ export const useProfile = () => {
       const { data } = await api.get<ProfileResponse>('/user');
       return data;
     },
-    enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 60, // 5 minutes
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    enabled: isLoggedIn
   });
 };
 
@@ -116,10 +112,7 @@ export const useAllPatients = () => {
       return data;
     },
     enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    staleTime: 1000 * 60 * 5 // 5 minutes — patients change more often than defaults
   });
 };
 
@@ -133,10 +126,7 @@ export const useClients = () => {
       return data;
     },
     enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    staleTime: 1000 * 60 * 5 // 5 minutes
   });
 };
 
@@ -152,9 +142,7 @@ export const useAllUsers = (query?: GetUsersQuery): UseQueryResult<GetUsersRespo
       return data;
     },
     enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 2, // 2 minutes
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    staleTime: 1000 * 60 * 2 // 2 minutes — admin list needs fresher data
   });
 };
 
@@ -168,10 +156,7 @@ export const useGetAvailableModules = () => {
       return data;
     },
     enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    staleTime: 1000 * 60 * 5 // 5 minutes
   });
 };
 export const useAdminStats = () => {
@@ -198,9 +183,9 @@ export const useAddRemoveTherapist = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['patients'] });
-      queryClient.refetchQueries({ queryKey: ['clients'] });
-      queryClient.refetchQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['patients'] });
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
     }
   });
 };
@@ -214,8 +199,8 @@ export const useAdminVerifyTherapist = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['profile'] });
-      queryClient.refetchQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
     }
   });
 };

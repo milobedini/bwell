@@ -1,49 +1,33 @@
-import { Platform, StyleSheet, Text, type TextProps } from 'react-native';
+import { Platform, StyleSheet, Text, type TextProps, type TextStyle } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 
+type TextType =
+  | 'default'
+  | 'title'
+  | 'subtitle'
+  | 'link'
+  | 'small'
+  | 'smallBold'
+  | 'italic'
+  | 'smallTitle'
+  | 'button'
+  | 'error'
+  | 'profileButtonText';
+
 export type ThemedTextProps = TextProps & {
-  type?:
-    | 'default'
-    | 'title'
-    | 'subtitle'
-    | 'link'
-    | 'small'
-    | 'smallBold'
-    | 'italic'
-    | 'smallTitle'
-    | 'button'
-    | 'error'
-    | 'profileButtonText';
+  type?: TextType;
   className?: string;
   onLight?: boolean;
 };
 
 export function ThemedText({ style, type = 'default', onLight = false, className, ...rest }: ThemedTextProps) {
   return (
-    <Text
-      style={[
-        type === 'default' && styles.default,
-        type === 'title' && styles.title,
-        type === 'subtitle' && styles.subtitle,
-        type === 'smallTitle' && styles.smallTitle,
-        type === 'link' && styles.link,
-        type === 'small' && styles.small,
-        type === 'smallBold' && styles.smallBold,
-        type === 'italic' && styles.italic,
-        type === 'button' && styles.button,
-        type === 'error' && styles.error,
-        type === 'profileButtonText' && styles.profileButtonText,
-        onLight && { color: Colors.sway.dark },
-        style
-      ]}
-      {...rest}
-      className={className}
-    />
+    <Text style={[styleMap[type], onLight && { color: Colors.sway.dark }, style]} {...rest} className={className} />
   );
 }
 
-const styles = StyleSheet.create({
+const styleMap: Record<TextType, TextStyle> = StyleSheet.create({
   default: {
     fontSize: Platform.select({ ios: 18, android: 18, default: 18 }),
     lineHeight: Platform.select({ ios: 24, android: 24, default: 24 }),
