@@ -28,13 +28,16 @@ bwell — an Expo React Native therapy app (iOS, Android, Web) with role-based a
 - Solo developer — commit and push directly to `main`
 - Use conventional commits, keep messages concise
 - Never include AI co-author references in commit messages
+- Before staging, run `npx prettier --write .` to format all files — husky pre-commit hooks check this
 - After a successful commit and push, run `npm run publish` to publish an OTA update
 
 ## Commands
 
+- `npx prettier --write .` — format all files (run before committing)
 - `npx tsc --noEmit` — type check
 - `npx expo start` — dev server
 - `npx eslint .` — lint
+- `npm run publish` — OTA update via EAS
 
 ## Code Conventions
 
