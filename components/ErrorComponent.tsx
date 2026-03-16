@@ -20,37 +20,37 @@ const ErrorComponent = ({ errorType, redirectLogin }: { errorType: ErrorTypes; r
     case ErrorTypes.NO_CONTENT:
       return (
         <Container>
-          <ThemedText>No content available</ThemedText>
+          <ThemedText className="px-4">No content available</ThemedText>
         </Container>
       );
     case ErrorTypes.NOT_FOUND:
       return (
         <Container>
-          <ThemedText>Resource not found</ThemedText>
+          <ThemedText className="px-4">Resource not found</ThemedText>
         </Container>
       );
     case ErrorTypes.UNAUTHORIZED:
       return (
         <Container>
-          <ThemedText>Unauthorized access</ThemedText>
+          <ThemedText className="px-4">Unauthorized access</ThemedText>
         </Container>
       );
     case ErrorTypes.VALIDATION_ERROR:
       return (
         <Container>
-          <ThemedText>Validation error occurred</ThemedText>
+          <ThemedText className="px-4">Validation error occurred</ThemedText>
         </Container>
       );
     case ErrorTypes.GENERAL_ERROR:
       return (
         <Container>
-          <ThemedText>Something went wrong</ThemedText>
+          <ThemedText className="px-4">Something went wrong</ThemedText>
         </Container>
       );
     default:
       return (
         <Container>
-          <ThemedText>Unknown error occurred</ThemedText>
+          <ThemedText className="px-4">Unknown error occurred</ThemedText>
         </Container>
       );
   }

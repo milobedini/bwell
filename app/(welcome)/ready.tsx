@@ -31,7 +31,7 @@ const ReadyScreen = () => {
 
   if (!started) {
     return (
-      <Container centered className="gap-2 bg-sway-dark">
+      <Container centered className="gap-2 bg-sway-dark px-4">
         <Image source={logo} style={styles.image} onLoad={() => SplashScreen.hideAsync()} />
         <ThemedText type="title">Welcome to BWell</ThemedText>
         <ThemedButton onPress={onGetStarted}>Get started!</ThemedButton>

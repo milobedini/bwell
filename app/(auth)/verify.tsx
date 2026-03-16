@@ -95,7 +95,7 @@ const Verify = () => {
 
   return (
     <Container>
-      <ContentContainer className="mt-4 px-8">
+      <ContentContainer className="mt-4">
         <ThemedText type="title" className="text-center">
           Verify your e-mail
         </ThemedText>

@@ -27,7 +27,7 @@ const AllUsersList = () => {
 
   return (
     <Container>
-      <ThemedText type="title" className="text-center">
+      <ThemedText type="title" className="px-4 text-center">
         All Users
       </ThemedText>
 

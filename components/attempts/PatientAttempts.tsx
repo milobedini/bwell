@@ -27,7 +27,7 @@ const PatientAttempts = () => {
 
   return (
     <Container>
-      <View className="mb-4 px-8">
+      <View className="mb-4 px-4">
         <SegmentedButtons
           value={view}
           onValueChange={(v) => setView(v as AttemptStatusInput)}
@@ -58,7 +58,7 @@ const PatientAttempts = () => {
         />
       </View>
       {!attempts?.length ? (
-        <View className="px-8">
+        <View className="px-4">
           <ThemedText>No {view} attempts</ThemedText>
         </View>
       ) : (

@@ -24,7 +24,7 @@ const AttemptPresenter = ({ attempt, mode, patientName }: AttemptPresenterProps)
   // TODO: add presenters for 'psychoeducation' and 'exercise'
   return (
     <Container>
-      <ThemedText>No module type attempt presenter yet</ThemedText>
+      <ThemedText className="px-4">No module type attempt presenter yet</ThemedText>
     </Container>
   );
 };

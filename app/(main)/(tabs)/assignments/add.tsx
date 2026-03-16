@@ -92,7 +92,7 @@ const AddAssignment = () => {
   }, [createAssignment, input, router]);
 
   return (
-    <Container>
+    <Container className="px-4">
       {/* Inputs */}
       <SelectField
         label="Client"

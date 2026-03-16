@@ -28,6 +28,7 @@ bwell — an Expo React Native therapy app (iOS, Android, Web) with role-based a
 - Solo developer — commit and push directly to `main`
 - Use conventional commits, keep messages concise
 - Never include AI co-author references in commit messages
+- After a successful commit and push, run `npm run publish` to publish an OTA update
 
 ## Commands
 
