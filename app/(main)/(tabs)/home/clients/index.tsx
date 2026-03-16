@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FlatList, TouchableOpacity, View } from 'react-native';
 import { Link } from 'expo-router';
-import Container from '@/components/Container';
 import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
@@ -43,18 +42,18 @@ const AllClients = () => {
   if (!clients) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
   if (!clients.length)
     return (
-      <Container>
+      <ContentContainer>
         <ContentContainer className="mt-4 gap-4">
           <ThemedText type="subtitle">You have no clients (yet!)</ThemedText>
           <Link asChild href={'/home/patients'}>
             <ThemedButton>View all patients</ThemedButton>
           </Link>
         </ContentContainer>
-      </Container>
+      </ContentContainer>
     );
 
   return (
-    <Container>
+    <ContentContainer>
       <FlatList
         data={clients}
         keyExtractor={(item) => item._id}
@@ -106,7 +105,7 @@ const AllClients = () => {
           patient={pickerPatient}
         />
       )}
-    </Container>
+    </ContentContainer>
   );
 };
 

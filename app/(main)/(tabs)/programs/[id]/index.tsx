@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from 'expo-router';
-import Container from '@/components/Container';
+import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import ModulesList from '@/components/module/ModulesList';
@@ -16,8 +16,8 @@ export default function ProgramDetail() {
   if (!data || !data.length) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
-    <Container>
+    <ContentContainer>
       <ModulesList data={data} />
-    </Container>
+    </ContentContainer>
   );
 }

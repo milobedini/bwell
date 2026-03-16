@@ -4,7 +4,7 @@ import { Appbar, Badge, IconButton } from 'react-native-paper';
 import { clsx } from 'clsx';
 import Constants from 'expo-constants';
 import { Link, useLocalSearchParams } from 'expo-router';
-import Container from '@/components/Container';
+import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import { ThemedText } from '@/components/ThemedText';
@@ -86,7 +86,7 @@ const ClientDetail = () => {
   return (
     <>
       {renderHeader()}
-      <Container>
+      <ContentContainer>
         {attempts.length ? (
           <FlatList
             data={attempts}
@@ -131,7 +131,7 @@ const ClientDetail = () => {
         ) : (
           <ThemedText className="p-4">No submissions...</ThemedText>
         )}
-      </Container>
+      </ContentContainer>
       <FilterDrawer
         visible={drawerOpen}
         onDismiss={() => setDrawerOpen(false)}

@@ -2,6 +2,8 @@ import { Platform } from 'react-native';
 import { SafeAreaView, SafeAreaViewProps } from 'react-native-safe-area-context';
 import { clsx } from 'clsx';
 
+// Only use for screens without a visible header (headerShown: false).
+// When a non-transparent header is shown, it already handles safe area — use ContentContainer instead.
 type ContainerProps = SafeAreaViewProps & {
   centered?: boolean;
 };

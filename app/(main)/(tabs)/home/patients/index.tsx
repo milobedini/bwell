@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FlatList, View } from 'react-native';
-import Container from '@/components/Container';
+import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import { ThemedText } from '@/components/ThemedText';
@@ -43,7 +43,7 @@ const AllPatients = () => {
   if (!patients || !patients.length) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
-    <Container>
+    <ContentContainer>
       <FlatList
         data={patients}
         keyExtractor={(item) => item._id}
@@ -81,7 +81,7 @@ const AllPatients = () => {
         onDismiss={closeMenu}
         actions={actions}
       />
-    </Container>
+    </ContentContainer>
   );
 };
 

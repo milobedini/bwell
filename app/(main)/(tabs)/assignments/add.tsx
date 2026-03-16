@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { TextInput, View } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
-import Container from '@/components/Container';
+import ContentContainer from '@/components/ContentContainer';
 import ThemedButton from '@/components/ThemedButton';
 import { renderErrorToast, renderSuccessToast } from '@/components/toast/toastOptions';
 import DueDateField from '@/components/ui/DueDateField';
@@ -92,7 +92,7 @@ const AddAssignment = () => {
   }, [createAssignment, input, router]);
 
   return (
-    <Container className="px-4">
+    <ContentContainer>
       {/* Inputs */}
       <SelectField
         label="Client"
@@ -172,7 +172,7 @@ const AddAssignment = () => {
         onSelect={(item) => setModule(item.raw)}
         leftIcon={() => 'book-open-page-variant'}
       />
-    </Container>
+    </ContentContainer>
   );
 };
 

@@ -1,6 +1,6 @@
 import { FlatList, TouchableOpacity, View } from 'react-native';
 import { Link } from 'expo-router';
-import Container from '@/components/Container';
+import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import { ThemedText } from '@/components/ThemedText';
@@ -16,7 +16,7 @@ export default function ProgramList() {
   if (!programs || !programs.length) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
-    <Container>
+    <ContentContainer>
       <FlatList
         data={programs}
         keyExtractor={(item) => item._id}
@@ -40,6 +40,6 @@ export default function ProgramList() {
           </Link>
         )}
       />
-    </Container>
+    </ContentContainer>
   );
 }

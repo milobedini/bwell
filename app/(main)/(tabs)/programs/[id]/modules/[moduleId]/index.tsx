@@ -1,7 +1,6 @@
 import { ScrollView, View } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { useLocalSearchParams } from 'expo-router';
-import Container from '@/components/Container';
 import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
@@ -28,7 +27,7 @@ const ModuleDetail = () => {
   const { module, questions, scoreBands } = data;
 
   return (
-    <Container>
+    <ContentContainer>
       <ContentContainer>
         <ScrollView>
           {/* Module Summary */}
@@ -51,7 +50,7 @@ const ModuleDetail = () => {
           )}
         </ScrollView>
       </ContentContainer>
-    </Container>
+    </ContentContainer>
   );
 };
 

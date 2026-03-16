@@ -2,7 +2,7 @@ import { View } from 'react-native';
 import { Link } from 'expo-router';
 import { useViewTherapistOutstandingAssignments } from '@/hooks/useAssignments';
 
-import Container from '../Container';
+import ContentContainer from '../ContentContainer';
 import ErrorComponent, { ErrorTypes } from '../ErrorComponent';
 import { LoadingIndicator } from '../LoadingScreen';
 import { PrimaryButton } from '../ThemedButton';
@@ -18,7 +18,7 @@ const TherapistActiveAssignments = () => {
   if (!data) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
-    <Container>
+    <ContentContainer>
       {!data.length && (
         <View>
           <ThemedText className="mt-2 px-4 text-center">You have no active assignments currently...</ThemedText>
@@ -28,7 +28,7 @@ const TherapistActiveAssignments = () => {
         </View>
       )}
       <AssignmentsListTherapist data={data} />
-    </Container>
+    </ContentContainer>
   );
 };
 

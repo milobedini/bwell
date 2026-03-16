@@ -4,7 +4,7 @@ import { Link } from 'expo-router';
 import { useTherapistGetLatestAttempts } from '@/hooks/useAttempts';
 import { dateString } from '@/utils/dates';
 
-import Container from '../Container';
+import ContentContainer from '../ContentContainer';
 import ErrorComponent, { ErrorTypes } from '../ErrorComponent';
 import { LoadingIndicator } from '../LoadingScreen';
 import { ThemedText } from '../ThemedText';
@@ -19,7 +19,7 @@ const TherapistLatestAttempts = () => {
   if (!data) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
-    <Container>
+    <ContentContainer>
       {data.length ? (
         <FlatList
           data={data}
@@ -60,7 +60,7 @@ const TherapistLatestAttempts = () => {
       ) : (
         <ThemedText className="p-4">No submissions...</ThemedText>
       )}
-    </Container>
+    </ContentContainer>
   );
 };
 

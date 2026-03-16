@@ -10,7 +10,6 @@ const stackScreenOptions: NativeStackNavigationOptions = {
 
 const nestedScreenOptions: NativeStackNavigationOptions = {
   headerShown: true,
-  headerTransparent: true,
   headerBackButtonDisplayMode: 'minimal',
   headerTitle: '',
   headerStyle: { backgroundColor: Colors.sway.dark },
@@ -22,7 +21,6 @@ const stackScreenOptionsWithTitle = (title?: string): NativeStackNavigationOptio
   if (!title) return stackScreenOptions;
   return {
     headerShown: true,
-    headerTransparent: true,
     headerTitle: title,
     headerTitleStyle: { color: 'white', fontFamily: Fonts.Bold, fontSize: 24 },
     headerStyle: { backgroundColor: Colors.sway.dark },

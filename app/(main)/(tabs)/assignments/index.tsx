@@ -74,7 +74,7 @@ const AssignmentsHome = () => {
         tabBarShowLabel: true,
         tabBarShowIcon: true,
         tabBarLabelStyle: {
-          marginTop: 20,
+          marginTop: 4,
           fontFamily: Fonts.Bold,
           color: 'white',
           textAlign: 'center'
@@ -85,7 +85,7 @@ const AssignmentsHome = () => {
         tabBarIndicatorStyle: { backgroundColor: Colors.sway.bright },
         tabBarStyle: {
           paddingTop: top,
-          height: 88 + top,
+          height: 72 + top,
           borderTopWidth: 0,
           shadowOpacity: 0.3,
           shadowColor: '#34715D',
