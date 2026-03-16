@@ -33,11 +33,17 @@ bwell — an Expo React Native therapy app (iOS, Android, Web) with role-based a
 
 ## Commands
 
-- `npx prettier --write .` — format all files (run before committing)
-- `npx tsc --noEmit` — type check
+- `npx eslint --fix .` — auto-fix eslint issues (import sorting, etc.)
+- `npx prettier --write .` — format all files
+- `npm run lint` — run all validation (expo lint, eslint, prettier check, type check) — use this to validate changes
 - `npx expo start` — dev server
-- `npx eslint .` — lint
 - `npm run publish` — OTA update via EAS
+
+## Validation Workflow
+
+1. Run `npx eslint --fix .` to auto-fix eslint issues (import sorting, etc.)
+2. Run `npx prettier --write .` to format all files
+3. Run `npm run lint` to validate everything passes
 
 ## Code Conventions
 

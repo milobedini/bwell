@@ -1,5 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Dimensions, FlatList, ListRenderItemInfo, ScrollView, View, ViewToken } from 'react-native';
+import {
+  FlatList,
+  LayoutChangeEvent,
+  ListRenderItemInfo,
+  ScrollView,
+  useWindowDimensions,
+  View,
+  ViewToken
+} from 'react-native';
 import { Card, Chip, Divider, ProgressBar } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -19,9 +27,6 @@ import type {
 import Dots from './Dots';
 import QuestionSlide from './QuestionSlide';
 
-const { width } = Dimensions.get('window');
-const PAGE_W = width;
-
 type QuestionnairePresenterProps = {
   attempt: AttemptDetailResponseItem;
   detail: AttemptDetail;
@@ -32,6 +37,17 @@ type QuestionnairePresenterProps = {
 export default function QuestionnairePresenter({ attempt, detail, mode, patientName }: QuestionnairePresenterProps) {
   const router = useRouter();
   const { assignmentId } = useLocalSearchParams<{ assignmentId?: string }>();
+  const { width: screenWidth } = useWindowDimensions();
+  const [pageWidth, setPageWidth] = useState(screenWidth);
+  const PAGE_W = pageWidth;
+
+  const onContainerLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      const w = e.nativeEvent.layout.width;
+      if (w > 0 && w !== pageWidth) setPageWidth(w);
+    },
+    [pageWidth]
+  );
 
   const { mutate: saveAttempt, isPending: isSaving, isSuccess: saved } = useSaveModuleAttempt(attempt._id);
   const { mutate: submitAttempt } = useSubmitAttempt(attempt._id);
@@ -68,7 +84,10 @@ export default function QuestionnairePresenter({ attempt, detail, mode, patientN
     setTimeout(() => flatRef.current?.scrollToIndex({ index: i, animated: true }), 50);
   }, []);
 
-  const getItemLayout = useCallback((_: unknown, i: number) => ({ length: PAGE_W, offset: PAGE_W * i, index: i }), []);
+  const getItemLayout = useCallback(
+    (_: unknown, i: number) => ({ length: PAGE_W, offset: PAGE_W * i, index: i }),
+    [PAGE_W]
+  );
 
   const handleAnswered = useCallback(
     async (q: AttemptDetailItem, pick: { score: number; index: number; text: string }) => {
@@ -94,7 +113,7 @@ export default function QuestionnairePresenter({ attempt, detail, mode, patientN
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<AttemptDetailItem>) => (
-      <View style={{ width: PAGE_W, paddingHorizontal: 16, alignItems: 'center' }}>
+      <View style={{ width: PAGE_W }}>
         <QuestionSlide
           key={item.questionId}
           mode={mode}
@@ -109,7 +128,7 @@ export default function QuestionnairePresenter({ attempt, detail, mode, patientN
         />
       </View>
     ),
-    [handleAnswered, mode]
+    [handleAnswered, mode, PAGE_W]
   );
 
   const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
@@ -165,7 +184,7 @@ export default function QuestionnairePresenter({ attempt, detail, mode, patientN
   }, [mode, saveAttempt, submitAttempt, currentAnswersArray, assignmentId, router]);
 
   return (
-    <ScrollView className="flex-1">
+    <ScrollView className="flex-1" onLayout={onContainerLayout}>
       {/* Header */}
       <View className="gap-2 px-4 pt-1">
         <ThemedText type="title">
@@ -221,7 +240,7 @@ export default function QuestionnairePresenter({ attempt, detail, mode, patientN
         onViewableItemsChanged={onViewableItemsChanged}
         pagingEnabled
         decelerationRate="fast"
-        snapToAlignment="start"
+        snapToInterval={PAGE_W}
         getItemLayout={getItemLayout}
         initialScrollIndex={index}
         onMomentumScrollEnd={(e) => {

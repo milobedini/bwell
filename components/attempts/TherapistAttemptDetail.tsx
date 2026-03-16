@@ -1,6 +1,6 @@
+import { View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import AttemptPresenter from '@/components/attempts/presenters/AttemptPresenter';
-import Container from '@/components/Container';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import { useTherapistGetAttemptDetail } from '@/hooks/useAttempts';
@@ -19,9 +19,9 @@ const TherapistAttemptDetail = () => {
   if (!attempt || !data) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
-    <Container>
+    <View className="flex-1">
       <AttemptPresenter attempt={attempt} mode="view" patientName={patientName} />
-    </Container>
+    </View>
   );
 };
 

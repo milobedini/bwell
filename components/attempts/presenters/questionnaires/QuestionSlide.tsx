@@ -62,7 +62,6 @@ const QuestionSlide = ({ mode, question, onPick, colors }: QuestionSlideProps) =
   return (
     <Card
       style={{
-        width: '100%',
         marginHorizontal: 16,
         backgroundColor: colors?.card,
         height: '100%'
