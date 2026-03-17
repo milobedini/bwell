@@ -2,7 +2,50 @@
 
 ## Project
 
-bwell — an Expo React Native therapy app (iOS, Android, Web) with role-based access (Patient, Therapist, Admin).
+bwell — an Expo React Native therapy app (iOS, Android, Web) with role-based access (Patient, Therapist, Admin). A CBT (Cognitive Behavioural Therapy) companion that supports self-help, therapist-guided CBT, and PWP-guided workflows.
+
+## Product Vision
+
+The app has three tiers (from `docs/proposal.pdf`):
+
+1. **Self-help** — Patient picks a program independently, self-monitors with questionnaires, works through CBT tools unguided
+2. **Guided by CBT therapist** (priority) — Full CBT program where therapist assigns homework, reviews patient work weekly. Tools: PHQ-9, Activity Diary, 5 Areas Model, General/Weekly Goals, Thinking Traps, Thought Monitoring, Thought Challenging, Longitudinal Model, Belief Change Evidence Table, Modifying Unhelpful Beliefs
+3. **Guided by PWP therapist** — Subset of CBT tools (behavioural focus), therapist reviews homework. Shares Activity Diary, 5 Areas Model, Goals with tier 2 but omits cognitive tools (thinking traps, thought challenging, etc.)
+
+### Programs planned
+
+- **Primary:** Depression, Generalised Anxiety (GAD-7), Panic Disorder (PDSS), OCD, Health Anxiety, Stress, Phobias, PTSD, Agoraphobia, Social Anxiety
+- **Additional:** Sleep, Assertiveness, ACT
+
+### Current build status
+
+**Done:**
+- Auth (register, login, email verification, logout, 401 auto-clear)
+- Role system (Patient, Therapist, Admin) with therapist verification
+- Therapist-patient relationship (assign/remove clients)
+- Assignment system (due dates, recurrence, notes)
+- Questionnaire engine (scored MCQ, horizontal pager, auto-save, score bands) — supports PHQ-9, GAD-7, PDSS
+- Attempt lifecycle (start → auto-save → submit → view)
+- Therapist timeline (paginated patient history, filterable)
+- Admin dashboard (stats, therapist verification)
+- Onboarding carousel + welcome flow
+
+**In progress / partial:**
+- Activity Diary (module type exists, presenter started, numeric fields — missing full weekly grid, mastery/pleasure 0-10 scales, reflection prompts)
+
+**Not yet built (working down the proposal):**
+- 5 Areas Model (interactive CBT cycle: Situation → Thoughts → Emotions → Behaviours → Physical)
+- General Goals (goal + current/mid/end ratings 0-10, reflection prompts)
+- Weekly Goals (to-do list, tick off, tie to activity diary)
+- Thinking Traps (learn traps, identify patterns, reflect)
+- Thought Monitoring (log unhelpful thoughts, tag with thinking trap)
+- Thought Challenging (structured evidence for/against worksheet)
+- Longitudinal Model / Extended CBT Cycle (Beck formulation)
+- Belief Change Evidence Table (old belief vs new belief evidence)
+- Modifying Unhelpful Beliefs (structured worksheet)
+- Psychoeducation presenter (module type enum exists, no UI)
+- Exercise presenter (module type enum exists, no UI)
+- Self-help program recommendation (suggest programs from questionnaire scores)
 
 ## Stack
 
@@ -14,6 +57,7 @@ bwell — an Expo React Native therapy app (iOS, Android, Web) with role-based a
 - **UI:** react-native-paper, @gorhom/bottom-sheet, moti, react-native-reanimated, @shopify/react-native-skia
 - **API:** Axios with cookie-based auth (`withCredentials: true`)
 - **Types:** Shared types via `@milobedini/shared-types` npm package
+- **Backend:** Node/Express + MongoDB (separate repo at `../cbt/`)
 
 ## Architecture
 
@@ -22,6 +66,8 @@ bwell — an Expo React Native therapy app (iOS, Android, Web) with role-based a
 - Auth state is persisted in AsyncStorage via Zustand middleware; 401 responses auto-clear auth state via the axios interceptor in `api/api.ts`
 - Protected routes are guarded in `app/(main)/_layout.tsx` — redirects to login if no user
 - Role-based tab visibility uses `href: null` in tab config
+- Module types each get their own presenter component in `components/attempts/presenters/` — the `AttemptPresenter` routes to the correct one based on module type
+- Each new CBT tool will likely need: a new `ModuleType` enum value, a Mongoose model (BE), a controller (BE), a FE presenter component, and a hook
 
 ## Git Workflow
 
