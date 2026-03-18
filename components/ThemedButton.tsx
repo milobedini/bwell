@@ -1,11 +1,12 @@
-import { Image, TouchableOpacity, TouchableOpacityProps } from 'react-native';
+import type { ReactNode } from 'react';
+import { Image, Pressable, PressableProps } from 'react-native';
 import { clsx } from 'clsx';
 
 import { ThemedText } from './ThemedText';
 
 import bWellIcon from '../assets/images/icon.png';
 
-type ThemedButtonProps = TouchableOpacityProps & {
+type ThemedButtonProps = PressableProps & {
   compact?: boolean;
   title?: string;
   logo?: boolean;
@@ -13,67 +14,76 @@ type ThemedButtonProps = TouchableOpacityProps & {
   logoClasses?: string;
   variant?: 'default' | 'error';
   centered?: boolean;
+  children?: ReactNode;
 };
 
 const ThemedButton = (props: ThemedButtonProps) => {
   const { className, children, disabled, compact, title, variant = 'default', centered, ...rest } = props;
   return (
-    <TouchableOpacity
+    <Pressable
       disabled={disabled}
       className={clsx(
         'rounded-md p-4',
         disabled && 'bg-sway-darkGrey',
-        compact && `w-[200] px-3 py-2`,
+        compact && 'w-[200] px-3 py-2',
         variant === 'error' && 'bg-error',
-        variant === 'default' && 'bg-sway-bright',
+        variant === 'default' && !disabled && 'bg-sway-bright',
         centered && 'self-center',
         className
       )}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: !!disabled }}
       {...rest}
     >
-      <ThemedText type="button" className="text-center">
-        {title ? title : children}
-      </ThemedText>
-    </TouchableOpacity>
-  );
-};
-
-const PrimaryButton = ({ onPress, title, logo, className, textClasses, logoClasses, variant }: ThemedButtonProps) => {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      className={clsx(
-        'w-[300] flex-row items-center justify-evenly self-center rounded-lg border',
-        !variant && 'border-sway-bright bg-sway-buttonBackground',
-        variant === 'error' && 'bg-error text-black',
-        className
+      {({ pressed }) => (
+        <ThemedText type="button" className="text-center" style={{ opacity: pressed ? 0.7 : 1 }}>
+          {title ?? children}
+        </ThemedText>
       )}
-      activeOpacity={0.4}
-    >
-      <ThemedText
-        type="title"
-        className={clsx('max-w-[50%] text-center', textClasses)}
-        style={{ fontSize: 20 }}
-        onLight={variant === 'error'}
-      >
-        {title}
-      </ThemedText>
-      {logo && <Image source={bWellIcon} className={clsx('h-[120] w-[120]', logoClasses)} />}
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
-const SecondaryButton = ({ onPress, title, children }: ThemedButtonProps) => {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.7}
-      className="my-2.5 w-full rounded-xl bg-sway-buttonBackground p-3"
-    >
-      <ThemedText type="profileButtonText">{title || children}</ThemedText>
-    </TouchableOpacity>
-  );
-};
+const PrimaryButton = ({ onPress, title, logo, className, textClasses, logoClasses, variant }: ThemedButtonProps) => (
+  <Pressable
+    onPress={onPress}
+    className={clsx(
+      'w-[300] flex-row items-center justify-evenly self-center rounded-lg border',
+      !variant && 'border-sway-bright bg-sway-buttonBackground',
+      variant === 'error' && 'bg-error text-black',
+      className
+    )}
+    accessibilityRole="button"
+  >
+    {({ pressed }) => (
+      <>
+        <ThemedText
+          type="title"
+          className={clsx('max-w-[50%] text-center', textClasses)}
+          style={{ fontSize: 20, opacity: pressed ? 0.4 : 1 }}
+          onLight={variant === 'error'}
+        >
+          {title}
+        </ThemedText>
+        {logo && <Image source={bWellIcon} className={clsx('h-[120] w-[120]', logoClasses)} />}
+      </>
+    )}
+  </Pressable>
+);
+
+const SecondaryButton = ({ onPress, title, children }: ThemedButtonProps) => (
+  <Pressable
+    onPress={onPress}
+    className="my-2.5 w-full rounded-xl bg-sway-buttonBackground p-3"
+    accessibilityRole="button"
+  >
+    {({ pressed }) => (
+      <ThemedText type="profileButtonText" style={{ opacity: pressed ? 0.7 : 1 }}>
+        {title ?? children}
+      </ThemedText>
+    )}
+  </Pressable>
+);
 
 export default ThemedButton;
 export { PrimaryButton, SecondaryButton };
