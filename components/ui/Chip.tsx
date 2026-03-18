@@ -1,7 +1,8 @@
 import type { ComponentProps, ReactNode } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { Colors } from '@/constants/Colors';
+import { Fonts } from '@/constants/Typography';
 import { AccessPolicy, AssignmentStatus, CanStartReason } from '@/types/types';
 import type { AssignmentRecurrence, AvailableModulesItem } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
@@ -34,6 +35,59 @@ const StatusChip = ({ label, color, borderColor, icon, iconElement, className, b
     </ThemedText>
   </View>
 );
+
+type SelectableChipProps = {
+  label: string | number;
+  selected: boolean;
+  onPress: () => void;
+  disabled?: boolean;
+  icon?: MCIName;
+  className?: string;
+  accessibilityLabel?: string;
+  selectedBg?: string;
+  unselectedBg?: string;
+  selectedTextColor?: string;
+  unselectedTextColor?: string;
+};
+
+const SelectableChip = ({
+  label,
+  selected,
+  onPress,
+  disabled,
+  icon,
+  className,
+  accessibilityLabel,
+  selectedBg = Colors.sway.bright,
+  unselectedBg = Colors.sway.buttonBackgroundSolid,
+  selectedTextColor = Colors.sway.dark,
+  unselectedTextColor = 'white'
+}: SelectableChipProps) => {
+  const bg = selected ? selectedBg : unselectedBg;
+  const textColor = selected ? selectedTextColor : unselectedTextColor;
+  const fontFamily = selected ? Fonts.Bold : Fonts.Regular;
+  const borderColor = selected ? selectedBg : Colors.chip.darkCardAlt;
+
+  return (
+    <Pressable
+      onPress={disabled ? undefined : onPress}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? String(label)}
+      accessibilityState={{ selected, disabled: !!disabled }}
+      className={`flex-row items-center gap-1 rounded-2xl border px-3 py-1 ${className ?? 'self-start'}`}
+      style={({ pressed, hovered }) => ({
+        backgroundColor: bg,
+        borderColor,
+        opacity: disabled ? 0.5 : pressed || hovered ? 0.8 : 1
+      })}
+    >
+      {icon ? <MaterialCommunityIcons name={icon} size={14} color={textColor} /> : null}
+      <ThemedText type="small" style={{ color: textColor, fontSize: 12, lineHeight: 16, fontFamily }}>
+        {String(label)}
+      </ThemedText>
+    </Pressable>
+  );
+};
 
 const PendingChip = ({ animate }: { animate?: boolean }) => (
   <StatusChip
@@ -292,6 +346,7 @@ export {
   PendingChip,
   RecurrenceChip,
   SaveProgressChip,
+  SelectableChip,
   StatusChip,
   TimeLeftChip
 };
