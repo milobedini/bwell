@@ -13,16 +13,26 @@ import { useSaveModuleAttempt, useSubmitAttempt } from '@/hooks/useAttempts';
 import {
   buildDaySlots,
   dateISO,
-  dayLabel,
+  isSlotFilled,
+  moodColor,
+  REFLECTION_PROMPTS,
   type SlotKey,
   slotLabel,
   type SlotValue,
   startOfMonday
 } from '@/utils/activityHelpers';
-import type { AttemptDetailResponseItem, DiaryDetail, DiaryEntryInput } from '@milobedini/shared-types';
+import type {
+  AttemptDetailResponseItem,
+  DiaryDetail,
+  DiaryEntryInput,
+  SaveProgressInput
+} from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
+import DayChip from './DayChip';
 import NumericField from './NumericField';
+import ReflectionPrompt from './ReflectionPrompt';
+import WeeklySummary from './WeeklySummary';
 
 type ActivityDiaryPresenterProps = {
   attempt: AttemptDetailResponseItem & { diary: DiaryDetail };
@@ -41,6 +51,9 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
 
   const canEdit = mode === 'edit';
   const { moduleSnapshot, weekStart, userNote, startedAt, completedAt, diary, updatedAt } = attempt;
+
+  const [userNoteText, setUserNoteText] = useState(attempt.userNote ?? '');
+  const [noteDirty, setNoteDirty] = useState(false);
 
   const markDirty = useCallback((k: SlotKey) => {
     setDirtyKeys((prev) => {
@@ -66,6 +79,8 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
 
   // local state
   const [slots, setSlots] = useState<Record<SlotKey, SlotValue>>({});
+
+  const reflectionPrompt = useMemo(() => REFLECTION_PROMPTS[Math.floor(Math.random() * REFLECTION_PROMPTS.length)], []);
 
   // seed + hydrate from diary.days
   useEffect(() => {
@@ -121,6 +136,16 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
     [activeDayISO, slots]
   );
 
+  const slotFillsByDay = useMemo(() => {
+    const result: Record<string, boolean[]> = {};
+    for (const d of days) {
+      const iso = dateISO(d);
+      const daySlots = buildDaySlots(iso);
+      result[iso] = daySlots.map((r) => isSlotFilled(slots[r.key] ?? r.value));
+    }
+    return result;
+  }, [days, slots]);
+
   const updateSlot = useCallback(
     (key: SlotKey, patch: Partial<SlotValue>) => {
       setSlots((prev) => {
@@ -157,26 +182,47 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   );
 
   const saveDirty = useCallback(() => {
-    if (!dirtyKeys.size) return;
-    const payload = buildPayload(dirtyKeys);
-    saveAttempt(
-      { diaryEntries: payload, merge: true },
-      {
-        onError: (err) => renderErrorToast(err),
-        onSuccess: () => {
-          setDirtyKeys(new Set()); // reset dirty state
-        }
+    if (!dirtyKeys.size && !noteDirty) return;
+    const payload: SaveProgressInput = { merge: true };
+    if (dirtyKeys.size) {
+      payload.diaryEntries = buildPayload(dirtyKeys);
+    }
+    if (noteDirty) {
+      payload.userNote = userNoteText;
+    }
+    saveAttempt(payload, {
+      onError: (err) => renderErrorToast(err),
+      onSuccess: () => {
+        setDirtyKeys(new Set());
+        setNoteDirty(false);
       }
-    );
-  }, [dirtyKeys, buildPayload, saveAttempt]);
+    });
+  }, [dirtyKeys, noteDirty, userNoteText, buildPayload, saveAttempt]);
 
   const renderSlot = useCallback(
     ({ item }: ListRenderItemInfo<{ key: SlotKey; value: SlotValue }>) => {
       const { key, value } = item;
       const disabled = !canEdit;
+      const tintColor = moodColor(value.mood);
       return (
-        <Card style={{ backgroundColor: Colors.sway.buttonBackground, marginBottom: 10, marginHorizontal: 8 }}>
-          <Card.Title title={value.label} titleStyle={{ color: 'white', fontFamily: Fonts.Bold }} />
+        <Card
+          style={{
+            backgroundColor: Colors.sway.buttonBackground,
+            marginBottom: 10,
+            marginHorizontal: 8,
+            borderLeftWidth: 3,
+            borderLeftColor: tintColor ?? 'transparent'
+          }}
+        >
+          <Card.Title
+            title={value.label}
+            titleStyle={{ color: 'white', fontFamily: Fonts.Bold }}
+            right={() =>
+              tintColor && value.mood != null ? (
+                <ThemedText style={{ fontSize: 11, color: tintColor, marginRight: 12 }}>mood {value.mood}</ThemedText>
+              ) : null
+            }
+          />
           <Card.Content style={{ gap: 8 }}>
             <TextInput
               mode="flat"
@@ -288,7 +334,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                   </>
                 )}
                 <SaveProgressChip saved={saved} isSaving={isSaving} />
-                {!!dirtyKeys.size && (
+                {(!!dirtyKeys.size || noteDirty) && (
                   <Chip
                     icon={() => <MaterialCommunityIcons name="content-save" size={24} color={Colors.chip.green} />}
                     mode="outlined"
@@ -299,10 +345,10 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                       alignSelf: 'center',
                       marginTop: 8
                     }}
-                    disabled={!dirtyKeys.size}
+                    disabled={!dirtyKeys.size && !noteDirty}
                     onPress={saveDirty}
                   >
-                    {dirtyKeys.size ? `Save changes (${dirtyKeys.size})` : 'Saved'}
+                    {dirtyKeys.size || noteDirty ? 'Save changes' : 'Saved'}
                   </Chip>
                 )}
               </View>
@@ -319,6 +365,10 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
               ) : null}
               <Divider className="my-2" bold />
 
+              {canEdit && <ReflectionPrompt prompt={reflectionPrompt} />}
+
+              <WeeklySummary totals={diary.totals} />
+
               {/* Horizontal day selector */}
               <ScrollView
                 horizontal
@@ -326,21 +376,15 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                 contentContainerStyle={{ paddingHorizontal: 0, gap: 8 }}
               >
                 {days.map((d) => {
-                  const value = dateISO(d);
-                  const selected = value === activeDayISO;
+                  const iso = dateISO(d);
                   return (
-                    <Chip
-                      key={value}
-                      mode={selected ? 'flat' : 'outlined'}
-                      selected={selected}
-                      onPress={() => setActiveDayISO(value)}
-                      style={{
-                        backgroundColor: selected ? Colors.sway.bright : Colors.sway.buttonBackground
-                      }}
-                      textStyle={{ color: selected ? Colors.sway.dark : 'white', fontFamily: Fonts.Bold }}
-                    >
-                      {`${dayLabel(d)} ${d.getDate()}`}
-                    </Chip>
+                    <DayChip
+                      key={iso}
+                      date={d}
+                      selected={iso === activeDayISO}
+                      slotFills={slotFillsByDay[iso] ?? []}
+                      onPress={() => setActiveDayISO(iso)}
+                    />
                   );
                 })}
               </ScrollView>
@@ -350,24 +394,46 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
         }
         ListFooterComponent={
           <View>
+            {canEdit && (
+              <View style={{ marginBottom: 12, marginHorizontal: 8 }}>
+                <TextInput
+                  mode="outlined"
+                  label="Note for your therapist"
+                  placeholder="Anything you'd like your therapist to know this week..."
+                  placeholderTextColor={Colors.sway.darkGrey}
+                  value={userNoteText}
+                  onChangeText={(t) => {
+                    setUserNoteText(t);
+                    setNoteDirty(true);
+                  }}
+                  multiline
+                  maxLength={500}
+                  style={{ backgroundColor: 'transparent', minHeight: 64 }}
+                  textColor="white"
+                  outlineColor={Colors.sway.darkGrey}
+                  activeOutlineColor={Colors.sway.bright}
+                  theme={{ colors: { onSurfaceVariant: Colors.sway.lightGrey } }}
+                />
+              </View>
+            )}
             {mode === 'edit' && (
               <View className="gap-3 pb-2">
                 <PrimaryButton
-                  title={allAnswered ? 'Submit diary' : !!dirtyKeys.size ? `Save & Exit (${dirtyKeys.size})` : 'Exit'}
+                  title={allAnswered ? 'Submit diary' : dirtyKeys.size || noteDirty ? `Save & Exit` : 'Exit'}
                   onPress={() => {
                     if (!canEdit || !allAnswered) {
-                      if (dirtyKeys.size) {
-                        const payload = buildPayload(dirtyKeys);
-                        saveAttempt(
-                          { diaryEntries: payload, merge: true },
-                          {
-                            onError: (err) => renderErrorToast(err),
-                            onSuccess: () => {
-                              setDirtyKeys(new Set());
-                              router.back();
-                            }
+                      if (dirtyKeys.size || noteDirty) {
+                        const payload: SaveProgressInput = { merge: true };
+                        if (dirtyKeys.size) payload.diaryEntries = buildPayload(dirtyKeys);
+                        if (noteDirty) payload.userNote = userNoteText;
+                        saveAttempt(payload, {
+                          onError: (err) => renderErrorToast(err),
+                          onSuccess: () => {
+                            setDirtyKeys(new Set());
+                            setNoteDirty(false);
+                            router.back();
                           }
-                        );
+                        });
                       } else {
                         router.back();
                       }
@@ -383,24 +449,26 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                         }
                       });
 
-                    if (dirtyKeys.size) {
-                      const payload = buildPayload(dirtyKeys);
-                      saveAttempt(
-                        { diaryEntries: payload, merge: true },
-                        {
-                          onError: (err) => renderErrorToast(err),
-                          onSuccess: () => {
-                            setDirtyKeys(new Set());
-                            afterSave();
-                          }
+                    if (dirtyKeys.size || noteDirty) {
+                      const payload: SaveProgressInput = { merge: true };
+                      if (dirtyKeys.size) payload.diaryEntries = buildPayload(dirtyKeys);
+                      if (noteDirty) payload.userNote = userNoteText;
+                      saveAttempt(payload, {
+                        onError: (err) => renderErrorToast(err),
+                        onSuccess: () => {
+                          setDirtyKeys(new Set());
+                          setNoteDirty(false);
+                          afterSave();
                         }
-                      );
+                      });
                     } else {
                       afterSave();
                     }
                   }}
                 />
-                {!!dirtyKeys.size && <PrimaryButton title="Cancel" onPress={router.back} variant="error" />}
+                {(!!dirtyKeys.size || noteDirty) && (
+                  <PrimaryButton title="Cancel" onPress={router.back} variant="error" />
+                )}
               </View>
             )}
             {mode !== 'edit' && <PrimaryButton title="Exit" onPress={() => router.back()} />}
