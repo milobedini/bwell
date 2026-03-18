@@ -2,10 +2,9 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Slot } from 'expo-router';
-import ToastManager from 'toastify-react-native';
+import { Toaster } from 'sonner-native';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import FontsContainer from '@/components/FontsContainer';
-import toastConfig from '@/components/toast/toastConfig';
 import { Colors } from '@/constants/Colors';
 import { getDeviceDatesLocaleKey, registerDatesTranslations } from '@/utils/locales';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -37,7 +36,25 @@ export default function RootLayout() {
             <PaperProvider>
               <FontsContainer>
                 <Slot />
-                <ToastManager config={toastConfig} />
+                <Toaster
+                  position="top-center"
+                  offset={60}
+                  toastOptions={{
+                    style: {
+                      backgroundColor: Colors.sway.dark,
+                      borderColor: Colors.sway.buttonBackgroundSolid,
+                      borderWidth: 1
+                    },
+                    titleStyle: {
+                      color: Colors.primary.white,
+                      fontFamily: 'SpaceGrotesk-SemiBold'
+                    },
+                    descriptionStyle: {
+                      color: Colors.sway.darkGrey,
+                      fontFamily: 'SpaceGrotesk-Regular'
+                    }
+                  }}
+                />
               </FontsContainer>
             </PaperProvider>
           </SafeAreaProvider>

@@ -53,7 +53,8 @@ export async function pickClientAndCompose(
     }
 
     // 4) Last resort
-    return renderErrorToast('No email app or Gmail found.');
+    renderErrorToast('No email app or Gmail found.');
+    return;
   }
 
   // ... (your same client picker + composeAsync code here)
