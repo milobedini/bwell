@@ -20,7 +20,7 @@ const EmptyState = ({ icon, title, subtitle, action }: EmptyStateProps) => (
       {title}
     </ThemedText>
     {subtitle ? (
-      <ThemedText type="small" className="text-center" style={{ color: Colors.sway.darkGrey }}>
+      <ThemedText type="small" className="text-center text-sway-darkGrey">
         {subtitle}
       </ThemedText>
     ) : null}
