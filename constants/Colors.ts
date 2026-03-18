@@ -57,7 +57,6 @@ export const Colors = {
     moodCool: '#5b8def',
     closeness: '#e76f9a',
     enjoyment: '#a78bfa',
-    promptBg: '#1a3a4a',
-    promptBorder: '#1a2a3a'
+    promptBg: '#1a3a4a'
   }
 };

@@ -80,7 +80,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   // local state
   const [slots, setSlots] = useState<Record<SlotKey, SlotValue>>({});
 
-  const reflectionPrompt = useMemo(() => REFLECTION_PROMPTS[Math.floor(Math.random() * REFLECTION_PROMPTS.length)], []);
+  const [reflectionPrompt] = useState(() => REFLECTION_PROMPTS[Math.floor(Math.random() * REFLECTION_PROMPTS.length)]);
 
   // seed + hydrate from diary.days
   useEffect(() => {
@@ -116,14 +116,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   const progress = useMemo(() => {
     const vals = Object.values(slots);
     if (!vals.length) return 0;
-    const filled = vals.filter(
-      (v) =>
-        (v.activity && v.activity.trim().length > 0) ||
-        v.mood != null ||
-        v.achievement != null ||
-        v.closeness != null ||
-        v.enjoyment != null
-    ).length;
+    const filled = vals.filter(isSlotFilled).length;
     return filled / vals.length;
   }, [slots]);
 
@@ -181,23 +174,23 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
     [slots]
   );
 
+  const buildSavePayload = useCallback((): SaveProgressInput => {
+    const payload: SaveProgressInput = { merge: true };
+    if (dirtyKeys.size) payload.diaryEntries = buildPayload(dirtyKeys);
+    if (noteDirty) payload.userNote = userNoteText;
+    return payload;
+  }, [dirtyKeys, noteDirty, userNoteText, buildPayload]);
+
   const saveDirty = useCallback(() => {
     if (!dirtyKeys.size && !noteDirty) return;
-    const payload: SaveProgressInput = { merge: true };
-    if (dirtyKeys.size) {
-      payload.diaryEntries = buildPayload(dirtyKeys);
-    }
-    if (noteDirty) {
-      payload.userNote = userNoteText;
-    }
-    saveAttempt(payload, {
+    saveAttempt(buildSavePayload(), {
       onError: (err) => renderErrorToast(err),
       onSuccess: () => {
         setDirtyKeys(new Set());
         setNoteDirty(false);
       }
     });
-  }, [dirtyKeys, noteDirty, userNoteText, buildPayload, saveAttempt]);
+  }, [dirtyKeys, noteDirty, buildSavePayload, saveAttempt]);
 
   const renderSlot = useCallback(
     ({ item }: ListRenderItemInfo<{ key: SlotKey; value: SlotValue }>) => {
@@ -423,10 +416,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                   onPress={() => {
                     if (!canEdit || !allAnswered) {
                       if (dirtyKeys.size || noteDirty) {
-                        const payload: SaveProgressInput = { merge: true };
-                        if (dirtyKeys.size) payload.diaryEntries = buildPayload(dirtyKeys);
-                        if (noteDirty) payload.userNote = userNoteText;
-                        saveAttempt(payload, {
+                        saveAttempt(buildSavePayload(), {
                           onError: (err) => renderErrorToast(err),
                           onSuccess: () => {
                             setDirtyKeys(new Set());
@@ -450,10 +440,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                       });
 
                     if (dirtyKeys.size || noteDirty) {
-                      const payload: SaveProgressInput = { merge: true };
-                      if (dirtyKeys.size) payload.diaryEntries = buildPayload(dirtyKeys);
-                      if (noteDirty) payload.userNote = userNoteText;
-                      saveAttempt(payload, {
+                      saveAttempt(buildSavePayload(), {
                         onError: (err) => renderErrorToast(err),
                         onSuccess: () => {
                           setDirtyKeys(new Set());
