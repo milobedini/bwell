@@ -20,12 +20,13 @@ type StatusChipProps = {
   icon?: MCIName;
   iconElement?: ReactNode;
   className?: string;
+  backgroundColor?: string;
 };
 
-const StatusChip = ({ label, color, borderColor, icon, iconElement, className }: StatusChipProps) => (
+const StatusChip = ({ label, color, borderColor, icon, iconElement, className, backgroundColor }: StatusChipProps) => (
   <View
     className={`flex-row items-center gap-1 rounded-2xl border px-3 py-1 ${className ?? 'self-start'}`}
-    style={{ borderColor }}
+    style={{ borderColor, backgroundColor }}
   >
     {iconElement ?? (icon ? <MaterialCommunityIcons name={icon} size={14} color={color} /> : null)}
     <ThemedText type="small" style={{ color, fontSize: 12, lineHeight: 16 }}>
