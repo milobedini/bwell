@@ -9,6 +9,7 @@ import ErrorComponent, { ErrorTypes } from '../ErrorComponent';
 import { LoadingIndicator } from '../LoadingScreen';
 import { ThemedText } from '../ThemedText';
 import { DateChip } from '../ui/Chip';
+import EmptyState from '../ui/EmptyState';
 
 const TherapistLatestAttempts = () => {
   const { data, isPending, isError } = useTherapistGetLatestAttempts();
@@ -58,7 +59,7 @@ const TherapistLatestAttempts = () => {
           }}
         ></FlatList>
       ) : (
-        <ThemedText className="p-4">No submissions...</ThemedText>
+        <EmptyState icon="file-document-outline" title="No submissions" />
       )}
     </ContentContainer>
   );

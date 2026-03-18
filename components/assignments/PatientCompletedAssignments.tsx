@@ -4,7 +4,7 @@ import { AssignmentStatusSearchOptions } from '@/types/types';
 import ContentContainer from '../ContentContainer';
 import ErrorComponent, { ErrorTypes } from '../ErrorComponent';
 import { LoadingIndicator } from '../LoadingScreen';
-import { ThemedText } from '../ThemedText';
+import EmptyState from '../ui/EmptyState';
 
 import AssignmentsListPatient from './AssignmentsListPatient';
 
@@ -20,7 +20,7 @@ const PatientCompletedAssignments = () => {
       {data.length ? (
         <AssignmentsListPatient data={data} completed />
       ) : (
-        <ThemedText className="p-4">No completed assignments...</ThemedText>
+        <EmptyState icon="check-all" title="No completed assignments" />
       )}
     </ContentContainer>
   );

@@ -1,38 +1,53 @@
-import type { ReactNode } from 'react';
-import { ActivityIndicator, Chip } from 'react-native-paper';
-import type { IconProps } from 'react-native-paper/lib/typescript/components/MaterialCommunityIcon';
+import type { ComponentProps, ReactNode } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { Colors } from '@/constants/Colors';
-import { Fonts } from '@/constants/Typography';
 import { AccessPolicy, AssignmentStatus, CanStartReason } from '@/types/types';
 import type { AssignmentRecurrence, AvailableModulesItem } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 
+import { ThemedText } from '../ThemedText';
+
 import hourglass from '@/assets/lotties/hourglass.json';
 
-const PendingChip = ({ animate }: { animate?: boolean }) => {
-  const animatedIcon = <LottieView source={hourglass} autoPlay loop style={{ width: 42, height: 42 }} />;
+type MCIName = ComponentProps<typeof MaterialCommunityIcons>['name'];
 
-  return (
-    <Chip
-      icon={() => {
-        if (animate) return animatedIcon;
-        return <MaterialIcons name="hourglass-top" size={24} color={Colors.primary.info} />;
-      }}
-      textStyle={{
-        fontFamily: Fonts.Black,
-        color: Colors.primary.info
-      }}
-      style={{
-        backgroundColor: Colors.sway.buttonBackground,
-        borderColor: Colors.sway.bright
-      }}
-    >
-      Awaiting BWell verification
-    </Chip>
-  );
+type StatusChipProps = {
+  label: string;
+  color: string;
+  borderColor: string;
+  icon?: MCIName;
+  iconElement?: ReactNode;
+  className?: string;
 };
+
+const StatusChip = ({ label, color, borderColor, icon, iconElement, className }: StatusChipProps) => (
+  <View
+    className={`flex-row items-center gap-1 rounded-2xl border px-3 py-1 ${className ?? 'self-start'}`}
+    style={{ borderColor }}
+  >
+    {iconElement ?? (icon ? <MaterialCommunityIcons name={icon} size={14} color={color} /> : null)}
+    <ThemedText type="small" style={{ color, fontSize: 12, lineHeight: 16 }}>
+      {label}
+    </ThemedText>
+  </View>
+);
+
+const PendingChip = ({ animate }: { animate?: boolean }) => (
+  <StatusChip
+    label="Pending verification"
+    color={Colors.primary.info}
+    borderColor={Colors.sway.bright}
+    iconElement={
+      animate ? (
+        <LottieView source={hourglass} autoPlay loop style={{ width: 20, height: 20 }} />
+      ) : (
+        <MaterialIcons name="hourglass-top" size={14} color={Colors.primary.info} />
+      )
+    }
+  />
+);
 
 type AccessPolicyChipProps = {
   accessPolicy: AccessPolicy;
@@ -42,44 +57,22 @@ const AccessPolicyChip = ({ accessPolicy }: AccessPolicyChipProps) => {
   switch (accessPolicy) {
     case AccessPolicy.ASSIGNED:
       return (
-        <Chip
-          icon={() => <MaterialCommunityIcons name="calendar-clock" size={24} color={Colors.chip.infoBlue} />}
-          mode="outlined"
-          compact
-          textStyle={{
-            fontFamily: Fonts.Black,
-            color: Colors.chip.infoBlue
-          }}
-          style={{
-            backgroundColor: Colors.sway.buttonBackground,
-            borderColor: Colors.chip.infoBlueBorder,
-            alignSelf: 'flex-start'
-          }}
-        >
-          Assignment only
-        </Chip>
+        <StatusChip
+          label="Assigned"
+          color={Colors.chip.infoBlue}
+          borderColor={Colors.chip.infoBlueBorder}
+          icon="calendar-clock"
+        />
       );
-
     case AccessPolicy.OPEN:
       return (
-        <Chip
-          icon={() => <MaterialCommunityIcons name="lock-open-variant-outline" size={24} color={Colors.chip.teal} />}
-          mode="outlined"
-          compact
-          textStyle={{
-            fontFamily: Fonts.Black,
-            color: Colors.chip.teal
-          }}
-          style={{
-            backgroundColor: Colors.sway.buttonBackground,
-            borderColor: Colors.chip.tealBorder,
-            alignSelf: 'flex-start'
-          }}
-        >
-          Open
-        </Chip>
+        <StatusChip
+          label="Open"
+          color={Colors.chip.teal}
+          borderColor={Colors.chip.tealBorder}
+          icon="lock-open-variant-outline"
+        />
       );
-
     default:
       return null;
   }
@@ -93,42 +86,16 @@ const BlockedChip = (reason: CanStartReason): ReactNode => {
   switch (reason) {
     case CanStartReason.REQUIRES_ASSIGNMENT:
       return (
-        <Chip
-          icon={() => <MaterialCommunityIcons name="calendar-clock" size={24} color={Colors.chip.amber} />}
-          mode="outlined"
-          textStyle={{
-            fontFamily: Fonts.Black,
-            color: Colors.chip.amber
-          }}
-          compact
-          style={{
-            backgroundColor: Colors.sway.buttonBackground,
-            borderColor: Colors.chip.amberBorder,
-            alignSelf: 'flex-start'
-          }}
-        >
-          Awaiting assignment
-        </Chip>
+        <StatusChip
+          label="Needs assignment"
+          color={Colors.chip.amber}
+          borderColor={Colors.chip.amberBorder}
+          icon="calendar-clock"
+        />
       );
-
     default:
       return (
-        <Chip
-          icon={() => <MaterialCommunityIcons name="calendar-clock" size={24} color={Colors.chip.red} />}
-          mode="outlined"
-          textStyle={{
-            fontFamily: Fonts.Black,
-            color: Colors.chip.red
-          }}
-          compact
-          style={{
-            backgroundColor: Colors.sway.buttonBackground,
-            borderColor: Colors.chip.redBorder,
-            alignSelf: 'flex-start'
-          }}
-        >
-          Sign in to start
-        </Chip>
+        <StatusChip label="Sign in" color={Colors.chip.red} borderColor={Colors.chip.redBorder} icon="calendar-clock" />
       );
   }
 };
@@ -137,26 +104,16 @@ const CanStartChip = ({ meta }: CanStartChipProps) => {
   const { canStart, canStartReason } = meta;
   if (canStart)
     return (
-      <Chip
-        icon={() => <MaterialCommunityIcons name="check-circle-outline" size={24} color={Colors.chip.green} />}
-        mode="outlined"
-        textStyle={{
-          fontFamily: Fonts.Black,
-          color: Colors.chip.green
-        }}
-        compact
-        style={{
-          backgroundColor: Colors.sway.buttonBackground,
-          borderColor: Colors.chip.greenBorder,
-          alignSelf: 'flex-start'
-        }}
-      >
-        Ready to start
-      </Chip>
+      <StatusChip
+        label="Ready"
+        color={Colors.chip.green}
+        borderColor={Colors.chip.greenBorder}
+        icon="check-circle-outline"
+      />
     );
-
   return BlockedChip(canStartReason as CanStartReason);
 };
+
 type AssignmentStatusChipProps = {
   status: AssignmentStatus;
 };
@@ -165,85 +122,59 @@ const AssignmentStatusChip = ({ status }: AssignmentStatusChipProps) => {
   switch (status) {
     case AssignmentStatus.ASSIGNED:
       return (
-        <Chip
-          icon={() => <MaterialCommunityIcons name="clipboard-text-clock" size={24} color={Colors.chip.infoBlue} />}
-          mode="outlined"
-          textStyle={{
-            fontFamily: Fonts.Black,
-            color: Colors.chip.infoBlue
-          }}
-          compact
-          style={{
-            backgroundColor: Colors.sway.buttonBackground,
-            borderColor: Colors.chip.infoBlueBorder,
-            alignSelf: 'flex-start'
-          }}
-        >
-          Assigned
-        </Chip>
+        <StatusChip
+          label="Assigned"
+          color={Colors.chip.infoBlue}
+          borderColor={Colors.chip.infoBlueBorder}
+          icon="clipboard-text-clock"
+        />
       );
     case AssignmentStatus.IN_PROGRESS:
       return (
-        <Chip
-          icon={() => <MaterialCommunityIcons name="progress-clock" size={24} color={Colors.primary.black} />}
-          mode="outlined"
-          textStyle={{
-            fontFamily: Fonts.Black,
-            color: Colors.primary.black
-          }}
-          compact
-          style={{
-            backgroundColor: Colors.primary.warning,
-            borderColor: Colors.chip.infoBlueBorder,
-            alignSelf: 'flex-start'
-          }}
-        >
-          In progress
-        </Chip>
+        <View className="self-start rounded-2xl" style={{ backgroundColor: Colors.primary.warning }}>
+          <StatusChip
+            label="In progress"
+            color={Colors.primary.black}
+            borderColor={Colors.primary.warning}
+            iconElement={<MaterialCommunityIcons name="progress-clock" size={14} color={Colors.primary.black} />}
+          />
+        </View>
       );
     default:
-      return;
+      return null;
   }
 };
 
 const DueChip = ({ dueAt, completed }: { dueAt?: string; completed?: boolean }) => {
   if (!dueAt)
     return (
-      <Chip
-        mode="outlined"
-        compact
-        icon={() => <MaterialCommunityIcons name="calendar" size={24} color={Colors.chip.neutral} />}
-        textStyle={{ color: Colors.chip.neutral, fontFamily: Fonts.Black, fontSize: 16 }}
-        style={{ borderColor: Colors.chip.neutralBorder, backgroundColor: 'transparent', alignSelf: 'flex-start' }}
-      >
-        {`Open-ended`}
-      </Chip>
+      <StatusChip
+        label="No deadline"
+        color={Colors.chip.neutral}
+        borderColor={Colors.chip.neutralBorder}
+        icon="calendar"
+      />
     );
+
   const due = new Date(dueAt);
 
   if (completed)
     return (
-      <Chip
-        mode="outlined"
-        compact
-        icon={() => <MaterialCommunityIcons name="check-circle-outline" size={24} color={Colors.chip.green} />}
-        textStyle={{ color: Colors.chip.green, fontFamily: Fonts.Black, fontSize: 16 }}
-        style={{ borderColor: Colors.chip.greenBorder, backgroundColor: 'transparent', alignSelf: 'flex-start' }}
-      >
-        {`Completed ${due.toLocaleDateString()}`}
-      </Chip>
+      <StatusChip
+        label={`Completed ${due.toLocaleDateString()}`}
+        color={Colors.chip.green}
+        borderColor={Colors.chip.greenBorder}
+        icon="check-circle-outline"
+      />
     );
 
   return (
-    <Chip
-      mode="outlined"
-      compact
-      icon={() => <MaterialCommunityIcons name="calendar" size={24} color={Colors.chip.neutral} />}
-      textStyle={{ color: Colors.chip.neutral, fontFamily: Fonts.Black, fontSize: 16 }}
-      style={{ borderColor: Colors.chip.neutralBorder, backgroundColor: 'transparent', alignSelf: 'flex-start' }}
-    >
-      {`Due ${due.toLocaleDateString()}`}
-    </Chip>
+    <StatusChip
+      label={`Due ${due.toLocaleDateString()}`}
+      color={Colors.chip.neutral}
+      borderColor={Colors.chip.neutralBorder}
+      icon="calendar"
+    />
   );
 };
 
@@ -253,7 +184,7 @@ const TimeLeftChip = ({ dueAt }: { dueAt: string }) => {
 
   const diffMs = due.getTime() - Date.now();
 
-  let icon: IconProps['name'] = 'calendar-clock';
+  let icon: MCIName = 'calendar-clock';
   let color = Colors.chip.infoBlue;
   let border = Colors.chip.infoBlueBorder;
   let label = '';
@@ -272,71 +203,49 @@ const TimeLeftChip = ({ dueAt }: { dueAt: string }) => {
   } else {
     const days = Math.ceil(diffMs / 86400000);
     icon = 'calendar-clock';
-    color = Colors.chip.infoBlue;
-    border = Colors.chip.infoBlueBorder;
     label = `${days} ${days === 1 ? 'day' : 'days'} left`;
   }
 
-  return (
-    <Chip
-      mode="outlined"
-      compact
-      icon={() => <MaterialCommunityIcons name={icon} size={24} color={color} />}
-      textStyle={{ color, fontFamily: Fonts.Black, fontSize: 16 }}
-      style={{ borderColor: border, backgroundColor: 'transparent', alignSelf: 'flex-start' }}
-    >
-      {label}
-    </Chip>
-  );
+  return <StatusChip label={label} color={color} borderColor={border} icon={icon} />;
 };
 
 const RecurrenceChip = ({ recurrence }: { recurrence: AssignmentRecurrence }) => {
-  if (!recurrence || !recurrence?.freq || recurrence.freq === 'none') return null;
+  if (!recurrence?.freq || recurrence.freq === 'none') return null;
 
   const freq = recurrence.freq.toLowerCase();
   const interval = recurrence.interval ?? 1;
 
   let label = '';
-  let icon: IconProps['name'] = 'repeat';
+  let icon: MCIName = 'repeat';
   const color = Colors.chip.infoBlue;
   const border = Colors.chip.infoBlueBorder;
 
   if (freq === 'weekly') {
-    label =
-      interval === 1 ? 'Repeats weekly' : interval === 2 ? 'Repeats every 2 weeks' : `Repeats every ${interval} weeks`;
+    if (interval === 1) label = 'Weekly';
+    else if (interval === 2) label = 'Biweekly';
+    else label = `Every ${interval}w`;
     icon = 'calendar-week';
   } else if (freq === 'monthly') {
-    label = interval === 1 ? 'Repeats monthly' : `Repeats every ${interval} months`;
+    if (interval === 1) label = 'Monthly';
+    else label = `Every ${interval}m`;
     icon = 'calendar-month';
   } else {
     return null;
   }
 
-  return (
-    <Chip
-      mode="outlined"
-      compact
-      icon={() => <MaterialCommunityIcons name={icon} size={24} color={color} />}
-      textStyle={{ color, fontFamily: Fonts.Black, fontSize: 16 }}
-      style={{ borderColor: border, backgroundColor: 'transparent', alignSelf: 'flex-start' }}
-    >
-      {label}
-    </Chip>
-  );
+  return <StatusChip label={label} color={color} borderColor={border} icon={icon} />;
 };
 
 const DateChip = ({ dateString, prefix }: { dateString: string; prefix?: string }) => {
   const date = new Date(dateString);
 
   return (
-    <Chip
-      mode="outlined"
-      icon={() => <MaterialCommunityIcons name="calendar" size={24} color={Colors.chip.neutral} />}
-      textStyle={{ color: Colors.chip.neutral, fontFamily: Fonts.Black, fontSize: 16, textTransform: 'capitalize' }}
-      style={{ borderColor: Colors.chip.neutralBorder, backgroundColor: 'transparent', alignSelf: 'flex-start' }}
-    >
-      {`${prefix ? `${prefix} ` : ''}${date.toLocaleDateString()}`}
-    </Chip>
+    <StatusChip
+      label={`${prefix ? `${prefix} ` : ''}${date.toLocaleDateString()}`}
+      color={Colors.chip.neutral}
+      borderColor={Colors.chip.neutralBorder}
+      icon="calendar"
+    />
   );
 };
 
@@ -347,32 +256,29 @@ type SaveProgressChipProps = {
 
 const SaveProgressChip = ({ isSaving, saved }: SaveProgressChipProps) => {
   if (!isSaving && !saved) return null;
+
   if (isSaving)
     return (
-      <Chip
-        textStyle={{ fontFamily: Fonts.Black, color: Colors.chip.green }}
-        style={{ backgroundColor: Colors.sway.dark, alignSelf: 'center', marginTop: 8 }}
-        icon={() => <ActivityIndicator animating color={Colors.sway.bright} style={{ marginRight: 12 }} />}
-      >
-        Saving
-      </Chip>
+      <StatusChip
+        label="Saving"
+        color={Colors.chip.green}
+        borderColor={Colors.chip.greenBorder}
+        className="mt-2 self-center"
+        iconElement={<ActivityIndicator animating color={Colors.sway.bright} size="small" />}
+      />
     );
+
   if (saved)
     return (
-      <Chip
-        icon={() => <MaterialCommunityIcons name="check-circle-outline" size={24} color={Colors.chip.green} />}
-        mode="outlined"
-        textStyle={{ fontFamily: Fonts.Black, color: Colors.chip.green }}
-        style={{
-          backgroundColor: Colors.sway.buttonBackground,
-          borderColor: Colors.chip.greenBorder,
-          alignSelf: 'center',
-          marginTop: 8
-        }}
-      >
-        Saved
-      </Chip>
+      <StatusChip
+        label="Saved"
+        color={Colors.chip.green}
+        borderColor={Colors.chip.greenBorder}
+        className="mt-2 self-center"
+        icon="check-circle-outline"
+      />
     );
+
   return null;
 };
 
@@ -385,5 +291,6 @@ export {
   PendingChip,
   RecurrenceChip,
   SaveProgressChip,
+  StatusChip,
   TimeLeftChip
 };

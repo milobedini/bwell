@@ -1,16 +1,15 @@
-import { View } from 'react-native';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useViewTherapistOutstandingAssignments } from '@/hooks/useAssignments';
 
 import ContentContainer from '../ContentContainer';
 import ErrorComponent, { ErrorTypes } from '../ErrorComponent';
 import { LoadingIndicator } from '../LoadingScreen';
-import { PrimaryButton } from '../ThemedButton';
-import { ThemedText } from '../ThemedText';
+import EmptyState from '../ui/EmptyState';
 
 import AssignmentsListTherapist from './AssignmentsListTherapist';
 
 const TherapistActiveAssignments = () => {
+  const router = useRouter();
   const { data, isPending, isError } = useViewTherapistOutstandingAssignments();
 
   if (isPending) return <LoadingIndicator marginBottom={0} />;
@@ -20,12 +19,14 @@ const TherapistActiveAssignments = () => {
   return (
     <ContentContainer>
       {!data.length && (
-        <View>
-          <ThemedText className="mt-2 px-4 text-center">You have no active assignments currently...</ThemedText>
-          <Link asChild href={{ pathname: '/assignments/add', params: { headerTitle: 'Create Assignment' } }} push>
-            <PrimaryButton title="Create assignment" logo />
-          </Link>
-        </View>
+        <EmptyState
+          icon="clipboard-text-outline"
+          title="No active assignments"
+          action={{
+            label: 'Create assignment',
+            onPress: () => router.push({ pathname: '/assignments/add', params: { headerTitle: 'Create Assignment' } })
+          }}
+        />
       )}
       <AssignmentsListTherapist data={data} />
     </ContentContainer>

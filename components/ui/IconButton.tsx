@@ -8,12 +8,17 @@ type IconButtonProps = PressableProps &
     color?: string | OpaqueColorValue;
   };
 
-const IconButton = ({ onPress, className, color, ...iconProps }: IconButtonProps) => {
-  return (
-    <Pressable onPress={onPress} className={className}>
-      <IconSymbol color={color || Colors.sway.bright} {...iconProps} />
-    </Pressable>
-  );
-};
+const IconButton = ({ onPress, className, color, disabled, ...iconProps }: IconButtonProps) => (
+  <Pressable
+    onPress={onPress}
+    className={className}
+    disabled={disabled}
+    style={({ pressed }) => ({ opacity: disabled ? 0.4 : pressed ? 0.7 : 1 })}
+    accessibilityRole="button"
+    accessibilityState={{ disabled: !!disabled }}
+  >
+    <IconSymbol color={color || Colors.sway.bright} {...iconProps} />
+  </Pressable>
+);
 
 export default IconButton;
