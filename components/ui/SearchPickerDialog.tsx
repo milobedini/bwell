@@ -3,6 +3,7 @@ import { FlatList, View } from 'react-native';
 import { Dialog, Divider, IconButton, List, Portal, TextInput } from 'react-native-paper';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import { ThemedText } from '@/components/ThemedText';
+import EmptyState from '@/components/ui/EmptyState';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import usePickerConstants from '@/utils/usePickerConstants';
@@ -120,7 +121,7 @@ export default function SearchPickerDialog<T extends BaseItem>({
         {!isPending && !isError && (
           <Dialog.ScrollArea style={{ height: '100%' }}>
             {filtered.length === 0 ? (
-              <List.Item title="No results" />
+              <EmptyState icon="magnify" title="No results" />
             ) : (
               <FlatList
                 data={filtered}

@@ -13,6 +13,7 @@ import ErrorComponent, { ErrorTypes } from '../ErrorComponent';
 import { LoadingIndicator } from '../LoadingScreen';
 import { ThemedText } from '../ThemedText';
 import { DateChip } from '../ui/Chip';
+import EmptyState from '../ui/EmptyState';
 
 const PatientAttempts = () => {
   const router = useRouter();
@@ -75,9 +76,7 @@ const PatientAttempts = () => {
         />
       </View>
       {!attempts?.length ? (
-        <View>
-          <ThemedText>No {view} attempts</ThemedText>
-        </View>
+        <EmptyState icon="file-document-outline" title={`No ${view} attempts`} />
       ) : (
         <FlatList
           data={attempts}
