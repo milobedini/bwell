@@ -1,4 +1,23 @@
+import { Colors } from '@/constants/Colors';
 import { SLOT_END_HOUR, SLOT_START_HOUR, SLOT_STEP_HOURS } from '@milobedini/shared-types';
+
+export const REFLECTION_PROMPTS = [
+  'Try to notice which activities lifted your mood — even small things count.',
+  "Rate achievement based on effort, not outcome — doing something difficult counts even if it didn't go perfectly.",
+  'Closeness includes any feeling of connection — a text, a smile from a stranger, time with a pet.',
+  'There are no wrong answers. Just record what you actually did and how it felt.',
+  "If you can't remember exactly, your best guess is good enough.",
+  "Notice if certain times of day tend to feel better or worse — that's useful information.",
+  'Enjoyment can be subtle — a warm drink, a song you like, a moment of quiet.',
+  "It's okay to leave slots blank if you were asleep or can't recall. Fill in what you can."
+] as const;
+
+export const moodColor = (mood?: number): string | undefined => {
+  if (mood == null) return undefined;
+  if (mood >= 60) return Colors.diary.moodWarm;
+  if (mood <= 40) return Colors.diary.moodCool;
+  return undefined;
+};
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
@@ -43,5 +62,12 @@ function buildDaySlots(baseIso: string): { key: SlotKey; value: SlotValue }[] {
   }
   return rows;
 }
+
+export const isSlotFilled = (v: SlotValue): boolean =>
+  (v.activity && v.activity.trim().length > 0) ||
+  v.mood != null ||
+  v.achievement != null ||
+  v.closeness != null ||
+  v.enjoyment != null;
 
 export { buildDaySlots, dateISO, dayLabel, type SlotKey, slotLabel, type SlotValue, startOfMonday };
