@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
-import { Button, Chip, Dialog, Portal, SegmentedButtons, TextInput } from 'react-native-paper';
+import { Button, Dialog, Portal, SegmentedButtons, TextInput } from 'react-native-paper';
 import Constants from 'expo-constants';
 import SelectField from '@/components/ui/SelectField';
-import { Colors } from '@/constants/Colors';
 import { clamp } from '@/utils/helpers';
 
 import { ThemedText } from '../ThemedText';
+
+import { SelectableChip } from './Chip';
 
 export type AssignmentRecurrence = {
   freq: 'weekly' | 'monthly' | 'none';
@@ -133,21 +134,7 @@ const RecurrenceField = ({ value, onChange, label = 'Recurrence' }: RecurrenceFi
                   </ThemedText>
                   <View className="flex-row flex-wrap gap-2">
                     {suggested.map((n) => (
-                      <Chip
-                        key={n}
-                        selected={interval === n}
-                        showSelectedCheck={false}
-                        onPress={() => pickInterval(n)}
-                        style={
-                          interval === n
-                            ? {
-                                backgroundColor: Colors.sway.bright
-                              }
-                            : {}
-                        }
-                      >
-                        {n}
-                      </Chip>
+                      <SelectableChip key={n} label={n} selected={interval === n} onPress={() => pickInterval(n)} />
                     ))}
                   </View>
                   <View className="mt-2">
