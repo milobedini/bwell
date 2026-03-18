@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { View } from 'react-native';
-import { Card, Chip } from 'react-native-paper';
+import { Card } from 'react-native-paper';
 import { ThemedText } from '@/components/ThemedText';
+import { SelectableChip } from '@/components/ui/Chip';
 import { Colors } from '@/constants/Colors';
-import { Fonts } from '@/constants/Typography';
 import type { AttemptDetailItem } from '@milobedini/shared-types';
 
 type QuestionSlideProps = {
@@ -30,31 +30,18 @@ const QuestionSlide = ({ mode, question, onPick, colors }: QuestionSlideProps) =
       choices.map((c, idx) => {
         const selectedPill = selected === idx;
         return (
-          <Chip
+          <SelectableChip
             key={`${question.questionId}-${idx}`}
-            mode={selectedPill ? 'flat' : 'outlined'}
-            selected={!!selectedPill}
+            label={c.text}
+            selected={selectedPill}
             disabled={disabled}
-            showSelectedCheck={false}
-            compact
-            style={{
-              backgroundColor: selectedPill ? colors?.accent : colors?.card,
-              borderColor: selectedPill ? colors?.accent : Colors.chip.darkCardAlt,
-              marginRight: 8,
-              marginBottom: 8
-            }}
-            textStyle={{
-              color: selectedPill ? Colors.chip.darkCardDeep : colors?.textOnDark,
-              fontFamily: selectedPill ? Fonts.Bold : Fonts.Regular,
-              fontSize: 14
-            }}
-            onPress={() => {
-              if (disabled) return;
-              onPick?.(question, { score: c.score, index: idx, text: c.text });
-            }}
-          >
-            {c.text}
-          </Chip>
+            onPress={() => onPick?.(question, { score: c.score, index: idx, text: c.text })}
+            selectedBg={colors?.accent}
+            unselectedBg={colors?.card}
+            selectedTextColor={Colors.chip.darkCardDeep}
+            unselectedTextColor={colors?.textOnDark}
+            className="mb-2 mr-2 self-start"
+          />
         );
       }),
     [choices, colors?.accent, colors?.card, colors?.textOnDark, disabled, onPick, question, selected]

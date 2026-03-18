@@ -8,13 +8,13 @@ import {
   View,
   ViewToken
 } from 'react-native';
-import { Card, Chip, Divider, ProgressBar } from 'react-native-paper';
+import { Card, Divider, ProgressBar } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { PrimaryButton } from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import { renderErrorToast, renderSuccessToast } from '@/components/toast/toastOptions';
-import { SaveProgressChip } from '@/components/ui/Chip';
+import { SaveProgressChip, StatusChip } from '@/components/ui/Chip';
 import { Colors } from '@/constants/Colors';
 import { useSaveModuleAttempt, useSubmitAttempt } from '@/hooks/useAttempts';
 import type {
@@ -138,15 +138,14 @@ export default function QuestionnairePresenter({ attempt, detail, mode, patientN
 
   const bandChip = useMemo(() => {
     if (mode !== 'view' || totalScore == null) return null;
+    const scoreText = typeof totalScore === 'number' ? ` \u2022 Score: ${totalScore}` : '';
     return (
-      <Chip
-        mode="flat"
-        elevated
-        style={{ backgroundColor: Colors.primary.accent }}
-        textStyle={{ color: Colors.sway.dark }}
-      >
-        {scoreBandLabel ?? band?.label ?? '–'} {typeof totalScore === 'number' ? `• Score: ${totalScore}` : ''}
-      </Chip>
+      <StatusChip
+        label={`${scoreBandLabel ?? band?.label ?? '\u2013'}${scoreText}`}
+        color={Colors.sway.dark}
+        borderColor={Colors.primary.accent}
+        backgroundColor={Colors.primary.accent}
+      />
     );
   }, [band?.label, mode, scoreBandLabel, totalScore]);
 
@@ -201,18 +200,30 @@ export default function QuestionnairePresenter({ attempt, detail, mode, patientN
         <View className="flex-row flex-wrap items-center gap-2">
           {bandChip}
           {mode === 'view' ? (
-            <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
-              Completed {new Date(completedAt ?? '').toLocaleDateString()}
-            </Chip>
+            <StatusChip
+              label={`Completed ${new Date(completedAt ?? '').toLocaleDateString()}`}
+              color="white"
+              borderColor={Colors.chip.darkCard}
+              backgroundColor={Colors.chip.darkCard}
+              icon="check-circle-outline"
+            />
           ) : (
-            <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
-              In progress {startedAt ? `• ${new Date(startedAt).toLocaleDateString()}` : ''}
-            </Chip>
+            <StatusChip
+              label={`In progress${startedAt ? ` \u2022 ${new Date(startedAt).toLocaleDateString()}` : ''}`}
+              color="white"
+              borderColor={Colors.chip.darkCard}
+              backgroundColor={Colors.chip.darkCard}
+              icon="progress-clock"
+            />
           )}
           {durationText ? (
-            <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
-              Duration {durationText}
-            </Chip>
+            <StatusChip
+              label={`Duration ${durationText}`}
+              color="white"
+              borderColor={Colors.chip.darkCard}
+              backgroundColor={Colors.chip.darkCard}
+              icon="clock-outline"
+            />
           ) : null}
         </View>
         {userNote ? (
