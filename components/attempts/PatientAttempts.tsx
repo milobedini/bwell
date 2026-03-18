@@ -1,15 +1,14 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FlatList, TouchableOpacity } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
 import { clsx } from 'clsx';
-import { Link } from 'expo-router';
+import { Link, useFocusEffect } from 'expo-router';
 import { View } from 'moti';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useGetMyAttempts } from '@/hooks/useAttempts';
 import { AttemptStatusInput } from '@/types/types';
 
-import Container from '../Container';
 import ErrorComponent, { ErrorTypes } from '../ErrorComponent';
 import { LoadingIndicator } from '../LoadingScreen';
 import { ThemedText } from '../ThemedText';
@@ -17,6 +16,13 @@ import { DateChip } from '../ui/Chip';
 
 const PatientAttempts = () => {
   const [view, setView] = useState<AttemptStatusInput>(AttemptStatusInput.ACTIVE);
+
+  useFocusEffect(
+    useCallback(() => {
+      setView(AttemptStatusInput.ACTIVE);
+    }, [])
+  );
+
   const { data, isPending, isError } = useGetMyAttempts({ status: view });
   const attempts = data?.attempts;
 
@@ -26,7 +32,7 @@ const PatientAttempts = () => {
   if (!data) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
-    <Container>
+    <View className="flex-1">
       <View className="mb-4 px-4">
         <SegmentedButtons
           value={view}
@@ -95,7 +101,7 @@ const PatientAttempts = () => {
           }}
         ></FlatList>
       )}
-    </Container>
+    </View>
   );
 };
 
