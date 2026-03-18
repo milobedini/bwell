@@ -8,13 +8,13 @@ import {
   ScrollView,
   View
 } from 'react-native';
-import { Card, Chip, TextInput } from 'react-native-paper';
+import { Card, TextInput } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { PrimaryButton } from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import { renderErrorToast, renderSuccessToast } from '@/components/toast/toastOptions';
-import { SaveProgressChip } from '@/components/ui/Chip';
+import { SaveProgressChip, StatusChip } from '@/components/ui/Chip';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useSaveModuleAttempt, useSubmitAttempt } from '@/hooks/useAttempts';
@@ -308,29 +308,43 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
               {patientName && <ThemedText type="subtitle">{`by ${patientName}`}</ThemedText>}
 
               <View className="flex-row flex-wrap items-center gap-2">
-                <Chip
-                  style={{ backgroundColor: Colors.sway.bright }}
-                  textStyle={{ color: Colors.sway.dark, fontFamily: Fonts.Bold }}
-                >
-                  {`${Math.round(progress * 100)}%`}
-                </Chip>
+                <StatusChip
+                  label={`${Math.round(progress * 100)}%`}
+                  color={Colors.sway.dark}
+                  borderColor={Colors.sway.bright}
+                  backgroundColor={Colors.sway.bright}
+                />
                 {mode === 'view' ? (
-                  <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
-                    {completedAt
-                      ? `Completed ${new Date(completedAt).toLocaleDateString()}`
-                      : `Last Update ${new Date(updatedAt).toLocaleDateString()}`}
-                  </Chip>
+                  <StatusChip
+                    label={
+                      completedAt
+                        ? `Completed ${new Date(completedAt).toLocaleDateString()}`
+                        : `Last Update ${new Date(updatedAt).toLocaleDateString()}`
+                    }
+                    color="white"
+                    borderColor={Colors.chip.darkCard}
+                    backgroundColor={Colors.chip.darkCard}
+                    icon={completedAt ? 'check-circle-outline' : 'calendar'}
+                  />
                 ) : (
                   <>
                     {startedAt && !dirtyKeys.size && (
-                      <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
-                        {`Started ${new Date(startedAt).toLocaleDateString()}`}
-                      </Chip>
+                      <StatusChip
+                        label={`Started ${new Date(startedAt).toLocaleDateString()}`}
+                        color="white"
+                        borderColor={Colors.chip.darkCard}
+                        backgroundColor={Colors.chip.darkCard}
+                        icon="calendar"
+                      />
                     )}
                     {updatedAt && (
-                      <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
-                        {`Updated ${new Date(updatedAt).toLocaleDateString()}`}
-                      </Chip>
+                      <StatusChip
+                        label={`Updated ${new Date(updatedAt).toLocaleDateString()}`}
+                        color="white"
+                        borderColor={Colors.chip.darkCard}
+                        backgroundColor={Colors.chip.darkCard}
+                        icon="calendar"
+                      />
                     )}
                   </>
                 )}
@@ -346,19 +360,26 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                   </Pressable>
                 ) : null}
                 {(!!dirtyKeys.size || noteDirty) && (
-                  <Chip
-                    icon={() => <MaterialCommunityIcons name="content-save" size={24} color={Colors.chip.green} />}
-                    mode="outlined"
-                    textStyle={{ fontFamily: Fonts.Black, color: Colors.chip.green }}
-                    style={{
-                      backgroundColor: Colors.sway.buttonBackground,
-                      borderColor: Colors.chip.greenBorder
-                    }}
-                    disabled={!dirtyKeys.size && !noteDirty}
+                  <Pressable
                     onPress={saveDirty}
+                    disabled={!dirtyKeys.size && !noteDirty}
+                    accessibilityRole="button"
+                    accessibilityLabel="Save changes"
+                    className="flex-row items-center gap-1 self-start rounded-2xl border px-3 py-1.5"
+                    style={({ pressed, hovered }) => ({
+                      backgroundColor: Colors.sway.buttonBackground,
+                      borderColor: Colors.chip.greenBorder,
+                      opacity: !dirtyKeys.size && !noteDirty ? 0.5 : pressed || hovered ? 0.8 : 1
+                    })}
                   >
-                    {dirtyKeys.size || noteDirty ? 'Save changes' : 'Saved'}
-                  </Chip>
+                    <MaterialCommunityIcons name="content-save" size={16} color={Colors.chip.green} />
+                    <ThemedText
+                      type="small"
+                      style={{ color: Colors.chip.green, fontFamily: Fonts.Black, fontSize: 12, lineHeight: 16 }}
+                    >
+                      {dirtyKeys.size || noteDirty ? 'Save changes' : 'Saved'}
+                    </ThemedText>
+                  </Pressable>
                 )}
               </View>
 
