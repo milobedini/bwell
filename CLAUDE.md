@@ -71,7 +71,6 @@ The app has three tiers (from `docs/proposal.pdf`):
 
 ## Git Workflow
 
-- Solo developer — commit and push directly to `main`
 - Use conventional commits, keep messages concise
 - Never include AI co-author references in commit messages
 - Before staging, run `npx prettier --write .` to format all files — husky pre-commit hooks check this
