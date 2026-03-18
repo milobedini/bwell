@@ -23,7 +23,7 @@ const ThemedButton = (props: ThemedButtonProps) => {
     <Pressable
       disabled={disabled}
       className={clsx(
-        'rounded-md p-4',
+        'rounded-md p-4 hover:opacity-80',
         disabled && 'bg-sway-darkGrey',
         compact && 'w-[200] px-3 py-2',
         variant === 'error' && 'bg-error',
@@ -49,7 +49,7 @@ const PrimaryButton = ({ onPress, title, logo, className, textClasses, logoClass
     onPress={onPress}
     className={clsx(
       'w-[300] flex-row items-center justify-evenly self-center rounded-lg border',
-      !variant && 'border-sway-bright bg-sway-buttonBackground',
+      !variant && 'border-sway-bright bg-sway-buttonBackground hover:border-sway-lightGrey',
       variant === 'error' && 'bg-error text-black',
       className
     )}
@@ -74,7 +74,7 @@ const PrimaryButton = ({ onPress, title, logo, className, textClasses, logoClass
 const SecondaryButton = ({ onPress, title, children }: ThemedButtonProps) => (
   <Pressable
     onPress={onPress}
-    className="my-2.5 w-full rounded-xl bg-sway-buttonBackground p-3"
+    className="my-2.5 w-full rounded-xl bg-sway-buttonBackground p-3 hover:bg-sway-buttonBackgroundSolid"
     accessibilityRole="button"
   >
     {({ pressed }) => (
