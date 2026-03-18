@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, ListRenderItemInfo, Platform, ScrollView, View } from 'react-native';
-import { Card, Chip, Divider, ProgressBar, TextInput } from 'react-native-paper';
+import {
+  FlatList,
+  KeyboardAvoidingView,
+  ListRenderItemInfo,
+  Platform,
+  Pressable,
+  ScrollView,
+  View
+} from 'react-native';
+import { Card, Chip, TextInput } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { PrimaryButton } from '@/components/ThemedButton';
@@ -54,6 +62,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
 
   const [userNoteText, setUserNoteText] = useState(attempt.userNote ?? '');
   const [noteDirty, setNoteDirty] = useState(false);
+  const [disclaimerOpen, setDisclaimerOpen] = useState(false);
 
   const markDirty = useCallback((k: SlotKey) => {
     setDirtyKeys((prev) => {
@@ -296,16 +305,15 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
           <View>
             {/* Sticky header region */}
             <View className="z-20 gap-1 bg-sway-dark px-4 pt-1">
-              {patientName && <ThemedText type="subtitle">{patientName && `by ${patientName}`}</ThemedText>}
-
-              {moduleSnapshot?.disclaimer ? <ThemedText>{moduleSnapshot.disclaimer}</ThemedText> : null}
-
-              <View className="gap-1">
-                <ProgressBar progress={progress} color={Colors.sway.bright} />
-                <ThemedText>{Math.round(progress * 100)}%</ThemedText>
-              </View>
+              {patientName && <ThemedText type="subtitle">{`by ${patientName}`}</ThemedText>}
 
               <View className="flex-row flex-wrap items-center gap-2">
+                <Chip
+                  style={{ backgroundColor: Colors.sway.bright }}
+                  textStyle={{ color: Colors.sway.dark, fontFamily: Fonts.Bold }}
+                >
+                  {`${Math.round(progress * 100)}%`}
+                </Chip>
                 {mode === 'view' ? (
                   <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
                     {completedAt
@@ -327,6 +335,16 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                   </>
                 )}
                 <SaveProgressChip saved={saved} isSaving={isSaving} />
+                {moduleSnapshot?.disclaimer ? (
+                  <Pressable
+                    onPress={() => setDisclaimerOpen((prev) => !prev)}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel="Safety information"
+                  >
+                    <MaterialCommunityIcons name="information-outline" size={20} color={Colors.sway.lightGrey} />
+                  </Pressable>
+                ) : null}
                 {(!!dirtyKeys.size || noteDirty) && (
                   <Chip
                     icon={() => <MaterialCommunityIcons name="content-save" size={24} color={Colors.chip.green} />}
@@ -334,9 +352,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                     textStyle={{ fontFamily: Fonts.Black, color: Colors.chip.green }}
                     style={{
                       backgroundColor: Colors.sway.buttonBackground,
-                      borderColor: Colors.chip.greenBorder,
-                      alignSelf: 'center',
-                      marginTop: 8
+                      borderColor: Colors.chip.greenBorder
                     }}
                     disabled={!dirtyKeys.size && !noteDirty}
                     onPress={saveDirty}
@@ -345,6 +361,12 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                   </Chip>
                 )}
               </View>
+
+              {disclaimerOpen && moduleSnapshot?.disclaimer ? (
+                <ThemedText style={{ fontSize: 12, color: Colors.sway.darkGrey, marginTop: 4 }}>
+                  {moduleSnapshot.disclaimer}
+                </ThemedText>
+              ) : null}
 
               {userNote ? (
                 <Card style={{ backgroundColor: Colors.sway.buttonBackground }}>
@@ -356,7 +378,6 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                   </Card.Content>
                 </Card>
               ) : null}
-              <Divider className="my-2" bold />
 
               {canEdit && <ReflectionPrompt prompt={reflectionPrompt} />}
 
@@ -389,9 +410,11 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
           <View>
             {canEdit && (
               <View style={{ marginBottom: 12, marginHorizontal: 8 }}>
+                <ThemedText style={{ fontSize: 12, color: Colors.sway.darkGrey, marginBottom: 4 }}>
+                  Therapist note
+                </ThemedText>
                 <TextInput
-                  mode="outlined"
-                  label="Note for your therapist"
+                  mode="flat"
                   placeholder="Anything you'd like your therapist to know this week..."
                   placeholderTextColor={Colors.sway.darkGrey}
                   value={userNoteText}
@@ -402,10 +425,11 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                   multiline
                   maxLength={500}
                   style={{ backgroundColor: 'transparent', minHeight: 64 }}
+                  className="border border-sway-darkGrey"
                   textColor="white"
-                  outlineColor={Colors.sway.darkGrey}
-                  activeOutlineColor={Colors.sway.bright}
-                  theme={{ colors: { onSurfaceVariant: Colors.sway.lightGrey } }}
+                  underlineColor="transparent"
+                  activeUnderlineColor="transparent"
+                  theme={{ colors: { onSurfaceVariant: Colors.sway.darkGrey } }}
                 />
               </View>
             )}
