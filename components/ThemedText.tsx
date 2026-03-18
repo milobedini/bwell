@@ -35,27 +35,27 @@ const styleMap: Record<TextType, TextStyle> = StyleSheet.create({
     color: Colors.sway.white
   },
   title: {
-    fontSize: Platform.select({ ios: 32, android: 32, default: 70 }),
-    lineHeight: Platform.select({ ios: 36, android: 36, default: 72 }),
+    fontSize: Platform.select({ ios: 32, android: 32, default: 36 }),
+    lineHeight: Platform.select({ ios: 36, android: 36, default: 40 }),
     fontFamily: Fonts.Bold,
     marginBottom: 6,
     color: Colors.sway.white
   },
   subtitle: {
-    fontSize: Platform.select({ ios: 24, android: 24, default: 50 }),
-    lineHeight: Platform.select({ ios: 24, android: 24, default: 50 }),
+    fontSize: Platform.select({ ios: 24, android: 24, default: 28 }),
+    lineHeight: Platform.select({ ios: 24, android: 24, default: 32 }),
     fontFamily: Fonts.Black,
     color: Colors.sway.white
   },
   smallTitle: {
-    fontSize: Platform.select({ ios: 20, android: 20, default: 30 }),
-    lineHeight: Platform.select({ ios: 20, android: 20, default: 30 }),
+    fontSize: Platform.select({ ios: 20, android: 20, default: 22 }),
+    lineHeight: Platform.select({ ios: 20, android: 20, default: 24 }),
     fontFamily: Fonts.Black,
     color: Colors.sway.white
   },
   link: {
-    fontSize: Platform.select({ ios: 13, android: 13, default: 15 }),
-    lineHeight: Platform.select({ ios: 16, android: 16, default: 18 }),
+    fontSize: Platform.select({ ios: 13, android: 13, default: 14 }),
+    lineHeight: Platform.select({ ios: 16, android: 16, default: 16 }),
     fontFamily: Fonts.Regular,
     textTransform: 'uppercase'
   },
@@ -72,7 +72,7 @@ const styleMap: Record<TextType, TextStyle> = StyleSheet.create({
     color: Colors.sway.white
   },
   italic: {
-    fontSize: Platform.select({ ios: 18, android: 18, default: 20 }),
+    fontSize: Platform.select({ ios: 18, android: 18, default: 18 }),
     lineHeight: Platform.select({ ios: 24, android: 24, default: 24 }),
     fontFamily: Fonts.Italic,
     color: Colors.sway.white
