@@ -1,12 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Dimensions, KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
-import { Button, Chip, Divider, IconButton, Portal, Surface, TextInput } from 'react-native-paper';
+import {
+  Animated,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+  View
+} from 'react-native';
+import { Button, Divider, IconButton, Portal, Surface, TextInput } from 'react-native-paper';
 import Constants from 'expo-constants';
 import { Colors } from '@/constants/Colors';
 import { DEFAULT_FILTERS, type FilterDrawerValues } from '@/constants/Filters';
 import { clamp } from '@/utils/helpers';
 
 import { ThemedText } from '../ThemedText';
+
+import { SelectableChip } from './Chip';
 
 export type DrawerStatusOption = 'submitted' | 'active' | 'started' | 'abandoned' | 'all';
 
@@ -22,9 +32,6 @@ export type FilterDrawerProps = {
   title?: string;
 };
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const DRAWER_WIDTH = Math.min(420, Math.floor(SCREEN_WIDTH * 0.9));
-
 export const FilterDrawer = ({
   visible,
   onDismiss,
@@ -35,9 +42,11 @@ export const FilterDrawer = ({
   moduleChoices,
   title = 'Filters'
 }: FilterDrawerProps) => {
+  const { width: screenWidth } = useWindowDimensions();
+  const drawerWidth = Math.min(420, Math.floor(screenWidth * 0.9));
   const [local, setLocal] = useState<FilterDrawerValues>(values);
   const [limitText, setLimitText] = useState(values.limit?.toString() ?? '');
-  const translateX = useRef(new Animated.Value(DRAWER_WIDTH)).current;
+  const translateX = useRef(new Animated.Value(drawerWidth)).current;
 
   useEffect(() => {
     // sync external changes when drawer opens with fresh defaults
@@ -49,11 +58,11 @@ export const FilterDrawer = ({
 
   useEffect(() => {
     Animated.timing(translateX, {
-      toValue: visible ? 0 : DRAWER_WIDTH,
+      toValue: visible ? 0 : drawerWidth,
       duration: 220,
       useNativeDriver: true
     }).start();
-  }, [visible, translateX]);
+  }, [visible, translateX, drawerWidth]);
 
   const setStatus = (s: DrawerStatusOption) => {
     setLocal((prev) => {
@@ -94,7 +103,7 @@ export const FilterDrawer = ({
         style={StyleSheet.absoluteFill}
       >
         <Animated.View
-          style={[styles.drawerContainer, { width: DRAWER_WIDTH, transform: [{ translateX }] }]}
+          style={[styles.drawerContainer, { width: drawerWidth, transform: [{ translateX }] }]}
           pointerEvents={visible ? 'auto' : 'none'}
         >
           <Surface elevation={3} style={styles.surface}>
@@ -113,11 +122,7 @@ export const FilterDrawer = ({
               <View style={styles.rowWrap}>
                 {statusOptions.map((opt) => {
                   const selected = (local.status ?? []).includes(opt);
-                  return (
-                    <Chip key={opt} selected={selected} onPress={() => setStatus(opt)} style={styles.chip}>
-                      {opt}
-                    </Chip>
-                  );
+                  return <SelectableChip key={opt} label={opt} selected={selected} onPress={() => setStatus(opt)} />;
                 })}
               </View>
             </View>
@@ -129,22 +134,18 @@ export const FilterDrawer = ({
               </ThemedText>
               {moduleChoices?.length ? (
                 <View style={styles.rowWrap}>
-                  <Chip
+                  <SelectableChip
+                    label="Any"
                     selected={!local.moduleId}
                     onPress={() => setLocal((prev) => ({ ...prev, moduleId: undefined }))}
-                    style={styles.chip}
-                  >
-                    Any
-                  </Chip>
+                  />
                   {moduleChoices.map((m) => (
-                    <Chip
+                    <SelectableChip
                       key={m.id}
+                      label={m.title}
                       selected={local.moduleId === m.id}
                       onPress={() => setLocal((prev) => ({ ...prev, moduleId: m.id }))}
-                      style={styles.chip}
-                    >
-                      {m.title}
-                    </Chip>
+                    />
                   ))}
                 </View>
               ) : (
@@ -227,7 +228,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 8
   },
-  chip: { marginRight: 4 },
   helper: { opacity: 0.6, marginTop: 4 },
   footer: {
     flexDirection: 'row',
