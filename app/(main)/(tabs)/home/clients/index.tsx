@@ -1,12 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FlatList, TouchableOpacity, View } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import ModulePicker from '@/components/module/ModulePicker';
-import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
+import EmptyState from '@/components/ui/EmptyState';
 import FabGroup from '@/components/ui/fab/FabGroup';
 import FabTrigger from '@/components/ui/fab/FabTrigger';
 import useGetFabOptions, { FabOptionsVariant } from '@/components/ui/fab/useGetFabOptions';
@@ -14,6 +14,7 @@ import { useClients } from '@/hooks/useUsers';
 import type { AuthUser } from '@milobedini/shared-types';
 
 const AllClients = () => {
+  const router = useRouter();
   const { data: clients, isPending, isError } = useClients();
 
   const [openFab, setOpenFab] = useState(false);
@@ -43,12 +44,11 @@ const AllClients = () => {
   if (!clients.length)
     return (
       <ContentContainer>
-        <ContentContainer className="mt-4 gap-4">
-          <ThemedText type="subtitle">You have no clients (yet!)</ThemedText>
-          <Link asChild href={'/home/patients'}>
-            <ThemedButton>View all patients</ThemedButton>
-          </Link>
-        </ContentContainer>
+        <EmptyState
+          icon="account-group-outline"
+          title="No clients yet"
+          action={{ label: 'View all patients', onPress: () => router.push('/home/patients') }}
+        />
       </ContentContainer>
     );
 

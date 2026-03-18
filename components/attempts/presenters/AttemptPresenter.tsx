@@ -1,5 +1,6 @@
+import { useRouter } from 'expo-router';
 import Container from '@/components/Container';
-import { ThemedText } from '@/components/ThemedText';
+import EmptyState from '@/components/ui/EmptyState';
 import { isDiaryAttempt, isQuestionnaireAttempt } from '@/utils/types';
 import { AttemptDetailResponseItem } from '@milobedini/shared-types';
 
@@ -13,6 +14,8 @@ export type AttemptPresenterProps = {
 };
 
 const AttemptPresenter = ({ attempt, mode, patientName }: AttemptPresenterProps) => {
+  const router = useRouter();
+
   if (attempt.moduleType === 'questionnaire' && isQuestionnaireAttempt(attempt) && attempt.detail) {
     return <QuestionnairePresenter attempt={attempt} mode={mode} patientName={patientName} detail={attempt.detail} />;
   }
@@ -24,7 +27,11 @@ const AttemptPresenter = ({ attempt, mode, patientName }: AttemptPresenterProps)
   // TODO: add presenters for 'psychoeducation' and 'exercise'
   return (
     <Container>
-      <ThemedText className="px-4">No module type attempt presenter yet</ThemedText>
+      <EmptyState
+        icon="puzzle-outline"
+        title="Not available yet"
+        action={{ label: 'Go back', onPress: () => router.back() }}
+      />
     </Container>
   );
 };
