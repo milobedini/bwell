@@ -125,7 +125,7 @@ From the dev server, press **i** for iOS simulator, **a** for Android emulator, 
 ## Architecture
 
 - **Auth** is cookie-based (`withCredentials: true`). A 401 interceptor auto-clears the Zustand auth store and redirects to login.
-- **Query defaults** (1-hour stale time, no refetch on mount/focus) are centralized in the root layout. Individual hooks override only when fresher data is needed.
+- **Query defaults** (1-hour stale time, refetch on window-focus and reconnect disabled) are centralized in the root layout. Individual hooks override only when fresher data is needed.
 - **Route protection** lives in the `(main)/_layout.tsx` guard. Role-based tab visibility uses expo-router's `href: null` pattern to hide tabs per role.
 - **Shared types** are published as an npm package (`@milobedini/shared-types`) to keep the frontend and backend in sync.
 
