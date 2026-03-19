@@ -1,0 +1,5 @@
+- Adding patient as client from all patients, then returning to clients screen, not there.
+- Large gap above client timeline, below toollbar/header.
+- When we have alternating row backgrounds, the horizontal width is not the full screen, as it is using some container padding from somewhere, and thus it looks off. Admin -> All Users looks ideal.
+- Assignments list (active), there is a text percentage indicator that is just text, not in a status chip. And when saved, and then return to list, not updated, although it is in the detail.
+- Add therapist note not working and looks bad. The input should simply resemble the rest of the activity text inputs for consistency.

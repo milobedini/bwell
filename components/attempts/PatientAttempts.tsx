@@ -45,7 +45,7 @@ const PatientAttempts = () => {
 
   return (
     <View className="flex-1">
-      <View className="mb-4">
+      <View className="mb-4 px-4">
         <SegmentedButtons
           value={view}
           onValueChange={(v) => setView(v as AttemptStatusInput)}

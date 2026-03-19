@@ -8,7 +8,7 @@ const AttemptsList = () => {
   const user = useAuthStore((s) => s.user);
 
   return (
-    <ContentContainer>
+    <ContentContainer padded={false}>
       {isTherapist(user?.roles) && <TherapistLatestAttempts />}
       {isPatient(user?.roles) && <PatientAttempts />}
     </ContentContainer>
