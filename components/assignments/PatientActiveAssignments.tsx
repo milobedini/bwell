@@ -16,7 +16,7 @@ const PatientActiveAssignments = () => {
   if (!data) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
-    <ContentContainer>
+    <ContentContainer padded={false}>
       {!!data.length ? (
         <AssignmentsListPatient data={data} />
       ) : (

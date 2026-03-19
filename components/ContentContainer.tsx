@@ -5,11 +5,12 @@ import { clsx } from 'clsx';
 // For headerless screens, use Container instead.
 type ContentContainerProps = ViewProps & {
   centered?: boolean;
+  padded?: boolean;
 };
 
-const ContentContainer = ({ children, className, centered, ...rest }: ContentContainerProps) => {
+const ContentContainer = ({ children, className, centered, padded = true, ...rest }: ContentContainerProps) => {
   return (
-    <View className={clsx('flex-1 bg-sway-dark px-4', centered && 'items-center', className)} {...rest}>
+    <View className={clsx('flex-1 bg-sway-dark', padded && 'px-4', centered && 'items-center', className)} {...rest}>
       {children}
     </View>
   );
