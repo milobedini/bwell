@@ -11,7 +11,6 @@ import type { MyAssignmentView } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
 import { ThemedText } from '../ThemedText';
-import { renderErrorToast, renderSuccessToast } from '../toast/toastOptions';
 import { DueChip, RecurrenceChip, TimeLeftChip } from '../ui/Chip';
 import FabTrigger from '../ui/fab/FabTrigger';
 
@@ -31,9 +30,7 @@ const AssignmentsListTherapist = ({ data }: AssignmentsListTherapistProps) => {
       removeAssignment(
         { assignmentId: id },
         {
-          onError: (err) => renderErrorToast(err),
-          onSuccess: (res) => {
-            renderSuccessToast(res?.message || '');
+          onSuccess: () => {
             closeMenu();
           }
         }

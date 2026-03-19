@@ -10,7 +10,6 @@ import { MyAssignmentView } from '@milobedini/shared-types';
 
 import ThemedButton from '../ThemedButton';
 import { ThemedText } from '../ThemedText';
-import { renderErrorToast } from '../toast/toastOptions';
 import { AssignmentStatusChip, DueChip, RecurrenceChip, StatusChip, TimeLeftChip } from '../ui/Chip';
 
 type AssignmentsListPatientProps = {
@@ -34,10 +33,7 @@ const AssignmentsListPatient = ({ data, completed }: AssignmentsListPatientProps
                 id: res.attempt._id,
                 assignmentId: assignment._id
               }
-            }),
-          onError: (err) => {
-            renderErrorToast(err);
-          }
+            })
         }
       );
     },

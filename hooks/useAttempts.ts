@@ -13,8 +13,9 @@ import type {
   TherapistLatestResponse,
   TherapistLatestRow
 } from '@milobedini/shared-types';
-import { type InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type InfiniteData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { useMutationWithToast } from './useMutationWithToast';
 import { useIsLoggedIn } from './useUsers';
 
 // QUERIES
@@ -163,7 +164,7 @@ export const useStartModuleAttempt = () => {
   const qc = useQueryClient();
   type StartAttemptInput = { moduleId: string; assignmentId?: string };
 
-  return useMutation<StartAttemptResponse, AxiosError, StartAttemptInput>({
+  return useMutationWithToast<StartAttemptResponse, AxiosError, StartAttemptInput>({
     mutationFn: async ({ moduleId, assignmentId }): Promise<StartAttemptResponse> => {
       const { data } = await api.post<StartAttemptResponse>(
         `modules/${moduleId}/attempts`,
@@ -176,13 +177,14 @@ export const useStartModuleAttempt = () => {
       qc.invalidateQueries({ queryKey: ['attempts', 'mine'] });
       qc.invalidateQueries({ queryKey: ['attempts', 'therapist'] });
       qc.invalidateQueries({ queryKey: ['clients'] });
-    }
+    },
+    toast: { pending: 'Starting attempt...', success: 'Attempt started', error: 'Failed to start attempt' }
   });
 };
 export const useSaveModuleAttempt = (attemptId: string) => {
   const qc = useQueryClient();
 
-  return useMutation<SaveProgressResponse, AxiosError, SaveProgressInput>({
+  return useMutationWithToast<SaveProgressResponse, AxiosError, SaveProgressInput>({
     mutationFn: async (responses): Promise<SaveProgressResponse> => {
       const { data } = await api.patch<SaveProgressResponse>(`attempts/${attemptId}`, responses);
       return data;
@@ -192,13 +194,14 @@ export const useSaveModuleAttempt = (attemptId: string) => {
       qc.invalidateQueries({ queryKey: ['attempts', 'mine'] });
       qc.invalidateQueries({ queryKey: ['attempts', 'therapist', 'patient-timeline'] });
       qc.invalidateQueries({ queryKey: ['assignments'] });
-    }
+    },
+    toast: { pending: 'Saving progress...', success: 'Progress saved', error: 'Failed to save' }
   });
 };
 export const useSubmitAttempt = (attemptId: string) => {
   const qc = useQueryClient();
 
-  return useMutation<SubmitAttemptResponse, AxiosError, SubmitAttemptInput>({
+  return useMutationWithToast<SubmitAttemptResponse, AxiosError, SubmitAttemptInput>({
     mutationFn: async (responses): Promise<SubmitAttemptResponse> => {
       const { data } = await api.post<SubmitAttemptResponse>(`attempts/${attemptId}/submit`, responses);
       return data;
@@ -210,6 +213,7 @@ export const useSubmitAttempt = (attemptId: string) => {
       qc.invalidateQueries({ queryKey: ['attempts', 'therapist'] });
       qc.invalidateQueries({ queryKey: ['clients'] });
       qc.invalidateQueries({ queryKey: ['attempts', 'therapist', 'patient-timeline'] });
-    }
+    },
+    toast: { pending: 'Submitting...', success: 'Submitted successfully', error: 'Submission failed' }
   });
 };

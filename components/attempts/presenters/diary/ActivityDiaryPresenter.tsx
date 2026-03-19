@@ -13,7 +13,6 @@ import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { PrimaryButton } from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
-import { renderErrorToast, renderSuccessToast } from '@/components/toast/toastOptions';
 import { SaveProgressChip } from '@/components/ui/Chip';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
@@ -54,7 +53,12 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   const router = useRouter();
   const { assignmentId } = useLocalSearchParams<{ assignmentId?: string }>();
 
-  const { mutate: saveAttempt, isPending: isSaving, isSuccess: saved } = useSaveModuleAttempt(attempt._id);
+  const {
+    mutate: saveAttempt,
+    mutateSilently: saveAttemptSilently,
+    isPending: isSaving,
+    isSuccess: saved
+  } = useSaveModuleAttempt(attempt._id);
   const { mutate: submitAttempt } = useSubmitAttempt(attempt._id);
 
   const canEdit = mode === 'edit';
@@ -192,14 +196,13 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
 
   const saveDirty = useCallback(() => {
     if (!dirtyKeys.size && !noteDirty) return;
-    saveAttempt(buildSavePayload(), {
-      onError: (err) => renderErrorToast(err),
+    saveAttemptSilently(buildSavePayload(), {
       onSuccess: () => {
         setDirtyKeys(new Set());
         setNoteDirty(false);
       }
     });
-  }, [dirtyKeys, noteDirty, buildSavePayload, saveAttempt]);
+  }, [dirtyKeys, noteDirty, buildSavePayload, saveAttemptSilently]);
 
   const renderSlot = useCallback(
     ({ item }: ListRenderItemInfo<{ key: SlotKey; value: SlotValue }>) => {
@@ -448,7 +451,6 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                     if (!canEdit || !allAnswered) {
                       if (dirtyKeys.size || noteDirty) {
                         saveAttempt(buildSavePayload(), {
-                          onError: (err) => renderErrorToast(err),
                           onSuccess: () => {
                             setDirtyKeys(new Set());
                             setNoteDirty(false);
@@ -463,16 +465,11 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                     // ensure latest edits are saved before submit
                     const afterSave = () =>
                       submitAttempt(assignmentId ? { assignmentId: String(assignmentId) } : {}, {
-                        onError: (err) => renderErrorToast(err),
-                        onSuccess: () => {
-                          renderSuccessToast('Submitted activity diary');
-                          router.back();
-                        }
+                        onSuccess: () => router.back()
                       });
 
                     if (dirtyKeys.size || noteDirty) {
-                      saveAttempt(buildSavePayload(), {
-                        onError: (err) => renderErrorToast(err),
+                      saveAttemptSilently(buildSavePayload(), {
                         onSuccess: () => {
                           setDirtyKeys(new Set());
                           setNoteDirty(false);
