@@ -63,7 +63,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 
 ## Architecture
 
-- Query defaults (staleTime, refetch settings) are centralized in `QueryClient` in `app/_layout.tsx` — only override in hooks when a shorter staleTime is needed
+- Query defaults (1-hour staleTime, refetchOnWindowFocus/refetchOnReconnect disabled) are centralized in `QueryClient` in `app/_layout.tsx` — only override in hooks when a shorter staleTime is needed
 - Use `invalidateQueries` (not `refetchQueries`) in mutation `onSuccess` callbacks for consistency
 - Auth state is persisted in AsyncStorage via Zustand middleware; 401 responses auto-clear auth state via the axios interceptor in `api/api.ts`
 - Protected routes are guarded in `app/(main)/_layout.tsx` — redirects to login if no user
