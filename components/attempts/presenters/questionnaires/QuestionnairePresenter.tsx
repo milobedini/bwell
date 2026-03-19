@@ -49,7 +49,6 @@ export default function QuestionnairePresenter({ attempt, detail, mode, patientN
   );
 
   const {
-    mutate: saveAttempt,
     mutateSilently: saveAttemptSilently,
     isPending: isSaving,
     isSuccess: saved
@@ -169,8 +168,8 @@ export default function QuestionnairePresenter({ attempt, detail, mode, patientN
   const handleSubmit = useCallback(() => {
     if (mode !== 'edit') return router.back();
 
-    // last save, then submit
-    saveAttempt(
+    // last save, then submit — silent save so only the submit toast shows
+    saveAttemptSilently(
       { answers: currentAnswersArray() },
       {
         onSuccess: () => {
@@ -180,7 +179,7 @@ export default function QuestionnairePresenter({ attempt, detail, mode, patientN
         }
       }
     );
-  }, [mode, saveAttempt, submitAttempt, currentAnswersArray, assignmentId, router]);
+  }, [mode, saveAttemptSilently, submitAttempt, currentAnswersArray, assignmentId, router]);
 
   return (
     <ScrollView className="flex-1" onLayout={onContainerLayout}>

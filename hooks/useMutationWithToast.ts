@@ -25,12 +25,12 @@ export const useMutationWithToast = <TData = unknown, TError = Error, TVariables
   }
 ): UseMutationWithToastResult<TData, TError, TVariables, TContext> => {
   const { toast: toastConfig, mutationFn, ...rest } = options;
-  const silentRef = useRef(false);
+  const silentCountRef = useRef(0);
 
   const wrappedMutationFn = mutationFn
     ? async (...args: Parameters<typeof mutationFn>): Promise<TData> => {
-        const isSilent = silentRef.current;
-        silentRef.current = false;
+        const isSilent = silentCountRef.current > 0;
+        if (isSilent) silentCountRef.current -= 1;
 
         const toastId = isSilent ? undefined : toast.loading(toastConfig.pending, { styles: TOAST_STYLES.loading });
 
@@ -49,7 +49,7 @@ export const useMutationWithToast = <TData = unknown, TError = Error, TVariables
 
           return result;
         } catch (err) {
-          const errorMsg = getServerErrorMessage(err);
+          const errorMsg = toastConfig.error ?? getServerErrorMessage(err);
 
           if (toastId !== undefined) {
             toast.error(errorMsg, {
@@ -71,7 +71,7 @@ export const useMutationWithToast = <TData = unknown, TError = Error, TVariables
 
   const mutateSilently: typeof mutation.mutate = useCallback(
     (variables, mutateOptions) => {
-      silentRef.current = true;
+      silentCountRef.current += 1;
       mutation.mutate(variables, mutateOptions);
     },
     [mutation.mutate]

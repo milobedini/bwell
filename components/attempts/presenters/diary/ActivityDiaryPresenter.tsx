@@ -469,7 +469,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                       });
 
                     if (dirtyKeys.size || noteDirty) {
-                      saveAttempt(buildSavePayload(), {
+                      saveAttemptSilently(buildSavePayload(), {
                         onSuccess: () => {
                           setDirtyKeys(new Set());
                           setNoteDirty(false);
