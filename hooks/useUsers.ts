@@ -15,7 +15,9 @@ import type {
   VerifyTherapistInput,
   VerifyTherapistResponse
 } from '@milobedini/shared-types';
-import { useMutation, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
+import { useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
+
+import { useMutationWithToast } from './useMutationWithToast';
 
 // Helpers
 const isDefined = <T>(v: T | undefined): v is T => v !== undefined;
@@ -177,10 +179,15 @@ export const useAdminStats = () => {
 export const useAddRemoveTherapist = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<AddRemoveTherapistResponse, AxiosError, AddRemoveTherapistInput>({
+  return useMutationWithToast<AddRemoveTherapistResponse, AxiosError, AddRemoveTherapistInput>({
     mutationFn: async (clientData): Promise<AddRemoveTherapistResponse> => {
       const { data } = await api.post<AddRemoveTherapistResponse>('/user/assign', clientData);
       return data;
+    },
+    toast: {
+      pending: 'Updating therapist...',
+      success: (res) => res.message,
+      error: 'Update failed'
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
@@ -193,10 +200,15 @@ export const useAddRemoveTherapist = () => {
 export const useAdminVerifyTherapist = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<VerifyTherapistResponse, AxiosError, VerifyTherapistInput>({
+  return useMutationWithToast<VerifyTherapistResponse, AxiosError, VerifyTherapistInput>({
     mutationFn: async (therapistId): Promise<VerifyTherapistResponse> => {
       const { data } = await api.post<VerifyTherapistResponse>('/user/verify', therapistId);
       return data;
+    },
+    toast: {
+      pending: 'Verifying therapist...',
+      success: 'Therapist verified',
+      error: 'Verification failed'
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
