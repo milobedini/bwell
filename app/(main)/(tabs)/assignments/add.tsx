@@ -4,7 +4,6 @@ import { Divider } from 'react-native-paper';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import ContentContainer from '@/components/ContentContainer';
 import ThemedButton from '@/components/ThemedButton';
-import { renderErrorToast, renderSuccessToast } from '@/components/toast/toastOptions';
 import DueDateField from '@/components/ui/DueDateField';
 import RecurrenceField from '@/components/ui/RecurrenceField';
 import SearchPickerDialog from '@/components/ui/SearchPickerDialog';
@@ -84,10 +83,8 @@ const AddAssignment = () => {
   const handleSubmit = useCallback(() => {
     createAssignment.mutate(input, {
       onSuccess: () => {
-        renderSuccessToast('Created assignment');
         router.navigate('/(main)/(tabs)/assignments');
-      },
-      onError: (err) => renderErrorToast(err)
+      }
     });
   }, [createAssignment, input, router]);
 

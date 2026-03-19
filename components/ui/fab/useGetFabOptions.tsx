@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { renderErrorToast, renderSuccessToast } from '@/components/toast/toastOptions';
+import { renderErrorToast } from '@/components/toast/toastOptions';
 import { useAddRemoveTherapist } from '@/hooks/useUsers';
 import { useAuthStore } from '@/stores/authStore';
 import { pickClientAndCompose } from '@/utils/mail';
@@ -35,14 +35,8 @@ const useGetFabOptions = ({
       addRemoveTherapist.mutate(
         { patientId: selectedEntity._id, therapistId: user._id },
         {
-          onSuccess: (data) => {
-            renderSuccessToast(data.message);
-            closeMenu();
-          },
-          onError: (err) => {
-            renderErrorToast(err);
-            closeMenu();
-          }
+          onSuccess: () => closeMenu(),
+          onError: () => closeMenu()
         }
       );
     }
