@@ -29,9 +29,11 @@ The app has three tiers (from `docs/proposal.pdf`):
 - Therapist timeline (paginated patient history, filterable)
 - Admin dashboard (stats, therapist verification)
 - Onboarding carousel + welcome flow
+- Activity Diary (weekly grid, day chips with fill indicators, numeric fields, reflection prompts, editable user note, collapsible weekly summary, slot mood tinting)
+- UI component system (StatusChip base, EmptyState component, Pressable buttons with hover/focus/disabled states, colour tokens in tailwind config, web-aligned font scale)
 
 **In progress / partial:**
-- Activity Diary (module type exists, presenter started, numeric fields — missing full weekly grid, mastery/pleasure 0-10 scales, reflection prompts)
+- (none currently)
 
 **Not yet built (working down the proposal):**
 - 5 Areas Model (interactive CBT cycle: Situation → Thoughts → Emotions → Behaviours → Physical)
@@ -97,3 +99,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - Use `Colors` constants from `constants/Colors.ts` — never hardcode hex values in components
 - Use `useWindowDimensions()` hook over static `Dimensions.get()` in components
 - Wrap dev-only logging in `if (__DEV__)`
+
+## Custom Skills
+
+- **update-status** — When the user says "update status", "sync claude md", or "update build status", read and follow `.claude/skills/update-status/SKILL.md`
