@@ -40,9 +40,7 @@ export default function RootLayout() {
                   offset={60}
                   toastOptions={{
                     style: {
-                      backgroundColor: Colors.sway.dark,
-                      borderColor: Colors.sway.buttonBackgroundSolid,
-                      borderWidth: 1
+                      backgroundColor: Colors.sway.dark
                     },
                     titleStyle: {
                       color: Colors.primary.white,
