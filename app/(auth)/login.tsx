@@ -10,7 +10,6 @@ import AuthSheetHandle from '@/components/auth/AuthSheetHandle';
 import AuthSubmitButton from '@/components/auth/AuthSubmitButton';
 import AuthVideoBackground from '@/components/auth/AuthVideoBackground';
 import { ThemedText } from '@/components/ThemedText';
-import { renderErrorToast } from '@/components/toast/toastOptions';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useLogin } from '@/hooks/useAuth';
@@ -105,8 +104,7 @@ export default function Login() {
                 validationSchema={LoginSchema}
                 onSubmit={(values) => {
                   login.mutate(values, {
-                    onSuccess: () => router.replace('/home'),
-                    onError: (err) => renderErrorToast(err)
+                    onSuccess: () => router.replace('/home')
                   });
                 }}
               >

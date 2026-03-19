@@ -13,7 +13,6 @@ import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { PrimaryButton } from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
-import { renderErrorToast, renderSuccessToast } from '@/components/toast/toastOptions';
 import { SaveProgressChip } from '@/components/ui/Chip';
 import { Colors } from '@/constants/Colors';
 import { useSaveModuleAttempt, useSubmitAttempt } from '@/hooks/useAttempts';
@@ -49,7 +48,12 @@ export default function QuestionnairePresenter({ attempt, detail, mode, patientN
     [pageWidth]
   );
 
-  const { mutate: saveAttempt, isPending: isSaving, isSuccess: saved } = useSaveModuleAttempt(attempt._id);
+  const {
+    mutate: saveAttempt,
+    mutateSilently: saveAttemptSilently,
+    isPending: isSaving,
+    isSuccess: saved
+  } = useSaveModuleAttempt(attempt._id);
   const { mutate: submitAttempt } = useSubmitAttempt(attempt._id);
 
   const { moduleSnapshot, totalScore, scoreBandLabel, band, durationSecs, userNote, startedAt, completedAt } = attempt;
@@ -100,7 +104,7 @@ export default function QuestionnairePresenter({ attempt, detail, mode, patientN
         chosenText: pick.text
       });
 
-      saveAttempt({ answers: currentAnswersArray() }, { onError: (err) => renderErrorToast(err) });
+      saveAttemptSilently({ answers: currentAnswersArray() });
 
       if (index < detail.items.length - 1) {
         const next = index + 1;
@@ -108,7 +112,7 @@ export default function QuestionnairePresenter({ attempt, detail, mode, patientN
         setIndex(next);
       }
     },
-    [mode, index, detail.items.length, saveAttempt, currentAnswersArray, scrollTo]
+    [mode, index, detail.items.length, saveAttemptSilently, currentAnswersArray, scrollTo]
   );
 
   const renderItem = useCallback(
@@ -169,14 +173,9 @@ export default function QuestionnairePresenter({ attempt, detail, mode, patientN
     saveAttempt(
       { answers: currentAnswersArray() },
       {
-        onError: (err) => renderErrorToast(err),
         onSuccess: () => {
           submitAttempt(assignmentId ? { assignmentId: String(assignmentId) } : {}, {
-            onError: (err) => renderErrorToast(err),
-            onSuccess: () => {
-              renderSuccessToast('Submitted module attempt');
-              router.back();
-            }
+            onSuccess: () => router.back()
           });
         }
       }

@@ -1,7 +1,6 @@
 import { useAdminVerifyTherapist } from '@/hooks/useUsers';
 import type { AuthUser } from '@milobedini/shared-types';
 
-import { renderErrorToast, renderSuccessToast } from '../toast/toastOptions';
 import SearchPickerDialog from '../ui/SearchPickerDialog';
 
 type TherapistPickerProps = {
@@ -21,13 +20,7 @@ const TherapistPicker = ({ visible, onDismiss, therapists }: TherapistPickerProp
   }));
 
   const handleSelect = (item: (typeof items)[number]) => {
-    verifyTherapist.mutate(
-      { therapistId: item._id },
-      {
-        onSuccess: (res) => renderSuccessToast(res.message),
-        onError: (err) => renderErrorToast(err)
-      }
-    );
+    verifyTherapist.mutate({ therapistId: item._id });
   };
 
   return (
