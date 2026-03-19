@@ -409,29 +409,36 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
         ListFooterComponent={
           <View>
             {canEdit && (
-              <View style={{ marginBottom: 12, marginHorizontal: 8 }}>
-                <ThemedText style={{ fontSize: 12, color: Colors.sway.darkGrey, marginBottom: 4 }}>
-                  Therapist note
-                </ThemedText>
-                <TextInput
-                  mode="flat"
-                  placeholder="Anything you'd like your therapist to know this week..."
-                  placeholderTextColor={Colors.sway.darkGrey}
-                  value={userNoteText}
-                  onChangeText={(t) => {
-                    setUserNoteText(t);
-                    setNoteDirty(true);
-                  }}
-                  multiline
-                  maxLength={500}
-                  style={{ backgroundColor: 'transparent', minHeight: 64 }}
-                  className="border border-sway-darkGrey"
-                  textColor="white"
-                  underlineColor="transparent"
-                  activeUnderlineColor="transparent"
-                  theme={{ colors: { onSurfaceVariant: Colors.sway.darkGrey } }}
-                />
-              </View>
+              <Card
+                style={{
+                  backgroundColor: Colors.sway.buttonBackground,
+                  marginBottom: 10,
+                  marginHorizontal: 8
+                }}
+              >
+                <Card.Title title="Note for therapist" titleStyle={{ color: 'white', fontFamily: Fonts.Bold }} />
+                <Card.Content>
+                  <TextInput
+                    mode="flat"
+                    placeholder="Anything you'd like your therapist to know this week..."
+                    placeholderTextColor="white"
+                    value={userNoteText}
+                    onChangeText={(t) => {
+                      setUserNoteText(t);
+                      setNoteDirty(true);
+                    }}
+                    multiline
+                    maxLength={500}
+                    style={{ backgroundColor: 'transparent', minHeight: 64 }}
+                    className="overflow-hidden text-ellipsis border border-sway-darkGrey text-white"
+                    textColor="white"
+                    underlineColor="transparent"
+                    activeUnderlineColor={Colors.sway.bright}
+                    theme={{ colors: { onSurfaceVariant: Colors.sway.lightGrey } }}
+                    clearButtonMode="always"
+                  />
+                </Card.Content>
+              </Card>
             )}
             {mode === 'edit' && (
               <View className="gap-3 pb-2">

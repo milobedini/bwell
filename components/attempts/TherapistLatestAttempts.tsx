@@ -20,7 +20,7 @@ const TherapistLatestAttempts = () => {
   if (!data) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
-    <ContentContainer>
+    <ContentContainer padded={false}>
       {data.length ? (
         <FlatList
           data={data}

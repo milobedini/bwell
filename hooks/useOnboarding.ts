@@ -5,6 +5,7 @@ export const markOnboardingComplete = async () => {
   try {
     await AsyncStorage.setItem('hasSeenOnboarding', 'true');
   } catch (err) {
+    // eslint-disable-next-line no-console
     if (__DEV__) console.warn('Failed to persist onboarding status:', err);
   }
 };

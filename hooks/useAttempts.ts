@@ -191,6 +191,7 @@ export const useSaveModuleAttempt = (attemptId: string) => {
       qc.invalidateQueries({ queryKey: ['attempts', 'detail'] });
       qc.invalidateQueries({ queryKey: ['attempts', 'mine'] });
       qc.invalidateQueries({ queryKey: ['attempts', 'therapist', 'patient-timeline'] });
+      qc.invalidateQueries({ queryKey: ['assignments'] });
     }
   });
 };
