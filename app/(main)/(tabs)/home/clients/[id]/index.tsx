@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { FlatList, TouchableOpacity, View } from 'react-native';
 import { Appbar, Badge, IconButton } from 'react-native-paper';
 import { clsx } from 'clsx';
-import Constants from 'expo-constants';
 import { Link, useLocalSearchParams } from 'expo-router';
 import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
@@ -58,7 +57,7 @@ const ClientDetail = () => {
     <Appbar.Header
       mode="small"
       elevated
-      statusBarHeight={Constants.statusBarHeight + 32}
+      statusBarHeight={0}
       style={{
         backgroundColor: Colors.primary.charcoal,
         borderBottomWidth: 1,
@@ -86,7 +85,7 @@ const ClientDetail = () => {
   return (
     <>
       {renderHeader()}
-      <ContentContainer>
+      <ContentContainer padded={false}>
         {attempts.length ? (
           <FlatList
             data={attempts}

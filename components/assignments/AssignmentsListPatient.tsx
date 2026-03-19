@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { FlatList, View } from 'react-native';
 import { clsx } from 'clsx';
 import { Link, useRouter } from 'expo-router';
+import { Colors } from '@/constants/Colors';
 import { useStartModuleAttempt } from '@/hooks/useAttempts';
 import { AssignmentStatus } from '@/types/types';
 import { dateString } from '@/utils/dates';
@@ -10,7 +11,7 @@ import { MyAssignmentView } from '@milobedini/shared-types';
 import ThemedButton from '../ThemedButton';
 import { ThemedText } from '../ThemedText';
 import { renderErrorToast } from '../toast/toastOptions';
-import { AssignmentStatusChip, DueChip, RecurrenceChip, TimeLeftChip } from '../ui/Chip';
+import { AssignmentStatusChip, DueChip, RecurrenceChip, StatusChip, TimeLeftChip } from '../ui/Chip';
 
 type AssignmentsListPatientProps = {
   data: MyAssignmentView[];
@@ -57,7 +58,12 @@ const AssignmentsListPatient = ({ data, completed }: AssignmentsListPatientProps
               <ThemedText type="smallTitle">{item.module.title}</ThemedText>
               {isInProgress && <AssignmentStatusChip status={item.status as AssignmentStatus} />}
               {isInProgress && item.percentComplete !== undefined && (
-                <ThemedText type="default">{Math.round(item.percentComplete)}%</ThemedText>
+                <StatusChip
+                  label={`${Math.round(item.percentComplete)}%`}
+                  color={Colors.chip.amber}
+                  borderColor={Colors.chip.amberBorder}
+                  icon="progress-clock"
+                />
               )}
             </View>
             <ThemedText>Assigned by {item.therapist.name}</ThemedText>
