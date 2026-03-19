@@ -13,7 +13,7 @@ export default defineConfig([
   ...configs.recommended,
 
   // Ignore build output and files with config.cjs
-  { ignores: ['dist/**', '.expo/**', '**.cjs', '**.config.js'] },
+  { ignores: ['dist/**', '.expo/**', '.worktrees/**', '**.cjs', '**.config.js'] },
 
   // Your project rules (register plugins here and keep the plugin rules in the same object)
   {
