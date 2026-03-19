@@ -2,12 +2,7 @@ import { useCallback, useRef } from 'react';
 import { toast } from 'sonner-native';
 import { TOAST_DURATIONS, TOAST_STYLES } from '@/components/toast/toastOptions';
 import { getServerErrorMessage } from '@/utils/axiosErrorString';
-import {
-  type MutationFunctionContext,
-  useMutation,
-  type UseMutationOptions,
-  type UseMutationResult
-} from '@tanstack/react-query';
+import { useMutation, type UseMutationOptions, type UseMutationResult } from '@tanstack/react-query';
 
 export type ToastConfig<TData = unknown> = {
   pending: string;
@@ -33,14 +28,14 @@ export const useMutationWithToast = <TData = unknown, TError = Error, TVariables
   const silentRef = useRef(false);
 
   const wrappedMutationFn = mutationFn
-    ? async (variables: TVariables, context: MutationFunctionContext): Promise<TData> => {
+    ? async (...args: Parameters<typeof mutationFn>): Promise<TData> => {
         const isSilent = silentRef.current;
         silentRef.current = false;
 
         const toastId = isSilent ? undefined : toast.loading(toastConfig.pending, { styles: TOAST_STYLES.loading });
 
         try {
-          const result = await mutationFn(variables, context);
+          const result = await mutationFn(...args);
           const successMsg =
             typeof toastConfig.success === 'function' ? toastConfig.success(result) : toastConfig.success;
 
