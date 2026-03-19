@@ -11,7 +11,6 @@ import AuthSheetHandle from '@/components/auth/AuthSheetHandle';
 import AuthSubmitButton from '@/components/auth/AuthSubmitButton';
 import AuthVideoBackground from '@/components/auth/AuthVideoBackground';
 import { ThemedText } from '@/components/ThemedText';
-import { renderErrorToast } from '@/components/toast/toastOptions';
 import KeyboardAvoidingWrapper from '@/components/ui/KeyboardAvoidingWrapper';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
@@ -119,8 +118,7 @@ export default function Signup() {
                           pathname: '/(auth)/verify',
                           params: { userId: id }
                         });
-                      },
-                      onError: (err) => renderErrorToast(err)
+                      }
                     });
                   }}
                 >
