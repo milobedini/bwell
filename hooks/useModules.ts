@@ -8,8 +8,9 @@ import type {
   ModulesPlainResponse,
   ModulesWithMetaResponse
 } from '@milobedini/shared-types';
-import { useMutation, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
+import { useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 
+import { useMutationWithToast } from './useMutationWithToast';
 import { useIsLoggedIn } from './useUsers';
 
 // --- API methods ---
@@ -74,8 +75,9 @@ export function useModules({ programId, withMeta }: UseModuleOptions = {}) {
 export const useCreateModule = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<Module, AxiosError, CreateModuleInput>({
+  return useMutationWithToast<Module, AxiosError, CreateModuleInput>({
     mutationFn: createModule,
+    toast: { pending: 'Creating module...', success: 'Module created', error: 'Failed to create module' },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['modules'] });
     }
