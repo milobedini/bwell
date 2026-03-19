@@ -43,6 +43,13 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 - Verify new therapist accounts
 - Browse and filter all registered therapists
 
+## Recent Milestones
+
+- **Query refactor** — restored default refetchOnMount, dropped refetchType workaround (2026-03-19)
+- **UI bug fixes** — resolved stale data, layout gaps, row widths, chip styling, therapist note input (2026-03-19)
+- **UI/UX polish pass** — StatusChip rewrite, EmptyState component, Pressable buttons, web font alignment, colour tokens (2026-03-18)
+- **Activity Diary enhancements** — reflection prompts, editable user note, day chip fill indicators, collapsible weekly summary, slot mood tinting (2026-03-18)
+
 ## Tech Stack
 
 | Layer | Technology |
