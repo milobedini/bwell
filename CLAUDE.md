@@ -64,6 +64,17 @@ The app has three tiers (from `docs/proposal.pdf`):
 
 ## Architecture
 
+### Directory Structure
+
+- `app/` — expo-router pages (`(auth)/`, `(main)/`, `(welcome)/`)
+- `components/` — shared and feature-specific components
+- `components/attempts/presenters/` — module-type presenter components
+- `hooks/` — custom React hooks (data fetching, mutations)
+- `api/` — Axios instance and API helpers
+- `constants/` — Colors, shared constants
+- `store/` — Zustand stores
+- `types/` — local TypeScript types
+
 - Query defaults (1-hour staleTime, refetchOnWindowFocus/refetchOnReconnect disabled) are centralized in `QueryClient` in `app/_layout.tsx` — only override in hooks when a shorter staleTime is needed
 - Use `invalidateQueries` (not `refetchQueries`) in mutation `onSuccess` callbacks for consistency
 - Auth state is persisted in AsyncStorage via Zustand middleware; 401 responses auto-clear auth state via the axios interceptor in `api/api.ts`
@@ -93,13 +104,78 @@ The app has three tiers (from `docs/proposal.pdf`):
 - `npx prettier --write .` — format all files
 - `npm run lint` — run all validation (expo lint, eslint, prettier check, type check) — use this to validate changes
 - `npx expo start` — dev server
+- `npm run restart` — dev server with cache clear
+- `npm run clean` — full clean reinstall (rm node_modules, npm ci, expo install --fix)
+- `npm run update-types` — reinstall `@milobedini/shared-types` to pick up latest version
 - `npm run publish` — OTA update via EAS
+- `npm run publish-web` — export and deploy web build
 
 ## Validation Workflow
 
 1. Run `npx eslint --fix .` to auto-fix eslint issues (import sorting, etc.)
 2. Run `npx prettier --write .` to format all files
 3. Run `npm run lint` to validate everything passes
+
+## E2E Testing (Maestro)
+
+- **Tool:** Maestro v2.3.0 — flows live in `.maestro/`
+- **App ID:** `host.exp.Exponent` (Expo Go)
+- **Run all flows:** `maestro test .maestro/`
+- **Run role suite:** `maestro test .maestro/therapist/` (or `patient/`, `admin/`)
+- **Run one flow:** `maestro test .maestro/therapist/<flow-name>.yaml`
+- **Inspect UI:** `maestro hierarchy` — shows the accessibility tree Maestro can interact with
+- **Requires:** iOS simulator booted, Expo dev server running (`npx expo start`), backend running (`../cbt/`)
+
+### Directory Structure
+
+Flows are organised by role since tabs, home screens, and content differ per role:
+
+```
+.maestro/
+├── therapist/    # Flows for verified therapist sessions
+├── patient/      # Flows for patient sessions
+└── admin/        # Flows for admin sessions
+```
+
+Run a role suite only when logged in as that role. Do not run `maestro test .maestro/` across roles — run one role directory at a time.
+
+### When to Write Flows
+
+- When building a new screen or feature, write Maestro flows for it as part of the work
+- When modifying an existing screen, update or add flows to cover the changes
+- Run `maestro hierarchy` to discover available selectors before writing flows
+
+### Writing Flows
+
+- One flow per file, named descriptively: `<screen>-<what-it-tests>.yaml`
+- Use text selectors by default — match against `accessibilityLabel`, `accessibilityText`, or visible text
+- Tab bar items use iOS accessibility format: `".*Home, tab.*"` (regex)
+- Use `waitForAnimationToEnd` after navigation taps
+- Use `tapOn` with `text:` for tab/button navigation, not `back` (iOS has no hardware back button)
+- Use `tapOn: { id: "BackButton" }` for the header back arrow on nested screens
+- Use `assertVisible:` to verify screen content
+- Avoid coordinate-based tapping — it breaks across screen sizes
+
+### Known Limitations
+
+- `@gorhom/bottom-sheet` content is invisible to Maestro's accessibility tree (portal rendering) — cannot test bottom sheet form content with text selectors
+- `moti` elements animated from `opacity: 0` are excluded from the accessibility tree until animation completes
+
+### Flow Conventions
+
+- Every tab navigation must `assertVisible` on content unique to that tab — not just tap and move on
+- Use `assertNotVisible` to verify role-based hiding (e.g. therapist should not see "All Users" tab)
+
+```yaml
+appId: host.exp.Exponent
+---
+# Screen Name — What This Tests
+# Brief description of the flow.
+
+- assertVisible: "Expected text"
+- tapOn: "Button text"
+- waitForAnimationToEnd
+```
 
 ## Code Conventions
 
