@@ -1,0 +1,22 @@
+appId: host.exp.Exponent
+---
+# Therapist Home
+# Verifies the therapist home screen renders with correct buttons and tab bar.
+
+# -- Home screen content --
+- assertVisible: 'Your clients'
+- assertVisible: 'All patients'
+
+# -- Correct tabs visible (no "All Users" for therapist) --
+- assertVisible:
+    text: '.*Home, tab, 1 of 6.*'
+- assertVisible:
+    text: '.*Assignments, tab.*'
+- assertVisible:
+    text: '.*Attempts, tab.*'
+- assertVisible:
+    text: '.*Programs, tab.*'
+- assertVisible:
+    text: '.*Profile, tab.*'
+- assertNotVisible:
+    text: '.*All Users.*'
