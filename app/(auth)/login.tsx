@@ -108,19 +108,21 @@ export default function Login() {
                   });
                 }}
               >
-                {({ handleSubmit, values, touched, errors, handleBlur, handleChange, isValidating, isValid }) => {
-                  const buttonDisabled = isPending || isValidating || !isValid;
+                {({ handleSubmit, values, touched, errors, handleBlur, handleChange }) => {
+                  const buttonDisabled = isPending;
 
                   return (
                     <>
                       <BottomSheetTextInput
                         autoCapitalize="none"
+                        autoComplete="username"
                         autoCorrect={false}
                         autoFocus
                         clearButtonMode="while-editing"
                         editable={!isPending}
                         placeholder="Email or Username"
                         returnKeyType="send"
+                        textContentType="username"
                         placeholderTextColor={'black'}
                         onSubmitEditing={() => handleSubmit()}
                         value={values.identifier}
@@ -133,6 +135,7 @@ export default function Login() {
                       )}
                       <BottomSheetTextInput
                         autoCapitalize="none"
+                        autoComplete="password"
                         autoCorrect={false}
                         clearButtonMode="while-editing"
                         editable={!isPending}
@@ -140,6 +143,7 @@ export default function Login() {
                         placeholder="Password"
                         placeholderTextColor={'black'}
                         returnKeyType="send"
+                        textContentType="password"
                         onSubmitEditing={() => handleSubmit()}
                         secureTextEntry
                         value={values.password}
