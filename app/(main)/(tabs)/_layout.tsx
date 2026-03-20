@@ -30,7 +30,8 @@ export default function MainTabsLayout() {
           shadowOffset: { width: 0, height: 6 }
         },
         tabBarActiveTintColor: Colors.sway.bright,
-        tabBarInactiveTintColor: Colors.sway.lightGrey
+        tabBarInactiveTintColor: Colors.sway.lightGrey,
+        sceneStyle: { backgroundColor: Colors.sway.dark }
       }}
     >
       <Tabs.Screen
