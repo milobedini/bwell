@@ -15,7 +15,7 @@ import type {
   VerifyTherapistInput,
   VerifyTherapistResponse
 } from '@milobedini/shared-types';
-import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useMutationWithToast } from './useMutationWithToast';
 
@@ -146,7 +146,8 @@ export const useAllUsers = (query?: Omit<GetUsersQuery, 'page'>) => {
     initialPageParam: 1,
     getNextPageParam: (lastPage) => (lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined),
     enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 2
+    staleTime: 1000 * 60 * 2,
+    placeholderData: keepPreviousData
   });
 };
 

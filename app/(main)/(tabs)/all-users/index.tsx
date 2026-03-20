@@ -30,7 +30,7 @@ const AllUsersList = () => {
   const [sort, setSort] = useState<SortOption>('createdAt:desc');
 
   // Query
-  const { data, isPending, isError, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching, refetch } = useAllUsers(
+  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching, refetch } = useAllUsers(
     {
       q: debouncedSearch || undefined,
       roles: filters.roles,
@@ -51,7 +51,7 @@ const AllUsersList = () => {
   const facets = data?.pages[0]?.facets;
   const total = data?.pages[0]?.total;
 
-  if (isPending) return <LoadingIndicator marginBottom={0} />;
+  if (isLoading) return <LoadingIndicator marginBottom={0} />;
   if (isError)
     return (
       <Container>
@@ -86,9 +86,10 @@ const AllUsersList = () => {
             left={<TextInput.Icon icon="magnify" />}
             right={
               search ? (
-                <TextInput.Icon icon="close" onPress={() => setSearch('')} />
-              ) : isFetching && debouncedSearch ? (
-                <TextInput.Icon icon={() => <ActivityIndicator size="small" color={Colors.sway.bright} />} />
+                <TextInput.Icon
+                  icon={isFetching ? () => <ActivityIndicator size="small" color={Colors.sway.bright} /> : 'close'}
+                  onPress={isFetching ? undefined : () => setSearch('')}
+                />
               ) : null
             }
             outlineColor={Colors.sway.buttonBackgroundSolid}
@@ -122,7 +123,7 @@ const AllUsersList = () => {
         </View>
 
         {/* User list */}
-        {users.length === 0 ? (
+        {!isFetching && users.length === 0 ? (
           <EmptyState
             icon="account-search-outline"
             title="No users match your filters"
@@ -132,8 +133,9 @@ const AllUsersList = () => {
           <FlatList
             data={users}
             keyExtractor={(item) => item._id}
-            renderItem={({ item }) => <UserListItem user={item} />}
+            renderItem={({ item }) => <UserListItem user={item} sort={sort} />}
             ItemSeparatorComponent={() => <Divider />}
+            contentContainerStyle={{ paddingBottom: 80 }}
             onEndReachedThreshold={0.5}
             onEndReached={() => {
               if (hasNextPage && !isFetchingNextPage) fetchNextPage();

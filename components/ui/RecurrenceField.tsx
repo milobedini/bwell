@@ -107,7 +107,7 @@ const RecurrenceField = ({ value, onChange, label = 'Recurrence' }: RecurrenceFi
         >
           <Dialog visible={open} onDismiss={() => setOpen(false)} style={{ width: '90%', alignSelf: 'center' }}>
             <Dialog.Title>
-              <ThemedText type="subtitle" className="text-center" onLight>
+              <ThemedText type="subtitle" className="text-center">
                 {label}
               </ThemedText>
             </Dialog.Title>
@@ -128,7 +128,7 @@ const RecurrenceField = ({ value, onChange, label = 'Recurrence' }: RecurrenceFi
               {/* Interval controls */}
               {showIntervalControls && (
                 <View className="mt-2 gap-2">
-                  <ThemedText onLight type="smallBold">
+                  <ThemedText type="smallBold">
                     Suggested intervals {freq === 'weekly' ? '(weeks)' : '(months)'}
                   </ThemedText>
                   <View className="flex-row flex-wrap gap-2">
@@ -145,13 +145,14 @@ const RecurrenceField = ({ value, onChange, label = 'Recurrence' }: RecurrenceFi
                               }
                             : {}
                         }
+                        textStyle={interval === n ? { color: Colors.sway.dark } : undefined}
                       >
                         {n}
                       </Chip>
                     ))}
                   </View>
                   <View className="mt-2">
-                    <ThemedText type="smallBold" onLight className="mb-1">
+                    <ThemedText type="smallBold" className="mb-1">
                       Other
                     </ThemedText>
                     <TextInput
@@ -164,6 +165,7 @@ const RecurrenceField = ({ value, onChange, label = 'Recurrence' }: RecurrenceFi
                       onChangeText={onChangeIntervalText}
                       right={<TextInput.Affix text={freq === 'weekly' ? 'wk' : 'mo'} />}
                       error={intervalStr.length > 0 && !isManualValid}
+                      style={{ backgroundColor: Colors.chip.darkCard }}
                     />
                     {!isManualValid && (
                       <ThemedText type="error">{`Enter a number between ${bounds.min} and ${bounds.max}.`}</ThemedText>
@@ -171,7 +173,7 @@ const RecurrenceField = ({ value, onChange, label = 'Recurrence' }: RecurrenceFi
                   </View>
 
                   {/* Live preview */}
-                  <ThemedText onLight style={{ opacity: 0.7 }}>
+                  <ThemedText style={{ opacity: 0.7 }}>
                     To be completed {formatRecurrence({ freq, interval }).toLocaleLowerCase()}
                   </ThemedText>
                 </View>
