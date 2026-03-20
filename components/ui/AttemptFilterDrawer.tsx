@@ -3,19 +3,17 @@ import { Animated, Dimensions, KeyboardAvoidingView, Platform, Pressable, StyleS
 import { Button, Chip, Divider, IconButton, Portal, Surface, TextInput } from 'react-native-paper';
 import Constants from 'expo-constants';
 import { Colors } from '@/constants/Colors';
-import { DEFAULT_FILTERS, type FilterDrawerValues } from '@/constants/Filters';
+import { type AttemptFilterDrawerValues, DEFAULT_FILTERS, type DrawerStatusOption } from '@/constants/Filters';
 import { clamp } from '@/utils/helpers';
 
 import { ThemedText } from '../ThemedText';
 
-export type DrawerStatusOption = 'submitted' | 'active' | 'started' | 'abandoned' | 'all';
-
-export type FilterDrawerProps = {
+export type AttemptFilterDrawerProps = {
   visible: boolean;
   onDismiss: () => void;
-  values: FilterDrawerValues;
-  onChange: (values: FilterDrawerValues) => void;
-  onApply: (values: FilterDrawerValues) => void;
+  values: AttemptFilterDrawerValues;
+  onChange: (values: AttemptFilterDrawerValues) => void;
+  onApply: (values: AttemptFilterDrawerValues) => void;
   onReset?: () => void;
   // Optional: allow passing module choices to render chips instead of a raw field
   moduleChoices?: { id: string; title: string }[];
@@ -25,7 +23,7 @@ export type FilterDrawerProps = {
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const DRAWER_WIDTH = Math.min(420, Math.floor(SCREEN_WIDTH * 0.9));
 
-export const FilterDrawer = ({
+export const AttemptFilterDrawer = ({
   visible,
   onDismiss,
   values,
@@ -34,8 +32,8 @@ export const FilterDrawer = ({
   onReset,
   moduleChoices,
   title = 'Filters'
-}: FilterDrawerProps) => {
-  const [local, setLocal] = useState<FilterDrawerValues>(values);
+}: AttemptFilterDrawerProps) => {
+  const [local, setLocal] = useState<AttemptFilterDrawerValues>(values);
   const [limitText, setLimitText] = useState(values.limit?.toString() ?? '');
   const translateX = useRef(new Animated.Value(DRAWER_WIDTH)).current;
 
