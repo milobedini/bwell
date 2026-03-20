@@ -41,10 +41,11 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 - Dashboard with user counts, weekly completions, and platform stats
 - Verify new therapist accounts
-- Browse and filter all registered therapists
+- Search, filter, and sort all registered users with infinite scroll
 
 ## Recent Milestones
 
+- **Admin All Users** — search, filtering, sorting, and infinite scroll for user management (2026-03-20)
 - **Query refactor** — restored default refetchOnMount, dropped refetchType workaround (2026-03-19)
 - **UI bug fixes** — resolved stale data, layout gaps, row widths, chip styling, therapist note input (2026-03-19)
 - **UI/UX polish pass** — StatusChip rewrite, EmptyState component, Pressable buttons, web font alignment, colour tokens (2026-03-18)
@@ -76,7 +77,7 @@ app/
     ├── assignments/     # View & create assignments
     ├── attempts/        # View attempt history & details
     ├── programs/        # Browse programs & modules
-    ├── all-users/       # Admin: manage therapists
+    ├── all-users/       # Admin: search, filter & sort all users
     └── profile/         # User profile & logout
 
 api/                     # Axios instance & interceptors
