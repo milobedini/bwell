@@ -116,14 +116,12 @@ export default function Login() {
                     <>
                       <BottomSheetTextInput
                         autoCapitalize="none"
-                        autoComplete="username"
                         autoCorrect={false}
                         autoFocus
                         clearButtonMode="while-editing"
                         editable={!isPending}
                         placeholder="Email or Username"
                         returnKeyType="send"
-                        textContentType="username"
                         placeholderTextColor={'black'}
                         onSubmitEditing={() => handleSubmit()}
                         value={values.identifier}
@@ -134,7 +132,6 @@ export default function Login() {
                       {submitted && errors.identifier && <ThemedText type="error">{errors.identifier}</ThemedText>}
                       <BottomSheetTextInput
                         autoCapitalize="none"
-                        autoComplete="password"
                         autoCorrect={false}
                         clearButtonMode="while-editing"
                         editable={!isPending}
@@ -142,7 +139,6 @@ export default function Login() {
                         placeholder="Password"
                         placeholderTextColor={'black'}
                         returnKeyType="send"
-                        textContentType="password"
                         onSubmitEditing={() => handleSubmit()}
                         secureTextEntry
                         value={values.password}
