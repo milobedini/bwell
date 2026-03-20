@@ -108,7 +108,8 @@ export default function Login() {
                   });
                 }}
               >
-                {({ handleSubmit, values, touched, errors, handleBlur, handleChange }) => {
+                {({ handleSubmit, values, submitCount, errors, handleBlur, handleChange }) => {
+                  const submitted = submitCount > 0;
                   const buttonDisabled = isPending;
 
                   return (
@@ -130,9 +131,7 @@ export default function Login() {
                         onBlur={handleBlur('identifier')}
                         className="h-[64px] rounded border-b-[1px] border-b-black"
                       />
-                      {touched.identifier && errors.identifier && (
-                        <ThemedText type="error">{errors.identifier}</ThemedText>
-                      )}
+                      {submitted && errors.identifier && <ThemedText type="error">{errors.identifier}</ThemedText>}
                       <BottomSheetTextInput
                         autoCapitalize="none"
                         autoComplete="password"
@@ -151,7 +150,7 @@ export default function Login() {
                         onBlur={handleBlur('password')}
                         className="h-[64px] rounded border-b-[1px] border-b-black"
                       />
-                      {touched.password && errors.password && <ThemedText type="error">{errors.password}</ThemedText>}
+                      {submitted && errors.password && <ThemedText type="error">{errors.password}</ThemedText>}
 
                       <MotiView
                         state={dynamicAnimation}
