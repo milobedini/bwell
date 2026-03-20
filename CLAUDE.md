@@ -63,6 +63,17 @@ The app has three tiers (from `docs/proposal.pdf`):
 
 ## Architecture
 
+### Directory Structure
+
+- `app/` — expo-router pages (`(auth)/`, `(main)/`, `(welcome)/`)
+- `components/` — shared and feature-specific components
+- `components/attempts/presenters/` — module-type presenter components
+- `hooks/` — custom React hooks (data fetching, mutations)
+- `api/` — Axios instance and API helpers
+- `constants/` — Colors, shared constants
+- `store/` — Zustand stores
+- `types/` — local TypeScript types
+
 - Query defaults (1-hour staleTime, refetchOnWindowFocus/refetchOnReconnect disabled) are centralized in `QueryClient` in `app/_layout.tsx` — only override in hooks when a shorter staleTime is needed
 - Use `invalidateQueries` (not `refetchQueries`) in mutation `onSuccess` callbacks for consistency
 - Auth state is persisted in AsyncStorage via Zustand middleware; 401 responses auto-clear auth state via the axios interceptor in `api/api.ts`
@@ -84,7 +95,11 @@ The app has three tiers (from `docs/proposal.pdf`):
 - `npx prettier --write .` — format all files
 - `npm run lint` — run all validation (expo lint, eslint, prettier check, type check) — use this to validate changes
 - `npx expo start` — dev server
+- `npm run restart` — dev server with cache clear
+- `npm run clean` — full clean reinstall (rm node_modules, npm ci, expo install --fix)
+- `npm run update-types` — reinstall `@milobedini/shared-types` to pick up latest version
 - `npm run publish` — OTA update via EAS
+- `npm run publish-web` — export and deploy web build
 
 ## Validation Workflow
 
