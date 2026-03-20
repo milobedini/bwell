@@ -104,19 +104,21 @@ const UserFilterDrawer = ({ visible, onDismiss, values, onApply, facets }: UserF
     facetData?: { _id: boolean; count: number }[]
   ) => (
     <View style={styles.section}>
-      <ThemedText type="smallTitle" style={styles.sectionTitle}>
+      <ThemedText type="small" className="text-sway-darkGrey">
         {label}
       </ThemedText>
       <View style={styles.rowWrap}>
         {[true, false].map((val) => {
+          const isSelected = local[key] === val;
           const count = getFacetCount(facetData, val);
           const chipLabel = `${val ? 'Yes' : 'No'}${count !== undefined ? ` (${count})` : ''}`;
           return (
             <Chip
               key={String(val)}
-              selected={local[key] === val}
+              selected={isSelected}
               onPress={() => toggleBoolean(key, val)}
-              style={styles.chip}
+              style={[styles.chip, isSelected && styles.chipSelected]}
+              textStyle={isSelected ? { color: Colors.sway.bright } : undefined}
             >
               {chipLabel}
             </Chip>
@@ -146,22 +148,24 @@ const UserFilterDrawer = ({ visible, onDismiss, values, onApply, facets }: UserF
 
             <Divider />
 
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
               {/* Roles */}
               <View style={styles.section}>
-                <ThemedText type="smallTitle" style={styles.sectionTitle}>
+                <ThemedText type="small" className="text-sway-darkGrey">
                   Roles
                 </ThemedText>
                 <View style={styles.rowWrap}>
                   {ROLE_OPTIONS.map((role) => {
+                    const isSelected = (local.roles ?? []).includes(role);
                     const count = getFacetCount(facets?.roles, role);
                     const chipLabel = `${role.charAt(0).toUpperCase() + role.slice(1)}${count !== undefined ? ` (${count})` : ''}`;
                     return (
                       <Chip
                         key={role}
-                        selected={(local.roles ?? []).includes(role)}
+                        selected={isSelected}
                         onPress={() => toggleRole(role)}
-                        style={styles.chip}
+                        style={[styles.chip, isSelected && styles.chipSelected]}
+                        textStyle={isSelected ? { color: Colors.sway.bright } : undefined}
                       >
                         {chipLabel}
                       </Chip>
@@ -177,55 +181,70 @@ const UserFilterDrawer = ({ visible, onDismiss, values, onApply, facets }: UserF
 
               {/* Created Date */}
               <View style={styles.section}>
-                <ThemedText type="smallTitle" style={styles.sectionTitle}>
+                <ThemedText type="small" className="text-sway-darkGrey">
                   Created Date
                 </ThemedText>
-                <TextInput
-                  mode="outlined"
-                  label="From (YYYY-MM-DD)"
-                  value={local.createdFrom ?? ''}
-                  onChangeText={(t) => setLocal((prev) => ({ ...prev, createdFrom: t || undefined }))}
-                  keyboardType="numeric"
-                />
-                <TextInput
-                  mode="outlined"
-                  label="To (YYYY-MM-DD)"
-                  value={local.createdTo ?? ''}
-                  onChangeText={(t) => setLocal((prev) => ({ ...prev, createdTo: t || undefined }))}
-                  keyboardType="numeric"
-                  style={{ marginTop: 8 }}
-                />
+                <View style={styles.dateRow}>
+                  <TextInput
+                    mode="outlined"
+                    label="From"
+                    placeholder="YYYY-MM-DD"
+                    value={local.createdFrom ?? ''}
+                    onChangeText={(t) => setLocal((prev) => ({ ...prev, createdFrom: t || undefined }))}
+                    keyboardType="numeric"
+                    dense
+                    style={styles.dateInput}
+                  />
+                  <TextInput
+                    mode="outlined"
+                    label="To"
+                    placeholder="YYYY-MM-DD"
+                    value={local.createdTo ?? ''}
+                    onChangeText={(t) => setLocal((prev) => ({ ...prev, createdTo: t || undefined }))}
+                    keyboardType="numeric"
+                    dense
+                    style={styles.dateInput}
+                  />
+                </View>
               </View>
 
               {/* Last Login */}
               <View style={styles.section}>
-                <ThemedText type="smallTitle" style={styles.sectionTitle}>
+                <ThemedText type="small" className="text-sway-darkGrey">
                   Last Login
                 </ThemedText>
-                <TextInput
-                  mode="outlined"
-                  label="From (YYYY-MM-DD)"
-                  value={local.lastLoginFrom ?? ''}
-                  onChangeText={(t) => setLocal((prev) => ({ ...prev, lastLoginFrom: t || undefined }))}
-                  keyboardType="numeric"
-                />
-                <TextInput
-                  mode="outlined"
-                  label="To (YYYY-MM-DD)"
-                  value={local.lastLoginTo ?? ''}
-                  onChangeText={(t) => setLocal((prev) => ({ ...prev, lastLoginTo: t || undefined }))}
-                  keyboardType="numeric"
-                  style={{ marginTop: 8 }}
-                />
+                <View style={styles.dateRow}>
+                  <TextInput
+                    mode="outlined"
+                    label="From"
+                    placeholder="YYYY-MM-DD"
+                    value={local.lastLoginFrom ?? ''}
+                    onChangeText={(t) => setLocal((prev) => ({ ...prev, lastLoginFrom: t || undefined }))}
+                    keyboardType="numeric"
+                    dense
+                    style={styles.dateInput}
+                  />
+                  <TextInput
+                    mode="outlined"
+                    label="To"
+                    placeholder="YYYY-MM-DD"
+                    value={local.lastLoginTo ?? ''}
+                    onChangeText={(t) => setLocal((prev) => ({ ...prev, lastLoginTo: t || undefined }))}
+                    keyboardType="numeric"
+                    dense
+                    style={styles.dateInput}
+                  />
+                </View>
               </View>
             </ScrollView>
 
+            <Divider style={{ marginBottom: 12 }} />
             <View style={styles.footer}>
-              <Button onPress={handleReset} mode="text" textColor="black" buttonColor={Colors.sway.darkGrey}>
+              <Button onPress={handleReset} mode="text" textColor={Colors.sway.darkGrey} compact>
                 Reset All
               </Button>
               <View style={{ flex: 1 }} />
-              <Button onPress={onDismiss} mode="text" buttonColor={Colors.primary.error} textColor="black">
+              <Button onPress={onDismiss} mode="text" textColor={Colors.sway.darkGrey} compact>
                 Cancel
               </Button>
               <Button onPress={handleApply} mode="contained" buttonColor={Colors.sway.bright} textColor="black">
@@ -264,24 +283,34 @@ const styles = StyleSheet.create({
     marginBottom: 8
   },
   section: {
-    marginTop: 16,
-    gap: 8
-  },
-  sectionTitle: {
-    marginBottom: 4
+    marginTop: 20,
+    gap: 10
   },
   rowWrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8
   },
-  chip: { marginRight: 4 },
+  chip: {
+    borderWidth: 1,
+    borderColor: Colors.sway.buttonBackgroundSolid
+  },
+  chipSelected: {
+    borderColor: Colors.sway.bright,
+    backgroundColor: 'rgba(24, 205, 186, 0.12)'
+  },
+  dateRow: {
+    flexDirection: 'row',
+    gap: 10
+  },
+  dateInput: {
+    flex: 1
+  },
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginTop: 'auto',
-    paddingTop: 12
+    paddingBottom: 4
   }
 });
 

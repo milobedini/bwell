@@ -1,4 +1,5 @@
 import { Pressable, View } from 'react-native';
+import type { SortOption } from '@/components/admin/SortButton';
 import { Colors } from '@/constants/Colors';
 import type { UsersListItem } from '@milobedini/shared-types';
 
@@ -7,6 +8,7 @@ import { StatusChip } from '../ui/Chip';
 
 type UserListItemProps = {
   user: UsersListItem;
+  sort?: SortOption;
   onPress?: () => void;
 };
 
@@ -30,29 +32,48 @@ const formatRelativeTime = (dateString?: string): string => {
   return `${months}mo ago`;
 };
 
-const UserListItem = ({ user, onPress }: UserListItemProps) => {
+const getTimestamp = (user: UsersListItem, sort?: SortOption): { label: string; value: string } => {
+  if (sort === 'lastLogin:desc') {
+    return { label: '', value: formatRelativeTime(user.lastLogin) };
+  }
+  if (sort === 'createdAt:desc' || sort === 'createdAt:asc') {
+    return { label: 'Created ', value: formatRelativeTime(user.createdAt) };
+  }
+  // Default: show last login
+  return { label: '', value: formatRelativeTime(user.lastLogin) };
+};
+
+const UserListItem = ({ user, sort, onPress }: UserListItemProps) => {
   const primaryName = user.name ?? user.username;
   const showUsername = !!user.name;
+  const timestamp = getTimestamp(user, sort);
 
   return (
-    <Pressable onPress={onPress} className="gap-2 px-4 py-3" style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
-      {/* Row 1: Name + last login */}
-      <View className="flex-row items-center justify-between">
-        <View className="flex-1 flex-row items-baseline gap-2">
-          <ThemedText type="smallTitle">{primaryName}</ThemedText>
-          {showUsername && (
-            <ThemedText type="small" className="text-sway-darkGrey">
-              @{user.username}
-            </ThemedText>
-          )}
-        </View>
-        <ThemedText type="small" className="text-sway-darkGrey">
-          {formatRelativeTime(user.lastLogin)}
+    <Pressable
+      onPress={onPress}
+      className="gap-1.5 px-4 py-3"
+      style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+    >
+      {/* Row 1: Name + timestamp */}
+      <View className="flex-row items-baseline justify-between">
+        <ThemedText type="smallTitle" className="shrink" numberOfLines={1}>
+          {primaryName}
+        </ThemedText>
+        <ThemedText type="small" className="ml-3 text-sway-darkGrey" numberOfLines={1}>
+          {timestamp.label}
+          {timestamp.value}
         </ThemedText>
       </View>
 
-      {/* Row 2: Email */}
-      <ThemedText type="small" className="text-sway-darkGrey">
+      {/* Row 2: Username */}
+      {showUsername && (
+        <ThemedText type="small" className="text-sway-darkGrey" numberOfLines={1}>
+          @{user.username}
+        </ThemedText>
+      )}
+
+      {/* Row 3: Email */}
+      <ThemedText type="small" className="text-sway-darkGrey" numberOfLines={1}>
         {user.email}
       </ThemedText>
 

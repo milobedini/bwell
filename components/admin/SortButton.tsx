@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Pressable, StyleSheet } from 'react-native';
 import { Button, Menu } from 'react-native-paper';
 import { Colors } from '@/constants/Colors';
 
@@ -25,37 +26,41 @@ const SortButton = ({ value, onChange }: SortButtonProps) => {
   const currentLabel = SORT_OPTIONS.find((o) => o.value === value)?.label ?? 'Sort';
 
   return (
-    <Menu
-      visible={visible}
-      onDismiss={() => setVisible(false)}
-      anchor={
-        <Button
-          mode="outlined"
-          icon="sort"
-          onPress={() => setVisible(true)}
-          textColor={Colors.sway.lightGrey}
-          style={{ borderColor: Colors.sway.buttonBackgroundSolid }}
-          compact
-        >
-          {currentLabel}
-        </Button>
-      }
-      contentStyle={{ backgroundColor: Colors.sway.dark }}
-    >
-      {SORT_OPTIONS.map((opt) => (
-        <Menu.Item
-          key={opt.value}
-          onPress={() => {
-            onChange(opt.value);
-            setVisible(false);
-          }}
-          title={opt.label}
-          titleStyle={{
-            color: opt.value === value ? Colors.sway.bright : Colors.sway.lightGrey
-          }}
-        />
-      ))}
-    </Menu>
+    <>
+      {visible && <Pressable style={StyleSheet.absoluteFill} onPress={() => setVisible(false)} />}
+      <Menu
+        visible={visible}
+        onDismiss={() => setVisible(false)}
+        anchor={
+          <Button
+            mode="outlined"
+            icon="sort"
+            onPress={() => setVisible(true)}
+            textColor={Colors.sway.lightGrey}
+            style={{ borderColor: Colors.sway.buttonBackgroundSolid }}
+            compact
+          >
+            {currentLabel}
+          </Button>
+        }
+        contentStyle={{ backgroundColor: Colors.sway.dark }}
+      >
+        {SORT_OPTIONS.map((opt) => (
+          <Menu.Item
+            key={opt.value}
+            onPress={() => {
+              onChange(opt.value);
+              setVisible(false);
+            }}
+            title={opt.label}
+            leadingIcon={opt.value === value ? 'check' : undefined}
+            titleStyle={{
+              color: opt.value === value ? Colors.sway.bright : Colors.sway.lightGrey
+            }}
+          />
+        ))}
+      </Menu>
+    </>
   );
 };
 

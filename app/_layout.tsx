@@ -1,5 +1,5 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { PaperProvider } from 'react-native-paper';
+import { MD3DarkTheme, PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Slot } from 'expo-router';
 import { Toaster } from 'sonner-native';
@@ -23,6 +23,28 @@ const queryClient = new QueryClient({
   }
 });
 
+const paperTheme = {
+  ...MD3DarkTheme,
+  colors: {
+    ...MD3DarkTheme.colors,
+    surface: Colors.sway.dark,
+    surfaceVariant: Colors.sway.buttonBackgroundSolid,
+    surfaceContainerHigh: Colors.chip.darkCard,
+    surfaceContainerHighest: Colors.chip.darkCardAlt,
+    elevation: {
+      ...MD3DarkTheme.colors.elevation,
+      level3: Colors.chip.darkCard
+    },
+    onSurface: Colors.sway.lightGrey,
+    onSurfaceVariant: Colors.sway.darkGrey,
+    secondaryContainer: Colors.sway.buttonBackgroundSolid,
+    onSecondaryContainer: Colors.sway.bright,
+    outline: Colors.sway.buttonBackgroundSolid,
+    primary: Colors.sway.bright,
+    onPrimary: Colors.sway.dark
+  }
+};
+
 const available = registerDatesTranslations();
 const deviceDatesLocaleKey = getDeviceDatesLocaleKey(available);
 
@@ -32,7 +54,7 @@ export default function RootLayout() {
       <ErrorBoundary>
         <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.sway.dark }}>
           <SafeAreaProvider>
-            <PaperProvider>
+            <PaperProvider theme={paperTheme}>
               <FontsContainer>
                 <Slot />
                 <Toaster
