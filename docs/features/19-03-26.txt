@@ -5,4 +5,4 @@ Refining - nothing new
 - Therapist, remove assignments is horrible and breaks.
 - Patient, diary started, updated text at top is bad/long. Top section crowded. General scroll behaviour in large input list is not great. Should be able to use next (or right) mobile arrow to toggle inputs, with the view changing accordingly Issues with save and exit on live.
 - Admin all users filter and search.
-- SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/th3rdwave/react-native-safe-area-context
+- SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/th3rdwave/react-native-safe-area-context. KNOWN ISSUE WITH SOME OF OUR PACKAGES

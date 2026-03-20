@@ -15,7 +15,7 @@ import type {
   VerifyTherapistInput,
   VerifyTherapistResponse
 } from '@milobedini/shared-types';
-import { useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useMutationWithToast } from './useMutationWithToast';
 
@@ -132,19 +132,22 @@ export const useClients = () => {
   });
 };
 
-export const useAllUsers = (query?: GetUsersQuery): UseQueryResult<GetUsersResponse, AxiosError<ApiError>> => {
+export const useAllUsers = (query?: Omit<GetUsersQuery, 'page'>) => {
   const isLoggedIn = useIsLoggedIn();
 
-  return useQuery<GetUsersResponse, AxiosError<ApiError>>({
+  return useInfiniteQuery<GetUsersResponse, AxiosError<ApiError>>({
     queryKey: ['admin', 'users', query ?? {}],
-    queryFn: async () => {
+    queryFn: async ({ pageParam }) => {
       const { data } = await api.get<GetUsersResponse>('/user/users', {
-        params: buildParams(query)
+        params: buildParams({ ...query, page: pageParam as number })
       });
       return data;
     },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => (lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined),
     enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 2 // 2 minutes — admin list needs fresher data
+    staleTime: 1000 * 60 * 2,
+    placeholderData: keepPreviousData
   });
 };
 

@@ -1,31 +1,34 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Dimensions, KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
+import {
+  Animated,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+  View
+} from 'react-native';
 import { Button, Chip, Divider, IconButton, Portal, Surface, TextInput } from 'react-native-paper';
 import Constants from 'expo-constants';
 import { Colors } from '@/constants/Colors';
-import { DEFAULT_FILTERS, type FilterDrawerValues } from '@/constants/Filters';
+import { type AttemptFilterDrawerValues, DEFAULT_FILTERS, type DrawerStatusOption } from '@/constants/Filters';
 import { clamp } from '@/utils/helpers';
 
 import { ThemedText } from '../ThemedText';
 
-export type DrawerStatusOption = 'submitted' | 'active' | 'started' | 'abandoned' | 'all';
-
-export type FilterDrawerProps = {
+export type AttemptFilterDrawerProps = {
   visible: boolean;
   onDismiss: () => void;
-  values: FilterDrawerValues;
-  onChange: (values: FilterDrawerValues) => void;
-  onApply: (values: FilterDrawerValues) => void;
+  values: AttemptFilterDrawerValues;
+  onChange: (values: AttemptFilterDrawerValues) => void;
+  onApply: (values: AttemptFilterDrawerValues) => void;
   onReset?: () => void;
   // Optional: allow passing module choices to render chips instead of a raw field
   moduleChoices?: { id: string; title: string }[];
   title?: string;
 };
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const DRAWER_WIDTH = Math.min(420, Math.floor(SCREEN_WIDTH * 0.9));
-
-export const FilterDrawer = ({
+export const AttemptFilterDrawer = ({
   visible,
   onDismiss,
   values,
@@ -34,10 +37,12 @@ export const FilterDrawer = ({
   onReset,
   moduleChoices,
   title = 'Filters'
-}: FilterDrawerProps) => {
-  const [local, setLocal] = useState<FilterDrawerValues>(values);
+}: AttemptFilterDrawerProps) => {
+  const { width: screenWidth } = useWindowDimensions();
+  const drawerWidth = Math.min(420, Math.floor(screenWidth * 0.9));
+  const [local, setLocal] = useState<AttemptFilterDrawerValues>(values);
   const [limitText, setLimitText] = useState(values.limit?.toString() ?? '');
-  const translateX = useRef(new Animated.Value(DRAWER_WIDTH)).current;
+  const translateX = useRef(new Animated.Value(drawerWidth)).current;
 
   useEffect(() => {
     // sync external changes when drawer opens with fresh defaults
@@ -49,11 +54,11 @@ export const FilterDrawer = ({
 
   useEffect(() => {
     Animated.timing(translateX, {
-      toValue: visible ? 0 : DRAWER_WIDTH,
+      toValue: visible ? 0 : drawerWidth,
       duration: 220,
       useNativeDriver: true
     }).start();
-  }, [visible, translateX]);
+  }, [visible, translateX, drawerWidth]);
 
   const setStatus = (s: DrawerStatusOption) => {
     setLocal((prev) => {
@@ -94,7 +99,7 @@ export const FilterDrawer = ({
         style={StyleSheet.absoluteFill}
       >
         <Animated.View
-          style={[styles.drawerContainer, { width: DRAWER_WIDTH, transform: [{ translateX }] }]}
+          style={[styles.drawerContainer, { width: drawerWidth, transform: [{ translateX }] }]}
           pointerEvents={visible ? 'auto' : 'none'}
         >
           <Surface elevation={3} style={styles.surface}>
