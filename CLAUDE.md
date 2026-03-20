@@ -33,7 +33,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - UI component system (StatusChip base, EmptyState component, Pressable buttons with hover/focus/disabled states, colour tokens in tailwind config, web-aligned font scale)
 
 **In progress / partial:**
-- (none currently)
+- Admin All Users screen — search, filtering (role, verification, therapist, date ranges), sorting, and infinite scroll with lazy loading
 
 **Not yet built (working down the proposal):**
 - 5 Areas Model (interactive CBT cycle: Situation → Thoughts → Emotions → Behaviours → Physical)
