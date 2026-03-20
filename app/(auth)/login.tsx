@@ -108,19 +108,22 @@ export default function Login() {
                   });
                 }}
               >
-                {({ handleSubmit, values, touched, errors, handleBlur, handleChange, isValidating, isValid }) => {
-                  const buttonDisabled = isPending || isValidating || !isValid;
+                {({ handleSubmit, values, submitCount, errors, handleBlur, handleChange }) => {
+                  const submitted = submitCount > 0;
+                  const buttonDisabled = isPending;
 
                   return (
                     <>
                       <BottomSheetTextInput
                         autoCapitalize="none"
+                        autoComplete="username"
                         autoCorrect={false}
                         autoFocus
                         clearButtonMode="while-editing"
                         editable={!isPending}
                         placeholder="Email or Username"
                         returnKeyType="send"
+                        textContentType="username"
                         placeholderTextColor={'black'}
                         onSubmitEditing={() => handleSubmit()}
                         value={values.identifier}
@@ -128,11 +131,10 @@ export default function Login() {
                         onBlur={handleBlur('identifier')}
                         className="h-[64px] rounded border-b-[1px] border-b-black"
                       />
-                      {touched.identifier && errors.identifier && (
-                        <ThemedText type="error">{errors.identifier}</ThemedText>
-                      )}
+                      {submitted && errors.identifier && <ThemedText type="error">{errors.identifier}</ThemedText>}
                       <BottomSheetTextInput
                         autoCapitalize="none"
+                        autoComplete="password"
                         autoCorrect={false}
                         clearButtonMode="while-editing"
                         editable={!isPending}
@@ -140,6 +142,7 @@ export default function Login() {
                         placeholder="Password"
                         placeholderTextColor={'black'}
                         returnKeyType="send"
+                        textContentType="password"
                         onSubmitEditing={() => handleSubmit()}
                         secureTextEntry
                         value={values.password}
@@ -147,7 +150,7 @@ export default function Login() {
                         onBlur={handleBlur('password')}
                         className="h-[64px] rounded border-b-[1px] border-b-black"
                       />
-                      {touched.password && errors.password && <ThemedText type="error">{errors.password}</ThemedText>}
+                      {submitted && errors.password && <ThemedText type="error">{errors.password}</ThemedText>}
 
                       <MotiView
                         state={dynamicAnimation}

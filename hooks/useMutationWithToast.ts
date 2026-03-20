@@ -74,6 +74,7 @@ export const useMutationWithToast = <TData = unknown, TError = Error, TVariables
       silentCountRef.current += 1;
       mutation.mutate(variables, mutateOptions);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- depend on .mutate only; `mutation` is a new object every render
     [mutation.mutate]
   );
 

@@ -1,0 +1,7 @@
+Refining - nothing new
+- Apple auto details only triggered in password field. FIXED
+- Weird moments of white app background being seen, e.g. clients back to home screen.
+- Client, users actions icons and look.
+- Therapist, remove assignments is horrible and breaks.
+- Patient, diary started, updated text at top is bad/long. Top section crowded. General scroll behaviour in large input list is not great. Should be able to use next (or right) mobile arrow to toggle inputs, with the view changing accordingly Issues with save and exit on live.
+- Admin all users filter and search.
