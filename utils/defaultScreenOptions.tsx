@@ -14,7 +14,8 @@ const nestedScreenOptions: NativeStackNavigationOptions = {
   headerTitle: '',
   headerStyle: { backgroundColor: Colors.sway.dark },
   headerShadowVisible: false,
-  headerTintColor: Colors.sway.bright
+  headerTintColor: Colors.sway.bright,
+  contentStyle: { backgroundColor: Colors.sway.dark }
 };
 
 const stackScreenOptionsWithTitle = (title?: string): NativeStackNavigationOptions => {
