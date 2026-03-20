@@ -222,7 +222,7 @@ const UserFilterDrawer = ({ visible, onDismiss, values, onApply, facets }: UserF
 
             <View style={styles.footer}>
               <Button onPress={handleReset} mode="text" textColor="black" buttonColor={Colors.sway.darkGrey}>
-                Reset
+                Reset All
               </Button>
               <View style={{ flex: 1 }} />
               <Button onPress={onDismiss} mode="text" buttonColor={Colors.primary.error} textColor="black">
