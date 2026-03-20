@@ -97,7 +97,7 @@ const DueDateField = ({ value, onChange, label = 'Due date' }: DueDateFieldProps
           dismissableBackButton
         >
           <Dialog.Title>
-            <ThemedText type="subtitle" onLight className="text-center">
+            <ThemedText type="subtitle" className="text-center">
               {label}
             </ThemedText>
           </Dialog.Title>

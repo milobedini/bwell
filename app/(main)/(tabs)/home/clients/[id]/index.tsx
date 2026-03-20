@@ -7,16 +7,16 @@ import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import { ThemedText } from '@/components/ThemedText';
+import { AttemptFilterDrawer } from '@/components/ui/AttemptFilterDrawer';
 import { DateChip, DueChip } from '@/components/ui/Chip';
-import { FilterDrawer } from '@/components/ui/FilterDrawer';
 import { Colors } from '@/constants/Colors';
-import type { FilterDrawerValues } from '@/constants/Filters';
+import type { AttemptFilterDrawerValues } from '@/constants/Filters';
 import { useGetPatientTimeline } from '@/hooks/useAttempts';
 import { useModules } from '@/hooks/useModules';
 import { AttemptStatus, ModuleType } from '@/types/types';
 import { dateString } from '@/utils/dates';
 
-const defaultFilters: FilterDrawerValues = {
+const defaultFilters: AttemptFilterDrawerValues = {
   status: ['submitted'],
   limit: 20,
   moduleId: undefined
@@ -27,7 +27,7 @@ const ClientDetail = () => {
   const { data: modules } = useModules();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [filters, setFilters] = useState<FilterDrawerValues>(defaultFilters);
+  const [filters, setFilters] = useState<AttemptFilterDrawerValues>(defaultFilters);
 
   const statusParam = useMemo(() => {
     const s = filters.status ?? ['submitted'];
@@ -131,7 +131,7 @@ const ClientDetail = () => {
           <ThemedText className="p-4">No submissions...</ThemedText>
         )}
       </ContentContainer>
-      <FilterDrawer
+      <AttemptFilterDrawer
         visible={drawerOpen}
         onDismiss={() => setDrawerOpen(false)}
         values={filters}

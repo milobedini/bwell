@@ -31,9 +31,10 @@ The app has three tiers (from `docs/proposal.pdf`):
 - Onboarding carousel + welcome flow
 - Activity Diary (weekly grid, day chips with fill indicators, numeric fields, reflection prompts, editable user note, collapsible weekly summary, slot mood tinting)
 - UI component system (StatusChip base, EmptyState component, Pressable buttons with hover/focus/disabled states, colour tokens in tailwind config, web-aligned font scale)
+- Admin All Users (search, filtering, sorting, infinite scroll with lazy loading)
+- Global Paper dark theme (MD3DarkTheme, dialog surfaces, dark-aware text)
 
-**In progress / partial:**
-- (none currently)
+**In progress / partial:** (none currently)
 
 **Not yet built (working down the proposal):**
 - 5 Areas Model (interactive CBT cycle: Situation → Thoughts → Emotions → Behaviours → Physical)
@@ -81,6 +82,14 @@ The app has three tiers (from `docs/proposal.pdf`):
 - Role-based tab visibility uses `href: null` in tab config
 - Module types each get their own presenter component in `components/attempts/presenters/` — the `AttemptPresenter` routes to the correct one based on module type
 - Each new CBT tool will likely need: a new `ModuleType` enum value, a Mongoose model (BE), a controller (BE), a FE presenter component, and a hook
+
+### Patterns
+
+- **Infinite scroll:** Use `useInfiniteQuery` with `initialPageParam: 1` and `getNextPageParam` from `page`/`totalPages`. Flatten pages via `data.pages.flatMap(p => p.items)`. See `useAllUsers` for reference.
+- **Infinite scroll + search:** Use `keepPreviousData` with `useInfiniteQuery` to prevent full-screen flashes on param changes. Use `isLoading` (not `isPending`) for initial full-screen loaders. Guard empty states with `!isFetching && items.length === 0`. See `useAllUsers` + `AllUsersList` for reference.
+- **Value debounce:** Use `useDebounce(value, delay)` from `hooks/useDebounce.ts` for search inputs. Distinct from callback-based `useDebouncedCallback` in `utils/debounce.ts`.
+- **Filter drawers:** Slide-in from right using `Animated.View` + `useWindowDimensions()`. See `AttemptFilterDrawer` (timeline) and `UserFilterDrawer` (admin users).
+- **Paper dark theme:** Global `MD3DarkTheme` is configured in `_layout.tsx` with app color tokens. Dialog backgrounds use `surfaceContainerHigh` / `elevation.level3` (set to `Colors.chip.darkCard`). When adding Paper `TextInput` inside dialogs, set `style={{ backgroundColor: Colors.chip.darkCard }}` to match the dialog surface. Do not use `ThemedText`'s `onLight` prop inside dialogs — they are dark-themed.
 
 ## Git Workflow
 
@@ -179,4 +188,4 @@ appId: host.exp.Exponent
 ## Custom Skills
 
 - **update-status** — When the user says "update status", "sync claude md", or "update build status", read and follow `.claude/skills/update-status/SKILL.md`
-- **visual-test** — When the user says "visual test", "screenshot test", or "check the UI", read and follow `.claude/skills/visual-test/SKILL.md`
+- **visual-test** — Opinionated UI/UX review via simulator screenshots, cross-referenced against the feature's superpowers plan/spec. **Proactively offer** to run after completing feature development from a superpowers plan, before pushing to git, or before creating a PR — any time UI has changed. Uses Maestro for navigation only (temp scripts), does not create persistent test flows.

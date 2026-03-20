@@ -63,7 +63,7 @@ export default function SearchPickerDialog<T extends BaseItem>({
         leftIcon ? (
           <List.Icon
             {...props}
-            icon={() => <MaterialCommunityIcons name={leftIcon(item)} size={32} />}
+            icon={() => <MaterialCommunityIcons name={leftIcon(item)} size={32} color={Colors.sway.darkGrey} />}
             color={Colors.sway.darkGrey}
             style={{ paddingLeft: 0 }}
           />
@@ -94,7 +94,7 @@ export default function SearchPickerDialog<T extends BaseItem>({
         dismissableBackButton
       >
         <Dialog.Title>
-          <ThemedText type="subtitle" className="text-center" onLight>
+          <ThemedText type="subtitle" className="text-center">
             {title}
           </ThemedText>
         </Dialog.Title>
@@ -110,6 +110,7 @@ export default function SearchPickerDialog<T extends BaseItem>({
             </ThemedText>
           ) : (
             <TextInput
+              mode="outlined"
               placeholder={`Search ${title.toLowerCase()}…`}
               value={query}
               onChangeText={setQuery}
