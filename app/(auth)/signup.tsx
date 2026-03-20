@@ -122,22 +122,14 @@ export default function Signup() {
                     });
                   }}
                 >
-                  {({
-                    handleSubmit,
-                    values,
-                    touched,
-                    errors,
-                    handleBlur,
-                    handleChange,
-                    setFieldValue,
-                    isValid,
-                    isValidating
-                  }) => {
-                    const buttonDisabled = isPending || isValidating || !isValid;
+                  {({ handleSubmit, values, submitCount, errors, handleBlur, handleChange, setFieldValue }) => {
+                    const submitted = submitCount > 0;
+                    const buttonDisabled = isPending;
                     return (
                       <>
                         <BottomSheetTextInput
                           autoCapitalize="none"
+                          autoComplete="email"
                           autoCorrect={false}
                           autoFocus
                           clearButtonMode="while-editing"
@@ -145,6 +137,7 @@ export default function Signup() {
                           placeholder="Email"
                           placeholderTextColor={'black'}
                           returnKeyType="send"
+                          textContentType="emailAddress"
                           onSubmitEditing={() => handleSubmit()}
                           value={values.email}
                           keyboardType="email-address"
@@ -152,24 +145,27 @@ export default function Signup() {
                           onBlur={handleBlur('email')}
                           className="h-[64px] rounded border-b-[1px] border-b-black"
                         />
-                        {touched.email && errors.email && <ThemedText type="error">{errors.email}</ThemedText>}
+                        {submitted && errors.email && <ThemedText type="error">{errors.email}</ThemedText>}
                         <BottomSheetTextInput
                           autoCapitalize="none"
+                          autoComplete="username"
                           autoCorrect={false}
                           clearButtonMode="while-editing"
                           editable={!isPending}
                           placeholder="Username"
                           placeholderTextColor={'black'}
                           returnKeyType="send"
+                          textContentType="username"
                           onSubmitEditing={() => handleSubmit()}
                           value={values.username}
                           onChangeText={handleChange('username')}
                           onBlur={handleBlur('username')}
                           className="h-[64px] rounded border-b-[1px] border-b-black"
                         />
-                        {touched.username && errors.username && <ThemedText type="error">{errors.username}</ThemedText>}
+                        {submitted && errors.username && <ThemedText type="error">{errors.username}</ThemedText>}
                         <BottomSheetTextInput
                           autoCapitalize="none"
+                          autoComplete="password-new"
                           autoCorrect={false}
                           clearButtonMode="while-editing"
                           editable={!isPending}
@@ -177,6 +173,7 @@ export default function Signup() {
                           placeholder="Password"
                           placeholderTextColor={'black'}
                           returnKeyType="send"
+                          textContentType="newPassword"
                           onSubmitEditing={() => handleSubmit()}
                           secureTextEntry
                           value={values.password}
@@ -184,7 +181,7 @@ export default function Signup() {
                           onBlur={handleBlur('password')}
                           className="h-[64px] rounded border-b-[1px] border-b-black"
                         />
-                        {touched.password && errors.password && <ThemedText type="error">{errors.password}</ThemedText>}
+                        {submitted && errors.password && <ThemedText type="error">{errors.password}</ThemedText>}
                         <SegmentedButtons
                           value={values.roles[0] || ''}
                           onValueChange={(role) => {
