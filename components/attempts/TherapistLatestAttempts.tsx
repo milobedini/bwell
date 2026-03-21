@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { FlatList, type ListRenderItemInfo, TouchableOpacity, View } from 'react-native';
 import { clsx } from 'clsx';
 import { Link } from 'expo-router';
@@ -13,41 +13,53 @@ import { ThemedText } from '../ThemedText';
 import { DateChip } from '../ui/Chip';
 import EmptyState from '../ui/EmptyState';
 
+type TherapistAttemptListItemProps = {
+  item: TherapistLatestRow;
+  index: number;
+};
+
+const TherapistAttemptListItemBase = ({ item, index }: TherapistAttemptListItemProps) => {
+  const bgColor = index % 2 === 0 ? '' : 'bg-sway-buttonBackground';
+
+  return (
+    <Link
+      asChild
+      href={{
+        pathname: '/attempts/[id]',
+        params: {
+          id: item._id,
+          headerTitle: `${item.module.title} (${dateString(item.completedAt || '')})`
+        }
+      }}
+      push
+      withAnchor
+    >
+      <TouchableOpacity className={clsx('gap-2 p-4', bgColor)}>
+        <ThemedText type="subtitle">
+          {item.module.title} by {item.user.name}
+        </ThemedText>
+        {!!item.totalScore && (
+          <ThemedText>
+            {item.totalScore} {item.scoreBandLabel}
+          </ThemedText>
+        )}
+        <View className="flex-row items-center gap-4">
+          <DateChip prefix={'Completed'} dateString={item.completedAt || ''} />
+        </View>
+      </TouchableOpacity>
+    </Link>
+  );
+};
+
+const TherapistAttemptListItem = memo(TherapistAttemptListItemBase);
+
 const TherapistLatestAttempts = () => {
   const { data, isPending, isError } = useTherapistGetLatestAttempts();
 
-  const renderItem = useCallback(({ item, index }: ListRenderItemInfo<TherapistLatestRow>) => {
-    const bgColor = index % 2 === 0 ? '' : 'bg-sway-buttonBackground';
-
-    return (
-      <Link
-        asChild
-        href={{
-          pathname: '/attempts/[id]',
-          params: {
-            id: item._id,
-            headerTitle: `${item.module.title} (${dateString(item.completedAt || '')})`
-          }
-        }}
-        push
-        withAnchor
-      >
-        <TouchableOpacity key={item._id} className={clsx('gap-2 p-4', bgColor)}>
-          <ThemedText type="subtitle">
-            {item.module.title} by {item.user.name}
-          </ThemedText>
-          {!!item.totalScore && (
-            <ThemedText>
-              {item.totalScore} {item.scoreBandLabel}
-            </ThemedText>
-          )}
-          <View className="flex-row items-center gap-4">
-            <DateChip prefix={'Completed'} dateString={item.completedAt || ''} />
-          </View>
-        </TouchableOpacity>
-      </Link>
-    );
-  }, []);
+  const renderItem = useCallback(
+    ({ item, index }: ListRenderItemInfo<TherapistLatestRow>) => <TherapistAttemptListItem item={item} index={index} />,
+    []
+  );
 
   if (isPending) return <LoadingIndicator marginBottom={0} />;
   if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
