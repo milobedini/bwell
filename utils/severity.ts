@@ -6,9 +6,9 @@ type SeverityColors = {
 };
 
 const SEVERITY_MAP: readonly { pattern: RegExp; border: string; pillBg: string }[] = [
-  { pattern: /severe|high/i, border: Colors.chip.red, pillBg: Colors.tint.error },
-  { pattern: /moderate/i, border: Colors.chip.amber, pillBg: Colors.tint.info },
-  { pattern: /mild|minimal|low/i, border: Colors.chip.green, pillBg: Colors.tint.teal }
+  { pattern: /severe|high/i, border: Colors.chip.redBorder, pillBg: Colors.tint.error },
+  { pattern: /moderate/i, border: Colors.chip.amberBorder, pillBg: Colors.tint.info },
+  { pattern: /mild|minimal|low/i, border: Colors.chip.greenBorder, pillBg: Colors.tint.teal }
 ];
 
 const DEFAULT_COLORS: SeverityColors = {
