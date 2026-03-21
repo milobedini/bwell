@@ -25,13 +25,14 @@ type AssignmentListItemTherapistProps = {
 
 const AssignmentListItemTherapistBase = ({ item, index, onOpenMenu }: AssignmentListItemTherapistProps) => {
   const bgColor = index % 2 === 0 ? '' : 'bg-sway-buttonBackground';
+  const handlePress = useCallback(() => onOpenMenu(item._id), [onOpenMenu, item._id]);
 
   return (
     <View className={`gap-1 p-4 ${bgColor}`}>
       <View className="flex-row items-center justify-between">
         <ThemedText type="smallTitle">{item.module.title}</ThemedText>
         <TouchableOpacity
-          onPress={() => onOpenMenu(item._id)}
+          onPress={handlePress}
           className="h-9 w-9 items-center justify-center rounded-lg active:opacity-70"
           style={{ backgroundColor: Colors.chip.darkCardAlt }}
           hitSlop={8}
@@ -72,7 +73,7 @@ const AssignmentsListTherapist = ({ data }: AssignmentsListTherapistProps) => {
 
   const handleRemoveAssignment = useCallback(() => {
     if (!selectedId) return;
-    removeAssignment({ assignmentId: selectedId }, { onSuccess: closeMenu });
+    removeAssignment({ assignmentId: selectedId }, { onSuccess: closeMenu, onError: closeMenu });
   }, [removeAssignment, selectedId, closeMenu]);
 
   const openMenu = useCallback((id: string) => {
@@ -92,6 +93,8 @@ const AssignmentsListTherapist = ({ data }: AssignmentsListTherapistProps) => {
     [handleRemoveAssignment]
   );
 
+  const keyExtractor = useCallback((item: MyAssignmentView) => item._id, []);
+
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<MyAssignmentView>) => (
       <AssignmentListItemTherapist item={item} index={index} onOpenMenu={openMenu} />
@@ -101,7 +104,7 @@ const AssignmentsListTherapist = ({ data }: AssignmentsListTherapistProps) => {
 
   return (
     <>
-      <FlatList data={data} keyExtractor={(item) => item._id} renderItem={renderItem} />
+      <FlatList data={data} keyExtractor={keyExtractor} renderItem={renderItem} />
 
       <ActionMenu
         visible={menuOpen}

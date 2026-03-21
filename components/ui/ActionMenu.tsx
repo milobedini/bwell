@@ -23,9 +23,13 @@ type ActionMenuProps = {
 };
 
 const ActionMenu = ({ visible, onDismiss, title, subtitle, actions }: ActionMenuProps) => {
-  const handleAction = useCallback((onPress: () => void) => {
-    onPress();
-  }, []);
+  const handleAction = useCallback(
+    (onPress: () => void) => {
+      onDismiss();
+      onPress();
+    },
+    [onDismiss]
+  );
 
   return (
     <Modal visible={visible} transparent animationType="none" onRequestClose={onDismiss} statusBarTranslucent>
@@ -90,7 +94,7 @@ const ActionMenu = ({ visible, onDismiss, title, subtitle, actions }: ActionMenu
                     >
                       <View
                         className="mr-4 h-9 w-9 items-center justify-center rounded-xl"
-                        style={{ backgroundColor: isDestructive ? 'rgba(255,109,94,0.15)' : 'rgba(24,205,186,0.15)' }}
+                        style={{ backgroundColor: isDestructive ? Colors.tint.error : Colors.tint.teal }}
                       >
                         <Icon name={action.icon} size={20} color={iconColor} />
                       </View>
