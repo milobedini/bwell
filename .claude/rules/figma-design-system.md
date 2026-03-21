@@ -19,7 +19,7 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 - Feature-specific components go in `components/<feature>/` (e.g., `components/diary/`, `components/admin/`)
 - Module presenters go in `components/attempts/presenters/`
 - Shared layout wrappers: `Container` (headerless screens), `ContentContainer` (screens with visible header)
-- Always check for existing components before creating new ones — reuse `ThemedText`, `ThemedButton`, `StatusChip`, `EmptyState`, `IconButton`, `Collapsible`, `SelectField`, `ActionMenu`
+- Always check for existing components before creating new ones — reuse `ThemedText`, `ThemedButton`, `StatusChip`, `EmptyState`, `IconButton`, `Collapsible`, `SelectField`, `ActionMenu`, `Chip`, `DueDateField`, `RecurrenceField`, `SearchPickerDialog`, `KeyboardAvoidingWrapper`
 
 ## Color Tokens
 
@@ -41,7 +41,12 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 | Info | `Colors.primary.info` | `#FFD15D` |
 | Card background | `Colors.chip.darkCard` / `bg-chip-darkCard` | `#262E42` |
 | Card alt background | `Colors.chip.darkCardAlt` / `bg-chip-darkCardAlt` | `#334368` |
+| Card deep background | `Colors.chip.darkCardDeep` / `bg-chip-darkCardDeep` | `#0B1A2A` |
 | Overlay | `Colors.overlay.medium` | `rgba(0,0,0,0.5)` |
+| Overlay light | `Colors.overlay.light` | `rgba(0,0,0,0.32)` |
+| Tint teal | `Colors.tint.teal` | `rgba(24,205,186,0.15)` |
+| Tint error | `Colors.tint.error` | `rgba(255,109,94,0.15)` |
+| Tint info | `Colors.tint.info` | `rgba(255,209,93,0.15)` |
 
 **Status chip color pairs** (background + border):
 
@@ -72,6 +77,7 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 | `link` | Lato-Regular (uppercase) | 13 (web: 14) | Navigation links |
 | `italic` | Lato-Italic | 18 | Emphasized body |
 | `error` | Lato-Italic (error color) | 14 (web: 16) | Error messages |
+| `profileButtonText` | Lato-Bold | 20 | Profile/settings buttons |
 
 - IMPORTANT: Do NOT use `ThemedText`'s `onLight` prop inside Paper dialogs — dialogs are dark-themed
 
@@ -95,6 +101,7 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 - IMPORTANT: Do NOT install new icon packages — use the existing libraries
 - Primary: `@react-native-vector-icons/material-design-icons` (MaterialCommunityIcons)
 - Secondary: `@react-native-vector-icons/material-icons` (MaterialIcons)
+- Also available: `@react-native-vector-icons/ionicons`, `@react-native-vector-icons/ant-design`
 - Cross-platform wrapper: `IconSymbol` from `@/components/ui/IconSymbol` (SF Symbols on iOS, Material Icons fallback)
 - Common sizes: 14, 18, 20, 24, 40
 
@@ -111,7 +118,7 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 - Primary action: `ThemedButton` with `variant="default"` (teal bg)
 - Destructive: `ThemedButton` with `variant="error"` (red bg)
 - Disabled: automatically uses `bg-sway-darkGrey`
-- FAB groups: use `FabGroup` from `@/components/ui/fab/FabGroup`
+- Contextual actions: use `ActionMenu` bottom sheet for list item actions (replaced FabGroup)
 
 ## Spacing
 
