@@ -1,23 +1,69 @@
-import { useCallback, useMemo, useState } from 'react';
-import { FlatList, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { FlatList, TouchableOpacity, View } from 'react-native';
 import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import { ThemedText } from '@/components/ThemedText';
-import FabGroup from '@/components/ui/fab/FabGroup';
-import FabTrigger from '@/components/ui/fab/FabTrigger';
-import useGetFabOptions, { FabOptionsVariant } from '@/components/ui/fab/useGetFabOptions';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+import { renderErrorToast } from '@/components/toast/toastOptions';
+import type { ActionMenuItem } from '@/components/ui/ActionMenu';
+import ActionMenu from '@/components/ui/ActionMenu';
 import { Colors } from '@/constants/Colors';
-import { useAllPatients } from '@/hooks/useUsers';
+import { useAddRemoveTherapist, useAllPatients } from '@/hooks/useUsers';
 import { useAuthStore } from '@/stores/authStore';
+import { pickClientAndCompose } from '@/utils/mail';
+import type { AuthUser } from '@milobedini/shared-types';
+import Icon from '@react-native-vector-icons/material-design-icons';
+
+const PatientRow = ({
+  patient,
+  isClient,
+  onMenuPress
+}: {
+  patient: AuthUser;
+  isClient: boolean;
+  onMenuPress: (id: string) => void;
+}) => (
+  <TouchableOpacity
+    className="mb-1 flex-row items-center justify-between rounded-xl px-4 py-4 active:opacity-80"
+    style={{ backgroundColor: Colors.chip.darkCard }}
+  >
+    <View className="flex-row items-center gap-3">
+      <View
+        className="h-10 w-10 items-center justify-center rounded-full"
+        style={{ backgroundColor: isClient ? 'rgba(255,209,93,0.15)' : 'rgba(24,205,186,0.15)' }}
+      >
+        <Icon
+          name={isClient ? 'star' : 'account'}
+          size={20}
+          color={isClient ? Colors.primary.info : Colors.sway.bright}
+        />
+      </View>
+      <View>
+        <ThemedText type="default">{patient.name || patient.username}</ThemedText>
+        <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
+          {patient.email}
+        </ThemedText>
+      </View>
+    </View>
+    <TouchableOpacity
+      onPress={() => onMenuPress(patient._id)}
+      className="h-9 w-9 items-center justify-center rounded-lg active:opacity-70"
+      style={{ backgroundColor: Colors.chip.darkCardAlt }}
+      hitSlop={8}
+    >
+      <Icon name="dots-vertical" size={18} color={Colors.sway.darkGrey} />
+    </TouchableOpacity>
+  </TouchableOpacity>
+);
+
+const MemoPatientRow = React.memo(PatientRow);
 
 const AllPatients = () => {
   const user = useAuthStore((s) => s.user);
-
   const { data: patients, isPending, isError } = useAllPatients();
+  const addRemoveTherapist = useAddRemoveTherapist();
 
-  const [openFab, setOpenFab] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
 
   const selectedPatient = useMemo(
@@ -27,16 +73,64 @@ const AllPatients = () => {
   const isClient = selectedPatient?.therapist === user?._id;
 
   const closeMenu = useCallback(() => {
-    setOpenFab(false);
+    setMenuOpen(false);
     setSelectedPatientId(null);
   }, []);
 
-  const actions = useGetFabOptions({
-    variant: FabOptionsVariant.PATIENTS,
-    closeMenu,
-    selectedEntity: selectedPatient,
-    isClient
-  });
+  const handleMenuPress = useCallback((id: string) => {
+    setSelectedPatientId(id);
+    setMenuOpen(true);
+  }, []);
+
+  const handleAddRemoveClient = useCallback(() => {
+    if (selectedPatient?._id && user?._id) {
+      addRemoveTherapist.mutate(
+        { patientId: selectedPatient._id, therapistId: user._id },
+        { onSuccess: closeMenu, onError: closeMenu }
+      );
+    }
+  }, [addRemoveTherapist, closeMenu, selectedPatient?._id, user?._id]);
+
+  const handleEmailPatient = useCallback(async () => {
+    if (!selectedPatient?.email) return;
+    try {
+      await pickClientAndCompose({
+        recipients: [selectedPatient.email],
+        subject: '',
+        body: ''
+      });
+    } catch (error) {
+      renderErrorToast(error);
+    }
+    closeMenu();
+  }, [closeMenu, selectedPatient?.email]);
+
+  const actions: ActionMenuItem[] = useMemo(
+    () => [
+      {
+        icon: isClient ? 'star-off' : 'star',
+        label: isClient ? 'Remove as client' : 'Add as client',
+        onPress: handleAddRemoveClient,
+        variant: isClient ? ('destructive' as const) : ('default' as const)
+      },
+      {
+        icon: 'email-outline',
+        label: 'Email patient',
+        onPress: handleEmailPatient
+      }
+    ],
+    [handleAddRemoveClient, handleEmailPatient, isClient]
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: AuthUser }) => {
+      const patientIsClient = item.therapist === user?._id;
+      return <MemoPatientRow patient={item} isClient={patientIsClient} onMenuPress={handleMenuPress} />;
+    },
+    [handleMenuPress, user?._id]
+  );
+
+  const keyExtractor = useCallback((item: AuthUser) => item._id, []);
 
   if (isPending) return <LoadingIndicator marginBottom={0} />;
   if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
@@ -46,39 +140,16 @@ const AllPatients = () => {
     <ContentContainer>
       <FlatList
         data={patients}
-        keyExtractor={(item) => item._id}
-        contentContainerClassName="px-4"
-        renderItem={({ item: patient }) => {
-          const isClient = patient?.therapist === user?._id;
-
-          return (
-            <View
-              key={patient._id}
-              className="mb-4 flex-row items-center justify-between rounded-md border-b border-sway-lightGrey pb-4"
-            >
-              <View className="mr-2 flex-1">
-                <ThemedText type="smallTitle">{patient.email}</ThemedText>
-                <View className="flex-row gap-2">
-                  <ThemedText>{patient.username}</ThemedText>
-                  {isClient && <IconSymbol name="star.fill" color={Colors.primary.info} />}
-                </View>
-              </View>
-              <FabTrigger
-                onPress={() => {
-                  setSelectedPatientId(patient._id);
-                  setOpenFab(true);
-                }}
-                icon="dots-horizontal"
-              />
-            </View>
-          );
-        }}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        contentContainerClassName="gap-2 px-1 pt-2"
       />
-      <FabGroup
-        visible={selectedPatientId !== null}
-        open={openFab}
-        onOpenChange={setOpenFab}
+
+      <ActionMenu
+        visible={menuOpen}
         onDismiss={closeMenu}
+        title={selectedPatient?.name || selectedPatient?.username}
+        subtitle={selectedPatient?.email}
         actions={actions}
       />
     </ContentContainer>
