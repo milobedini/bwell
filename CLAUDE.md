@@ -33,6 +33,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - UI component system (StatusChip base, EmptyState component, Pressable buttons with hover/focus/disabled states, colour tokens in tailwind config, web-aligned font scale)
 - Admin All Users (search, filtering, sorting, infinite scroll with lazy loading)
 - Global Paper dark theme (MD3DarkTheme, dialog surfaces, dark-aware text)
+- Performance: lazy tabs, React.memo/useCallback on FlatList components, expo-image migration, Hermes engine
 
 **In progress / partial:** (none currently)
 
@@ -57,7 +58,8 @@ The app has three tiers (from `docs/proposal.pdf`):
 - **Styling:** NativeWind (Tailwind CSS) — prefer className over StyleSheet where possible
 - **State:** Zustand (client/auth), TanStack React Query (server state)
 - **Forms:** Formik + Yup
-- **UI:** react-native-paper, @gorhom/bottom-sheet, moti, react-native-reanimated, @shopify/react-native-skia
+- **UI:** react-native-paper, @gorhom/bottom-sheet, moti, react-native-reanimated, @shopify/react-native-skia, expo-image
+- **JS Engine:** Hermes (explicitly enabled in app.config.js)
 - **API:** Axios with cookie-based auth (`withCredentials: true`)
 - **Types:** Shared types via `@milobedini/shared-types` npm package
 - **Backend:** Node/Express + MongoDB (separate repo at `../cbt/`)
@@ -90,6 +92,9 @@ The app has three tiers (from `docs/proposal.pdf`):
 - **Value debounce:** Use `useDebounce(value, delay)` from `hooks/useDebounce.ts` for search inputs. Distinct from callback-based `useDebouncedCallback` in `utils/debounce.ts`.
 - **Filter drawers:** Slide-in from right using `Animated.View` + `useWindowDimensions()`. See `AttemptFilterDrawer` (timeline) and `UserFilterDrawer` (admin users).
 - **Paper dark theme:** Global `MD3DarkTheme` is configured in `_layout.tsx` with app color tokens. Dialog backgrounds use `surfaceContainerHigh` / `elevation.level3` (set to `Colors.chip.darkCard`). When adding Paper `TextInput` inside dialogs, set `style={{ backgroundColor: Colors.chip.darkCard }}` to match the dialog surface. Do not use `ThemedText`'s `onLight` prop inside dialogs — they are dark-themed.
+- **FlatList performance:** Wrap list item components in `React.memo`. Extract `renderItem` to `useCallback` — never use inline arrow functions. Extract `ItemSeparatorComponent` to a stable const outside the component. See `ModulesList`, `AssignmentsListTherapist` for reference.
+- **Images:** Use `Image` from `expo-image` (not `react-native`). Use `contentFit` prop (not `resizeMode`). Dimensions go in `style`, not as direct props. For bundled assets, keep `ImageSourcePropType` from react-native (expo-image's `ImageSource` is object-only and incompatible with `require()` return type).
+- **Lazy tabs:** Tab navigator uses `lazy: true` in screenOptions — non-home tabs defer mounting until first focused.
 
 ## Git Workflow
 

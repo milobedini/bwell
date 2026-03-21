@@ -7,7 +7,6 @@ import { StatusBar } from 'expo-status-bar';
 import Container from '@/components/Container';
 import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
-import { Colors } from '@/constants/Colors';
 
 import logo from '../../assets/images/logo.png';
 
@@ -25,6 +24,9 @@ const styles = StyleSheet.create({
 const ReadyScreen = () => {
   const router = useRouter();
   const [started, setStarted] = useState(false);
+  const { width } = useWindowDimensions();
+  const imageSize = Math.min(width * 0.6, 280);
+
   const onGetStarted = () => {
     setStarted(true);
     router.push('/(welcome)/welcome-carousel');
