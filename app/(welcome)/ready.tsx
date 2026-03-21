@@ -1,29 +1,21 @@
 import { useState } from 'react';
-import { Image, StyleSheet } from 'react-native';
+import { useWindowDimensions } from 'react-native';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import Container from '@/components/Container';
 import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
-import { Colors } from '@/constants/Colors';
 
 import logo from '../../assets/images/logo.png';
-
-const styles = StyleSheet.create({
-  image: {
-    height: 500,
-    width: 800,
-    resizeMode: 'contain'
-  },
-  title: {
-    color: Colors.primary.accent
-  }
-});
 
 const ReadyScreen = () => {
   const router = useRouter();
   const [started, setStarted] = useState(false);
+  const { width } = useWindowDimensions();
+  const imageSize = Math.min(width * 0.6, 280);
+
   const onGetStarted = () => {
     setStarted(true);
     router.push('/(welcome)/welcome-carousel');
@@ -31,8 +23,13 @@ const ReadyScreen = () => {
 
   if (!started) {
     return (
-      <Container centered className="gap-2 bg-sway-dark px-4">
-        <Image source={logo} style={styles.image} onLoad={() => SplashScreen.hideAsync()} />
+      <Container centered className="justify-center gap-6 bg-sway-dark px-4">
+        <Image
+          source={logo}
+          style={{ width: imageSize, height: imageSize }}
+          contentFit="contain"
+          onLoad={() => SplashScreen.hideAsync()}
+        />
         <ThemedText type="title">Welcome to BWell</ThemedText>
         <ThemedButton onPress={onGetStarted}>Get started!</ThemedButton>
       </Container>
