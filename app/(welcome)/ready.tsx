@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -9,17 +9,6 @@ import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 
 import logo from '../../assets/images/logo.png';
-
-const styles = StyleSheet.create({
-  image: {
-    height: 300,
-    width: '80%',
-    maxWidth: 300
-  },
-  title: {
-    color: Colors.primary.accent
-  }
-});
 
 const ReadyScreen = () => {
   const router = useRouter();
@@ -35,7 +24,12 @@ const ReadyScreen = () => {
   if (!started) {
     return (
       <Container centered className="justify-evenly bg-sway-dark px-4">
-        <Image source={logo} contentFit="contain" style={styles.image} onLoad={() => SplashScreen.hideAsync()} />
+        <Image
+          source={logo}
+          style={{ width: imageSize, height: imageSize }}
+          contentFit="contain"
+          onLoad={() => SplashScreen.hideAsync()}
+        />
         <ThemedText type="title">Welcome to BWell</ThemedText>
         <ThemedButton onPress={onGetStarted}>Get started!</ThemedButton>
       </Container>

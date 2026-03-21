@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useRef, useState } from 'react';
 import { FlatList, type ListRenderItemInfo, TouchableOpacity } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
 import { clsx } from 'clsx';
@@ -15,6 +15,31 @@ import { LoadingIndicator } from '../LoadingScreen';
 import { ThemedText } from '../ThemedText';
 import { DateChip } from '../ui/Chip';
 import EmptyState from '../ui/EmptyState';
+
+type AttemptListItemProps = {
+  item: AttemptListItem;
+  index: number;
+  onPress: (id: string, title: string) => void;
+};
+
+const AttemptListItemBase = ({ item, index, onPress }: AttemptListItemProps) => {
+  const bgColor = index % 2 === 0 ? '' : 'bg-sway-buttonBackground';
+  return (
+    <TouchableOpacity className={clsx('gap-1 p-4', bgColor)} onPress={() => onPress(item._id, item.module.title)}>
+      <ThemedText type="smallTitle">{item.module.title}</ThemedText>
+      {!!item.totalScore && (
+        <ThemedText>
+          {item.totalScore} {item.scoreBandLabel}
+        </ThemedText>
+      )}
+      <View className="flex-row items-center gap-4">
+        <DateChip prefix={item.status} dateString={item.completedAt || item.lastInteractionAt || ''} />
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const AttemptListItemMemo = memo(AttemptListItemBase);
 
 const PatientAttempts = () => {
   const router = useRouter();
@@ -43,26 +68,9 @@ const PatientAttempts = () => {
   );
 
   const renderItem = useCallback(
-    ({ item, index }: ListRenderItemInfo<AttemptListItem>) => {
-      const bgColor = index % 2 === 0 ? '' : 'bg-sway-buttonBackground';
-      return (
-        <TouchableOpacity
-          key={item._id}
-          className={clsx('gap-1 p-4', bgColor)}
-          onPress={() => handleAttemptPress(item._id, item.module.title)}
-        >
-          <ThemedText type="smallTitle">{item.module.title}</ThemedText>
-          {!!item.totalScore && (
-            <ThemedText>
-              {item.totalScore} {item.scoreBandLabel}
-            </ThemedText>
-          )}
-          <View className="flex-row items-center gap-4">
-            <DateChip prefix={item.status} dateString={item.completedAt || item.lastInteractionAt || ''} />
-          </View>
-        </TouchableOpacity>
-      );
-    },
+    ({ item, index }: ListRenderItemInfo<AttemptListItem>) => (
+      <AttemptListItemMemo item={item} index={index} onPress={handleAttemptPress} />
+    ),
     [handleAttemptPress]
   );
 
