@@ -26,7 +26,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - Assignment system (due dates, recurrence, notes)
 - Questionnaire engine (scored MCQ, horizontal pager, auto-save, score bands) — supports PHQ-9, GAD-7, PDSS
 - Attempt lifecycle (start → auto-save → submit → view)
-- Therapist timeline (paginated patient history, filterable)
+- Therapist timeline (paginated patient history, filterable, severity-tinted attempt cards with score band colour mapping)
 - Admin dashboard (stats, therapist verification)
 - Onboarding carousel + welcome flow
 - Activity Diary (weekly grid, day chips with fill indicators, numeric fields, reflection prompts, editable user note, collapsible weekly summary, slot mood tinting)
@@ -76,6 +76,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - `constants/` — Colors, shared constants
 - `stores/` — Zustand stores
 - `types/` — local TypeScript types
+- `utils/` — helper functions (date formatting, severity colours, role checks, debounce)
 
 - Query defaults (1-hour staleTime, refetchOnWindowFocus/refetchOnReconnect disabled) are centralized in `QueryClient` in `app/_layout.tsx` — only override in hooks when a shorter staleTime is needed
 - Use `invalidateQueries` (not `refetchQueries`) in mutation `onSuccess` callbacks for consistency
@@ -129,6 +130,10 @@ The app has three tiers (from `docs/proposal.pdf`):
 - Use `Colors` constants from `constants/Colors.ts` — never hardcode hex values in components
 - Use `useWindowDimensions()` hook over static `Dimensions.get()` in components
 - Wrap dev-only logging in `if (__DEV__)`
+
+## Design System
+
+- Figma-to-code rules, colour tokens, typography, component inventory, and layout patterns are documented in `.claude/rules/figma-design-system.md` — this file is auto-loaded as context for every conversation and should be kept in sync with the codebase via the `update-status` skill.
 
 ## Custom Skills
 

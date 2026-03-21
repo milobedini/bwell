@@ -45,6 +45,8 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ## Recent Milestones
 
+- **Therapist attempts redesign** — severity-tinted cards with score band colour mapping, timeAgo display (2026-03-21)
+- **ActionMenu refactor** — replaced FabGroup with bottom sheet ActionMenu, added tint colour tokens (2026-03-21)
 - **Admin All Users** — search, filtering, sorting, and infinite scroll for user management (2026-03-20)
 - **Query refactor** — restored default refetchOnMount, dropped refetchType workaround (2026-03-19)
 - **UI bug fixes** — resolved stale data, layout gaps, row widths, chip styling, therapist note input (2026-03-19)
@@ -86,7 +88,7 @@ hooks/                   # React Query data-fetching hooks
 stores/                  # Zustand auth store
 constants/               # Colors & typography
 types/                   # Enums & local type definitions
-utils/                   # Role checks, date helpers, etc.
+utils/                   # Role checks, date helpers, severity colours, debounce
 ```
 
 ## Getting Started
