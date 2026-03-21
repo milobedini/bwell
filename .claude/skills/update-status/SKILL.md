@@ -7,7 +7,7 @@ description: Use when user says "update status", "sync claude md", "update build
 
 ## Overview
 
-Updates the **"Current build status"** section of `CLAUDE.md`, the **"Recent Milestones"** section of `README.md`, and **audits all other documented sections** (Architecture, Stack, README Architecture, etc.) against the actual codebase to catch drift.
+Updates the **"Current build status"** section of `CLAUDE.md`, the **"Recent Milestones"** section of `README.md`, **audits all other documented sections** (Architecture, Stack, README Architecture, etc.) against the actual codebase to catch drift, and **syncs the Figma design system rules** (`.claude/rules/figma-design-system.md`) with the current codebase.
 
 ## Workflow
 
@@ -20,16 +20,18 @@ digraph update_status {
   "4. Cross-ref proposal" [shape=box];
   "5. Update CLAUDE.md status" [shape=box];
   "6. Audit documented sections" [shape=box];
-  "7. Update README milestones" [shape=box];
-  "8. Show diff for approval" [shape=box];
+  "7. Audit Figma design system" [shape=box];
+  "8. Update README milestones" [shape=box];
+  "9. Show diff for approval" [shape=box];
 
   "1. Find last CLAUDE.md update" -> "2. Get git log since then";
   "2. Get git log since then" -> "3. Read executed plans";
   "3. Read executed plans" -> "4. Cross-ref proposal";
   "4. Cross-ref proposal" -> "5. Update CLAUDE.md status";
   "5. Update CLAUDE.md status" -> "6. Audit documented sections";
-  "6. Audit documented sections" -> "7. Update README milestones";
-  "7. Update README milestones" -> "8. Show diff for approval";
+  "6. Audit documented sections" -> "7. Audit Figma design system";
+  "7. Audit Figma design system" -> "8. Update README milestones";
+  "8. Update README milestones" -> "9. Show diff for approval";
 }
 ```
 
@@ -107,7 +109,38 @@ Common drift patterns to watch for:
 - New app routes or directories not in Project Structure
 - Removed or renamed scripts not updated in Commands
 
-### 7. Update README — recent milestones
+### 7. Audit Figma design system rules
+
+Audit `.claude/rules/figma-design-system.md` against the actual codebase to catch drift. This file is loaded as context for every Figma implementation task, so stale information directly causes incorrect code generation.
+
+#### What to verify
+
+| Section | Verify against |
+|---------|---------------|
+| **Color Tokens** | `constants/Colors.ts` and `tailwind.config.js` — check all tokens listed still exist with the correct values, and add any new tokens that have been introduced |
+| **Typography** | `components/ThemedText.tsx` — check all `type` variants match (font, size, use-case). Add new types, remove deleted ones |
+| **Component Organization** | `components/ui/` — check the reusable component list is complete. Add new UI primitives, remove deleted ones |
+| **Icon System** | `package.json` — verify listed icon packages are still the ones installed |
+| **Button Hierarchy** | `components/ui/ThemedButton.tsx` — check variant names and descriptions match |
+| **Layout Patterns** | `components/Container.tsx`, `components/ContentContainer.tsx` — verify defaults (className, padding) |
+| **Paper Theme** | `app/_layout.tsx` — verify theme config (colors, surface tokens) |
+| **Status chip color pairs** | `constants/Colors.ts` — verify all chip color pairs listed still exist and values are correct |
+
+#### How to audit
+
+1. **Read the source files** listed above (use parallel reads where possible)
+2. **Compare** what the code defines vs what the design system doc says
+3. **Fix** any inaccuracies — update values, add missing tokens, remove stale entries
+4. **Do not change** the Figma MCP Integration Flow, Import Conventions, Asset Handling, or Project-Specific Conventions sections unless they are factually wrong — these are workflow guidance, not derived from code
+
+Common drift patterns:
+- New color tokens added to `Colors.ts` / `tailwind.config.js` but not listed in the doc
+- ThemedText types added/renamed but not reflected in the typography table
+- New UI components created in `components/ui/` but not listed in Component Organization
+- ThemedButton variants added/changed but not in Button Hierarchy
+- Chip color pairs added or renamed
+
+### 8. Update README — recent milestones
 
 Add or update a `## Recent Milestones` section in `README.md`, placed **after the Features section and before the Tech Stack section**.
 
@@ -125,11 +158,12 @@ Rules:
 - Date = the merge/completion date from git history
 - Group related commits into single milestones (don't list individual commits)
 
-### 8. Show diff for approval
+### 9. Show diff for approval
 
 After editing all files, show the user a summary of what changed:
 - Items moved between status categories
 - Documentation corrections from the audit (list each fix with before → after)
+- Figma design system updates (new/changed/removed tokens, components, types)
 - New milestones added to README
 - Any items you were unsure about (flag for user decision)
 
@@ -137,7 +171,7 @@ After editing all files, show the user a summary of what changed:
 
 ## Edge cases
 
-- **No changes since last update:** Still run the audit (step 6) — documentation can drift even without new features. Only skip if user explicitly says "just milestones".
+- **No changes since last update:** Still run the audits (steps 6–7) — documentation can drift even without new features. Only skip if user explicitly says "just milestones".
 - **Ambiguous completion:** If a feature seems partially done but you're not sure, keep it in "In progress" and flag it for the user.
 - **Backend-only changes:** If commits are in the backend repo (`../cbt/`), note them but don't update frontend build status — this skill tracks the frontend app.
 - **Audit finds nothing wrong:** Report "all sections verified, no drift found" — don't make cosmetic edits.
