@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { FlatList, View } from 'react-native';
+import { FlatList, type ListRenderItemInfo, View } from 'react-native';
 import { clsx } from 'clsx';
 import { Link, useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
@@ -40,85 +40,84 @@ const AssignmentsListPatient = ({ data, completed }: AssignmentsListPatientProps
     [router, startAttempt]
   );
 
-  return (
-    <FlatList
-      data={data}
-      keyExtractor={(item) => item._id}
-      renderItem={({ item, index }) => {
-        const bgColor = index % 2 === 0 ? '' : 'bg-sway-buttonBackground';
-        const isInProgress = item.status === AssignmentStatus.IN_PROGRESS;
+  const renderItem = useCallback(
+    ({ item, index }: ListRenderItemInfo<MyAssignmentView>) => {
+      const bgColor = index % 2 === 0 ? '' : 'bg-sway-buttonBackground';
+      const isInProgress = item.status === AssignmentStatus.IN_PROGRESS;
 
-        return (
-          <View className={clsx('gap-1 p-4', bgColor)}>
-            <View className="flex-row items-center gap-2">
-              <ThemedText type="smallTitle">{item.module.title}</ThemedText>
-              {isInProgress && <AssignmentStatusChip status={item.status as AssignmentStatus} />}
-              {isInProgress && item.percentComplete !== undefined && (
-                <StatusChip
-                  label={`${Math.round(item.percentComplete)}%`}
-                  color={Colors.chip.amber}
-                  borderColor={Colors.chip.amberBorder}
-                  icon="progress-clock"
+      return (
+        <View className={clsx('gap-1 p-4', bgColor)}>
+          <View className="flex-row items-center gap-2">
+            <ThemedText type="smallTitle">{item.module.title}</ThemedText>
+            {isInProgress && <AssignmentStatusChip status={item.status as AssignmentStatus} />}
+            {isInProgress && item.percentComplete !== undefined && (
+              <StatusChip
+                label={`${Math.round(item.percentComplete)}%`}
+                color={Colors.chip.amber}
+                borderColor={Colors.chip.amberBorder}
+                icon="progress-clock"
+              />
+            )}
+          </View>
+          <ThemedText>Assigned by {item.therapist.name}</ThemedText>
+          {item.notes && <ThemedText type="italic">&quot;{item.notes}&quot;</ThemedText>}
+          {item.recurrence && completed && <RecurrenceChip recurrence={item.recurrence} />}
+          {completed && <DueChip completed dueAt={item.latestAttempt?.completedAt} />}
+          {completed && (
+            <Link
+              asChild
+              href={{
+                pathname: '/attempts/[id]',
+                params: {
+                  id: item.latestAttempt?._id as string,
+                  assignmentId: item._id,
+                  headerTitle: `${item.module.title} (${dateString(item.updatedAt)})`
+                }
+              }}
+              withAnchor
+            >
+              <ThemedButton title={'View attempt'} compact className="mt-4 self-start" />
+            </Link>
+          )}
+          {!completed && (
+            <View>
+              <View className="flex-row flex-wrap gap-1">
+                <DueChip dueAt={item.dueAt} />
+                {item.dueAt && <TimeLeftChip dueAt={item.dueAt} />}
+                {item.recurrence && !completed && <RecurrenceChip recurrence={item.recurrence} />}
+              </View>
+              {isInProgress ? (
+                <Link
+                  asChild
+                  withAnchor
+                  href={{
+                    pathname: '/attempts/[id]',
+                    params: {
+                      id: item.latestAttempt?._id as string,
+                      assignmentId: item._id,
+                      headerTitle: item.module.title
+                    }
+                  }}
+                >
+                  <ThemedButton title="Continue" compact className="mt-4 w-1/3" />
+                </Link>
+              ) : (
+                <ThemedButton
+                  title="Start"
+                  compact
+                  className="mt-4 w-1/3"
+                  onPress={() => createAttemptFromAssignment(item)}
                 />
               )}
             </View>
-            <ThemedText>Assigned by {item.therapist.name}</ThemedText>
-            {item.notes && <ThemedText type="italic">&quot;{item.notes}&quot;</ThemedText>}
-            {item.recurrence && completed && <RecurrenceChip recurrence={item.recurrence} />}
-            {completed && <DueChip completed dueAt={item.latestAttempt?.completedAt} />}
-            {completed && (
-              <Link
-                asChild
-                href={{
-                  pathname: '/attempts/[id]',
-                  params: {
-                    id: item.latestAttempt?._id as string,
-                    assignmentId: item._id,
-                    headerTitle: `${item.module.title} (${dateString(item.updatedAt)})`
-                  }
-                }}
-                withAnchor
-              >
-                <ThemedButton title={'View attempt'} compact className="mt-4 self-start" />
-              </Link>
-            )}
-            {!completed && (
-              <View>
-                <View className="flex-row flex-wrap gap-1">
-                  <DueChip dueAt={item.dueAt} />
-                  {item.dueAt && <TimeLeftChip dueAt={item.dueAt} />}
-                  {item.recurrence && !completed && <RecurrenceChip recurrence={item.recurrence} />}
-                </View>
-                {isInProgress ? (
-                  <Link
-                    asChild
-                    withAnchor
-                    href={{
-                      pathname: '/attempts/[id]',
-                      params: {
-                        id: item.latestAttempt?._id as string,
-                        assignmentId: item._id,
-                        headerTitle: item.module.title
-                      }
-                    }}
-                  >
-                    <ThemedButton title="Continue" compact className="mt-4 w-1/3" />
-                  </Link>
-                ) : (
-                  <ThemedButton
-                    title="Start"
-                    compact
-                    className="mt-4 w-1/3"
-                    onPress={() => createAttemptFromAssignment(item)}
-                  />
-                )}
-              </View>
-            )}
-          </View>
-        );
-      }}
-    />
+          )}
+        </View>
+      );
+    },
+    [completed, createAttemptFromAssignment]
   );
+
+  return <FlatList data={data} keyExtractor={(item) => item._id} renderItem={renderItem} />;
 };
 
 export default AssignmentsListPatient;
