@@ -34,7 +34,51 @@ export const formatForField = (d: Date, hasTime: boolean) => {
   }
 };
 
-export const dateString = (dateString: string): string => {
-  const date = new Date(dateString);
+export const dateString = (input: string): string => {
+  const date = new Date(input);
   return date.toLocaleDateString();
+};
+
+type TimeAgoResult = {
+  relative: string | null;
+  formatted: string;
+};
+
+export const timeAgo = (input: string): TimeAgoResult => {
+  const date = new Date(input);
+  const formatted = dateString(input);
+  const diffMs = Date.now() - date.getTime();
+
+  if (diffMs < 60_000) return { relative: 'just now', formatted };
+
+  const minutes = Math.floor(diffMs / 60_000);
+  if (minutes < 60)
+    return {
+      relative: minutes === 1 ? '1 minute ago' : `${minutes} minutes ago`,
+      formatted
+    };
+
+  const hours = Math.floor(diffMs / 3_600_000);
+  if (hours < 24)
+    return {
+      relative: hours === 1 ? '1 hour ago' : `${hours} hours ago`,
+      formatted
+    };
+
+  const days = Math.floor(diffMs / 86_400_000);
+  if (days < 7)
+    return {
+      relative: days === 1 ? '1 day ago' : `${days} days ago`,
+      formatted
+    };
+
+  if (days < 30) {
+    const weeks = Math.floor(days / 7);
+    return {
+      relative: weeks === 1 ? '1 week ago' : `${weeks} weeks ago`,
+      formatted
+    };
+  }
+
+  return { relative: null, formatted };
 };
