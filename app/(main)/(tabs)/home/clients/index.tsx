@@ -37,7 +37,7 @@ const ClientRow = ({ client, onMenuPress }: { client: AuthUser; onMenuPress: (id
       <View className="flex-row items-center gap-3">
         <View
           className="h-10 w-10 items-center justify-center rounded-full"
-          style={{ backgroundColor: 'rgba(24,205,186,0.15)' }}
+          style={{ backgroundColor: Colors.tint.teal }}
         >
           <Icon name="account" size={20} color={Colors.sway.bright} />
         </View>

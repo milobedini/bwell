@@ -22,39 +22,43 @@ const PatientRow = ({
   patient: AuthUser;
   isClient: boolean;
   onMenuPress: (id: string) => void;
-}) => (
-  <TouchableOpacity
-    className="mb-1 flex-row items-center justify-between rounded-xl px-4 py-4 active:opacity-80"
-    style={{ backgroundColor: Colors.chip.darkCard }}
-  >
-    <View className="flex-row items-center gap-3">
-      <View
-        className="h-10 w-10 items-center justify-center rounded-full"
-        style={{ backgroundColor: isClient ? 'rgba(255,209,93,0.15)' : 'rgba(24,205,186,0.15)' }}
-      >
-        <Icon
-          name={isClient ? 'star' : 'account'}
-          size={20}
-          color={isClient ? Colors.primary.info : Colors.sway.bright}
-        />
-      </View>
-      <View>
-        <ThemedText type="default">{patient.name || patient.username}</ThemedText>
-        <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
-          {patient.email}
-        </ThemedText>
-      </View>
-    </View>
-    <TouchableOpacity
-      onPress={() => onMenuPress(patient._id)}
-      className="h-9 w-9 items-center justify-center rounded-lg active:opacity-70"
-      style={{ backgroundColor: Colors.chip.darkCardAlt }}
-      hitSlop={8}
+}) => {
+  const handlePress = useCallback(() => onMenuPress(patient._id), [onMenuPress, patient._id]);
+
+  return (
+    <View
+      className="mb-1 flex-row items-center justify-between rounded-xl px-4 py-4"
+      style={{ backgroundColor: Colors.chip.darkCard }}
     >
-      <Icon name="dots-vertical" size={18} color={Colors.sway.darkGrey} />
-    </TouchableOpacity>
-  </TouchableOpacity>
-);
+      <View className="flex-row items-center gap-3">
+        <View
+          className="h-10 w-10 items-center justify-center rounded-full"
+          style={{ backgroundColor: isClient ? Colors.tint.info : Colors.tint.teal }}
+        >
+          <Icon
+            name={isClient ? 'star' : 'account'}
+            size={20}
+            color={isClient ? Colors.primary.info : Colors.sway.bright}
+          />
+        </View>
+        <View>
+          <ThemedText type="default">{patient.name || patient.username}</ThemedText>
+          <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
+            {patient.email}
+          </ThemedText>
+        </View>
+      </View>
+      <TouchableOpacity
+        onPress={handlePress}
+        className="h-9 w-9 items-center justify-center rounded-lg active:opacity-70"
+        style={{ backgroundColor: Colors.chip.darkCardAlt }}
+        hitSlop={8}
+      >
+        <Icon name="dots-vertical" size={18} color={Colors.sway.darkGrey} />
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const MemoPatientRow = React.memo(PatientRow);
 
