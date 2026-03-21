@@ -1,7 +1,8 @@
 import { type ReactNode, useEffect, useMemo } from 'react';
-import { Image, useWindowDimensions, View } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import { interpolate, useDerivedValue, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import Constants from 'expo-constants';
+import { Image } from 'expo-image';
 import { Colors } from '@/constants/Colors';
 import {
   BackdropFilter,
