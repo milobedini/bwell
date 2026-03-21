@@ -1,5 +1,5 @@
-import { Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Image } from 'expo-image';
 import { Tabs } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { useAuthStore } from '@/stores/authStore';
@@ -17,6 +17,7 @@ export default function MainTabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        lazy: true,
         tabBarStyle: {
           backgroundColor: Colors.sway.dark,
           borderTopColor: Colors.sway.bright,
@@ -41,8 +42,7 @@ export default function MainTabsLayout() {
           tabBarIcon: ({ size, focused }) => (
             <Image
               source={focused ? icon : disabledIcon}
-              width={size * 2}
-              height={size * 2}
+              contentFit="contain"
               style={{
                 width: size * 2,
                 height: size * 2

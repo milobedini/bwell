@@ -1,4 +1,5 @@
-import { ImageBackground, type ImageSourcePropType, useWindowDimensions } from 'react-native';
+import { type ImageSourcePropType, useWindowDimensions, View } from 'react-native';
+import { Image } from 'expo-image';
 import { Colors } from '@/constants/Colors';
 
 type ItemProp = {
@@ -11,18 +12,8 @@ export const Item = ({ item }: ItemProp) => {
   const { width, height } = useWindowDimensions();
 
   return (
-    <ImageBackground
-      source={item.image}
-      style={{
-        width,
-        height,
-        backgroundColor: Colors.primary.black
-      }}
-      imageStyle={{
-        flex: 1,
-        resizeMode: 'cover',
-        opacity: 0.7
-      }}
-    />
+    <View style={{ width, height, backgroundColor: Colors.primary.black }}>
+      <Image source={item.image} style={{ flex: 1, opacity: 0.7 }} contentFit="cover" />
+    </View>
   );
 };

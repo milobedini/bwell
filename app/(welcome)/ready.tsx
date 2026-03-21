@@ -23,7 +23,7 @@ const ReadyScreen = () => {
 
   if (!started) {
     return (
-      <Container centered className="justify-center gap-6 bg-sway-dark px-4">
+      <Container centered className="justify-evenly bg-sway-dark px-4">
         <Image
           source={logo}
           style={{ width: imageSize, height: imageSize }}

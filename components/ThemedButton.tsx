@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
-import { Image, Pressable, PressableProps } from 'react-native';
+import { Pressable, PressableProps } from 'react-native';
 import { clsx } from 'clsx';
+import { Image } from 'expo-image';
 
 import { ThemedText } from './ThemedText';
 

@@ -8,6 +8,7 @@ export default {
     scheme: 'bwell',
     userInterfaceStyle: 'automatic',
     newArchEnabled: true,
+    jsEngine: 'hermes',
     owner: 'milobedini',
     runtimeVersion: {
       policy: 'appVersion'
