@@ -44,6 +44,7 @@ const TherapistAttemptListItemBase = ({ item }: { item: TherapistLatestRow }) =>
         }
       }}
       push
+      withAnchor
     >
       <Pressable
         className="overflow-hidden rounded-xl bg-chip-darkCard"
@@ -70,7 +71,7 @@ const TherapistAttemptListItemBase = ({ item }: { item: TherapistLatestRow }) =>
             </View>
 
             {/* Row 2: Patient name */}
-            <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
+            <ThemedText type="small" className="text-sway-darkGrey">
               {item.user.name}
             </ThemedText>
 
@@ -82,7 +83,7 @@ const TherapistAttemptListItemBase = ({ item }: { item: TherapistLatestRow }) =>
                     {item.totalScore}
                   </ThemedText>
                 </View>
-                <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
+                <ThemedText type="small" className="text-sway-darkGrey">
                   {item.scoreBandLabel}
                 </ThemedText>
               </View>
@@ -91,7 +92,7 @@ const TherapistAttemptListItemBase = ({ item }: { item: TherapistLatestRow }) =>
             {/* Row 4: Relative time + date */}
             <View className="flex-row items-center gap-1">
               <MaterialCommunityIcons name="calendar" size={14} color={Colors.sway.darkGrey} />
-              <ThemedText type="small" style={{ color: Colors.sway.darkGrey, fontSize: 12 }}>
+              <ThemedText type="small" className="text-xs text-sway-darkGrey">
                 {relative ? `${relative} · ${formatted}` : formatted}
               </ThemedText>
             </View>

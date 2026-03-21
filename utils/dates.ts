@@ -46,6 +46,7 @@ type TimeAgoResult = {
 
 export const timeAgo = (input: string): TimeAgoResult => {
   const date = new Date(input);
+  if (isNaN(date.getTime())) return { relative: null, formatted: '' };
   const formatted = dateString(input);
   const diffMs = Date.now() - date.getTime();
 
