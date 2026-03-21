@@ -13,8 +13,9 @@ import logo from '../../assets/images/logo.png';
 
 const styles = StyleSheet.create({
   image: {
-    height: 500,
-    width: 800
+    height: 300,
+    width: '80%',
+    maxWidth: 300
   },
   title: {
     color: Colors.primary.accent
@@ -31,7 +32,7 @@ const ReadyScreen = () => {
 
   if (!started) {
     return (
-      <Container centered className="gap-2 bg-sway-dark px-4">
+      <Container centered className="justify-evenly bg-sway-dark px-4">
         <Image source={logo} contentFit="contain" style={styles.image} onLoad={() => SplashScreen.hideAsync()} />
         <ThemedText type="title">Welcome to BWell</ThemedText>
         <ThemedButton onPress={onGetStarted}>Get started!</ThemedButton>
