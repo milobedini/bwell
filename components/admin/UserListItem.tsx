@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Pressable, View } from 'react-native';
 import type { SortOption } from '@/components/admin/SortButton';
 import { Colors } from '@/constants/Colors';
@@ -123,4 +124,4 @@ const UserListItem = ({ user, sort, onPress }: UserListItemProps) => {
   );
 };
 
-export default UserListItem;
+export default memo(UserListItem);

@@ -1,4 +1,5 @@
-import { Image, View } from 'react-native';
+import { View } from 'react-native';
+import { Image } from 'expo-image';
 import { Colors } from '@/constants/Colors';
 
 import imageSource from '../../assets/images/icon.png';
@@ -17,10 +18,10 @@ export const LoginLogo = () => (
   >
     <Image
       source={imageSource}
+      contentFit="cover"
       style={{
         width: 100,
-        height: 100,
-        resizeMode: 'cover'
+        height: 100
       }}
     />
   </View>
