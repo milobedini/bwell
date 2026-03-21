@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { View } from 'react-native';
 import { Card, Chip } from 'react-native-paper';
 import { ThemedText } from '@/components/ThemedText';
@@ -78,4 +78,4 @@ const QuestionSlide = ({ mode, question, onPick, colors }: QuestionSlideProps) =
   );
 };
 
-export default QuestionSlide;
+export default memo(QuestionSlide);
