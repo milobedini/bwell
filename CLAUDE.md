@@ -30,7 +30,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - Admin dashboard (stats, therapist verification)
 - Onboarding carousel + welcome flow
 - Activity Diary (weekly grid, day chips with fill indicators, numeric fields, reflection prompts, editable user note, collapsible weekly summary, slot mood tinting)
-- UI component system (StatusChip base, EmptyState component, Pressable buttons with hover/focus/disabled states, colour tokens in tailwind config, web-aligned font scale)
+- UI component system (StatusChip base, EmptyState component, Pressable buttons with hover/focus/disabled states, colour tokens in tailwind config, web-aligned font scale, ActionMenu bottom sheet)
 - Admin All Users (search, filtering, sorting, infinite scroll with lazy loading)
 - Global Paper dark theme (MD3DarkTheme, dialog surfaces, dark-aware text)
 - Performance: lazy tabs, React.memo/useCallback on FlatList components, expo-image migration, Hermes engine
@@ -94,6 +94,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - **Paper dark theme:** Global `MD3DarkTheme` is configured in `_layout.tsx` with app color tokens. Dialog backgrounds use `surfaceContainerHigh` / `elevation.level3` (set to `Colors.chip.darkCard`). When adding Paper `TextInput` inside dialogs, set `style={{ backgroundColor: Colors.chip.darkCard }}` to match the dialog surface. Do not use `ThemedText`'s `onLight` prop inside dialogs — they are dark-themed.
 - **FlatList performance:** Wrap list item components in `React.memo`. Extract `renderItem` to `useCallback` — never use inline arrow functions. Extract `ItemSeparatorComponent` to a stable const outside the component. See `ModulesList`, `AssignmentsListTherapist` for reference.
 - **Images:** Use `Image` from `expo-image` (not `react-native`). Use `contentFit` prop (not `resizeMode`). Dimensions go in `style`, not as direct props. For bundled assets, keep `ImageSourcePropType` from react-native (expo-image's `ImageSource` is object-only and incompatible with `require()` return type). Note: `ImageProps` from react-native is NOT compatible with expo-image's `Image` component (type conflicts on `tintColor` etc.) — use expo-image's `ImageProps` when typing component props that spread onto expo-image `Image`.
+- **Action menus:** Use `ActionMenu` from `components/ui/ActionMenu.tsx` for contextual actions on list items (dots menu → slide-up card). Props: `title`, `subtitle`, `actions` (with `icon`, `label`, `variant: 'default' | 'destructive'`). Always dismiss ActionMenu before opening another modal to avoid z-index overlap.
 - **Lazy tabs:** Tab navigator uses `lazy: true` in screenOptions — non-home tabs defer mounting until first focused.
 
 ## Git Workflow

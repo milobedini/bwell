@@ -1,18 +1,17 @@
-import { memo, useCallback, useState } from 'react';
-import { FlatList, type ListRenderItemInfo, View } from 'react-native';
-import { FAB, Menu } from 'react-native-paper';
-import { clsx } from 'clsx';
+import { memo, useCallback, useMemo, useState } from 'react';
+import { FlatList, type ListRenderItemInfo, TouchableOpacity, View } from 'react-native';
+import { FAB } from 'react-native-paper';
 import { Link } from 'expo-router';
+import type { ActionMenuItem } from '@/components/ui/ActionMenu';
+import ActionMenu from '@/components/ui/ActionMenu';
 import { Colors } from '@/constants/Colors';
-import { Fonts } from '@/constants/Typography';
 import { useRemoveAssignment } from '@/hooks/useAssignments';
 import { dateString } from '@/utils/dates';
 import type { MyAssignmentView } from '@milobedini/shared-types';
-import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
+import Icon from '@react-native-vector-icons/material-design-icons';
 
 import { ThemedText } from '../ThemedText';
 import { DueChip, RecurrenceChip, TimeLeftChip } from '../ui/Chip';
-import FabTrigger from '../ui/fab/FabTrigger';
 
 type AssignmentsListTherapistProps = {
   data: MyAssignmentView[];
@@ -21,39 +20,24 @@ type AssignmentsListTherapistProps = {
 type AssignmentListItemTherapistProps = {
   item: MyAssignmentView;
   index: number;
-  menuVisible: boolean;
   onOpenMenu: (id: string) => void;
-  onCloseMenu: () => void;
-  onRemove: (id: string) => void;
 };
 
-const AssignmentListItemTherapistBase = ({
-  item,
-  index,
-  menuVisible,
-  onOpenMenu,
-  onCloseMenu,
-  onRemove
-}: AssignmentListItemTherapistProps) => {
+const AssignmentListItemTherapistBase = ({ item, index, onOpenMenu }: AssignmentListItemTherapistProps) => {
   const bgColor = index % 2 === 0 ? '' : 'bg-sway-buttonBackground';
 
   return (
-    <View className={clsx('gap-1 p-4', bgColor)}>
+    <View className={`gap-1 p-4 ${bgColor}`}>
       <View className="flex-row items-center justify-between">
         <ThemedText type="smallTitle">{item.module.title}</ThemedText>
-        <Menu
-          visible={menuVisible}
-          onDismiss={onCloseMenu}
-          contentStyle={{ backgroundColor: Colors.sway.lightGrey, elevation: 2 }}
-          anchor={<FabTrigger onPress={() => onOpenMenu(item._id)} icon="dots-horizontal" size="small" />}
+        <TouchableOpacity
+          onPress={() => onOpenMenu(item._id)}
+          className="h-9 w-9 items-center justify-center rounded-lg active:opacity-70"
+          style={{ backgroundColor: Colors.chip.darkCardAlt }}
+          hitSlop={8}
         >
-          <Menu.Item
-            leadingIcon={() => <MaterialCommunityIcons name="delete" size={24} color={Colors.primary.error} />}
-            onPress={() => onRemove(item._id)}
-            title="Remove"
-            titleStyle={{ color: Colors.primary.error, fontFamily: Fonts.Bold }}
-          />
-        </Menu>
+          <Icon name="dots-vertical" size={18} color={Colors.sway.darkGrey} />
+        </TouchableOpacity>
       </View>
       <ThemedText>
         Assigned to {item.user.name ?? item.user.username} on {dateString(item.createdAt)}
@@ -74,45 +58,63 @@ const AssignmentListItemTherapistBase = ({
 const AssignmentListItemTherapist = memo(AssignmentListItemTherapistBase);
 
 const AssignmentsListTherapist = ({ data }: AssignmentsListTherapistProps) => {
-  const [menuFor, setMenuFor] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const { mutate: removeAssignment } = useRemoveAssignment();
 
-  const closeMenu = useCallback(() => setMenuFor(null), []);
+  const selectedAssignment = useMemo(() => data.find((a) => a._id === selectedId), [data, selectedId]);
 
-  const handleRemoveAssignment = useCallback(
-    (id: string) => {
-      removeAssignment(
-        { assignmentId: id },
-        {
-          onSuccess: () => {
-            closeMenu();
-          }
-        }
-      );
-    },
-    [removeAssignment, closeMenu]
+  const closeMenu = useCallback(() => {
+    setMenuOpen(false);
+    setSelectedId(null);
+  }, []);
+
+  const handleRemoveAssignment = useCallback(() => {
+    if (!selectedId) return;
+    removeAssignment({ assignmentId: selectedId }, { onSuccess: closeMenu });
+  }, [removeAssignment, selectedId, closeMenu]);
+
+  const openMenu = useCallback((id: string) => {
+    setSelectedId(id);
+    setMenuOpen(true);
+  }, []);
+
+  const actions: ActionMenuItem[] = useMemo(
+    () => [
+      {
+        icon: 'delete-outline',
+        label: 'Remove assignment',
+        onPress: handleRemoveAssignment,
+        variant: 'destructive' as const
+      }
+    ],
+    [handleRemoveAssignment]
   );
-
-  const openMenu = useCallback((id: string) => setMenuFor(id), []);
 
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<MyAssignmentView>) => (
-      <AssignmentListItemTherapist
-        item={item}
-        index={index}
-        menuVisible={menuFor === item._id}
-        onOpenMenu={openMenu}
-        onCloseMenu={closeMenu}
-        onRemove={handleRemoveAssignment}
-      />
+      <AssignmentListItemTherapist item={item} index={index} onOpenMenu={openMenu} />
     ),
-    [menuFor, openMenu, closeMenu, handleRemoveAssignment]
+    [openMenu]
   );
 
   return (
     <>
       <FlatList data={data} keyExtractor={(item) => item._id} renderItem={renderItem} />
+
+      <ActionMenu
+        visible={menuOpen}
+        onDismiss={closeMenu}
+        title={selectedAssignment?.module.title}
+        subtitle={
+          selectedAssignment
+            ? `Assigned to ${selectedAssignment.user.name ?? selectedAssignment.user.username}`
+            : undefined
+        }
+        actions={actions}
+      />
+
       <Link
         href={{
           pathname: '/assignments/add',
