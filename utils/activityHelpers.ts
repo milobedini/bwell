@@ -66,4 +66,7 @@ function buildDaySlots(baseIso: string): { key: SlotKey; value: SlotValue }[] {
 export const isSlotFilled = (v: SlotValue): boolean =>
   v.activity.trim().length > 0 || v.mood != null || v.achievement != null || v.closeness != null || v.enjoyment != null;
 
+export const FIELD_NAMES = ['Activity', 'Mood', 'Achievement', 'Closeness', 'Enjoyment'] as const;
+export const FIELDS_PER_SLOT = FIELD_NAMES.length;
+
 export { buildDaySlots, dateISO, dayLabel, type SlotKey, slotLabel, type SlotValue, startOfMonday };
