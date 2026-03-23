@@ -28,6 +28,7 @@ export type AttemptFilterDrawerProps = {
   patientChoices?: { id: string; name: string; email: string }[];
   showSeverity?: boolean;
   showPatient?: boolean;
+  showLimit?: boolean;
   title?: string;
 };
 
@@ -42,6 +43,7 @@ export const AttemptFilterDrawer = ({
   patientChoices,
   showSeverity,
   showPatient,
+  showLimit = true,
   title = 'Filters'
 }: AttemptFilterDrawerProps) => {
   const { width: screenWidth } = useWindowDimensions();
@@ -202,7 +204,12 @@ export const AttemptFilterDrawer = ({
                     <Chip
                       key={m.id}
                       selected={local.moduleId === m.id}
-                      onPress={() => setLocal((prev) => ({ ...prev, moduleId: m.id }))}
+                      onPress={() =>
+                        setLocal((prev) => ({
+                          ...prev,
+                          moduleId: prev.moduleId === m.id ? undefined : m.id
+                        }))
+                      }
                       style={styles.chip}
                     >
                       {m.title}
@@ -253,19 +260,21 @@ export const AttemptFilterDrawer = ({
             )}
 
             {/* Limit */}
-            <View style={styles.section}>
-              <ThemedText type="smallTitle" style={styles.sectionTitle}>
-                Limit
-              </ThemedText>
-              <TextInput
-                mode="outlined"
-                keyboardType="number-pad"
-                value={limitText}
-                placeholder={String(DEFAULT_FILTERS.limit)}
-                onChangeText={setLimitText}
-              />
-              <ThemedText style={styles.helper}>Default 20 · Max 100</ThemedText>
-            </View>
+            {showLimit && (
+              <View style={styles.section}>
+                <ThemedText type="smallTitle" style={styles.sectionTitle}>
+                  Limit
+                </ThemedText>
+                <TextInput
+                  mode="outlined"
+                  keyboardType="number-pad"
+                  value={limitText}
+                  placeholder={String(DEFAULT_FILTERS.limit)}
+                  onChangeText={setLimitText}
+                />
+                <ThemedText style={styles.helper}>Default 20 · Max 100</ThemedText>
+              </View>
+            )}
 
             <View style={styles.footer}>
               <Button onPress={handleReset} mode="text" textColor="black" buttonColor={Colors.sway.darkGrey}>
