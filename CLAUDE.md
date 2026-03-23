@@ -142,6 +142,10 @@ The app has three tiers (from `docs/proposal.pdf`):
 
 - Figma-to-code rules, colour tokens, typography, component inventory, and layout patterns are documented in `.claude/rules/figma-design-system.md` — this file is auto-loaded as context for every conversation and should be kept in sync with the codebase via the `update-status` skill.
 
+## Code Review
+
+- When scoring code review issues, include all issues scoring **50 or above** (not just 80+)
+
 ## Custom Skills
 
 - **update-status** — When the user says "update status", "sync claude md", or "update build status", read and follow `.claude/skills/update-status/SKILL.md`
