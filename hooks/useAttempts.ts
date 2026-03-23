@@ -13,7 +13,7 @@ import type {
   SubmitAttemptResponse,
   TherapistLatestRow
 } from '@milobedini/shared-types';
-import { type InfiniteData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type InfiniteData, keepPreviousData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useMutationWithToast } from './useMutationWithToast';
 import { useIsLoggedIn } from './useUsers';
@@ -99,6 +99,7 @@ export const useTherapistGetLatestAttempts = (filters: TherapistLatestFilters = 
       nextCursor: infinite.pages.at(-1)?.nextCursor ?? null,
       totalCount: infinite.pages[0]?.totalCount ?? 0
     }),
+    placeholderData: keepPreviousData,
     enabled: isLoggedIn
   });
 
