@@ -68,7 +68,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   const { mutate: submitAttempt } = useSubmitAttempt(attempt._id);
 
   const canEdit = mode === 'edit';
-  const { moduleSnapshot, weekStart, userNote, startedAt, completedAt, diary, updatedAt } = attempt;
+  const { moduleSnapshot, weekStart, startedAt, completedAt, diary, updatedAt } = attempt;
 
   const [userNoteText, setUserNoteText] = useState(attempt.userNote ?? '');
   const [noteDirty, setNoteDirty] = useState(false);
@@ -381,7 +381,10 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
       keyboardVerticalOffset={Platform.select({ ios: 120, default: 0 })}
     >
       {/* Sticky day selector — always visible */}
-      <View className="bg-sway-dark px-4 pb-2 pt-1">
+      <View
+        style={{ borderBottomWidth: 1, borderBottomColor: Colors.chip.darkCard }}
+        className="bg-sway-dark px-4 pb-2 pt-1"
+      >
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -418,7 +421,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
         windowSize={6}
         removeClippedSubviews
         ListHeaderComponent={
-          <View className="gap-1 px-4 pt-1">
+          <View className="gap-3 px-4 pb-3 pt-3">
             {patientName && <ThemedText type="subtitle">{`by ${patientName}`}</ThemedText>}
 
             <View className="flex-row flex-wrap items-center gap-2">
@@ -429,24 +432,20 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                 {`${Math.round(progress * 100)}%`}
               </Chip>
               {mode === 'view' ? (
-                <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
+                <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
                   {completedAt
                     ? `Completed ${new Date(completedAt).toLocaleDateString()}`
-                    : `Last Update ${new Date(updatedAt).toLocaleDateString()}`}
-                </Chip>
+                    : `Updated ${new Date(updatedAt).toLocaleDateString()}`}
+                </ThemedText>
               ) : (
-                <>
-                  {startedAt && !dirtyKeys.size && (
-                    <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
-                      {`Started ${new Date(startedAt).toLocaleDateString()}`}
-                    </Chip>
-                  )}
-                  {updatedAt && (
-                    <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
-                      {`Updated ${new Date(updatedAt).toLocaleDateString()}`}
-                    </Chip>
-                  )}
-                </>
+                <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
+                  {[
+                    startedAt && !dirtyKeys.size && `Started ${new Date(startedAt).toLocaleDateString()}`,
+                    updatedAt && `Updated ${new Date(updatedAt).toLocaleDateString()}`
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </ThemedText>
               )}
               <SaveProgressChip saved={saved} isSaving={isSaving} />
               {moduleSnapshot?.disclaimer ? (
@@ -480,17 +479,6 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
               <ThemedText style={{ fontSize: 12, color: Colors.sway.darkGrey, marginTop: 4 }}>
                 {moduleSnapshot.disclaimer}
               </ThemedText>
-            ) : null}
-
-            {userNote ? (
-              <Card style={{ backgroundColor: Colors.sway.buttonBackground }}>
-                <Card.Content>
-                  <ThemedText type="smallTitle" className="mb-1 opacity-90">
-                    Note
-                  </ThemedText>
-                  <ThemedText className="opacity-90">{userNote}</ThemedText>
-                </Card.Content>
-              </Card>
             ) : null}
 
             {canEdit && <ReflectionPrompt prompt={reflectionPrompt} />}

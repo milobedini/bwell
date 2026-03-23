@@ -46,7 +46,6 @@ const WeeklySummary = memo(
         style={{
           backgroundColor: Colors.sway.buttonBackground,
           borderRadius: 8,
-          marginBottom: 12,
           overflow: 'hidden'
         }}
       >
