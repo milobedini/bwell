@@ -302,6 +302,28 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.select({ ios: 120, default: 0 })}
     >
+      {/* Sticky day selector — always visible */}
+      <View className="bg-sway-dark px-4 pb-2 pt-1">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 0, gap: 8 }}
+        >
+          {days.map((d) => {
+            const iso = dateISO(d);
+            return (
+              <DayChip
+                key={iso}
+                date={d}
+                selected={iso === activeDayISO}
+                slotFills={slotFillsByDay[iso] ?? []}
+                onPress={() => setActiveDayISO(iso)}
+              />
+            );
+          })}
+        </ScrollView>
+      </View>
+
       <FlatList
         data={dayRows}
         keyExtractor={(row) => row.key}
@@ -311,108 +333,84 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
         windowSize={6}
         removeClippedSubviews
         ListHeaderComponent={
-          <View>
-            {/* Sticky header region */}
-            <View className="z-20 gap-1 bg-sway-dark px-4 pt-1">
-              {patientName && <ThemedText type="subtitle">{`by ${patientName}`}</ThemedText>}
+          <View className="gap-1 px-4 pt-1">
+            {patientName && <ThemedText type="subtitle">{`by ${patientName}`}</ThemedText>}
 
-              <View className="flex-row flex-wrap items-center gap-2">
-                <Chip
-                  style={{ backgroundColor: Colors.sway.bright }}
-                  textStyle={{ color: Colors.sway.dark, fontFamily: Fonts.Bold }}
-                >
-                  {`${Math.round(progress * 100)}%`}
-                </Chip>
-                {mode === 'view' ? (
-                  <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
-                    {completedAt
-                      ? `Completed ${new Date(completedAt).toLocaleDateString()}`
-                      : `Last Update ${new Date(updatedAt).toLocaleDateString()}`}
-                  </Chip>
-                ) : (
-                  <>
-                    {startedAt && !dirtyKeys.size && (
-                      <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
-                        {`Started ${new Date(startedAt).toLocaleDateString()}`}
-                      </Chip>
-                    )}
-                    {updatedAt && (
-                      <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
-                        {`Updated ${new Date(updatedAt).toLocaleDateString()}`}
-                      </Chip>
-                    )}
-                  </>
-                )}
-                <SaveProgressChip saved={saved} isSaving={isSaving} />
-                {moduleSnapshot?.disclaimer ? (
-                  <Pressable
-                    onPress={() => setDisclaimerOpen((prev) => !prev)}
-                    hitSlop={8}
-                    accessibilityRole="button"
-                    accessibilityLabel="Safety information"
-                  >
-                    <MaterialCommunityIcons name="information-outline" size={20} color={Colors.sway.lightGrey} />
-                  </Pressable>
-                ) : null}
-                {(!!dirtyKeys.size || noteDirty) && (
-                  <Chip
-                    icon={() => <MaterialCommunityIcons name="content-save" size={24} color={Colors.chip.green} />}
-                    mode="outlined"
-                    textStyle={{ fontFamily: Fonts.Black, color: Colors.chip.green }}
-                    style={{
-                      backgroundColor: Colors.sway.buttonBackground,
-                      borderColor: Colors.chip.greenBorder
-                    }}
-                    disabled={!dirtyKeys.size && !noteDirty}
-                    onPress={saveDirty}
-                  >
-                    {dirtyKeys.size || noteDirty ? 'Save changes' : 'Saved'}
-                  </Chip>
-                )}
-              </View>
-
-              {disclaimerOpen && moduleSnapshot?.disclaimer ? (
-                <ThemedText style={{ fontSize: 12, color: Colors.sway.darkGrey, marginTop: 4 }}>
-                  {moduleSnapshot.disclaimer}
-                </ThemedText>
-              ) : null}
-
-              {userNote ? (
-                <Card style={{ backgroundColor: Colors.sway.buttonBackground }}>
-                  <Card.Content>
-                    <ThemedText type="smallTitle" className="mb-1 opacity-90">
-                      Note
-                    </ThemedText>
-                    <ThemedText className="opacity-90">{userNote}</ThemedText>
-                  </Card.Content>
-                </Card>
-              ) : null}
-
-              {canEdit && <ReflectionPrompt prompt={reflectionPrompt} />}
-
-              <WeeklySummary totals={diary.totals} />
-
-              {/* Horizontal day selector */}
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 0, gap: 8 }}
+            <View className="flex-row flex-wrap items-center gap-2">
+              <Chip
+                style={{ backgroundColor: Colors.sway.bright }}
+                textStyle={{ color: Colors.sway.dark, fontFamily: Fonts.Bold }}
               >
-                {days.map((d) => {
-                  const iso = dateISO(d);
-                  return (
-                    <DayChip
-                      key={iso}
-                      date={d}
-                      selected={iso === activeDayISO}
-                      slotFills={slotFillsByDay[iso] ?? []}
-                      onPress={() => setActiveDayISO(iso)}
-                    />
-                  );
-                })}
-              </ScrollView>
-              <View className="h-3" />
+                {`${Math.round(progress * 100)}%`}
+              </Chip>
+              {mode === 'view' ? (
+                <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
+                  {completedAt
+                    ? `Completed ${new Date(completedAt).toLocaleDateString()}`
+                    : `Last Update ${new Date(updatedAt).toLocaleDateString()}`}
+                </Chip>
+              ) : (
+                <>
+                  {startedAt && !dirtyKeys.size && (
+                    <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
+                      {`Started ${new Date(startedAt).toLocaleDateString()}`}
+                    </Chip>
+                  )}
+                  {updatedAt && (
+                    <Chip style={{ backgroundColor: Colors.chip.darkCard }} textStyle={{ color: 'white' }}>
+                      {`Updated ${new Date(updatedAt).toLocaleDateString()}`}
+                    </Chip>
+                  )}
+                </>
+              )}
+              <SaveProgressChip saved={saved} isSaving={isSaving} />
+              {moduleSnapshot?.disclaimer ? (
+                <Pressable
+                  onPress={() => setDisclaimerOpen((prev) => !prev)}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel="Safety information"
+                >
+                  <MaterialCommunityIcons name="information-outline" size={20} color={Colors.sway.lightGrey} />
+                </Pressable>
+              ) : null}
+              {(!!dirtyKeys.size || noteDirty) && (
+                <Chip
+                  icon={() => <MaterialCommunityIcons name="content-save" size={24} color={Colors.chip.green} />}
+                  mode="outlined"
+                  textStyle={{ fontFamily: Fonts.Black, color: Colors.chip.green }}
+                  style={{
+                    backgroundColor: Colors.sway.buttonBackground,
+                    borderColor: Colors.chip.greenBorder
+                  }}
+                  disabled={!dirtyKeys.size && !noteDirty}
+                  onPress={saveDirty}
+                >
+                  {dirtyKeys.size || noteDirty ? 'Save changes' : 'Saved'}
+                </Chip>
+              )}
             </View>
+
+            {disclaimerOpen && moduleSnapshot?.disclaimer ? (
+              <ThemedText style={{ fontSize: 12, color: Colors.sway.darkGrey, marginTop: 4 }}>
+                {moduleSnapshot.disclaimer}
+              </ThemedText>
+            ) : null}
+
+            {userNote ? (
+              <Card style={{ backgroundColor: Colors.sway.buttonBackground }}>
+                <Card.Content>
+                  <ThemedText type="smallTitle" className="mb-1 opacity-90">
+                    Note
+                  </ThemedText>
+                  <ThemedText className="opacity-90">{userNote}</ThemedText>
+                </Card.Content>
+              </Card>
+            ) : null}
+
+            {canEdit && <ReflectionPrompt prompt={reflectionPrompt} />}
+
+            <WeeklySummary totals={diary.totals} />
           </View>
         }
         ListFooterComponent={
@@ -509,8 +507,6 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
             {mode !== 'edit' && <PrimaryButton title="Exit" onPress={() => router.back()} />}
           </View>
         }
-        // make the very top header sticky
-        stickyHeaderIndices={[0]}
       />
     </KeyboardAvoidingView>
   );
