@@ -160,10 +160,9 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
         return next;
       });
 
-      if (canEdit) Haptics.selectionAsync().catch(() => {});
       markDirty(key);
     },
-    [canEdit, markDirty]
+    [markDirty]
   );
 
   const buildPayload = useCallback(
@@ -200,6 +199,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
       onSuccess: () => {
         setDirtyKeys(new Set());
         setNoteDirty(false);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       }
     });
   }, [dirtyKeys, noteDirty, buildSavePayload, saveAttemptSilently]);
@@ -234,7 +234,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
               disabled={disabled}
               label={mode === 'edit' ? 'Activity' : undefined}
               placeholder={mode === 'edit' ? 'What did you do?' : undefined}
-              placeholderTextColor={'white'}
+              placeholderTextColor={Colors.sway.darkGrey}
               value={value.activity}
               onChangeText={(t) => updateSlot(key, { activity: t })}
               style={{
@@ -424,7 +424,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                   <TextInput
                     mode="flat"
                     placeholder="Anything you'd like your therapist to know this week..."
-                    placeholderTextColor="white"
+                    placeholderTextColor={Colors.sway.darkGrey}
                     value={userNoteText}
                     onChangeText={(t) => {
                       setUserNoteText(t);
@@ -440,6 +440,16 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                     theme={{ colors: { onSurfaceVariant: Colors.sway.lightGrey } }}
                     clearButtonMode="always"
                   />
+                  <ThemedText
+                    type="small"
+                    style={{
+                      textAlign: 'right',
+                      marginTop: 4,
+                      color: userNoteText.length >= 450 ? Colors.primary.error : Colors.sway.darkGrey
+                    }}
+                  >
+                    {`${userNoteText.length}/500`}
+                  </ThemedText>
                 </Card.Content>
               </Card>
             )}
@@ -454,6 +464,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                           onSuccess: () => {
                             setDirtyKeys(new Set());
                             setNoteDirty(false);
+                            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
                             router.back();
                           }
                         });
@@ -465,7 +476,10 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                     // ensure latest edits are saved before submit
                     const afterSave = () =>
                       submitAttempt(assignmentId ? { assignmentId: String(assignmentId) } : {}, {
-                        onSuccess: () => router.back()
+                        onSuccess: () => {
+                          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+                          router.back();
+                        }
                       });
 
                     if (dirtyKeys.size || noteDirty) {
@@ -482,7 +496,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                   }}
                 />
                 {(!!dirtyKeys.size || noteDirty) && (
-                  <PrimaryButton title="Cancel" onPress={router.back} variant="error" />
+                  <PrimaryButton title="Discard changes" onPress={router.back} variant="error" />
                 )}
               </View>
             )}
