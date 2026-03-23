@@ -113,6 +113,21 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 - Filter drawers: slide-in from right using `Animated.View` + `useWindowDimensions()`, width ~75%
 - Collapsible sections: use `<Collapsible title="...">` component
 
+## Apple Human Interface Guidelines
+
+When translating Figma designs to code, apply these HIG principles:
+
+- **Safe areas:** Always respect device safe areas (notch, home indicator, status bar) — use `SafeAreaView` or expo-router's built-in safe area handling. Never place interactive elements in inset zones.
+- **Touch targets:** All tappable elements must be at least 44x44pt. When Figma designs show smaller hit areas, expand the touchable zone with padding while keeping the visual size.
+- **Navigation:** Use platform-native patterns — tab bars for top-level sections, stack/push for drill-down, bottom sheets for contextual actions, modals for focused tasks. Avoid custom navigation paradigms unless the Figma design explicitly calls for them.
+- **Gestures:** Support standard iOS gestures — swipe-back for navigation, pull-to-refresh on scrollable lists, swipe-to-delete for row actions. Implement via `react-native-gesture-handler` / Reanimated.
+- **Feedback:** Every interactive element needs visible press feedback. Use haptics (`expo-haptics`) for meaningful moments (submit success, error, toggle changes) — not for every tap.
+- **Modals:** Prefer half-sheet / bottom sheet presentation over full-screen modals for lightweight tasks (consistent with existing `@gorhom/bottom-sheet` usage).
+- **Destructive actions:** Always require confirmation. Use `ActionMenu` with `variant: 'destructive'` or an alert dialog. Red-tint the destructive option.
+- **Accessibility:** Support Dynamic Type scaling where feasible. Respect `reduceMotion` (skip decorative animations) and `reduceTransparency` settings. Ensure sufficient colour contrast (4.5:1 minimum for text).
+- **Content focus:** Minimise chrome — let content breathe. Avoid heavy borders, excessive dividers, or cluttered toolbars. When in doubt, favour whitespace over decoration.
+- **Platform controls:** Use native-feeling controls (switches, segmented controls, date pickers) rather than custom equivalents unless the design explicitly requires a custom treatment.
+
 ## Button Hierarchy
 
 - Primary action: `ThemedButton` with `variant="default"` (teal bg)
