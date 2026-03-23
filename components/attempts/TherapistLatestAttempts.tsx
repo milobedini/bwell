@@ -1,5 +1,6 @@
 import { type ComponentProps, memo, useCallback, useMemo, useState } from 'react';
 import {
+  ActivityIndicator,
   Pressable,
   RefreshControl,
   SectionList,
@@ -224,9 +225,9 @@ const ActiveFilterChips = memo(function ActiveFilterChips({
 const SectionHeader = memo(function SectionHeader({ title }: { title: string }) {
   return (
     <View
-      className="border-b px-4 py-2"
+      className="border-b px-4 pb-2 pt-3"
       style={{
-        backgroundColor: Colors.overlay.sectionHeader,
+        backgroundColor: Colors.sway.dark,
         borderBottomColor: Colors.chip.darkCardAlt
       }}
     >
@@ -320,13 +321,10 @@ const TherapistLatestAttempts = () => {
   return (
     <ContentContainer padded={false}>
       {/* Header */}
-      <View className="flex-row items-start justify-between px-4 pt-4">
-        <View>
-          <ThemedText type="title">Attempts</ThemedText>
-          <ThemedText type="small" className="text-sway-darkGrey">
-            {totalCount} {totalCount === 1 ? 'submission' : 'submissions'}
-          </ThemedText>
-        </View>
+      <View className="flex-row items-center justify-between px-4 pt-2">
+        <ThemedText type="small" className="text-sway-darkGrey">
+          {totalCount} {totalCount === 1 ? 'submission' : 'submissions'}
+        </ThemedText>
         <IconButton
           icon="filter-variant"
           iconColor={Colors.sway.lightGrey}
@@ -368,10 +366,14 @@ const TherapistLatestAttempts = () => {
               refreshing={isRefetching && !isFetchingNextPage}
               onRefresh={refetch}
               tintColor={Colors.sway.bright}
+              progressBackgroundColor={Colors.chip.darkCard}
             />
           }
           onEndReached={handleEndReached}
           onEndReachedThreshold={0.3}
+          ListFooterComponent={
+            isFetchingNextPage ? <ActivityIndicator color={Colors.sway.bright} style={{ paddingVertical: 16 }} /> : null
+          }
         />
       )}
 
