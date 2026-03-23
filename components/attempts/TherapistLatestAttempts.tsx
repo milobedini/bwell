@@ -251,7 +251,8 @@ const TherapistLatestAttempts = () => {
     refetch,
     hasNextPage,
     fetchNextPage,
-    isFetchingNextPage
+    isFetchingNextPage,
+    isFetching
   } = useTherapistGetLatestAttempts({
     ...filters,
     sort,
@@ -347,7 +348,13 @@ const TherapistLatestAttempts = () => {
       />
 
       {/* List */}
-      {sections.length > 0 ? (
+      {!isFetching && sections.length === 0 ? (
+        <EmptyState
+          icon="clipboard-text-outline"
+          title="No submissions yet"
+          subtitle="Completed work from your patients will appear here"
+        />
+      ) : (
         <SectionList
           sections={sections}
           keyExtractor={(item) => item._id}
@@ -365,12 +372,6 @@ const TherapistLatestAttempts = () => {
           }
           onEndReached={handleEndReached}
           onEndReachedThreshold={0.3}
-        />
-      ) : (
-        <EmptyState
-          icon="clipboard-text-outline"
-          title="No submissions yet"
-          subtitle="Completed work from your patients will appear here"
         />
       )}
 
