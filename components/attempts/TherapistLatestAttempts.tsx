@@ -391,6 +391,7 @@ const TherapistLatestAttempts = () => {
         patientChoices={patientChoices}
         showSeverity
         showPatient
+        showLimit={false}
       />
     </ContentContainer>
   );
