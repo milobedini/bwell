@@ -1,20 +1,25 @@
-// const path = require('path');
+const path = require('path');
 const { getDefaultConfig } = require('expo/metro-config');
 const { withNativeWind } = require('nativewind/metro');
 
-// /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);
 
-// Add `tslib` alias to fix "__extends" resolution issue
-// const ALIASES = {
-//   tslib: path.resolve(__dirname, 'node_modules/tslib/tslib.es6.js')
-// };
+// Fix web-specific module resolution issues:
+// 1. tslib: Metro misresolves tslib/modules/index.js (CJS/ESM interop failure)
+// 2. zustand/middleware: ESM build uses import.meta.env which is invalid
+//    in Metro's non-module <script> tag on web
+const ALIASES = {
+  tslib: path.resolve(__dirname, 'node_modules/tslib/tslib.es6.js')
+};
 
-// // Wrap resolver to support aliasing
-// const originalResolveRequest = config.resolver.resolveRequest;
-// config.resolver.resolveRequest = (context, moduleName, platform) => {
-//   return (originalResolveRequest ?? context.resolveRequest)(context, ALIASES[moduleName] ?? moduleName, platform);
-// };
+const WEB_ALIASES = {
+  'zustand/middleware': path.resolve(__dirname, 'node_modules/zustand/middleware.js')
+};
 
-// Inject NativeWind config (preserves the resolver above)
+const originalResolveRequest = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  const alias = ALIASES[moduleName] ?? (platform === 'web' ? WEB_ALIASES[moduleName] : undefined) ?? moduleName;
+  return (originalResolveRequest ?? context.resolveRequest)(context, alias, platform);
+};
+
 module.exports = withNativeWind(config, { input: './global.css' });

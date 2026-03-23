@@ -124,6 +124,12 @@ The app has three tiers (from `docs/proposal.pdf`):
 2. Run `npx prettier --write .` to format all files
 3. Run `npm run lint` to validate everything passes
 
+## Web Debugging
+
+- Use the **Playwright MCP server** to debug web-platform issues — navigate to `localhost`, take screenshots, read console errors, and inspect the DOM directly
+- Start the dev server with `npx expo start --web --port 8082`, then use Playwright to browse `http://localhost:8082`
+- Clean up `.playwright-mcp/` artifacts when done — do not commit them
+
 ## Code Conventions
 
 - Prefer arrow functions and `const`
