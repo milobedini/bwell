@@ -70,7 +70,7 @@ export const useTherapistGetLatestAttempts = (filters: TherapistLatestFilters = 
           patientId,
           moduleId,
           severity,
-          status: Array.isArray(status) ? status.join(',') : status,
+          status,
           sort,
           limit,
           cursor: pageParam ?? undefined
