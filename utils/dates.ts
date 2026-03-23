@@ -83,3 +83,47 @@ export const timeAgo = (input: string): TimeAgoResult => {
 
   return { relative: null, formatted };
 };
+
+type DateSection<T> = {
+  title: string;
+  data: T[];
+};
+
+export const groupByDate = <T extends { completedAt?: string }>(rows: T[]): DateSection<T>[] => {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today.getTime() - 86_400_000);
+  const dow = today.getDay() || 7; // Sunday becomes 7 (ISO convention)
+  const thisWeekStart = new Date(today.getTime() - (dow - 1) * 86_400_000);
+  const lastWeekStart = new Date(thisWeekStart.getTime() - 7 * 86_400_000);
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const buckets = new Map<string, T[]>();
+
+  const getKey = (dateStr?: string): string => {
+    if (!dateStr) return 'Earlier';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return 'Earlier';
+
+    if (d >= today) return 'Today';
+    if (d >= yesterday) return 'Yesterday';
+    if (d >= thisWeekStart) return 'This Week';
+    if (d >= lastWeekStart) return 'Last Week';
+    if (d >= thisMonthStart) return 'This Month';
+
+    // Month name + year for older entries
+    return new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' }).format(d);
+  };
+
+  const order = rows.reduce<string[]>((acc, row) => {
+    const key = getKey(row.completedAt);
+    if (!buckets.has(key)) {
+      buckets.set(key, []);
+      acc.push(key);
+    }
+    buckets.get(key)!.push(row);
+    return acc;
+  }, []);
+
+  return order.map((title) => ({ title, data: buckets.get(title)! }));
+};
