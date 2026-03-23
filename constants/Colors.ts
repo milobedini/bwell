@@ -52,7 +52,8 @@ export const Colors = {
   },
   overlay: {
     light: 'rgba(0,0,0,0.32)',
-    medium: 'rgba(0,0,0,0.5)'
+    medium: 'rgba(0,0,0,0.5)',
+    sectionHeader: 'rgba(38,46,66,0.5)'
   },
   gradient: {
     pink: '#E70696'
