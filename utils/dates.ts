@@ -93,7 +93,8 @@ export const groupByDate = <T extends { completedAt?: string }>(rows: T[]): Date
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterday = new Date(today.getTime() - 86_400_000);
-  const thisWeekStart = new Date(today.getTime() - today.getDay() * 86_400_000);
+  const dow = today.getDay() || 7; // Sunday becomes 7 (ISO convention)
+  const thisWeekStart = new Date(today.getTime() - (dow - 1) * 86_400_000);
   const lastWeekStart = new Date(thisWeekStart.getTime() - 7 * 86_400_000);
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
