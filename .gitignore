@@ -41,3 +41,4 @@ app-example
 .husky/_
 .superpowers/
 .worktrees/
+.playwright-mcp/
