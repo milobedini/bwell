@@ -25,6 +25,9 @@ export type AttemptFilterDrawerProps = {
   onReset?: () => void;
   // Optional: allow passing module choices to render chips instead of a raw field
   moduleChoices?: { id: string; title: string }[];
+  patientChoices?: { id: string; name: string; email: string }[];
+  showSeverity?: boolean;
+  showPatient?: boolean;
   title?: string;
 };
 
@@ -36,12 +39,23 @@ export const AttemptFilterDrawer = ({
   onApply,
   onReset,
   moduleChoices,
+  patientChoices,
+  showSeverity,
+  showPatient,
   title = 'Filters'
 }: AttemptFilterDrawerProps) => {
   const { width: screenWidth } = useWindowDimensions();
   const drawerWidth = Math.min(420, Math.floor(screenWidth * 0.9));
   const [local, setLocal] = useState<AttemptFilterDrawerValues>(values);
   const [limitText, setLimitText] = useState(values.limit?.toString() ?? '');
+  const [patientSearch, setPatientSearch] = useState('');
+
+  const filteredPatients = useMemo(() => {
+    if (!patientChoices?.length) return [];
+    if (!patientSearch.trim()) return patientChoices;
+    const q = patientSearch.toLowerCase();
+    return patientChoices.filter((p) => p.name.toLowerCase().includes(q) || p.email.toLowerCase().includes(q));
+  }, [patientChoices, patientSearch]);
   const translateX = useRef(new Animated.Value(drawerWidth)).current;
 
   useEffect(() => {
@@ -49,6 +63,7 @@ export const AttemptFilterDrawer = ({
     if (visible) {
       setLocal(values);
       setLimitText(values.limit?.toString() ?? '');
+      setPatientSearch('');
     }
   }, [visible, values]);
 
@@ -86,6 +101,7 @@ export const AttemptFilterDrawer = ({
 
   const handleReset = () => {
     setLocal(DEFAULT_FILTERS);
+    setPatientSearch('');
     onChange(DEFAULT_FILTERS);
     onReset?.();
   };
@@ -127,6 +143,47 @@ export const AttemptFilterDrawer = ({
               </View>
             </View>
 
+            {/* Patient */}
+            {showPatient && patientChoices && (
+              <View style={styles.section}>
+                <ThemedText type="smallTitle" style={styles.sectionTitle}>
+                  Patient
+                </ThemedText>
+                <TextInput
+                  mode="outlined"
+                  placeholder="Search patients..."
+                  value={patientSearch}
+                  onChangeText={setPatientSearch}
+                  left={<TextInput.Icon icon="magnify" />}
+                  style={{ backgroundColor: Colors.chip.darkCard }}
+                />
+                <View style={styles.rowWrap}>
+                  <Chip
+                    selected={!local.patientId}
+                    onPress={() => setLocal((prev) => ({ ...prev, patientId: undefined }))}
+                    style={styles.chip}
+                  >
+                    Any
+                  </Chip>
+                  {filteredPatients.map((p) => (
+                    <Chip
+                      key={p.id}
+                      selected={local.patientId === p.id}
+                      onPress={() =>
+                        setLocal((prev) => ({
+                          ...prev,
+                          patientId: prev.patientId === p.id ? undefined : p.id
+                        }))
+                      }
+                      style={styles.chip}
+                    >
+                      {p.name}
+                    </Chip>
+                  ))}
+                </View>
+              </View>
+            )}
+
             {/* Module */}
             <View style={styles.section}>
               <ThemedText type="smallTitle" style={styles.sectionTitle}>
@@ -161,6 +218,39 @@ export const AttemptFilterDrawer = ({
                 />
               )}
             </View>
+
+            {/* Severity */}
+            {showSeverity && (
+              <View style={styles.section}>
+                <ThemedText type="smallTitle" style={styles.sectionTitle}>
+                  Severity
+                </ThemedText>
+                <View style={styles.rowWrap}>
+                  <Chip
+                    selected={!local.severity}
+                    onPress={() => setLocal((prev) => ({ ...prev, severity: undefined }))}
+                    style={styles.chip}
+                  >
+                    Any
+                  </Chip>
+                  {(['severe', 'moderate', 'mild'] as const).map((sev) => (
+                    <Chip
+                      key={sev}
+                      selected={local.severity === sev}
+                      onPress={() =>
+                        setLocal((prev) => ({
+                          ...prev,
+                          severity: prev.severity === sev ? undefined : sev
+                        }))
+                      }
+                      style={styles.chip}
+                    >
+                      {sev.charAt(0).toUpperCase() + sev.slice(1)}
+                    </Chip>
+                  ))}
+                </View>
+              </View>
+            )}
 
             {/* Limit */}
             <View style={styles.section}>
