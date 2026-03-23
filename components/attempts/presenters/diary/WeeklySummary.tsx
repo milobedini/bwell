@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { LayoutAnimation, Platform, Pressable, UIManager, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
@@ -28,75 +28,86 @@ type WeeklySummaryProps = {
   defaultOpen?: boolean;
 };
 
-const WeeklySummary = ({ totals, defaultOpen = false }: WeeklySummaryProps) => {
-  const [open, setOpen] = useState(defaultOpen);
+const WeeklySummary = memo(
+  ({ totals, defaultOpen = false }: WeeklySummaryProps) => {
+    const [open, setOpen] = useState(defaultOpen);
 
-  const visibleMetrics = METRICS.filter((m) => totals[m.key] != null);
+    const visibleMetrics = METRICS.filter((m) => totals[m.key] != null);
 
-  if (visibleMetrics.length === 0) return null;
+    if (visibleMetrics.length === 0) return null;
 
-  const toggle = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setOpen((prev) => !prev);
-  };
+    const toggle = () => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setOpen((prev) => !prev);
+    };
 
-  return (
-    <View
-      style={{
-        backgroundColor: Colors.sway.buttonBackground,
-        borderRadius: 8,
-        marginBottom: 12,
-        overflow: 'hidden'
-      }}
-    >
-      <Pressable
-        onPress={toggle}
+    return (
+      <View
         style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: 12
+          backgroundColor: Colors.sway.buttonBackground,
+          borderRadius: 8,
+          marginBottom: 12,
+          overflow: 'hidden'
         }}
-        accessibilityRole="button"
-        accessibilityState={{ expanded: open }}
-        accessibilityLabel={`Weekly Summary, ${visibleMetrics.length} metrics`}
       >
-        <ThemedText style={{ fontFamily: Fonts.Bold, fontSize: 13 }}>Weekly Summary</ThemedText>
-        <MaterialCommunityIcons name={open ? 'chevron-up' : 'chevron-down'} size={20} color={Colors.sway.lightGrey} />
-      </Pressable>
-
-      {open && (
-        <View
+        <Pressable
+          onPress={toggle}
           style={{
             flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: 6,
-            paddingHorizontal: 12,
-            paddingBottom: 12
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: 12
           }}
+          accessibilityRole="button"
+          accessibilityState={{ expanded: open }}
+          accessibilityLabel={`Weekly Summary, ${visibleMetrics.length} metrics`}
         >
-          {visibleMetrics.map((m) => (
-            <View
-              key={m.key}
-              style={{
-                backgroundColor: Colors.sway.dark,
-                borderRadius: 6,
-                padding: 8,
-                alignItems: 'center',
-                flexBasis: '48%',
-                flexGrow: 1
-              }}
-            >
-              <ThemedText style={{ fontSize: 20, fontFamily: Fonts.Bold, color: m.color }}>
-                {(totals[m.key] as number).toFixed(1)}
-              </ThemedText>
-              <ThemedText style={{ fontSize: 10, color: Colors.sway.darkGrey }}>{m.label}</ThemedText>
-            </View>
-          ))}
-        </View>
-      )}
-    </View>
-  );
-};
+          <ThemedText style={{ fontFamily: Fonts.Bold, fontSize: 13 }}>Weekly Summary</ThemedText>
+          <MaterialCommunityIcons name={open ? 'chevron-up' : 'chevron-down'} size={20} color={Colors.sway.lightGrey} />
+        </Pressable>
+
+        {open && (
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              gap: 6,
+              paddingHorizontal: 12,
+              paddingBottom: 12
+            }}
+          >
+            {visibleMetrics.map((m) => (
+              <View
+                key={m.key}
+                style={{
+                  backgroundColor: Colors.sway.dark,
+                  borderRadius: 6,
+                  padding: 8,
+                  alignItems: 'center',
+                  flexBasis: '48%',
+                  flexGrow: 1
+                }}
+              >
+                <ThemedText style={{ fontSize: 20, fontFamily: Fonts.Bold, color: m.color }}>
+                  {(totals[m.key] as number).toFixed(1)}
+                </ThemedText>
+                <ThemedText style={{ fontSize: 10, color: Colors.sway.darkGrey }}>{m.label}</ThemedText>
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
+    );
+  },
+  (prev, next) =>
+    prev.totals.count === next.totals.count &&
+    prev.totals.avgMood === next.totals.avgMood &&
+    prev.totals.avgAchievement === next.totals.avgAchievement &&
+    prev.totals.avgCloseness === next.totals.avgCloseness &&
+    prev.totals.avgEnjoyment === next.totals.avgEnjoyment &&
+    prev.defaultOpen === next.defaultOpen
+);
+
+WeeklySummary.displayName = 'WeeklySummary';
 
 export default WeeklySummary;

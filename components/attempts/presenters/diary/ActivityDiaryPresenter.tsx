@@ -88,6 +88,15 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
     [monday]
   );
 
+  const weekSlots = useMemo(() => {
+    const result: Record<string, { key: SlotKey; value: SlotValue }[]> = {};
+    for (const d of days) {
+      const iso = dateISO(d);
+      result[iso] = buildDaySlots(iso);
+    }
+    return result;
+  }, [days]);
+
   const [activeDayISO, setActiveDayISO] = useState(() => dateISO(days[0] || monday));
 
   // local state
@@ -98,9 +107,8 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   // seed + hydrate from diary.days
   useEffect(() => {
     const seed: Record<SlotKey, SlotValue> = {};
-    for (const d of days) {
-      const iso = dateISO(d);
-      for (const row of buildDaySlots(iso)) {
+    for (const daySlots of Object.values(weekSlots)) {
+      for (const row of daySlots) {
         seed[row.key] = row.value;
       }
     }
@@ -124,7 +132,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
     }
 
     setSlots(seed);
-  }, [attempt._id, days, diary.days]);
+  }, [attempt._id, weekSlots, diary.days]);
 
   const progress = useMemo(() => {
     const vals = Object.values(slots);
@@ -138,19 +146,17 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   }, [slots]);
 
   const dayRows = useMemo(
-    () => buildDaySlots(activeDayISO).map((r) => ({ key: r.key, value: slots[r.key] ?? r.value })),
-    [activeDayISO, slots]
+    () => (weekSlots[activeDayISO] ?? []).map((r) => ({ key: r.key, value: slots[r.key] ?? r.value })),
+    [activeDayISO, slots, weekSlots]
   );
 
   const slotFillsByDay = useMemo(() => {
     const result: Record<string, boolean[]> = {};
-    for (const d of days) {
-      const iso = dateISO(d);
-      const daySlots = buildDaySlots(iso);
+    for (const [iso, daySlots] of Object.entries(weekSlots)) {
       result[iso] = daySlots.map((r) => isSlotFilled(slots[r.key] ?? r.value));
     }
     return result;
-  }, [days, slots]);
+  }, [weekSlots, slots]);
 
   const updateSlot = useCallback(
     (key: SlotKey, patch: Partial<SlotValue>) => {
