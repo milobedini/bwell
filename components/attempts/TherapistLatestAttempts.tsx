@@ -106,7 +106,7 @@ const TherapistAttemptListItemBase = ({ item }: { item: TherapistLatestRow }) =>
 const TherapistAttemptListItem = memo(TherapistAttemptListItemBase);
 
 const TherapistLatestAttempts = () => {
-  const { data, isPending, isError } = useTherapistGetLatestAttempts();
+  const { rows, isPending, isError } = useTherapistGetLatestAttempts();
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<TherapistLatestRow>) => <TherapistAttemptListItem item={item} />,
@@ -115,13 +115,13 @@ const TherapistLatestAttempts = () => {
 
   if (isPending) return <LoadingIndicator marginBottom={0} />;
   if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
-  if (!data) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
+  if (!rows) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
 
   return (
     <ContentContainer padded={false}>
-      {data.length ? (
+      {rows.length ? (
         <FlatList
-          data={data}
+          data={rows}
           keyExtractor={(item) => item._id}
           renderItem={renderItem}
           ItemSeparatorComponent={ItemSeparator}
