@@ -1,4 +1,4 @@
-import { type ComponentProps, memo, useCallback, useMemo, useState } from 'react';
+import { type ComponentProps, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import { Chip, IconButton } from 'react-native-paper';
 import { Link } from 'expo-router';
+import { toast } from 'sonner-native';
+import { TOAST_DURATIONS, TOAST_STYLES } from '@/components/toast/toastOptions';
 import { Colors } from '@/constants/Colors';
 import { type AttemptFilterDrawerValues, DEFAULT_FILTERS, type SortOption } from '@/constants/Filters';
 import { useTherapistAttemptModules, useTherapistGetLatestAttempts } from '@/hooks/useAttempts';
@@ -315,8 +317,17 @@ const TherapistLatestAttempts = () => {
     if (hasNextPage && !isFetchingNextPage) fetchNextPage();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  useEffect(() => {
+    if (isError && sections.length > 0) {
+      toast.error('Failed to refresh', {
+        duration: TOAST_DURATIONS.error,
+        styles: TOAST_STYLES.error
+      });
+    }
+  }, [isError, sections]);
+
   if (isPending) return <LoadingIndicator marginBottom={0} />;
-  if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
+  if (isError && !sections.length) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
 
   return (
     <ContentContainer padded={false}>
