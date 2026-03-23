@@ -1,8 +1,8 @@
+import type { SeverityOption, SortOption } from '@milobedini/shared-types';
+
 export type DrawerStatusOption = 'submitted' | 'active' | 'started' | 'abandoned' | 'all';
 
-export type SeverityOption = 'severe' | 'moderate' | 'mild';
-
-export type SortOption = 'newest' | 'oldest' | 'severity';
+export type { SeverityOption, SortOption };
 
 export type AttemptFilterDrawerValues = {
   status?: DrawerStatusOption[];
