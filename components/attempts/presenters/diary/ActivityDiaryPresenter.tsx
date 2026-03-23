@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -6,6 +6,7 @@ import {
   Platform,
   Pressable,
   ScrollView,
+  type TextInput as RNTextInput,
   View
 } from 'react-native';
 import { Card, Chip, TextInput } from 'react-native-paper';
@@ -20,6 +21,8 @@ import { useSaveModuleAttempt, useSubmitAttempt } from '@/hooks/useAttempts';
 import {
   buildDaySlots,
   dateISO,
+  FIELD_NAMES,
+  FIELDS_PER_SLOT,
   isSlotFilled,
   moodColor,
   REFLECTION_PROMPTS,
@@ -37,6 +40,7 @@ import type {
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
 import DayChip from './DayChip';
+import DiaryInputToolbar from './DiaryInputToolbar';
 import NumericField from './NumericField';
 import ReflectionPrompt from './ReflectionPrompt';
 import WeeklySummary from './WeeklySummary';
@@ -46,6 +50,8 @@ type ActivityDiaryPresenterProps = {
   mode: 'view' | 'edit';
   patientName?: string;
 };
+
+const DIARY_NAV_ID = 'diaryNav';
 
 const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPresenterProps) => {
   const [dirtyKeys, setDirtyKeys] = useState<Set<SlotKey>>(new Set());
@@ -67,6 +73,10 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   const [userNoteText, setUserNoteText] = useState(attempt.userNote ?? '');
   const [noteDirty, setNoteDirty] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
+
+  const flatListRef = useRef<FlatList>(null);
+  const inputRefs = useRef<Map<string, RNTextInput>>(new Map());
+  const [focusedFieldIdx, setFocusedFieldIdx] = useState<number | null>(null);
 
   const markDirty = useCallback((k: SlotKey) => {
     setDirtyKeys((prev) => {
@@ -150,6 +160,58 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
     [activeDayISO, slots, weekSlots]
   );
 
+  // Total fields for the current day
+  const totalFields = dayRows.length * FIELDS_PER_SLOT;
+
+  // Build the ordered ref key for a given slot index + field index
+  const refKey = useCallback((slotIdx: number, fieldIdx: number) => `${slotIdx}-${fieldIdx}`, []);
+
+  // Register a ref
+  const registerRef = useCallback((key: string, ref: RNTextInput | null) => {
+    if (ref) {
+      inputRefs.current.set(key, ref);
+    } else {
+      inputRefs.current.delete(key);
+    }
+  }, []);
+
+  // Focus a field by flat index
+  const focusField = useCallback(
+    (flatIdx: number) => {
+      const slotIdx = Math.floor(flatIdx / FIELDS_PER_SLOT);
+      const fieldIdx = flatIdx % FIELDS_PER_SLOT;
+      const key = refKey(slotIdx, fieldIdx);
+      const input = inputRefs.current.get(key);
+      if (input) {
+        input.focus();
+        if (flatListRef.current && slotIdx < dayRows.length) {
+          flatListRef.current.scrollToIndex({ index: slotIdx, animated: true, viewPosition: 0.3 });
+        }
+      }
+    },
+    [refKey, dayRows.length]
+  );
+
+  // Toolbar context label
+  const toolbarLabel = useMemo(() => {
+    if (focusedFieldIdx == null) return '';
+    const slotIdx = Math.floor(focusedFieldIdx / FIELDS_PER_SLOT);
+    const fieldIdx = focusedFieldIdx % FIELDS_PER_SLOT;
+    const slotLbl = dayRows[slotIdx]?.value.label ?? '';
+    return `${FIELD_NAMES[fieldIdx]} — ${slotLbl}`;
+  }, [focusedFieldIdx, dayRows]);
+
+  const SLOT_CARD_HEIGHT = 370;
+
+  const getItemLayout = useCallback(
+    (_data: unknown, index: number) => ({
+      length: SLOT_CARD_HEIGHT,
+      offset: SLOT_CARD_HEIGHT * index,
+      index
+    }),
+    []
+  );
+
   const slotFillsByDay = useMemo(() => {
     const result: Record<string, boolean[]> = {};
     for (const [iso, daySlots] of Object.entries(weekSlots)) {
@@ -211,10 +273,11 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   }, [dirtyKeys, noteDirty, buildSavePayload, saveAttemptSilently]);
 
   const renderSlot = useCallback(
-    ({ item }: ListRenderItemInfo<{ key: SlotKey; value: SlotValue }>) => {
+    ({ item, index: slotIdx }: ListRenderItemInfo<{ key: SlotKey; value: SlotValue }>) => {
       const { key, value } = item;
       const disabled = !canEdit;
       const tintColor = moodColor(value.mood);
+      const accessoryProps = canEdit ? { inputAccessoryViewID: DIARY_NAV_ID } : {};
       return (
         <Card
           style={{
@@ -236,6 +299,9 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
           />
           <Card.Content style={{ gap: 8 }}>
             <TextInput
+              ref={(r: RNTextInput | null) => registerRef(refKey(slotIdx, 0), r)}
+              onFocus={() => setFocusedFieldIdx(slotIdx * FIELDS_PER_SLOT + 0)}
+              {...accessoryProps}
               mode="flat"
               disabled={disabled}
               label={mode === 'edit' ? 'Activity' : undefined}
@@ -254,6 +320,9 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
               clearButtonMode={mode === 'edit' ? 'always' : 'never'}
             />
             <NumericField
+              ref={(r: RNTextInput | null) => registerRef(refKey(slotIdx, 1), r)}
+              onFocus={() => setFocusedFieldIdx(slotIdx * FIELDS_PER_SLOT + 1)}
+              inputAccessoryViewID={canEdit ? DIARY_NAV_ID : undefined}
               label="Mood"
               value={value.mood}
               min={0}
@@ -263,6 +332,9 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
               onChange={(n) => updateSlot(key, { mood: n })}
             />
             <NumericField
+              ref={(r: RNTextInput | null) => registerRef(refKey(slotIdx, 2), r)}
+              onFocus={() => setFocusedFieldIdx(slotIdx * FIELDS_PER_SLOT + 2)}
+              inputAccessoryViewID={canEdit ? DIARY_NAV_ID : undefined}
               label="Achievement"
               value={value.achievement}
               min={0}
@@ -272,6 +344,9 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
               onChange={(n) => updateSlot(key, { achievement: n })}
             />
             <NumericField
+              ref={(r: RNTextInput | null) => registerRef(refKey(slotIdx, 3), r)}
+              onFocus={() => setFocusedFieldIdx(slotIdx * FIELDS_PER_SLOT + 3)}
+              inputAccessoryViewID={canEdit ? DIARY_NAV_ID : undefined}
               label="Closeness"
               value={value.closeness}
               min={0}
@@ -281,6 +356,9 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
               onChange={(n) => updateSlot(key, { closeness: n })}
             />
             <NumericField
+              ref={(r: RNTextInput | null) => registerRef(refKey(slotIdx, 4), r)}
+              onFocus={() => setFocusedFieldIdx(slotIdx * FIELDS_PER_SLOT + 4)}
+              inputAccessoryViewID={canEdit ? DIARY_NAV_ID : undefined}
               label="Enjoyment"
               value={value.enjoyment}
               min={0}
@@ -293,7 +371,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
         </Card>
       );
     },
-    [canEdit, updateSlot, mode]
+    [canEdit, updateSlot, mode, registerRef, refKey]
   );
 
   return (
@@ -325,9 +403,16 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
       </View>
 
       <FlatList
+        ref={flatListRef}
         data={dayRows}
         keyExtractor={(row) => row.key}
         renderItem={renderSlot}
+        getItemLayout={getItemLayout}
+        onScrollToIndexFailed={(info) => {
+          setTimeout(() => {
+            flatListRef.current?.scrollToIndex({ index: info.index, animated: true, viewPosition: 0.3 });
+          }, 100);
+        }}
         initialNumToRender={8}
         maxToRenderPerBatch={8}
         windowSize={6}
@@ -508,6 +593,24 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
           </View>
         }
       />
+      {canEdit && (
+        <DiaryInputToolbar
+          nativeID={DIARY_NAV_ID}
+          label={toolbarLabel}
+          canGoPrev={focusedFieldIdx != null && focusedFieldIdx > 0}
+          canGoNext={focusedFieldIdx != null && focusedFieldIdx < totalFields - 1}
+          onPrev={() => {
+            if (focusedFieldIdx != null && focusedFieldIdx > 0) {
+              focusField(focusedFieldIdx - 1);
+            }
+          }}
+          onNext={() => {
+            if (focusedFieldIdx != null && focusedFieldIdx < totalFields - 1) {
+              focusField(focusedFieldIdx + 1);
+            }
+          }}
+        />
+      )}
     </KeyboardAvoidingView>
   );
 };
