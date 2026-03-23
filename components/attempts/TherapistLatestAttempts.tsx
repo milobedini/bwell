@@ -322,7 +322,7 @@ const TherapistLatestAttempts = () => {
     <ContentContainer padded={false}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 pt-2">
-        <ThemedText type="small" className="text-sway-darkGrey">
+        <ThemedText type="small" className="text-sway-darkGrey" style={{ opacity: isFetching && !isPending ? 0.4 : 1 }}>
           {totalCount} {totalCount === 1 ? 'submission' : 'submissions'}
         </ThemedText>
         <IconButton
