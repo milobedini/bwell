@@ -420,12 +420,13 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
     >
       <View
         style={{ borderBottomWidth: 1, borderBottomColor: Colors.chip.darkCard }}
-        className="bg-sway-dark px-4 pb-2 pt-1"
+        className="flex-row items-center justify-center bg-sway-dark pb-2 pl-4 pr-2 pt-1"
       >
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 0, gap: 8 }}
+          className="flex-1"
         >
           {days.map((d) => {
             const iso = dateISO(d);
@@ -440,6 +441,18 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
             );
           })}
         </ScrollView>
+        {hasDirtyChanges && (
+          <Pressable
+            onPress={saveDirty}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            className="ml-2 rounded-full p-2"
+            style={{ backgroundColor: Colors.chip.green }}
+            accessibilityLabel="Save changes"
+            accessibilityRole="button"
+          >
+            <MaterialCommunityIcons name="content-save" size={18} color={Colors.sway.dark} />
+          </Pressable>
+        )}
       </View>
 
       <FlatList
