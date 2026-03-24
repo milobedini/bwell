@@ -43,7 +43,7 @@ export const Colors = {
     darkCard: '#262E42',
     darkCardAlt: '#334368',
     darkCardDeep: '#0B1A2A',
-    darkCardBorder: 'rgba(255,255,255,0.08)',
+    darkCardBorder: 'rgba(255,255,255,0.18)',
     dotInactive: '#3A496B'
   },
   tint: {
