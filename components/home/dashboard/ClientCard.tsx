@@ -150,9 +150,9 @@ const ClientCard = memo(({ item }: ClientCardProps) => {
         borderTopWidth: 1,
         borderRightWidth: 1,
         borderBottomWidth: 1,
-        borderTopColor: Colors.chip.darkCardAlt,
-        borderRightColor: Colors.chip.darkCardAlt,
-        borderBottomColor: Colors.chip.darkCardAlt
+        borderTopColor: Colors.chip.darkCardBorder,
+        borderRightColor: Colors.chip.darkCardBorder,
+        borderBottomColor: Colors.chip.darkCardBorder
       })}
     >
       {/* Top row: name + last active */}
