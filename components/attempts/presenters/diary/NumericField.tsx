@@ -1,8 +1,9 @@
 import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { TextInput as NativeTextInput, type TextInput as RNTextInput, View } from 'react-native';
+import { type TextInput as RNTextInput, View } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
+import { type SlotKey, type SlotValue } from '@/utils/activityHelpers';
 import { clamp } from '@/utils/helpers';
 
 type NumericFieldProps = {
@@ -11,15 +12,27 @@ type NumericFieldProps = {
   min: number;
   max: number;
   disabled?: boolean;
-  onChange: (n: number) => void;
   maxLength?: number;
-  onFocus?: () => void;
-  inputAccessoryViewID?: string;
+  focusIdx: number;
+  setFocusedFieldIdx: (idx: number) => void;
+  slotKey: SlotKey;
+  field: keyof Pick<SlotValue, 'mood' | 'achievement' | 'closeness' | 'enjoyment'>;
+  onUpdate: (key: SlotKey, patch: Partial<SlotValue>) => void;
 };
+
+const THEME = {
+  colors: {
+    onSurfaceVariant: Colors.sway.lightGrey,
+    surfaceDisabled: Colors.sway.darkGrey,
+    onSurfaceDisabled: Colors.sway.darkGrey
+  }
+} as const;
+
+const INPUT_STYLE = { backgroundColor: 'transparent', height: 44, textAlign: 'center' } as const;
 
 const NumericField = memo(
   forwardRef<RNTextInput, NumericFieldProps>(function NumericField(
-    { label, value, min, max, disabled, onChange, maxLength = 3, onFocus, inputAccessoryViewID },
+    { label, value, min, max, disabled, maxLength = 3, focusIdx, setFocusedFieldIdx, slotKey, field, onUpdate },
     ref
   ) {
     const innerRef = useRef<RNTextInput>(null);
@@ -33,6 +46,8 @@ const NumericField = memo(
       setText(value == null ? '' : String(value));
     }, [value]);
 
+    const handleFocus = useCallback(() => setFocusedFieldIdx(focusIdx), [setFocusedFieldIdx, focusIdx]);
+
     const handleChange = useCallback(
       (t: string) => {
         // Allow empty while typing; filter to digits only
@@ -42,9 +57,9 @@ const NumericField = memo(
         // User still typing — don't emit until a number is present
         if (digits === '') return;
         const parsed = clamp(parseInt(digits, 10) || 0, min, max);
-        if (parsed !== value) onChange(parsed);
+        if (parsed !== value) onUpdate(slotKey, { [field]: parsed });
       },
-      [min, max, onChange, value]
+      [min, max, onUpdate, value, slotKey, field]
     );
 
     return (
@@ -55,28 +70,16 @@ const NumericField = memo(
           mode="outlined"
           value={text}
           onChangeText={handleChange}
-          onFocus={onFocus}
+          onFocus={handleFocus}
           disabled={disabled}
           keyboardType="number-pad"
           inputMode="numeric"
           maxLength={maxLength}
-          render={(props) => <NativeTextInput {...props} inputAccessoryViewID={inputAccessoryViewID} />}
-          style={{
-            backgroundColor: 'transparent',
-            height: 44,
-            textAlign: 'center'
-          }}
+          style={INPUT_STYLE}
           textColor="white"
-          theme={{
-            colors: {
-              onSurfaceVariant: Colors.sway.lightGrey,
-              surfaceDisabled: Colors.sway.darkGrey,
-              onSurfaceDisabled: Colors.sway.darkGrey
-            }
-          }}
+          theme={THEME}
           placeholder={`${min}–${max}`}
           placeholderTextColor={Colors.sway.darkGrey}
-          returnKeyType="done"
           submitBehavior="blurAndSubmit"
           outlineColor={text.length > 0 ? Colors.sway.bright : Colors.sway.darkGrey}
           activeOutlineColor={Colors.primary.accent}
