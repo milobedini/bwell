@@ -7,6 +7,7 @@ import {
   Platform,
   Pressable,
   ScrollView,
+  TextInput as NativeTextInput,
   type TextInput as RNTextInput,
   View
 } from 'react-native';
@@ -78,6 +79,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   const [userNoteText, setUserNoteText] = useState(attempt.userNote ?? '');
   const [noteDirty, setNoteDirty] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
+  const hasDirtyChanges = dirtyKeys.size > 0 || noteDirty;
 
   const flatListRef = useRef<FlatList>(null);
   const inputRefs = useRef<Map<string, RNTextInput>>(new Map());
@@ -109,14 +111,16 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
     [monday]
   );
 
-  const weekSlots = useMemo(() => {
-    const result: Record<string, { key: SlotKey; value: SlotValue }[]> = {};
-    for (const d of days) {
-      const iso = dateISO(d);
-      result[iso] = buildDaySlots(iso);
-    }
-    return result;
-  }, [days]);
+  const weekSlots = useMemo(
+    () =>
+      Object.fromEntries(
+        days.map((d) => {
+          const iso = dateISO(d);
+          return [iso, buildDaySlots(iso)];
+        })
+      ) as Record<string, { key: SlotKey; value: SlotValue }[]>,
+    [days]
+  );
 
   const [activeDayISO, setActiveDayISO] = useState(() => dateISO(days[0] || monday));
 
@@ -126,7 +130,6 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
     setFocusedFieldIdx(null);
   }, [activeDayISO]);
 
-  // local state
   const [slots, setSlots] = useState<Record<SlotKey, SlotValue>>({});
 
   const [reflectionPrompt] = useState(() => REFLECTION_PROMPTS[Math.floor(Math.random() * REFLECTION_PROMPTS.length)]);
@@ -180,8 +183,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   // Total fields for the current day
   const totalFields = dayRows.length * FIELDS_PER_SLOT;
 
-  // Build the ordered ref key for a given slot index + field index
-  const refKey = useCallback((slotIdx: number, fieldIdx: number) => `${slotIdx}-${fieldIdx}`, []);
+  const refKey = (slotIdx: number, fieldIdx: number): string => `${slotIdx}-${fieldIdx}`;
 
   // Register a ref
   const registerRef = useCallback((key: string, ref: RNTextInput | null) => {
@@ -224,7 +226,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
         tryFocus();
       }
     },
-    [refKey, dayRows.length]
+    [dayRows.length]
   );
 
   // Toolbar context label
@@ -245,13 +247,16 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
     []
   );
 
-  const slotFillsByDay = useMemo(() => {
-    const result: Record<string, boolean[]> = {};
-    for (const [iso, daySlots] of Object.entries(weekSlots)) {
-      result[iso] = daySlots.map((r) => isSlotFilled(slots[r.key] ?? r.value));
-    }
-    return result;
-  }, [weekSlots, slots]);
+  const slotFillsByDay = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(weekSlots).map(([iso, daySlots]) => [
+          iso,
+          daySlots.map((r) => isSlotFilled(slots[r.key] ?? r.value))
+        ])
+      ) as Record<string, boolean[]>,
+    [weekSlots, slots]
+  );
 
   const updateSlot = useCallback(
     (key: SlotKey, patch: Partial<SlotValue>) => {
@@ -267,23 +272,21 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   );
 
   const buildPayload = useCallback(
-    (keys: Iterable<SlotKey>): DiaryEntryInput[] => {
-      const out: DiaryEntryInput[] = [];
-      for (const k of keys) {
-        const v = slots[k];
-        if (!v) continue;
-        out.push({
-          at: v.at.toISOString(),
-          label: v.label,
-          activity: v.activity ?? '',
-          mood: v.mood,
-          achievement: v.achievement,
-          closeness: v.closeness,
-          enjoyment: v.enjoyment
-        });
-      }
-      return out;
-    },
+    (keys: Iterable<SlotKey>): DiaryEntryInput[] =>
+      Array.from(keys)
+        .filter((k) => slots[k] != null)
+        .map((k) => {
+          const v = slots[k];
+          return {
+            at: v.at.toISOString(),
+            label: v.label,
+            activity: v.activity ?? '',
+            mood: v.mood,
+            achievement: v.achievement,
+            closeness: v.closeness,
+            enjoyment: v.enjoyment
+          };
+        }),
     [slots]
   );
 
@@ -295,7 +298,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   }, [dirtyKeys, noteDirty, userNoteText, buildPayload]);
 
   const saveDirty = useCallback(() => {
-    if (!dirtyKeys.size && !noteDirty) return;
+    if (!hasDirtyChanges) return;
     saveAttemptSilently(buildSavePayload(), {
       onSuccess: () => {
         setDirtyKeys(new Set());
@@ -303,14 +306,14 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       }
     });
-  }, [dirtyKeys, noteDirty, buildSavePayload, saveAttemptSilently]);
+  }, [hasDirtyChanges, buildSavePayload, saveAttemptSilently]);
 
   const renderSlot = useCallback(
     ({ item, index: slotIdx }: ListRenderItemInfo<{ key: SlotKey; value: SlotValue }>) => {
       const { key, value } = item;
       const disabled = !canEdit;
       const tintColor = moodColor(value.mood);
-      const accessoryProps = canEdit ? { inputAccessoryViewID: DIARY_NAV_ID } : {};
+
       return (
         <Card
           style={{
@@ -334,7 +337,9 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
             <TextInput
               ref={getRefCallback(refKey(slotIdx, 0))}
               onFocus={() => setFocusedFieldIdx(slotIdx * FIELDS_PER_SLOT + 0)}
-              {...accessoryProps}
+              render={
+                canEdit ? (props) => <NativeTextInput {...props} inputAccessoryViewID={DIARY_NAV_ID} /> : undefined
+              }
               mode="flat"
               disabled={disabled}
               label={mode === 'edit' ? 'Activity' : undefined}
@@ -404,7 +409,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
         </Card>
       );
     },
-    [canEdit, updateSlot, mode, getRefCallback, refKey]
+    [canEdit, updateSlot, mode, getRefCallback]
   );
 
   return (
@@ -413,7 +418,6 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.select({ ios: 120, default: 0 })}
     >
-      {/* Sticky day selector — always visible */}
       <View
         style={{ borderBottomWidth: 1, borderBottomColor: Colors.chip.darkCard }}
         className="bg-sway-dark px-4 pb-2 pt-1"
@@ -473,7 +477,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
               ) : (
                 <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
                   {[
-                    startedAt && !dirtyKeys.size && `Started ${new Date(startedAt).toLocaleDateString()}`,
+                    startedAt && !hasDirtyChanges && `Started ${new Date(startedAt).toLocaleDateString()}`,
                     updatedAt && `Updated ${new Date(updatedAt).toLocaleDateString()}`
                   ]
                     .filter(Boolean)
@@ -491,7 +495,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                   <MaterialCommunityIcons name="information-outline" size={20} color={Colors.sway.lightGrey} />
                 </Pressable>
               ) : null}
-              {(!!dirtyKeys.size || noteDirty) && (
+              {hasDirtyChanges && (
                 <Chip
                   icon={() => <MaterialCommunityIcons name="content-save" size={24} color={Colors.chip.green} />}
                   mode="outlined"
@@ -500,10 +504,9 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                     backgroundColor: Colors.sway.buttonBackground,
                     borderColor: Colors.chip.greenBorder
                   }}
-                  disabled={!dirtyKeys.size && !noteDirty}
                   onPress={saveDirty}
                 >
-                  {dirtyKeys.size || noteDirty ? 'Save changes' : 'Saved'}
+                  Save changes
                 </Chip>
               )}
             </View>
@@ -580,10 +583,10 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
               <View className="gap-3 pb-2">
                 <PrimaryButton
                   className="mb-2"
-                  title={allAnswered ? 'Submit diary' : dirtyKeys.size || noteDirty ? `Save & Exit` : 'Exit'}
+                  title={allAnswered ? 'Submit diary' : hasDirtyChanges ? 'Save & Exit' : 'Exit'}
                   onPress={() => {
                     if (!canEdit || !allAnswered) {
-                      if (dirtyKeys.size || noteDirty) {
+                      if (hasDirtyChanges) {
                         saveAttempt(buildSavePayload(), {
                           onSuccess: () => {
                             setDirtyKeys(new Set());
@@ -609,7 +612,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                         }
                       });
 
-                    if (dirtyKeys.size || noteDirty) {
+                    if (hasDirtyChanges) {
                       saveAttemptSilently(buildSavePayload(), {
                         onSuccess: () => {
                           setDirtyKeys(new Set());
@@ -622,9 +625,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                     }
                   }}
                 />
-                {(!!dirtyKeys.size || noteDirty) && (
-                  <PrimaryButton title="Discard changes" onPress={router.back} variant="error" />
-                )}
+                {hasDirtyChanges && <PrimaryButton title="Discard changes" onPress={router.back} variant="error" />}
               </View>
             )}
             {mode !== 'edit' && <PrimaryButton className="mb-2" title="Exit" onPress={() => router.back()} />}
