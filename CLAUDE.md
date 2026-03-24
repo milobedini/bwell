@@ -29,7 +29,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - Therapist timeline (paginated patient history, filterable, severity-tinted attempt cards with score band colour mapping)
 - Admin dashboard (stats, therapist verification)
 - Onboarding carousel + welcome flow
-- Activity Diary (weekly grid, day chips with fill indicators, numeric fields, reflection prompts, editable user note, collapsible weekly summary, slot mood tinting)
+- Activity Diary (weekly grid, day chips with fill indicators, numeric fields, reflection prompts, editable user note, collapsible weekly summary, slot mood tinting, keyboard toolbar with prev/next navigation, modular presenter architecture with extracted hooks/components, FlatList performance tuning)
 - UI component system (StatusChip base, EmptyState component, Pressable buttons with hover/focus/disabled states, colour tokens in tailwind config, web-aligned font scale, ActionMenu bottom sheet)
 - Admin All Users (search, filtering, sorting, infinite scroll with lazy loading)
 - Global Paper dark theme (MD3DarkTheme, dialog surfaces, dark-aware text)
