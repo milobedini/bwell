@@ -20,7 +20,9 @@ const StatPill = memo(({ value, label, color, onPress }: StatPillProps) => (
       borderRadius: 14,
       paddingVertical: 12,
       paddingHorizontal: 10,
-      alignItems: 'center'
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: Colors.chip.dotInactive
     })}
   >
     <ThemedText type="subtitle" style={{ color, lineHeight: 28 }}>

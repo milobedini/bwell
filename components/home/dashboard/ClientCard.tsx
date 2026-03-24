@@ -50,16 +50,21 @@ type AssignmentDotsProps = {
   overdue: number;
 };
 
+const MAX_DOTS = 6;
+
 const AssignmentDots = ({ total, completed, overdue }: AssignmentDotsProps) => {
-  const dots = [
+  const allDots = [
     ...Array.from({ length: completed }, () => 'done' as const),
     ...Array.from({ length: overdue }, () => 'overdue' as const),
     ...Array.from({ length: Math.max(0, total - completed - overdue) }, () => 'pending' as const)
   ];
 
+  const visibleDots = allDots.slice(0, MAX_DOTS);
+  const overflow = allDots.length - MAX_DOTS;
+
   return (
     <View className="flex-row items-center gap-1.5">
-      {dots.map((status, i) => (
+      {visibleDots.map((status, i) => (
         <View
           key={i}
           style={{
@@ -81,6 +86,11 @@ const AssignmentDots = ({ total, completed, overdue }: AssignmentDotsProps) => {
           }}
         />
       ))}
+      {overflow > 0 && (
+        <ThemedText type="small" style={{ color: Colors.sway.darkGrey, fontSize: 11 }}>
+          +{overflow}
+        </ThemedText>
+      )}
     </View>
   );
 };
@@ -134,9 +144,11 @@ const ClientCard = memo(({ item }: ClientCardProps) => {
         borderRadius: 14,
         padding: 14,
         paddingBottom: 12,
-        marginBottom: 8,
+        marginBottom: 10,
         borderLeftWidth: 3.5,
-        borderLeftColor: borderColor
+        borderLeftColor: borderColor,
+        borderWidth: 1,
+        borderColor: Colors.chip.dotInactive
       })}
     >
       {/* Top row: name + last active */}
