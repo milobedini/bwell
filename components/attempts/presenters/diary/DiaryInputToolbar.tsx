@@ -2,6 +2,7 @@ import { Keyboard, Pressable, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 type DiaryInputToolbarProps = {
   label: string;
@@ -11,52 +12,51 @@ type DiaryInputToolbarProps = {
   onNext: () => void;
 };
 
-const ARROW_HIT_SLOP = { top: 8, bottom: 8, left: 12, right: 12 };
+const CHEVRON_SIZE = 24;
+const HIT_SLOP = { top: 8, bottom: 8, left: 12, right: 12 };
 
 const DiaryInputToolbar = ({ label, canGoPrev, canGoNext, onPrev, onNext }: DiaryInputToolbarProps) => (
-  <View className="flex-row items-center justify-between border-t border-sway-darkGrey bg-chip-darkCard px-3 py-2">
-    <View className="flex-row items-center gap-4">
+  <View className="flex-row items-center justify-between border-t border-sway-darkGrey bg-chip-darkCard px-2 py-1.5">
+    <View className="flex-row items-center gap-1">
       <Pressable
         onPress={onPrev}
         disabled={!canGoPrev}
-        hitSlop={ARROW_HIT_SLOP}
+        hitSlop={HIT_SLOP}
+        className="items-center justify-center rounded-md p-1.5"
+        style={({ pressed }) => (pressed && canGoPrev ? { opacity: 0.5 } : undefined)}
         accessibilityLabel="Previous field"
         accessibilityRole="button"
       >
-        <ThemedText
-          style={{
-            fontSize: 22,
-            fontFamily: Fonts.Bold,
-            color: canGoPrev ? Colors.sway.bright : Colors.sway.darkGrey
-          }}
-        >
-          {'‹'}
-        </ThemedText>
+        <MaterialIcons
+          name="keyboard-arrow-up"
+          size={CHEVRON_SIZE}
+          color={canGoPrev ? Colors.sway.bright : Colors.sway.darkGrey}
+        />
       </Pressable>
       <Pressable
         onPress={onNext}
         disabled={!canGoNext}
-        hitSlop={ARROW_HIT_SLOP}
+        hitSlop={HIT_SLOP}
+        className="items-center justify-center rounded-md p-1.5"
+        style={({ pressed }) => (pressed && canGoNext ? { opacity: 0.5 } : undefined)}
         accessibilityLabel="Next field"
         accessibilityRole="button"
       >
-        <ThemedText
-          style={{
-            fontSize: 22,
-            fontFamily: Fonts.Bold,
-            color: canGoNext ? Colors.sway.bright : Colors.sway.darkGrey
-          }}
-        >
-          {'›'}
-        </ThemedText>
+        <MaterialIcons
+          name="keyboard-arrow-down"
+          size={CHEVRON_SIZE}
+          color={canGoNext ? Colors.sway.bright : Colors.sway.darkGrey}
+        />
       </Pressable>
-      <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
+      <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginLeft: 4 }}>
         {label}
       </ThemedText>
     </View>
     <Pressable
       onPress={() => Keyboard.dismiss()}
-      hitSlop={ARROW_HIT_SLOP}
+      hitSlop={HIT_SLOP}
+      className="rounded-md px-2 py-1.5"
+      style={({ pressed }) => (pressed ? { opacity: 0.5 } : undefined)}
       accessibilityLabel="Dismiss keyboard"
       accessibilityRole="button"
     >
