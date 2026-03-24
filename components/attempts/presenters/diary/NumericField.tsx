@@ -24,7 +24,8 @@ const NumericField = memo(
   ) {
     const innerRef = useRef<RNTextInput>(null);
 
-    useImperativeHandle(ref, () => innerRef.current as RNTextInput);
+    // Expose focus() safely — innerRef may be null before mount
+    useImperativeHandle(ref, () => ({ focus: () => innerRef.current?.focus() }) as RNTextInput);
 
     const [text, setText] = useState<string>(value == null ? '' : String(value));
 
@@ -34,9 +35,11 @@ const NumericField = memo(
 
     const handleChange = useCallback(
       (t: string) => {
+        // Allow empty while typing; filter to digits only
         const digits = t.replace(/[^\d]/g, '');
         setText(digits);
 
+        // User still typing — don't emit until a number is present
         if (digits === '') return;
         const parsed = clamp(parseInt(digits, 10) || 0, min, max);
         if (parsed !== value) onChange(parsed);
