@@ -47,6 +47,14 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 | Tint teal | `Colors.tint.teal` | `rgba(24,205,186,0.15)` |
 | Tint error | `Colors.tint.error` | `rgba(255,109,94,0.15)` |
 | Tint info | `Colors.tint.info` | `rgba(255,209,93,0.15)` |
+| Diary mood warm | `Colors.diary.moodWarm` / `bg-diary-moodWarm` | `#f4a261` |
+| Diary mood cool | `Colors.diary.moodCool` / `bg-diary-moodCool` | `#5b8def` |
+| Diary closeness | `Colors.diary.closeness` / `bg-diary-closeness` | `#e76f9a` |
+| Diary enjoyment | `Colors.diary.enjoyment` / `bg-diary-enjoyment` | `#a78bfa` |
+| Diary prompt bg | `Colors.diary.promptBg` / `bg-diary-promptBg` | `#1a3a4a` |
+| Chip dot inactive | `Colors.chip.dotInactive` / `bg-chip-dotInactive` | `#3A496B` |
+| Overlay section header | `Colors.overlay.sectionHeader` | `rgba(38,46,66,0.5)` |
+| Gradient pink | `Colors.gradient.pink` | `#E70696` |
 
 **Status chip color pairs** (background + border):
 
@@ -133,6 +141,8 @@ When translating Figma designs to code, apply these HIG principles:
 - Primary action: `ThemedButton` with `variant="default"` (teal bg)
 - Destructive: `ThemedButton` with `variant="error"` (red bg)
 - Disabled: automatically uses `bg-sway-darkGrey`
+- Hero/branded: `PrimaryButton` — wide button with optional logo, border, translucent bg (onboarding, welcome screens)
+- Profile/settings: `SecondaryButton` — full-width rounded button with translucent bg
 - Contextual actions: use `ActionMenu` bottom sheet for list item actions (replaced FabGroup)
 
 ## Spacing

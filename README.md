@@ -45,6 +45,9 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ## Recent Milestones
 
+- **Diary keyboard toolbar** — native-style prev/next chevron navigation for numeric fields, keyboard-aware positioning (2026-03-24)
+- **Diary presenter refactor** — extracted 670-line presenter into composable hooks and components, FlatList performance tuning (2026-03-24)
+- **Diary UX polish** — compact header, floating save button, haptics, placeholder colours, character counts (2026-03-23)
 - **Therapist attempts redesign** — severity-tinted cards with score band colour mapping, timeAgo display (2026-03-21)
 - **ActionMenu refactor** — replaced FabGroup with bottom sheet ActionMenu, added tint colour tokens (2026-03-21)
 - **Admin All Users** — search, filtering, sorting, and infinite scroll for user management (2026-03-20)
