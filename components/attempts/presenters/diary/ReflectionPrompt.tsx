@@ -14,8 +14,7 @@ const ReflectionPrompt = ({ prompt }: ReflectionPromptProps) => (
       borderLeftWidth: 3,
       borderLeftColor: Colors.sway.bright,
       borderRadius: 6,
-      padding: 12,
-      marginBottom: 12
+      padding: 12
     }}
   >
     <ThemedText
