@@ -17,8 +17,6 @@ type ActivityDiaryPresenterProps = {
   patientName?: string;
 };
 
-const DIARY_NAV_ID = 'diaryNav';
-
 const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPresenterProps) => {
   const state = useDiaryState({ attempt, mode });
   const nav = useDiaryNavigation(state.dayRows, state.activeDayISO);
@@ -106,12 +104,11 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
         }
       />
 
-      {state.canEdit && (
+      {state.canEdit && nav.focusedFieldIdx != null && (
         <DiaryInputToolbar
-          nativeID={DIARY_NAV_ID}
           label={nav.toolbarLabel}
-          canGoPrev={nav.focusedFieldIdx != null && nav.focusedFieldIdx > 0}
-          canGoNext={nav.focusedFieldIdx != null && nav.focusedFieldIdx < nav.totalFields - 1}
+          canGoPrev={nav.focusedFieldIdx > 0}
+          canGoNext={nav.focusedFieldIdx < nav.totalFields - 1}
           onPrev={() => {
             if (nav.focusedFieldIdx != null && nav.focusedFieldIdx > 0) {
               nav.focusField(nav.focusedFieldIdx - 1);
