@@ -99,12 +99,9 @@ const WeeklySummary = memo(
     );
   },
   (prev, next) =>
+    prev.defaultOpen === next.defaultOpen &&
     prev.totals.count === next.totals.count &&
-    prev.totals.avgMood === next.totals.avgMood &&
-    prev.totals.avgAchievement === next.totals.avgAchievement &&
-    prev.totals.avgCloseness === next.totals.avgCloseness &&
-    prev.totals.avgEnjoyment === next.totals.avgEnjoyment &&
-    prev.defaultOpen === next.defaultOpen
+    METRICS.every((m) => prev.totals[m.key] === next.totals[m.key])
 );
 
 WeeklySummary.displayName = 'WeeklySummary';

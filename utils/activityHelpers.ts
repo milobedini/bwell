@@ -19,29 +19,28 @@ export const moodColor = (mood?: number): string | undefined => {
   return undefined;
 };
 
-const pad2 = (n: number) => String(n).padStart(2, '0');
+const pad2 = (n: number): string => String(n).padStart(2, '0');
 
-function startOfMonday(d: Date) {
+const startOfMonday = (d: Date): Date => {
   const dt = new Date(d);
   const day = dt.getDay();
   const diff = day === 0 ? -6 : 1 - day;
   dt.setHours(0, 0, 0, 0);
   dt.setDate(dt.getDate() + diff);
   return dt;
-}
-function dayLabel(d: Date) {
-  return d.toLocaleDateString(undefined, { weekday: 'short' });
-}
-function dateISO(d: Date) {
-  return d.toISOString().slice(0, 10);
-}
-function slotLabel(h: number) {
+};
+
+const dayLabel = (d: Date): string => d.toLocaleDateString(undefined, { weekday: 'short' });
+
+const dateISO = (d: Date): string => d.toISOString().slice(0, 10);
+
+const slotLabel = (h: number): string => {
   const end = Math.min(24, h + SLOT_STEP_HOURS);
   return `${pad2(h)}:00–${pad2(end)}:00`;
-}
+};
 
-type SlotKey = string;
-type SlotValue = {
+export type SlotKey = string;
+export type SlotValue = {
   at: Date;
   label: string;
   activity: string;
@@ -50,18 +49,23 @@ type SlotValue = {
   closeness?: number;
   enjoyment?: number;
 };
-function buildDaySlots(baseIso: string): { key: SlotKey; value: SlotValue }[] {
+
+// Generate the slot hours as an array to avoid mutable `let` loop
+const slotHours = Array.from(
+  { length: Math.ceil((SLOT_END_HOUR - SLOT_START_HOUR) / SLOT_STEP_HOURS) },
+  (_, i) => SLOT_START_HOUR + i * SLOT_STEP_HOURS
+);
+
+const buildDaySlots = (baseIso: string): { key: SlotKey; value: SlotValue }[] => {
   const base = new Date(`${baseIso}T00:00:00.000Z`);
-  const rows: { key: SlotKey; value: SlotValue }[] = [];
-  for (let h = SLOT_START_HOUR; h < SLOT_END_HOUR; h += SLOT_STEP_HOURS) {
+  return slotHours.map((h) => {
     const at = new Date(base);
     at.setUTCHours(h, 0, 0, 0);
     const label = slotLabel(h);
     const key = `${dateISO(at)}|${label}`;
-    rows.push({ key, value: { at, label, activity: '' } });
-  }
-  return rows;
-}
+    return { key, value: { at, label, activity: '' } };
+  });
+};
 
 export const isSlotFilled = (v: SlotValue): boolean =>
   v.activity.trim().length > 0 || v.mood != null || v.achievement != null || v.closeness != null || v.enjoyment != null;
@@ -69,4 +73,4 @@ export const isSlotFilled = (v: SlotValue): boolean =>
 export const FIELD_NAMES = ['Activity', 'Mood', 'Achievement', 'Closeness', 'Enjoyment'] as const;
 export const FIELDS_PER_SLOT = FIELD_NAMES.length;
 
-export { buildDaySlots, dateISO, dayLabel, type SlotKey, slotLabel, type SlotValue, startOfMonday };
+export { buildDaySlots, dateISO, dayLabel, slotLabel, startOfMonday };

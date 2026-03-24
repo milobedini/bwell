@@ -1,5 +1,5 @@
-import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { type TextInput as RNTextInput, View } from 'react-native';
+import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { TextInput as NativeTextInput, type TextInput as RNTextInput, View } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
@@ -47,8 +47,6 @@ const NumericField = memo(
       [min, max, onChange, value]
     );
 
-    const hasText = useMemo(() => text.length > 0, [text.length]);
-
     return (
       <View className="flex-row items-center justify-between px-2">
         <ThemedText>{label}</ThemedText>
@@ -62,7 +60,7 @@ const NumericField = memo(
           keyboardType="number-pad"
           inputMode="numeric"
           maxLength={maxLength}
-          inputAccessoryViewID={inputAccessoryViewID}
+          render={(props) => <NativeTextInput {...props} inputAccessoryViewID={inputAccessoryViewID} />}
           style={{
             backgroundColor: 'transparent',
             height: 44,
@@ -80,7 +78,7 @@ const NumericField = memo(
           placeholderTextColor={Colors.sway.darkGrey}
           returnKeyType="done"
           submitBehavior="blurAndSubmit"
-          outlineColor={hasText ? Colors.sway.bright : Colors.sway.darkGrey}
+          outlineColor={text.length > 0 ? Colors.sway.bright : Colors.sway.darkGrey}
           activeOutlineColor={Colors.primary.accent}
         />
       </View>
