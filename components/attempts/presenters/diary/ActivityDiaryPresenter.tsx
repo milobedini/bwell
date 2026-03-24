@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
+  Keyboard,
   KeyboardAvoidingView,
   ListRenderItemInfo,
   Platform,
@@ -53,6 +54,10 @@ type ActivityDiaryPresenterProps = {
 
 const DIARY_NAV_ID = 'diaryNav';
 
+// Estimated height of a single slot card (Card.Title + 5 fields + spacing).
+// Used by getItemLayout for fast FlatList scrollToIndex without measurement.
+const SLOT_CARD_HEIGHT = 370;
+
 const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPresenterProps) => {
   const [dirtyKeys, setDirtyKeys] = useState<Set<SlotKey>>(new Set());
 
@@ -68,7 +73,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   const { mutate: submitAttempt } = useSubmitAttempt(attempt._id);
 
   const canEdit = mode === 'edit';
-  const { moduleSnapshot, weekStart, startedAt, completedAt, diary, updatedAt } = attempt;
+  const { moduleSnapshot, weekStart, startedAt, completedAt, diary, updatedAt, userNote } = attempt;
 
   const [userNoteText, setUserNoteText] = useState(attempt.userNote ?? '');
   const [noteDirty, setNoteDirty] = useState(false);
@@ -77,6 +82,12 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   const flatListRef = useRef<FlatList>(null);
   const inputRefs = useRef<Map<string, RNTextInput>>(new Map());
   const [focusedFieldIdx, setFocusedFieldIdx] = useState<number | null>(null);
+
+  // Reset toolbar state when keyboard is dismissed via OS gesture (#4)
+  useEffect(() => {
+    const sub = Keyboard.addListener('keyboardDidHide', () => setFocusedFieldIdx(null));
+    return () => sub.remove();
+  }, []);
 
   const markDirty = useCallback((k: SlotKey) => {
     setDirtyKeys((prev) => {
@@ -108,6 +119,12 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   }, [days]);
 
   const [activeDayISO, setActiveDayISO] = useState(() => dateISO(days[0] || monday));
+
+  // Clear stale refs and reset toolbar when switching days (#6)
+  useEffect(() => {
+    inputRefs.current.clear();
+    setFocusedFieldIdx(null);
+  }, [activeDayISO]);
 
   // local state
   const [slots, setSlots] = useState<Record<SlotKey, SlotValue>>({});
@@ -175,18 +192,36 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
     }
   }, []);
 
-  // Focus a field by flat index
+  // Stable ref callback cache — avoids recreating arrow functions on every render (#2)
+  const refCallbackCache = useRef<Map<string, (r: RNTextInput | null) => void>>(new Map());
+  const getRefCallback = useCallback(
+    (key: string) => {
+      if (!refCallbackCache.current.has(key)) {
+        refCallbackCache.current.set(key, (r: RNTextInput | null) => registerRef(key, r));
+      }
+      return refCallbackCache.current.get(key)!;
+    },
+    [registerRef]
+  );
+
+  // Focus a field by flat index — scroll first so virtualised items mount before focus (#5)
   const focusField = useCallback(
     (flatIdx: number) => {
       const slotIdx = Math.floor(flatIdx / FIELDS_PER_SLOT);
       const fieldIdx = flatIdx % FIELDS_PER_SLOT;
       const key = refKey(slotIdx, fieldIdx);
-      const input = inputRefs.current.get(key);
-      if (input) {
-        input.focus();
-        if (flatListRef.current && slotIdx < dayRows.length) {
-          flatListRef.current.scrollToIndex({ index: slotIdx, animated: true, viewPosition: 0.3 });
-        }
+
+      const tryFocus = () => {
+        const input = inputRefs.current.get(key);
+        input?.focus();
+      };
+
+      if (flatListRef.current && slotIdx < dayRows.length) {
+        flatListRef.current.scrollToIndex({ index: slotIdx, animated: true, viewPosition: 0.3 });
+        // Allow next frame for virtualised item to mount after scroll
+        requestAnimationFrame(tryFocus);
+      } else {
+        tryFocus();
       }
     },
     [refKey, dayRows.length]
@@ -200,8 +235,6 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
     const slotLbl = dayRows[slotIdx]?.value.label ?? '';
     return `${FIELD_NAMES[fieldIdx]} — ${slotLbl}`;
   }, [focusedFieldIdx, dayRows]);
-
-  const SLOT_CARD_HEIGHT = 370;
 
   const getItemLayout = useCallback(
     (_data: unknown, index: number) => ({
@@ -299,7 +332,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
           />
           <Card.Content style={{ gap: 8 }}>
             <TextInput
-              ref={(r: RNTextInput | null) => registerRef(refKey(slotIdx, 0), r)}
+              ref={getRefCallback(refKey(slotIdx, 0))}
               onFocus={() => setFocusedFieldIdx(slotIdx * FIELDS_PER_SLOT + 0)}
               {...accessoryProps}
               mode="flat"
@@ -320,7 +353,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
               clearButtonMode={mode === 'edit' ? 'always' : 'never'}
             />
             <NumericField
-              ref={(r: RNTextInput | null) => registerRef(refKey(slotIdx, 1), r)}
+              ref={getRefCallback(refKey(slotIdx, 1))}
               onFocus={() => setFocusedFieldIdx(slotIdx * FIELDS_PER_SLOT + 1)}
               inputAccessoryViewID={canEdit ? DIARY_NAV_ID : undefined}
               label="Mood"
@@ -332,7 +365,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
               onChange={(n) => updateSlot(key, { mood: n })}
             />
             <NumericField
-              ref={(r: RNTextInput | null) => registerRef(refKey(slotIdx, 2), r)}
+              ref={getRefCallback(refKey(slotIdx, 2))}
               onFocus={() => setFocusedFieldIdx(slotIdx * FIELDS_PER_SLOT + 2)}
               inputAccessoryViewID={canEdit ? DIARY_NAV_ID : undefined}
               label="Achievement"
@@ -344,7 +377,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
               onChange={(n) => updateSlot(key, { achievement: n })}
             />
             <NumericField
-              ref={(r: RNTextInput | null) => registerRef(refKey(slotIdx, 3), r)}
+              ref={getRefCallback(refKey(slotIdx, 3))}
               onFocus={() => setFocusedFieldIdx(slotIdx * FIELDS_PER_SLOT + 3)}
               inputAccessoryViewID={canEdit ? DIARY_NAV_ID : undefined}
               label="Closeness"
@@ -356,7 +389,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
               onChange={(n) => updateSlot(key, { closeness: n })}
             />
             <NumericField
-              ref={(r: RNTextInput | null) => registerRef(refKey(slotIdx, 4), r)}
+              ref={getRefCallback(refKey(slotIdx, 4))}
               onFocus={() => setFocusedFieldIdx(slotIdx * FIELDS_PER_SLOT + 4)}
               inputAccessoryViewID={canEdit ? DIARY_NAV_ID : undefined}
               label="Enjoyment"
@@ -371,7 +404,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
         </Card>
       );
     },
-    [canEdit, updateSlot, mode, registerRef, refKey]
+    [canEdit, updateSlot, mode, getRefCallback, refKey]
   );
 
   return (
@@ -488,7 +521,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
         }
         ListFooterComponent={
           <View>
-            {canEdit && (
+            {canEdit ? (
               <Card
                 style={{
                   backgroundColor: Colors.sway.buttonBackground,
@@ -529,10 +562,24 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                   </ThemedText>
                 </Card.Content>
               </Card>
-            )}
+            ) : userNote ? (
+              <Card
+                style={{
+                  backgroundColor: Colors.sway.buttonBackground,
+                  marginBottom: 10,
+                  marginHorizontal: 8
+                }}
+              >
+                <Card.Title title="Patient note" titleStyle={{ color: 'white', fontFamily: Fonts.Bold }} />
+                <Card.Content>
+                  <ThemedText style={{ color: Colors.sway.lightGrey }}>{userNote}</ThemedText>
+                </Card.Content>
+              </Card>
+            ) : null}
             {mode === 'edit' && (
               <View className="gap-3 pb-2">
                 <PrimaryButton
+                  className="mb-2"
                   title={allAnswered ? 'Submit diary' : dirtyKeys.size || noteDirty ? `Save & Exit` : 'Exit'}
                   onPress={() => {
                     if (!canEdit || !allAnswered) {
@@ -543,6 +590,9 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                             setNoteDirty(false);
                             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
                             router.back();
+                          },
+                          onError: () => {
+                            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
                           }
                         });
                       } else {
@@ -577,7 +627,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                 )}
               </View>
             )}
-            {mode !== 'edit' && <PrimaryButton title="Exit" onPress={() => router.back()} />}
+            {mode !== 'edit' && <PrimaryButton className="mb-2" title="Exit" onPress={() => router.back()} />}
           </View>
         }
       />

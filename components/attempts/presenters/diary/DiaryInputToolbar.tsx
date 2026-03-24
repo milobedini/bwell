@@ -19,19 +19,8 @@ const DiaryInputToolbar = ({ nativeID, label, canGoPrev, canGoNext, onPrev, onNe
 
   return (
     <InputAccessoryView nativeID={nativeID}>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          backgroundColor: Colors.chip.darkCard,
-          paddingHorizontal: 12,
-          paddingVertical: 8,
-          borderTopWidth: 1,
-          borderTopColor: Colors.sway.darkGrey
-        }}
-      >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+      <View className="flex-row items-center justify-between border-t border-sway-darkGrey bg-chip-darkCard px-3 py-2">
+        <View className="flex-row items-center gap-4">
           <Pressable
             onPress={onPrev}
             disabled={!canGoPrev}
