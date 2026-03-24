@@ -97,7 +97,9 @@ export const formatRelativeTime = (isoDate: string): string => {
   if (diffMins < 60) return `${diffMins}m ago`;
   if (diffHours < 24) return `${diffHours}h ago`;
   if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffDays < 30) return `${diffDays}d ago`;
+  const diffWeeks = Math.floor(diffDays / 7);
+  if (diffDays < 90) return `${diffWeeks}w ago`;
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 };
 
