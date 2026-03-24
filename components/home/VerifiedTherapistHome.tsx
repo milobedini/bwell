@@ -1,21 +1,13 @@
-import { Link } from 'expo-router';
-
-import ContentContainer from '../ContentContainer';
-import { PrimaryButton } from '../ThemedButton';
+import { useProfile } from '@/hooks/useUsers';
 
 import { HomeScreen } from './HomeScreen';
+import TherapistDashboard from './TherapistDashboard';
 
 const VerifiedTherapistHome = () => {
-  const content = (
-    <ContentContainer className="gap-6">
-      <Link asChild href={'/home/clients'}>
-        <PrimaryButton title="Your clients" />
-      </Link>
-      <Link asChild href={'/home/patients'}>
-        <PrimaryButton title="All patients" />
-      </Link>
-    </ContentContainer>
-  );
+  const { data: profile } = useProfile();
+  const firstName = profile?.name?.split(' ')[0] || profile?.username || '';
+
+  const content = <TherapistDashboard firstName={firstName} />;
 
   return <HomeScreen content={content} />;
 };
