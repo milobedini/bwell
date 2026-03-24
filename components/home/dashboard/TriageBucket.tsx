@@ -51,7 +51,7 @@ const TriageBucket = memo(
           <View
             style={{
               marginLeft: 'auto',
-              backgroundColor: 'rgba(166,173,187,0.12)',
+              backgroundColor: Colors.tint.neutral,
               paddingHorizontal: 8,
               paddingVertical: 2,
               borderRadius: 10

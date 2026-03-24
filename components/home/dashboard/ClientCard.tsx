@@ -18,7 +18,7 @@ const getScoreBadgeStyle = (band: string) => {
   if (lower.includes('severe')) return { bg: Colors.tint.error, text: Colors.primary.error };
   if (lower.includes('moderate')) return { bg: Colors.tint.info, text: Colors.primary.warning };
   if (lower.includes('mild')) return { bg: Colors.tint.teal, text: Colors.sway.bright };
-  return { bg: 'rgba(166,173,187,0.1)', text: Colors.sway.darkGrey };
+  return { bg: Colors.tint.neutral, text: Colors.sway.darkGrey };
 };
 
 type ScoreDeltaProps = {
@@ -51,11 +51,11 @@ type AssignmentDotsProps = {
 };
 
 const AssignmentDots = ({ total, completed, overdue }: AssignmentDotsProps) => {
-  const dots: ('done' | 'overdue' | 'pending')[] = [];
-  for (let i = 0; i < completed; i++) dots.push('done');
-  for (let i = 0; i < overdue; i++) dots.push('overdue');
-  const pending = total - completed - overdue;
-  for (let i = 0; i < Math.max(0, pending); i++) dots.push('pending');
+  const dots = [
+    ...Array.from({ length: completed }, () => 'done' as const),
+    ...Array.from({ length: overdue }, () => 'overdue' as const),
+    ...Array.from({ length: Math.max(0, total - completed - overdue) }, () => 'pending' as const)
+  ];
 
   return (
     <View className="flex-row items-center gap-1.5">
@@ -92,7 +92,6 @@ type ProgressBarProps = {
 
 const ProgressBar = ({ completed, total }: ProgressBarProps) => {
   const pct = total > 0 ? (completed / total) * 100 : 0;
-  const fillColor = pct === 0 ? Colors.primary.error : pct < 50 ? Colors.primary.warning : Colors.sway.bright;
 
   return (
     <View
@@ -108,7 +107,7 @@ const ProgressBar = ({ completed, total }: ProgressBarProps) => {
           width: `${pct}%`,
           height: '100%',
           borderRadius: 2,
-          backgroundColor: pct > 0 ? fillColor : 'transparent'
+          backgroundColor: pct > 0 ? Colors.sway.bright : 'transparent'
         }}
       />
     </View>
@@ -171,7 +170,7 @@ const ClientCard = memo(({ item }: ClientCardProps) => {
         ) : (
           <View
             style={{
-              backgroundColor: 'rgba(166,173,187,0.1)',
+              backgroundColor: Colors.tint.neutral,
               paddingHorizontal: 10,
               paddingVertical: 4,
               borderRadius: 8

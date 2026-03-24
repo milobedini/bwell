@@ -28,7 +28,7 @@ type Props = {
 
 const TherapistDashboard = ({ firstName }: Props) => {
   const router = useRouter();
-  const { data, isPending, isError, refetch, isFetching } = useTherapistDashboard();
+  const { data, isPending, isError, refetch, isRefetching } = useTherapistDashboard();
 
   const scrollRef = useRef<ScrollView>(null);
   const attentionRef = useRef<View>(null);
@@ -47,10 +47,14 @@ const TherapistDashboard = ({ firstName }: Props) => {
       scrollRef.current?.scrollTo({ y: 0, animated: true });
       return;
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    target.current.measureLayout(scrollRef.current as any, (_x: number, y: number) => {
-      scrollRef.current?.scrollTo({ y, animated: true });
-    });
+    target.current.measureLayout(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      scrollRef.current as any,
+      (_x: number, y: number) => {
+        scrollRef.current?.scrollTo({ y, animated: true });
+      },
+      () => {}
+    );
   }, []);
 
   if (isPending) return <LoadingIndicator marginBottom={0} />;
@@ -86,7 +90,7 @@ const TherapistDashboard = ({ firstName }: Props) => {
       ref={scrollRef}
       className="flex-1 px-4"
       showsVerticalScrollIndicator={false}
-      refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor={Colors.sway.bright} />}
+      refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={Colors.sway.bright} />}
     >
       {/* Greeting */}
       <View className="py-2">
