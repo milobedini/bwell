@@ -62,11 +62,15 @@ export default function Profile() {
 
           {/* Menu View */}
           {therapist && (
-            <Link href={'/(main)/(tabs)/attempts'} asChild>
-              <SecondaryButton title="Patient history" />
-            </Link>
+            <>
+              <Link href={'/home/clients'} asChild>
+                <SecondaryButton title="Your Clients" />
+              </Link>
+              <Link href={'/home/patients'} asChild>
+                <SecondaryButton title="All Patients" />
+              </Link>
+            </>
           )}
-          <SecondaryButton title="Another button" />
           <SecondaryButton onPress={handleLogout} disabled={!profile} title="Log Out" />
         </MotiView>
       </ScrollView>
