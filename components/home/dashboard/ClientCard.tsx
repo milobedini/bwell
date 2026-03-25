@@ -7,10 +7,14 @@ import { formatRelativeTime } from '@/utils/dates';
 import { getSeverityColors } from '@/utils/severity';
 import { DashboardClientItem } from '@milobedini/shared-types';
 
-const getLeftBorderColor = (item: DashboardClientItem): string => {
-  if (item.reasons.includes('severe_score')) return Colors.primary.error;
-  if (item.reasons.includes('worsening') || item.reasons.includes('overdue')) return Colors.primary.warning;
-  if (item.assignments.completed > 0 && item.reasons.length === 0) return Colors.sway.bright;
+import { BucketType } from './TriageBucket';
+
+const getLeftBorderColor = (item: DashboardClientItem, bucket: BucketType): string => {
+  if (bucket === 'attention') {
+    if (item.reasons.includes('severe_score')) return Colors.primary.error;
+    return Colors.primary.warning;
+  }
+  if (bucket === 'completed') return Colors.sway.bright;
   return Colors.chip.dotInactive;
 };
 
@@ -115,11 +119,12 @@ const ProgressBar = ({ completed, total }: ProgressBarProps) => {
 
 type ClientCardProps = {
   item: DashboardClientItem;
+  bucket: BucketType;
 };
 
-const ClientCard = memo(({ item }: ClientCardProps) => {
+const ClientCard = memo(({ item, bucket }: ClientCardProps) => {
   const router = useRouter();
-  const borderColor = getLeftBorderColor(item);
+  const borderColor = getLeftBorderColor(item, bucket);
   const { latestScore, previousScore, assignments } = item;
   const severity = getSeverityColors(latestScore?.scoreBandLabel);
 

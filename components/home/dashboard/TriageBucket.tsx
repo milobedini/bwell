@@ -11,7 +11,7 @@ export type BucketType = 'attention' | 'completed' | 'inactive';
 const BUCKET_CONFIG: Record<BucketType, { dotColor: string; label: string }> = {
   attention: { dotColor: Colors.primary.error, label: 'NEEDS ATTENTION' },
   completed: { dotColor: Colors.sway.bright, label: 'COMPLETED THIS WEEK' },
-  inactive: { dotColor: Colors.sway.darkGrey, label: 'NO ACTIVITY' }
+  inactive: { dotColor: Colors.sway.darkGrey, label: 'NO SUBMISSIONS THIS WEEK' }
 };
 
 type TriageBucketProps = {
@@ -57,7 +57,7 @@ const TriageBucket = memo(
 
         {/* Client cards */}
         {items.map((item) => (
-          <ClientCard key={item.patient._id} item={item} />
+          <ClientCard key={item.patient._id} item={item} bucket={type} />
         ))}
       </View>
     );
