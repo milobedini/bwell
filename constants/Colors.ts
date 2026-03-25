@@ -43,7 +43,9 @@ export const Colors = {
     darkCard: '#262E42',
     darkCardAlt: '#334368',
     darkCardDeep: '#0B1A2A',
-    dotInactive: '#3A496B'
+    dotInactive: '#3A496B',
+    pill: '#1E2A45',
+    pillPressed: '#253352'
   },
   tint: {
     teal: 'rgba(24,205,186,0.15)',

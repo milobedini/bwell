@@ -139,82 +139,84 @@ const ClientCard = memo(({ item }: ClientCardProps) => {
   return (
     <Pressable
       onPress={() => router.push(`/home/clients/${item.patient._id}`)}
-      style={({ pressed }) => ({
-        backgroundColor: pressed ? Colors.chip.darkCardAlt : Colors.chip.darkCard,
-        borderRadius: 14,
-        padding: 14,
-        paddingBottom: 12,
-        marginBottom: 10,
-        borderLeftWidth: 3.5,
-        borderLeftColor: borderColor,
-        borderWidth: 1,
-        borderColor: Colors.chip.dotInactive
-      })}
+      className="mb-2.5 overflow-hidden rounded-[14] border-[#3A496B] border-b-[1.5] bg-[#253352]"
     >
-      {/* Top row: name + last active */}
-      <View className="flex-row items-start justify-between">
-        <ThemedText type="default" style={{ fontWeight: '700', fontSize: 16 }}>
-          {displayName}
-        </ThemedText>
-        <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
-          {item.lastActive ? formatRelativeTime(item.lastActive) : 'Never'}
-        </ThemedText>
-      </View>
+      <View className="flex-row">
+        {/* Left severity border */}
+        <View style={{ width: 4, backgroundColor: borderColor }} />
 
-      {/* Middle row: score badge + delta + assignment dots */}
-      <View className="mt-2 flex-row items-center gap-3">
-        {latestScore && scoreBadge ? (
-          <View
-            style={{
-              backgroundColor: scoreBadge.bg,
-              paddingHorizontal: 10,
-              paddingVertical: 4,
-              borderRadius: 8,
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 4
-            }}
-          >
-            <ThemedText type="smallBold" style={{ color: scoreBadge.text }}>
-              {latestScore.moduleTitle}: {latestScore.score}
+        {/* Card content */}
+        <View style={{ flex: 1, padding: 14, paddingBottom: 12 }}>
+          {/* Top row: name + last active */}
+          <View className="flex-row items-start justify-between">
+            <ThemedText type="default" style={{ fontWeight: '700', fontSize: 16 }}>
+              {displayName}
             </ThemedText>
-          </View>
-        ) : (
-          <View
-            style={{
-              backgroundColor: Colors.tint.neutral,
-              paddingHorizontal: 10,
-              paddingVertical: 4,
-              borderRadius: 8
-            }}
-          >
             <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
-              No scores
+              {item.lastActive ? formatRelativeTime(item.lastActive) : 'Never'}
             </ThemedText>
           </View>
-        )}
-        {latestScore && <ScoreDelta current={latestScore.score} previous={previousScore?.score ?? null} />}
-        <View className="ml-auto">
-          <AssignmentDots total={assignments.total} completed={assignments.completed} overdue={assignments.overdue} />
-        </View>
-      </View>
 
-      {/* Bottom row: completion text + progress bar */}
-      <View className="mt-1.5 flex-row items-center justify-between">
-        <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
-          <ThemedText type="small" style={{ color: Colors.sway.lightGrey }}>
-            {assignments.completed}
-          </ThemedText>
-          /{assignments.total} completed
-          {assignments.overdue > 0 && (
-            <ThemedText type="small" style={{ color: Colors.sway.lightGrey }}>
-              {' '}
-              · {assignments.overdue} overdue
+          {/* Middle row: score badge + delta + assignment dots */}
+          <View className="mt-2 flex-row items-center gap-3">
+            {latestScore && scoreBadge ? (
+              <View
+                style={{
+                  backgroundColor: scoreBadge.bg,
+                  paddingHorizontal: 10,
+                  paddingVertical: 4,
+                  borderRadius: 8,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 4
+                }}
+              >
+                <ThemedText type="smallBold" style={{ color: scoreBadge.text }}>
+                  {latestScore.moduleTitle}: {latestScore.score}
+                </ThemedText>
+              </View>
+            ) : (
+              <View
+                style={{
+                  backgroundColor: Colors.tint.neutral,
+                  paddingHorizontal: 10,
+                  paddingVertical: 4,
+                  borderRadius: 8
+                }}
+              >
+                <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
+                  No scores
+                </ThemedText>
+              </View>
+            )}
+            {latestScore && <ScoreDelta current={latestScore.score} previous={previousScore?.score ?? null} />}
+            <View className="ml-auto">
+              <AssignmentDots
+                total={assignments.total}
+                completed={assignments.completed}
+                overdue={assignments.overdue}
+              />
+            </View>
+          </View>
+
+          {/* Bottom row: completion text + progress bar */}
+          <View className="mt-1.5 flex-row items-center justify-between">
+            <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
+              <ThemedText type="small" style={{ color: Colors.sway.lightGrey }}>
+                {assignments.completed}
+              </ThemedText>
+              /{assignments.total} completed
+              {assignments.overdue > 0 && (
+                <ThemedText type="small" style={{ color: Colors.sway.lightGrey }}>
+                  {' '}
+                  · {assignments.overdue} overdue
+                </ThemedText>
+              )}
+              {assignments.total > 0 && assignments.completed === assignments.total && ' ✓'}
             </ThemedText>
-          )}
-          {assignments.total > 0 && assignments.completed === assignments.total && ' ✓'}
-        </ThemedText>
-        <ProgressBar completed={assignments.completed} total={assignments.total} />
+            <ProgressBar completed={assignments.completed} total={assignments.total} />
+          </View>
+        </View>
       </View>
     </Pressable>
   );
