@@ -151,6 +151,14 @@ export const groupByDate = <T extends { completedAt?: string }>(rows: T[]): Date
   return order.map((title) => ({ title, data: buckets.get(title)! }));
 };
 
+/** Time-based greeting: "Good morning", "Good afternoon", or "Good evening". */
+export const getGreeting = (): string => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+};
+
 /** Returns the Monday 00:00 of the current week as an ISO string. */
 export const getWeekStart = (): string => {
   const now = new Date();

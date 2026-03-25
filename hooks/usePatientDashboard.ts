@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useViewMyAssignments } from '@/hooks/useAssignments';
 import { useScoreTrends } from '@/hooks/useScoreTrends';
 import { AssignmentStatusSearchOptions } from '@/types/types';
@@ -11,6 +11,7 @@ export type PatientDashboardData = {
   weeklyCompletion: { completed: number; total: number };
   onTimeStreak: { current: number; history: ('on_time' | 'late')[] };
   scoreTrends: ScoreTrendItem[];
+  activeAssignmentCount: number;
   weekStart: string;
   hasData: boolean;
 };
@@ -65,11 +66,8 @@ const deriveOnTimeStreak = (
     return completedAt <= dueAt ? 'on_time' : 'late';
   });
 
-  let current = 0;
-  for (const entry of history) {
-    if (entry === 'on_time') current++;
-    else break;
-  }
+  const firstLate = history.indexOf('late');
+  const current = firstLate === -1 ? history.length : firstLate;
 
   return { current, history };
 };
@@ -83,11 +81,11 @@ export const usePatientDashboard = () => {
   const isError = activeQuery.isError || completedQuery.isError || trendsQuery.isError;
   const isRefetching = activeQuery.isRefetching || completedQuery.isRefetching || trendsQuery.isRefetching;
 
-  const refetch = () => {
+  const refetch = useCallback(() => {
     activeQuery.refetch();
     completedQuery.refetch();
     trendsQuery.refetch();
-  };
+  }, [activeQuery, completedQuery, trendsQuery]);
 
   const data = useMemo((): PatientDashboardData | null => {
     if (isPending) return null;
@@ -113,6 +111,7 @@ export const usePatientDashboard = () => {
       weeklyCompletion: deriveWeeklyCompletion(completedAssignments, activeAssignments),
       onTimeStreak: deriveOnTimeStreak(completedAssignments),
       scoreTrends,
+      activeAssignmentCount: activeAssignments.length,
       weekStart: getWeekStart(),
       hasData
     };

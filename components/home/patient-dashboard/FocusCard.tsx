@@ -52,9 +52,16 @@ const FocusCard = memo(({ assignment }: FocusCardProps) => {
       router.push('/(main)/(tabs)/programs');
       return;
     }
-    const moduleId = assignment.module._id;
-    const assignmentId = assignment._id;
-    router.push(`/(main)/modules/${moduleId}?assignmentId=${assignmentId}`);
+    // If there's an in-progress draft, navigate directly to that attempt
+    if (assignment.latestAttempt && !assignment.latestAttempt.completedAt) {
+      router.push({
+        pathname: '/(main)/(tabs)/attempts/[id]',
+        params: { id: assignment.latestAttempt._id, assignmentId: assignment._id }
+      });
+      return;
+    }
+    // Otherwise navigate to assignments tab where they can start
+    router.push('/(main)/(tabs)/assignments');
   }, [assignment, router]);
 
   // "All caught up" state
