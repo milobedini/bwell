@@ -84,6 +84,12 @@ export const timeAgo = (input: string): TimeAgoResult => {
   return { relative: null, formatted };
 };
 
+/** Short date format: "24 Mar" */
+export const formatShortDate = (isoDate: string): string => {
+  const date = new Date(isoDate);
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+};
+
 /** Compact relative time for dashboard cards (e.g. "2h ago", "3d ago") */
 export const formatRelativeTime = (isoDate: string): string => {
   const date = new Date(isoDate);
@@ -98,7 +104,7 @@ export const formatRelativeTime = (isoDate: string): string => {
   if (diffHours < 24) return `${diffHours}h ago`;
   if (diffDays === 1) return 'Yesterday';
   if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  return formatShortDate(isoDate);
 };
 
 type DateSection<T> = {
