@@ -43,12 +43,15 @@ export const Colors = {
     darkCard: '#262E42',
     darkCardAlt: '#334368',
     darkCardDeep: '#0B1A2A',
-    dotInactive: '#3A496B'
+    dotInactive: '#3A496B',
+    pill: '#1E2A45',
+    pillPressed: '#253352'
   },
   tint: {
     teal: 'rgba(24,205,186,0.15)',
     error: 'rgba(255,109,94,0.15)',
-    info: 'rgba(255,209,93,0.15)'
+    info: 'rgba(255,209,93,0.15)',
+    neutral: 'rgba(166,173,187,0.12)'
   },
   overlay: {
     light: 'rgba(0,0,0,0.32)',
