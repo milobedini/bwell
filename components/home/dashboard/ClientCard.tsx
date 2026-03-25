@@ -139,7 +139,7 @@ const ClientCard = memo(({ item }: ClientCardProps) => {
   return (
     <Pressable
       onPress={() => router.push(`/home/clients/${item.patient._id}`)}
-      className="mb-2.5 overflow-hidden rounded-[14] border-[#3A496B] border-b-[1.5] bg-[#253352]"
+      className="mb-2.5 overflow-hidden rounded-[14] border-chip-dotInactive border-b-[1.5] bg-chip-pillPressed"
     >
       <View className="flex-row">
         {/* Left severity border */}
