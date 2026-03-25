@@ -32,7 +32,7 @@ const PatientDashboard = memo(({ firstName, data, isRefetching, refetch }: Props
         <ThemedText type="subtitle">
           {getGreeting()}, {firstName}
         </ThemedText>
-        <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginTop: 2 }}>
+        <ThemedText type="small" className="mt-0.5" style={{ color: Colors.sway.darkGrey }}>
           Week of {formatShortDate(data.weekStart)}
         </ThemedText>
       </View>

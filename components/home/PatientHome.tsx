@@ -40,10 +40,10 @@ const PatientHome = () => {
         content={
           <ContentContainer>
             <View className="items-center gap-3 px-4">
-              <ThemedText type="subtitle" style={{ textAlign: 'center' }}>
+              <ThemedText type="subtitle" className="text-center">
                 Welcome to bwell
               </ThemedText>
-              <ThemedText type="small" style={{ textAlign: 'center', lineHeight: 20 }}>
+              <ThemedText type="small" className="text-center leading-5">
                 Your therapy companion.{'\n'}Let&apos;s get started.
               </ThemedText>
               <View className="mt-4 w-full gap-2.5">

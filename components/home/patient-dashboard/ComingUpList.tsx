@@ -45,7 +45,7 @@ const AssignmentRow = memo(({ assignment }: { assignment: MyAssignmentView }) =>
         <ThemedText type="default" style={{ fontWeight: '600', fontSize: 15 }}>
           {assignment.module.title}
         </ThemedText>
-        <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginTop: 3 }}>
+        <ThemedText type="small" className="mt-0.5" style={{ color: Colors.sway.darkGrey }}>
           {label}
         </ThemedText>
       </View>

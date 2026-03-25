@@ -90,7 +90,7 @@ const FocusCard = memo(({ assignment }: FocusCardProps) => {
         >
           ALL CAUGHT UP
         </ThemedText>
-        <ThemedText type="smallTitle" style={{ marginBottom: 4 }}>
+        <ThemedText type="smallTitle" className="mb-1">
           You&apos;re up to date
         </ThemedText>
         <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
@@ -132,7 +132,7 @@ const FocusCard = memo(({ assignment }: FocusCardProps) => {
       <ThemedText type="smallTitle" style={{ marginBottom: 4 }}>
         {assignment.module.title}
       </ThemedText>
-      <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginBottom: 14 }}>
+      <ThemedText type="small" className="mb-3.5" style={{ color: Colors.sway.darkGrey }}>
         {assignment.dueAt ? dueLabel(assignment.dueAt) : 'No due date'}
         {assignment.therapist?.name ? ` · From ${assignment.therapist.name}` : ''}
       </ThemedText>
