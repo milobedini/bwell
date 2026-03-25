@@ -26,11 +26,7 @@ const EffortStrip = memo(({ weeklyCompletion, onTimeStreak }: EffortStripProps) 
   return (
     <View className="mb-5 flex-row gap-2.5">
       {/* Weekly Completion */}
-      <Pressable
-        onPress={goToAssignments}
-        className="flex-1 rounded-[14px] p-4"
-        style={{ backgroundColor: Colors.chip.darkCard }}
-      >
+      <Pressable onPress={goToAssignments} className="flex-1 rounded-[14px] bg-chip-darkCard p-4">
         <View className="flex-row items-baseline">
           <ThemedText type="subtitle" style={{ color: Colors.sway.bright, fontSize: 30, lineHeight: 34 }}>
             {completed}
@@ -39,17 +35,10 @@ const EffortStrip = memo(({ weeklyCompletion, onTimeStreak }: EffortStripProps) 
             /{total}
           </ThemedText>
         </View>
-        <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginTop: 2 }}>
+        <ThemedText type="small" className="mt-0.5" style={{ color: Colors.sway.darkGrey }}>
           {total === 0 ? 'No assignments yet' : 'Assignments done'}
         </ThemedText>
-        <View
-          style={{
-            height: 4,
-            backgroundColor: Colors.chip.darkCardDeep,
-            borderRadius: 2,
-            marginTop: 10
-          }}
-        >
+        <View className="mt-2.5 h-1 rounded-sm bg-chip-darkCardDeep">
           <View
             style={{
               width: `${pct}%`,
@@ -62,11 +51,11 @@ const EffortStrip = memo(({ weeklyCompletion, onTimeStreak }: EffortStripProps) 
       </Pressable>
 
       {/* On-Time Streak */}
-      <View className="flex-1 rounded-[14px] p-4" style={{ backgroundColor: Colors.chip.darkCard }}>
+      <View className="flex-1 rounded-[14px] bg-chip-darkCard p-4">
         <ThemedText type="subtitle" style={{ color: Colors.sway.bright, fontSize: 30, lineHeight: 34 }}>
           {onTimeStreak.current}
         </ThemedText>
-        <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginTop: 2 }}>
+        <ThemedText type="small" className="mt-0.5" style={{ color: Colors.sway.darkGrey }}>
           {onTimeStreak.history.length === 0 ? 'Complete your first on time' : 'On time'}
         </ThemedText>
         <View className="mt-2.5 flex-row gap-1">
