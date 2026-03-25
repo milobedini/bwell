@@ -4,6 +4,10 @@ import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { DashboardStats } from '@milobedini/shared-types';
 
+import { BucketType } from './TriageBucket';
+
+type ScrollTarget = BucketType | 'top';
+
 type StatPillProps = {
   value: number;
   label: string;
@@ -20,7 +24,11 @@ const StatPill = memo(({ value, label, color, onPress }: StatPillProps) => (
     <ThemedText type="subtitle" style={{ color, lineHeight: 28 }}>
       {value}
     </ThemedText>
-    <ThemedText type="small" className="mt-0.5 text-[11px] uppercase tracking-wide text-sway-darkGrey">
+    <ThemedText
+      type="small"
+      className="mt-0.5 uppercase tracking-wide"
+      style={{ fontSize: 11, color: Colors.sway.darkGrey }}
+    >
       {label}
     </ThemedText>
   </Pressable>
@@ -30,7 +38,7 @@ StatPill.displayName = 'StatPill';
 
 type StatStripProps = {
   stats: DashboardStats;
-  onScrollToBucket: (bucket: 'attention' | 'completed' | 'inactive' | 'top') => void;
+  onScrollToBucket: (bucket: ScrollTarget) => void;
 };
 
 const StatStrip = memo(({ stats, onScrollToBucket }: StatStripProps) => {

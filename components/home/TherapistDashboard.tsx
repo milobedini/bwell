@@ -6,20 +6,16 @@ import { ThemedText } from '@/components/ThemedText';
 import EmptyState from '@/components/ui/EmptyState';
 import { Colors } from '@/constants/Colors';
 import { useTherapistDashboard } from '@/hooks/useTherapistDashboard';
+import { formatShortDate } from '@/utils/dates';
 
 import StatStrip from './dashboard/StatStrip';
-import TriageBucket from './dashboard/TriageBucket';
+import TriageBucket, { BucketType } from './dashboard/TriageBucket';
 
 const getGreeting = (): string => {
   const hour = new Date().getHours();
   if (hour < 12) return 'Good morning';
   if (hour < 18) return 'Good afternoon';
   return 'Good evening';
-};
-
-const formatWeekStart = (isoDate: string): string => {
-  const date = new Date(isoDate);
-  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 };
 
 type Props = {
@@ -35,7 +31,7 @@ const TherapistDashboard = ({ firstName }: Props) => {
   const completedRef = useRef<View>(null);
   const inactiveRef = useRef<View>(null);
 
-  const handleScrollToBucket = useCallback((bucket: 'attention' | 'completed' | 'inactive' | 'top') => {
+  const handleScrollToBucket = useCallback((bucket: BucketType | 'top') => {
     const refMap = {
       attention: attentionRef,
       completed: completedRef,
@@ -98,7 +94,7 @@ const TherapistDashboard = ({ firstName }: Props) => {
           {getGreeting()}, {firstName}
         </ThemedText>
         <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginTop: 2 }}>
-          Week of {formatWeekStart(data.weekStart)}
+          Week of {formatShortDate(data.weekStart)}
         </ThemedText>
       </View>
 
@@ -112,12 +108,8 @@ const TherapistDashboard = ({ firstName }: Props) => {
         data.noActivity.every((c) => c.assignments.total === 0) && (
           <Pressable
             onPress={() => router.push('/home/clients')}
-            style={{
-              backgroundColor: Colors.tint.teal,
-              borderRadius: 12,
-              padding: 14,
-              marginBottom: 8
-            }}
+            className="mb-2 rounded-xl p-3.5"
+            style={{ backgroundColor: Colors.tint.teal }}
           >
             <ThemedText type="smallBold" style={{ color: Colors.sway.bright }}>
               Assign homework to get started

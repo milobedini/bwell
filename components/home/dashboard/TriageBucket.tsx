@@ -6,7 +6,7 @@ import { DashboardClientItem } from '@milobedini/shared-types';
 
 import ClientCard from './ClientCard';
 
-type BucketType = 'attention' | 'completed' | 'inactive';
+export type BucketType = 'attention' | 'completed' | 'inactive';
 
 const BUCKET_CONFIG: Record<BucketType, { dotColor: string; label: string }> = {
   attention: { dotColor: Colors.primary.error, label: 'NEEDS ATTENTION' },
@@ -48,15 +48,7 @@ const TriageBucket = memo(
           >
             {config.label}
           </ThemedText>
-          <View
-            style={{
-              marginLeft: 'auto',
-              backgroundColor: Colors.tint.neutral,
-              paddingHorizontal: 8,
-              paddingVertical: 2,
-              borderRadius: 10
-            }}
-          >
+          <View className="ml-auto rounded-[10] px-2 py-0.5" style={{ backgroundColor: Colors.tint.neutral }}>
             <ThemedText type="small" style={{ color: Colors.sway.darkGrey, fontSize: 12 }}>
               {items.length}
             </ThemedText>
