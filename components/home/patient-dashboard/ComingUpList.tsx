@@ -15,15 +15,23 @@ const AssignmentRow = memo(({ assignment }: { assignment: MyAssignmentView }) =>
   const router = useRouter();
 
   const handlePress = useCallback(() => {
-    const moduleId = assignment.module._id;
-    const assignmentId = assignment._id;
-    router.push(`/(main)/modules/${moduleId}?assignmentId=${assignmentId}`);
+    // If there's an in-progress draft, navigate to that attempt
+    if (assignment.latestAttempt && !assignment.latestAttempt.completedAt) {
+      router.push({
+        pathname: '/(main)/(tabs)/attempts/[id]',
+        params: { id: assignment.latestAttempt._id, assignmentId: assignment._id }
+      });
+      return;
+    }
+    // Otherwise go to assignments tab
+    router.push('/(main)/(tabs)/assignments');
   }, [assignment, router]);
 
   const label = assignment.dueAt ? dueLabel(assignment.dueAt) : 'No due date';
-  const isDueSoon = assignment.dueAt
-    ? Math.round((new Date(assignment.dueAt).getTime() - Date.now()) / 86_400_000) <= 1
-    : false;
+  const daysUntilDue = assignment.dueAt
+    ? Math.round((new Date(assignment.dueAt).getTime() - Date.now()) / 86_400_000)
+    : null;
+  const isDueSoon = daysUntilDue !== null && daysUntilDue <= 1;
 
   return (
     <Pressable
@@ -48,7 +56,7 @@ const AssignmentRow = memo(({ assignment }: { assignment: MyAssignmentView }) =>
       )}
       {!isDueSoon && assignment.dueAt && (
         <ThemedText type="small" style={{ color: Colors.sway.darkGrey, fontSize: 13 }}>
-          {Math.max(0, Math.round((new Date(assignment.dueAt).getTime() - Date.now()) / 86_400_000))} days
+          {Math.max(0, daysUntilDue ?? 0)} days
         </ThemedText>
       )}
     </Pressable>

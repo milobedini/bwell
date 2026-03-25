@@ -6,17 +6,10 @@ import { ThemedText } from '@/components/ThemedText';
 import EmptyState from '@/components/ui/EmptyState';
 import { Colors } from '@/constants/Colors';
 import { useTherapistDashboard } from '@/hooks/useTherapistDashboard';
-import { formatShortDate } from '@/utils/dates';
+import { formatShortDate, getGreeting } from '@/utils/dates';
 
 import StatStrip from './dashboard/StatStrip';
 import TriageBucket, { BucketType } from './dashboard/TriageBucket';
-
-const getGreeting = (): string => {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 18) return 'Good afternoon';
-  return 'Good evening';
-};
 
 type Props = {
   firstName: string;
