@@ -150,3 +150,26 @@ export const groupByDate = <T extends { completedAt?: string }>(rows: T[]): Date
 
   return order.map((title) => ({ title, data: buckets.get(title)! }));
 };
+
+/** Returns the Monday 00:00 of the current week as an ISO string. */
+export const getWeekStart = (): string => {
+  const now = new Date();
+  const day = now.getDay() || 7; // Sunday → 7
+  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (day - 1));
+  return monday.toISOString();
+};
+
+/** Human-friendly due date label relative to today. */
+export const dueLabel = (dueAt: string): string => {
+  const due = new Date(dueAt);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate());
+  const diffDays = Math.round((dueDay.getTime() - today.getTime()) / 86_400_000);
+
+  if (diffDays < 0) return `Was due ${formatShortDate(dueAt)}`;
+  if (diffDays === 0) return 'Due today';
+  if (diffDays === 1) return 'Due tomorrow';
+  if (diffDays <= 7) return `${diffDays} days`;
+  return `Due ${formatShortDate(dueAt)}`;
+};
