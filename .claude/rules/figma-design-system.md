@@ -88,6 +88,7 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 | `profileButtonText` | Lato-Bold | 20 | Profile/settings buttons |
 
 - IMPORTANT: Do NOT use `ThemedText`'s `onLight` prop inside Paper dialogs — dialogs are dark-themed
+- IMPORTANT: To override text color on `ThemedText`, use the `style` prop (e.g., `style={{ color: Colors.sway.darkGrey }}`), NOT NativeWind `className` color classes. `ThemedText`'s `styleMap` sets `color` via `StyleSheet.create`, which takes precedence over NativeWind `className` — so `className="text-sway-darkGrey"` will be silently ignored.
 
 ## Styling Approach
 
