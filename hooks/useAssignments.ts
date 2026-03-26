@@ -19,18 +19,6 @@ import { useMutationWithToast } from './useMutationWithToast';
 import { useIsLoggedIn } from './useUsers';
 
 // QUERIES
-export const useViewTherapistOutstandingAssignments = () => {
-  const isLoggedIn = useIsLoggedIn();
-
-  return useQuery<MyAssignmentView[]>({
-    queryKey: ['assignments'],
-    queryFn: async (): Promise<MyAssignmentView[]> => {
-      const { data } = await api.get<MyAssignmentsResponse>('/assignments/mine');
-      return data.assignments;
-    },
-    enabled: isLoggedIn
-  });
-};
 export const useViewMyAssignments = ({ status }: { status: AssignmentStatusSearchOptions }) => {
   const isLoggedIn = useIsLoggedIn();
 
