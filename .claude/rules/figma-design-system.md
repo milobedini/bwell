@@ -145,6 +145,7 @@ When translating Figma designs to code, apply these HIG principles:
 - Hero/branded: `PrimaryButton` — wide button with optional logo, border, translucent bg (onboarding, welcome screens)
 - Profile/settings: `SecondaryButton` — full-width rounded button with translucent bg
 - Contextual actions: use `ActionMenu` bottom sheet for list item actions (replaced FabGroup)
+- IMPORTANT: Never use `style={({ pressed }) => ...}` callbacks on Pressable — NativeWind's `className` conflicts with style callbacks, causing neither to render. Use NativeWind modifiers: `active:bg-*`, `active:opacity-*`, `disabled:opacity-*`. For pressed state on children, use `group` on the Pressable and `group-active:opacity-*` on children.
 
 ## Spacing
 
