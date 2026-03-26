@@ -1,5 +1,5 @@
 import { type ComponentProps, memo, useCallback } from 'react';
-import { Pressable, TouchableOpacity, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { Link } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { dateString } from '@/utils/dates';
@@ -69,14 +69,14 @@ const AssignmentCardBase = ({ item, onOpenMenu }: AssignmentCardProps) => {
               </View>
             )}
           </View>
-          <TouchableOpacity
+          <Pressable
             onPress={handleMenu}
             className="h-8 w-8 items-center justify-center rounded-lg active:opacity-70"
             style={{ backgroundColor: Colors.chip.darkCardAlt }}
-            hitSlop={8}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <MaterialCommunityIcons name="dots-vertical" size={16} color={Colors.sway.darkGrey} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {/* Row 2: Chips */}

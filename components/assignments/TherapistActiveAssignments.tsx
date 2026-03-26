@@ -72,24 +72,42 @@ const TherapistActiveAssignments = () => {
 
   const handleClearAll = useCallback(() => setFilters(DEFAULT_ASSIGNMENT_FILTERS), []);
 
+  const handleOpenFilterDrawer = useCallback(() => setDrawerOpen(true), []);
+  const handleCloseFilterDrawer = useCallback(() => setDrawerOpen(false), []);
+  const handleApplyFilters = useCallback((v: AssignmentFilterValues) => {
+    setFilters(v);
+    setDrawerOpen(false);
+  }, []);
+  const handleResetFilters = useCallback(() => setFilters(DEFAULT_ASSIGNMENT_FILTERS), []);
+
+  const hasActiveFilters = Object.values(filters).some(Boolean);
+
   if (isPending) return <LoadingIndicator marginBottom={0} />;
   if (isError && !items.length) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
 
   return (
     <ContentContainer padded={false}>
       {!isFetching && items.length === 0 ? (
-        <EmptyState
-          icon="clipboard-text-outline"
-          title="No active assignments"
-          action={{
-            label: 'Create assignment',
-            onPress: () =>
-              router.push({
-                pathname: '/assignments/add',
-                params: { headerTitle: 'Create Assignment' }
-              })
-          }}
-        />
+        hasActiveFilters ? (
+          <EmptyState
+            icon="clipboard-text-outline"
+            title="No matching assignments"
+            subtitle="Try adjusting your filters"
+          />
+        ) : (
+          <EmptyState
+            icon="clipboard-text-outline"
+            title="No active assignments"
+            action={{
+              label: 'Create assignment',
+              onPress: () =>
+                router.push({
+                  pathname: '/assignments/add',
+                  params: { headerTitle: 'Create Assignment' }
+                })
+            }}
+          />
+        )
       ) : (
         <AssignmentsListTherapist
           items={items}
@@ -97,7 +115,7 @@ const TherapistActiveAssignments = () => {
           sort={sort}
           onSortChange={setSort}
           filters={filters}
-          onOpenFilterDrawer={() => setDrawerOpen(true)}
+          onOpenFilterDrawer={handleOpenFilterDrawer}
           onClearFilter={handleClearFilter}
           onClearAllFilters={handleClearAll}
           patientName={selectedPatientName}
@@ -115,13 +133,10 @@ const TherapistActiveAssignments = () => {
 
       <AssignmentFilterDrawer
         visible={drawerOpen}
-        onDismiss={() => setDrawerOpen(false)}
+        onDismiss={handleCloseFilterDrawer}
         values={filters}
-        onApply={(v) => {
-          setFilters(v);
-          setDrawerOpen(false);
-        }}
-        onReset={() => setFilters(DEFAULT_ASSIGNMENT_FILTERS)}
+        onApply={handleApplyFilters}
+        onReset={handleResetFilters}
         moduleChoices={moduleChoices}
         patientChoices={patientChoices}
       />
