@@ -99,6 +99,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - **Images:** Use `Image` from `expo-image` (not `react-native`). Use `contentFit` prop (not `resizeMode`). Dimensions go in `style`, not as direct props. For bundled assets, keep `ImageSourcePropType` from react-native (expo-image's `ImageSource` is object-only and incompatible with `require()` return type). Note: `ImageProps` from react-native is NOT compatible with expo-image's `Image` component (type conflicts on `tintColor` etc.) — use expo-image's `ImageProps` when typing component props that spread onto expo-image `Image`.
 - **Action menus:** Use `ActionMenu` from `components/ui/ActionMenu.tsx` for contextual actions on list items (dots menu → slide-up card). Props: `title`, `subtitle`, `actions` (with `icon`, `label`, `variant: 'default' | 'destructive'`). Always dismiss ActionMenu before opening another modal to avoid z-index overlap.
 - **Lazy tabs:** Tab navigator uses `lazy: true` in screenOptions — non-home tabs defer mounting until first focused.
+- **Pressable pressed/disabled states:** Never use `style={({ pressed }) => ...}` callbacks on Pressable — NativeWind's `className` processing conflicts with style callbacks, causing neither to render. Use NativeWind modifiers instead: `active:bg-chip-pillPressed`, `active:opacity-70`, `disabled:opacity-40`. For pressed state on children, use `group` on the Pressable and `group-active:opacity-70` on children.
 
 ## Git Workflow
 

@@ -49,7 +49,9 @@ export const Colors = {
   },
   tint: {
     teal: 'rgba(24,205,186,0.15)',
+    tealBorder: 'rgba(24,205,186,0.3)',
     error: 'rgba(255,109,94,0.15)',
+    errorBorder: 'rgba(255,109,94,0.3)',
     info: 'rgba(255,209,93,0.15)',
     neutral: 'rgba(166,173,187,0.12)'
   },

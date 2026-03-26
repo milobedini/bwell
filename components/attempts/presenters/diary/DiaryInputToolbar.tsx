@@ -22,8 +22,7 @@ const DiaryInputToolbar = ({ label, canGoPrev, canGoNext, onPrev, onNext }: Diar
         onPress={onPrev}
         disabled={!canGoPrev}
         hitSlop={HIT_SLOP}
-        className="items-center justify-center rounded-md p-1.5"
-        style={({ pressed }) => (pressed && canGoPrev ? { opacity: 0.5 } : undefined)}
+        className="items-center justify-center rounded-md p-1.5 active:opacity-50"
         accessibilityLabel="Previous field"
         accessibilityRole="button"
       >
@@ -37,8 +36,7 @@ const DiaryInputToolbar = ({ label, canGoPrev, canGoNext, onPrev, onNext }: Diar
         onPress={onNext}
         disabled={!canGoNext}
         hitSlop={HIT_SLOP}
-        className="items-center justify-center rounded-md p-1.5"
-        style={({ pressed }) => (pressed && canGoNext ? { opacity: 0.5 } : undefined)}
+        className="items-center justify-center rounded-md p-1.5 active:opacity-50"
         accessibilityLabel="Next field"
         accessibilityRole="button"
       >
@@ -55,8 +53,7 @@ const DiaryInputToolbar = ({ label, canGoPrev, canGoNext, onPrev, onNext }: Diar
     <Pressable
       onPress={() => Keyboard.dismiss()}
       hitSlop={HIT_SLOP}
-      className="rounded-md px-2 py-1.5"
-      style={({ pressed }) => (pressed ? { opacity: 0.5 } : undefined)}
+      className="rounded-md px-2 py-1.5 active:opacity-50"
       accessibilityLabel="Dismiss keyboard"
       accessibilityRole="button"
     >

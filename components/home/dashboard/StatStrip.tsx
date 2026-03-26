@@ -18,8 +18,7 @@ type StatPillProps = {
 const StatPill = memo(({ value, label, color, onPress }: StatPillProps) => (
   <Pressable
     onPress={onPress}
-    className="flex-1 items-center rounded-[14px] border-[1.5px] border-chip-dotInactive bg-chip-pill px-0.5 py-3"
-    style={({ pressed }) => pressed && { backgroundColor: Colors.chip.pillPressed }}
+    className="flex-1 items-center rounded-[14px] border-[1.5px] border-chip-dotInactive bg-chip-pill px-0.5 py-3 active:bg-chip-pillPressed"
   >
     <ThemedText type="subtitle" style={{ color, lineHeight: 28 }}>
       {value}
