@@ -155,31 +155,29 @@ const ActiveFilterChips = memo(function ActiveFilterChips({
 });
 
 const groupByPatient = (items: MyAssignmentView[]): AssignmentSection[] => {
-  const groups: AssignmentSection[] = [];
   const now = Date.now();
+  const map = new Map<string, AssignmentSection>();
+  const order: string[] = [];
 
   for (const item of items) {
     const pid = item.user._id;
-    const pName = item.user.name ?? item.user.username;
-    const last = groups.at(-1);
-
-    if (last && last.patientId === pid) {
-      last.data.push(item);
-      if (item.dueAt && new Date(item.dueAt).getTime() < now) {
-        last.overdueCount += 1;
-      }
-    } else {
-      const isOverdue = item.dueAt ? new Date(item.dueAt).getTime() < now : false;
-      groups.push({
-        title: pName,
+    if (!map.has(pid)) {
+      order.push(pid);
+      map.set(pid, {
+        title: item.user.name ?? item.user.username,
         patientId: pid,
-        data: [item],
-        overdueCount: isOverdue ? 1 : 0
+        data: [],
+        overdueCount: 0
       });
+    }
+    const group = map.get(pid)!;
+    group.data.push(item);
+    if (item.dueAt && new Date(item.dueAt).getTime() < now) {
+      group.overdueCount += 1;
     }
   }
 
-  return groups;
+  return order.map((pid) => map.get(pid)!);
 };
 
 const AssignmentsListTherapist = ({

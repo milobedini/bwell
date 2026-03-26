@@ -112,7 +112,6 @@ const AssignmentFilterDrawer = ({
 
   const handleApply = () => {
     onApply(local);
-    onDismiss();
   };
 
   const handleReset = () => {
