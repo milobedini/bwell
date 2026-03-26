@@ -44,7 +44,7 @@ const deriveWeeklyCompletion = (
 ): { completed: number; total: number } => {
   const weekStart = new Date(getWeekStart());
   const completedThisWeek = completedAssignments.filter(
-    (a) => a.updatedAt && new Date(a.updatedAt) >= weekStart
+    (a) => a.latestAttempt?.completedAt && new Date(a.latestAttempt.completedAt) >= weekStart
   ).length;
   const total = completedThisWeek + activeAssignments.length;
   return { completed: completedThisWeek, total };
@@ -85,7 +85,8 @@ export const usePatientDashboard = () => {
     activeQuery.refetch();
     completedQuery.refetch();
     trendsQuery.refetch();
-  }, [activeQuery, completedQuery, trendsQuery]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeQuery.refetch, completedQuery.refetch, trendsQuery.refetch]);
 
   const data = useMemo((): PatientDashboardData | null => {
     if (isPending) return null;
@@ -98,10 +99,10 @@ export const usePatientDashboard = () => {
 
     const focusAssignment = getFocusAssignment(activeAssignments);
 
-    // Upcoming: active assignments excluding focus card, sorted by due date, max 3
+    // Upcoming: active assignments excluding focus card, with due dates, sorted by due date (overdue first), max 3
     const upcomingAssignments = activeAssignments
       .filter((a) => a._id !== focusAssignment?._id)
-      .filter((a) => a.dueAt && new Date(a.dueAt) >= new Date())
+      .filter((a) => a.dueAt)
       .sort((a, b) => new Date(a.dueAt!).getTime() - new Date(b.dueAt!).getTime())
       .slice(0, 3);
 

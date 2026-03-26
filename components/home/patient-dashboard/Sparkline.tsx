@@ -24,7 +24,7 @@ const Sparkline = memo(({ data, width = 48, height = 22, color = Colors.primary.
     const p = Skia.Path.Make();
     for (const [i, val] of data.entries()) {
       const x = PADDING + (i / (data.length - 1)) * drawWidth;
-      const y = PADDING + ((val - min) / range) * drawHeight;
+      const y = PADDING + (1 - (val - min) / range) * drawHeight;
       if (i === 0) p.moveTo(x, y);
       else p.lineTo(x, y);
     }
