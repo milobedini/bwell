@@ -45,8 +45,13 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 | Overlay | `Colors.overlay.medium` | `rgba(0,0,0,0.5)` |
 | Overlay light | `Colors.overlay.light` | `rgba(0,0,0,0.32)` |
 | Tint teal | `Colors.tint.teal` | `rgba(24,205,186,0.15)` |
+| Tint teal border | `Colors.tint.tealBorder` | `rgba(24,205,186,0.3)` |
 | Tint error | `Colors.tint.error` | `rgba(255,109,94,0.15)` |
+| Tint error border | `Colors.tint.errorBorder` | `rgba(255,109,94,0.3)` |
 | Tint info | `Colors.tint.info` | `rgba(255,209,93,0.15)` |
+| Tint neutral | `Colors.tint.neutral` | `rgba(166,173,187,0.12)` |
+| Chip pill | `Colors.chip.pill` / `bg-chip-pill` | `#1E2A45` |
+| Chip pill pressed | `Colors.chip.pillPressed` / `bg-chip-pillPressed` | `#253352` |
 | Diary mood warm | `Colors.diary.moodWarm` / `bg-diary-moodWarm` | `#f4a261` |
 | Diary mood cool | `Colors.diary.moodCool` / `bg-diary-moodCool` | `#5b8def` |
 | Diary closeness | `Colors.diary.closeness` / `bg-diary-closeness` | `#e76f9a` |

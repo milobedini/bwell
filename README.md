@@ -25,6 +25,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ### Patient
 
+- Personalised dashboard with focus card, effort metrics, upcoming assignments, and score trends
 - Browse programs and modules
 - Complete assigned questionnaires, exercises, and psychoeducation content
 - Track active and completed assignments
@@ -32,6 +33,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ### Therapist
 
+- Triage dashboard with client status buckets (needs attention, completed, inactive), stat pills, and score deltas
 - Manage a client list from the patient pool
 - Assign and remove modules for each client
 - Review patient submissions and progress timelines
@@ -45,6 +47,8 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ## Recent Milestones
 
+- **Patient dashboard** — focus card, effort strip, coming up list, Skia sparkline score trends, pull-to-refresh (2026-03-26)
+- **Therapist dashboard** — triage buckets with client cards, stat pills, score deltas, assignment dots, progress bars (2026-03-25)
 - **Diary keyboard toolbar** — native-style prev/next chevron navigation for numeric fields, keyboard-aware positioning (2026-03-24)
 - **Diary presenter refactor** — extracted 670-line presenter into composable hooks and components, FlatList performance tuning (2026-03-24)
 - **Diary UX polish** — compact header, floating save button, haptics, placeholder colours, character counts (2026-03-23)
@@ -87,7 +91,7 @@ app/
 
 api/                     # Axios instance & interceptors
 components/              # Shared UI components
-hooks/                   # React Query data-fetching hooks
+hooks/                   # React Query data-fetching hooks & dashboard aggregation
 stores/                  # Zustand auth store
 constants/               # Colors & typography
 types/                   # Enums & local type definitions
