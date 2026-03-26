@@ -265,6 +265,7 @@ export const useSubmitAttempt = (attemptId: string) => {
       qc.invalidateQueries({ queryKey: ['attempts', 'therapist'] });
       qc.invalidateQueries({ queryKey: ['clients'] });
       qc.invalidateQueries({ queryKey: ['attempts', 'therapist', 'patient-timeline'] });
+      qc.invalidateQueries({ queryKey: ['score-trends'] });
     },
     toast: { pending: 'Submitting...', success: 'Submitted successfully', error: 'Submission failed' }
   });

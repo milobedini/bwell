@@ -1,4 +1,5 @@
 import { OpaqueColorValue, Pressable, PressableProps } from 'react-native';
+import { clsx } from 'clsx';
 import { Colors } from '@/constants/Colors';
 
 import { IconSymbol, IconSymbolProps } from './IconSymbol';
@@ -11,9 +12,8 @@ type IconButtonProps = PressableProps &
 const IconButton = ({ onPress, className, color, disabled, ...iconProps }: IconButtonProps) => (
   <Pressable
     onPress={onPress}
-    className={className}
+    className={clsx(className, 'active:opacity-70 disabled:opacity-40')}
     disabled={disabled}
-    style={({ pressed }) => ({ opacity: disabled ? 0.4 : pressed ? 0.7 : 1 })}
     accessibilityRole="button"
     accessibilityState={{ disabled: !!disabled }}
   >
