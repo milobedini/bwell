@@ -178,6 +178,6 @@ export const dueLabel = (dueAt: string): string => {
   if (diffDays < 0) return `Was due ${formatShortDate(dueAt)}`;
   if (diffDays === 0) return 'Due today';
   if (diffDays === 1) return 'Due tomorrow';
-  if (diffDays <= 7) return `${diffDays} days`;
+  if (diffDays <= 7) return `Due in ${diffDays} days`;
   return `Due ${formatShortDate(dueAt)}`;
 };

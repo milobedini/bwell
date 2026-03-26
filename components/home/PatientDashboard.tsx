@@ -46,7 +46,11 @@ const PatientDashboard = memo(({ firstName, data, isRefetching, refetch }: Props
       <EffortStrip weeklyCompletion={data.weeklyCompletion} onTimeStreak={data.onTimeStreak} />
 
       {/* Coming Up */}
-      <ComingUpList assignments={data.upcomingAssignments} hasMore={hasMoreAssignments} />
+      <ComingUpList
+        assignments={data.upcomingAssignments}
+        hasMore={hasMoreAssignments}
+        remainingCount={data.activeAssignmentCount - shownCount}
+      />
 
       {/* Your Progress */}
       <ProgressSection trends={data.scoreTrends} />
