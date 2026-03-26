@@ -33,6 +33,9 @@ The app has three tiers (from `docs/proposal.pdf`):
 - UI component system (StatusChip base, EmptyState component, Pressable buttons with hover/focus/disabled states, colour tokens in tailwind config, web-aligned font scale, ActionMenu bottom sheet)
 - Admin All Users (search, filtering, sorting, infinite scroll with lazy loading)
 - Global Paper dark theme (MD3DarkTheme, dialog surfaces, dark-aware text)
+- Therapist Home Dashboard (triage buckets — needs attention/completed/inactive, stat pills, client cards with score deltas, assignment dots, progress bars, bucket-driven border colours, pull-to-refresh)
+- Patient Dashboard (focus card with priority assignment, effort strip with weekly completion + on-time streak, coming up list with start/continue actions, progress section with Skia sparkline score trends, pull-to-refresh, empty/populated states)
+- Profile screen (therapist: Your Clients + All Patients navigation)
 - Performance: lazy tabs, React.memo/useCallback on FlatList components, expo-image migration, Hermes engine
 
 **In progress / partial:** (none currently)
