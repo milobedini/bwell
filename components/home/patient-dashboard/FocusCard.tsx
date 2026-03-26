@@ -23,21 +23,21 @@ const getUrgency = (assignment: MyAssignmentView) => {
 const URGENCY_STYLES = {
   overdue: {
     bg: Colors.tint.error,
-    border: 'rgba(255,109,94,0.3)',
+    border: Colors.tint.errorBorder,
     label: 'OVERDUE',
     labelColor: Colors.primary.error,
     ctaBg: Colors.primary.error
   },
   soon: {
     bg: Colors.tint.teal,
-    border: 'rgba(24,205,186,0.3)',
+    border: Colors.tint.tealBorder,
     label: 'YOUR FOCUS THIS WEEK',
     labelColor: Colors.sway.bright,
     ctaBg: Colors.sway.bright
   },
   future: {
     bg: Colors.tint.teal,
-    border: 'rgba(24,205,186,0.15)',
+    border: Colors.tint.teal,
     label: 'YOUR FOCUS THIS WEEK',
     labelColor: Colors.sway.bright,
     ctaBg: Colors.sway.bright
@@ -52,7 +52,6 @@ const FocusCard = memo(({ assignment }: FocusCardProps) => {
       router.push('/(main)/(tabs)/programs');
       return;
     }
-    // If there's an in-progress draft, navigate directly to that attempt
     if (assignment.latestAttempt && !assignment.latestAttempt.completedAt) {
       router.push({
         pathname: '/(main)/(tabs)/attempts/[id]',
@@ -60,7 +59,6 @@ const FocusCard = memo(({ assignment }: FocusCardProps) => {
       });
       return;
     }
-    // Otherwise navigate to assignments tab where they can start
     router.push('/(main)/(tabs)/assignments');
   }, [assignment, router]);
 
@@ -69,24 +67,13 @@ const FocusCard = memo(({ assignment }: FocusCardProps) => {
     return (
       <Pressable
         onPress={handlePress}
-        style={{
-          backgroundColor: Colors.tint.teal,
-          borderWidth: 1.5,
-          borderColor: 'rgba(24,205,186,0.15)',
-          borderRadius: 16,
-          padding: 18,
-          marginBottom: 16
-        }}
+        className="mb-4 rounded-2xl border-[1.5px] p-[18px]"
+        style={{ backgroundColor: Colors.tint.teal, borderColor: Colors.tint.teal }}
       >
         <ThemedText
           type="smallBold"
-          style={{
-            color: Colors.sway.bright,
-            textTransform: 'uppercase',
-            letterSpacing: 1.2,
-            fontSize: 11,
-            marginBottom: 8
-          }}
+          style={{ color: Colors.sway.bright, textTransform: 'uppercase', letterSpacing: 1.2, fontSize: 11 }}
+          className="mb-2"
         >
           ALL CAUGHT UP
         </ThemedText>
@@ -107,29 +94,18 @@ const FocusCard = memo(({ assignment }: FocusCardProps) => {
 
   return (
     <View
-      style={{
-        backgroundColor: styles.bg,
-        borderWidth: 1.5,
-        borderColor: styles.border,
-        borderRadius: 16,
-        padding: 18,
-        marginBottom: 16
-      }}
+      className="mb-4 rounded-2xl border-[1.5px] p-[18px]"
+      style={{ backgroundColor: styles.bg, borderColor: styles.border }}
     >
       <ThemedText
         type="smallBold"
-        style={{
-          color: styles.labelColor,
-          textTransform: 'uppercase',
-          letterSpacing: 1.2,
-          fontSize: 11,
-          marginBottom: 8
-        }}
+        style={{ color: styles.labelColor, textTransform: 'uppercase', letterSpacing: 1.2, fontSize: 11 }}
+        className="mb-2"
       >
         {urgency === 'overdue' ? '⚠ ' : ''}
         {styles.label}
       </ThemedText>
-      <ThemedText type="smallTitle" style={{ marginBottom: 4 }}>
+      <ThemedText type="smallTitle" className="mb-1">
         {assignment.module.title}
       </ThemedText>
       <ThemedText type="small" className="mb-3.5" style={{ color: Colors.sway.darkGrey }}>
