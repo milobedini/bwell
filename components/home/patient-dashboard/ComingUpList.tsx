@@ -36,10 +36,7 @@ const AssignmentRow = memo(({ assignment }: { assignment: MyAssignmentView }) =>
   return (
     <Pressable
       onPress={handlePress}
-      className="mb-2 flex-row items-center justify-between rounded-[14px] px-4 py-3.5"
-      style={({ pressed }) => ({
-        backgroundColor: pressed ? Colors.chip.pillPressed : Colors.chip.darkCard
-      })}
+      className="mb-2 flex-row items-center justify-between rounded-[14px] bg-chip-darkCard px-4 py-3.5 active:bg-chip-pillPressed"
     >
       <View className="mr-3 flex-1">
         <ThemedText type="default" style={{ fontWeight: '600', fontSize: 15 }}>

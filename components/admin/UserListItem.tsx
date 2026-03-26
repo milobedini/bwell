@@ -50,11 +50,7 @@ const UserListItem = ({ user, sort, onPress }: UserListItemProps) => {
   const timestamp = getTimestamp(user, sort);
 
   return (
-    <Pressable
-      onPress={onPress}
-      className="gap-1.5 px-4 py-3"
-      style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
-    >
+    <Pressable onPress={onPress} className="gap-1.5 px-4 py-3 active:opacity-70">
       {/* Row 1: Name + timestamp */}
       <View className="flex-row items-baseline justify-between">
         <ThemedText type="smallTitle" className="shrink" numberOfLines={1}>

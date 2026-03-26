@@ -24,7 +24,7 @@ const ThemedButton = (props: ThemedButtonProps) => {
     <Pressable
       disabled={disabled}
       className={clsx(
-        'rounded-md p-4 hover:opacity-80',
+        'group rounded-md p-4 hover:opacity-80',
         disabled && 'bg-sway-darkGrey',
         compact && 'w-[200] px-3 py-2',
         variant === 'error' && 'bg-error',
@@ -36,11 +36,9 @@ const ThemedButton = (props: ThemedButtonProps) => {
       accessibilityState={{ disabled: !!disabled }}
       {...rest}
     >
-      {({ pressed }) => (
-        <ThemedText type="button" className="text-center" style={{ opacity: pressed ? 0.7 : 1 }}>
-          {title ?? children}
-        </ThemedText>
-      )}
+      <ThemedText type="button" className="text-center group-active:opacity-70">
+        {title ?? children}
+      </ThemedText>
     </Pressable>
   );
 };
@@ -49,40 +47,34 @@ const PrimaryButton = ({ onPress, title, logo, className, textClasses, logoClass
   <Pressable
     onPress={onPress}
     className={clsx(
-      'w-[300] flex-row items-center justify-evenly self-center rounded-lg border',
+      'group w-[300] flex-row items-center justify-evenly self-center rounded-lg border',
       !variant && 'border-sway-bright bg-sway-buttonBackground hover:border-sway-lightGrey',
       variant === 'error' && 'bg-error text-black',
       className
     )}
     accessibilityRole="button"
   >
-    {({ pressed }) => (
-      <>
-        <ThemedText
-          type="title"
-          className={clsx('max-w-[50%] text-center', textClasses)}
-          style={{ fontSize: 20, opacity: pressed ? 0.4 : 1 }}
-          onLight={variant === 'error'}
-        >
-          {title}
-        </ThemedText>
-        {logo && <Image source={bWellIcon} className={clsx('h-[120] w-[120]', logoClasses)} />}
-      </>
-    )}
+    <ThemedText
+      type="title"
+      className={clsx('max-w-[50%] text-center group-active:opacity-40', textClasses)}
+      style={{ fontSize: 20 }}
+      onLight={variant === 'error'}
+    >
+      {title}
+    </ThemedText>
+    {logo && <Image source={bWellIcon} className={clsx('h-[120] w-[120]', logoClasses)} />}
   </Pressable>
 );
 
 const SecondaryButton = ({ onPress, title, children }: ThemedButtonProps) => (
   <Pressable
     onPress={onPress}
-    className="my-2.5 w-full rounded-xl bg-sway-buttonBackground p-3 hover:bg-sway-buttonBackgroundSolid"
+    className="group my-2.5 w-full rounded-xl bg-sway-buttonBackground p-3 hover:bg-sway-buttonBackgroundSolid"
     accessibilityRole="button"
   >
-    {({ pressed }) => (
-      <ThemedText type="profileButtonText" style={{ opacity: pressed ? 0.7 : 1 }}>
-        {title ?? children}
-      </ThemedText>
-    )}
+    <ThemedText type="profileButtonText" className="group-active:opacity-70">
+      {title ?? children}
+    </ThemedText>
   </Pressable>
 );
 

@@ -28,10 +28,7 @@ const ScoreCard = memo(({ trend }: { trend: ScoreTrendItem }) => {
   return (
     <Pressable
       onPress={handlePress}
-      className="flex-1 rounded-[14px] p-3.5"
-      style={({ pressed }) => ({
-        backgroundColor: pressed ? Colors.chip.pillPressed : Colors.chip.darkCard
-      })}
+      className="flex-1 rounded-[14px] bg-chip-darkCard p-3.5 active:bg-chip-pillPressed"
     >
       <ThemedText type="small" style={{ color: Colors.sway.darkGrey, fontWeight: '600' }}>
         {trend.moduleTitle}

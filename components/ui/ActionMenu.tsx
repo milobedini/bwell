@@ -87,10 +87,7 @@ const ActionMenu = ({ visible, onDismiss, title, subtitle, actions }: ActionMenu
                     <Pressable
                       key={action.label}
                       onPress={() => handleAction(action.onPress)}
-                      className="flex-row items-center px-5 py-4 active:opacity-70"
-                      style={({ pressed }) => ({
-                        backgroundColor: pressed ? Colors.chip.darkCardAlt : 'transparent'
-                      })}
+                      className="flex-row items-center px-5 py-4 active:bg-chip-darkCardAlt active:opacity-70"
                     >
                       <View
                         className="mr-4 h-9 w-9 items-center justify-center rounded-xl"
@@ -116,10 +113,7 @@ const ActionMenu = ({ visible, onDismiss, title, subtitle, actions }: ActionMenu
               <View className="border-t px-5 py-1" style={{ borderTopColor: Colors.chip.darkCardAlt }}>
                 <Pressable
                   onPress={onDismiss}
-                  className="items-center py-4 active:opacity-70"
-                  style={({ pressed }) => ({
-                    backgroundColor: pressed ? Colors.chip.darkCardAlt : 'transparent'
-                  })}
+                  className="items-center py-4 active:bg-chip-darkCardAlt active:opacity-70"
                 >
                   <ThemedText type="default" style={{ color: Colors.sway.darkGrey }}>
                     Cancel
