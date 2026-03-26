@@ -9,6 +9,7 @@ import type { MyAssignmentView } from '@milobedini/shared-types';
 type ComingUpListProps = {
   assignments: MyAssignmentView[];
   hasMore: boolean;
+  remainingCount: number;
 };
 
 const AssignmentRow = memo(({ assignment }: { assignment: MyAssignmentView }) => {
@@ -28,10 +29,7 @@ const AssignmentRow = memo(({ assignment }: { assignment: MyAssignmentView }) =>
   }, [assignment, router]);
 
   const label = assignment.dueAt ? dueLabel(assignment.dueAt) : 'No due date';
-  const daysUntilDue = assignment.dueAt
-    ? Math.round((new Date(assignment.dueAt).getTime() - Date.now()) / 86_400_000)
-    : null;
-  const isDueSoon = daysUntilDue !== null && daysUntilDue <= 1;
+  const hasDraft = assignment.latestAttempt && !assignment.latestAttempt.completedAt;
 
   return (
     <Pressable
@@ -46,23 +44,16 @@ const AssignmentRow = memo(({ assignment }: { assignment: MyAssignmentView }) =>
           {label}
         </ThemedText>
       </View>
-      {isDueSoon && (
-        <ThemedText type="small" style={{ color: Colors.sway.bright, fontWeight: '600', fontSize: 13 }}>
-          Start →
-        </ThemedText>
-      )}
-      {!isDueSoon && assignment.dueAt && (
-        <ThemedText type="small" style={{ color: Colors.sway.darkGrey, fontSize: 13 }}>
-          {Math.max(0, daysUntilDue ?? 0)} days
-        </ThemedText>
-      )}
+      <ThemedText type="small" style={{ color: Colors.sway.bright, fontWeight: '600', fontSize: 13 }}>
+        {hasDraft ? 'Continue →' : 'Start →'}
+      </ThemedText>
     </Pressable>
   );
 });
 
 AssignmentRow.displayName = 'AssignmentRow';
 
-const ComingUpList = memo(({ assignments, hasMore }: ComingUpListProps) => {
+const ComingUpList = memo(({ assignments, hasMore, remainingCount }: ComingUpListProps) => {
   const router = useRouter();
 
   const goToAssignments = useCallback(() => {
@@ -89,11 +80,18 @@ const ComingUpList = memo(({ assignments, hasMore }: ComingUpListProps) => {
         <AssignmentRow key={a._id} assignment={a} />
       ))}
       {hasMore && (
-        <Pressable onPress={goToAssignments} className="items-center py-1.5">
-          <ThemedText type="small" style={{ color: Colors.sway.bright, fontWeight: '600' }}>
-            View all assignments →
-          </ThemedText>
-        </Pressable>
+        <>
+          <View className="items-end pr-1 pt-0.5">
+            <ThemedText type="small" style={{ color: Colors.sway.darkGrey, fontSize: 12 }}>
+              +{remainingCount} more
+            </ThemedText>
+          </View>
+          <Pressable onPress={goToAssignments} className="items-center py-1.5">
+            <ThemedText type="small" style={{ color: Colors.sway.bright, fontWeight: '600' }}>
+              View all assignments →
+            </ThemedText>
+          </Pressable>
+        </>
       )}
     </View>
   );

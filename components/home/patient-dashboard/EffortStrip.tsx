@@ -56,7 +56,7 @@ const EffortStrip = memo(({ weeklyCompletion, onTimeStreak }: EffortStripProps) 
           {onTimeStreak.current}
         </ThemedText>
         <ThemedText type="small" className="mt-0.5" style={{ color: Colors.sway.darkGrey }}>
-          {onTimeStreak.history.length === 0 ? 'Complete your first on time' : 'On time'}
+          {onTimeStreak.history.length === 0 ? 'Complete your first on time' : 'On-time streak'}
         </ThemedText>
         <View className="mt-2.5 flex-row gap-1">
           {onTimeStreak.history.map((entry, i) => (

@@ -1,5 +1,5 @@
 import { memo, useCallback } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
@@ -28,9 +28,9 @@ const ScoreCard = memo(({ trend }: { trend: ScoreTrendItem }) => {
   return (
     <Pressable
       onPress={handlePress}
-      className="flex-1 rounded-[14px] bg-chip-darkCard p-3.5 active:bg-chip-pillPressed"
+      className="w-[110px] rounded-[14px] bg-chip-darkCard p-3.5 active:bg-chip-pillPressed"
     >
-      <ThemedText type="small" style={{ color: Colors.sway.darkGrey, fontWeight: '600' }}>
+      <ThemedText type="small" numberOfLines={1} style={{ color: Colors.sway.darkGrey, fontWeight: '600' }}>
         {trend.moduleTitle}
       </ThemedText>
       {hasPrevious ? (
@@ -70,11 +70,11 @@ const ProgressSection = memo(({ trends }: ProgressSectionProps) => {
       >
         Your Progress
       </ThemedText>
-      <View className="flex-row gap-2">
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2">
         {trends.map((trend) => (
           <ScoreCard key={trend.moduleId} trend={trend} />
         ))}
-      </View>
+      </ScrollView>
     </View>
   );
 });
