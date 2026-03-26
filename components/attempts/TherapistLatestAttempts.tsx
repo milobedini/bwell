@@ -62,10 +62,7 @@ const TherapistAttemptListItemBase = ({ item }: { item: TherapistLatestRow }) =>
       push
       withAnchor
     >
-      <Pressable
-        className="overflow-hidden rounded-xl bg-chip-darkCard"
-        style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
-      >
+      <Pressable className="overflow-hidden rounded-xl bg-chip-darkCard active:opacity-80">
         <View className="flex-row">
           {/* Severity accent border */}
           <View className="w-1 rounded-l-xl" style={{ backgroundColor: severity.border }} />

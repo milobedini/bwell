@@ -138,13 +138,8 @@ const FocusCard = memo(({ assignment }: FocusCardProps) => {
       </ThemedText>
       <Pressable
         onPress={handlePress}
-        style={({ pressed }) => ({
-          backgroundColor: styles.ctaBg,
-          borderRadius: 12,
-          padding: 12,
-          alignItems: 'center',
-          opacity: pressed ? 0.85 : 1
-        })}
+        className="items-center rounded-xl p-3 active:opacity-85"
+        style={{ backgroundColor: styles.ctaBg }}
       >
         <ThemedText type="smallBold" style={{ color: Colors.sway.dark, fontSize: 15 }}>
           {ctaText}
