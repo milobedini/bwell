@@ -28,8 +28,7 @@ const PatientGroupHeaderBase = ({
   return (
     <Pressable
       onPress={onToggle}
-      className="flex-row items-center justify-between rounded-t-xl px-4 py-3 active:opacity-80"
-      style={{ backgroundColor: Colors.chip.darkCard }}
+      className="flex-row items-center justify-between rounded-t-xl bg-chip-darkCard px-4 py-3 active:opacity-80"
     >
       <View className="flex-1 flex-row items-center gap-2.5">
         <ThemedText type="smallTitle" numberOfLines={1} className="flex-shrink">
