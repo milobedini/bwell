@@ -121,7 +121,7 @@ const EditAssignmentModal = ({ visible, onDismiss, assignment }: EditAssignmentM
                   onPress={handleSave}
                   mode="contained"
                   buttonColor={Colors.sway.bright}
-                  textColor="black"
+                  textColor={Colors.primary.black}
                   loading={isPending}
                   disabled={isPending}
                 >

@@ -12,6 +12,8 @@ import {
 import { Button, Chip, Divider, IconButton, Portal, Surface } from 'react-native-paper';
 import Constants from 'expo-constants';
 import { Colors } from '@/constants/Colors';
+import { AssignmentStatus } from '@/types/types';
+import { filterChipStyle, filterChipTextStyle } from '@/utils/chipStyles';
 import type { AssignmentUrgencyFilter } from '@milobedini/shared-types';
 
 import { ThemedText } from '../ThemedText';
@@ -42,21 +44,10 @@ type AssignmentFilterDrawerProps = {
   patientChoices?: { id: string; name: string; email: string }[];
 };
 
-const chipStyle = (selected: boolean) => ({
-  backgroundColor: selected ? Colors.tint.teal : Colors.chip.darkCard,
-  borderColor: selected ? Colors.sway.bright : Colors.chip.darkCardAlt,
-  borderWidth: 1
-});
-
-const chipTextStyle = (selected: boolean) => ({
-  color: selected ? Colors.sway.bright : Colors.sway.darkGrey,
-  fontSize: 13
-});
-
 const STATUS_OPTIONS = [
   { value: undefined, label: 'All' },
-  { value: 'assigned', label: 'Assigned' },
-  { value: 'in_progress', label: 'In Progress' }
+  { value: AssignmentStatus.ASSIGNED, label: 'Assigned' },
+  { value: AssignmentStatus.IN_PROGRESS, label: 'In Progress' }
 ] as const;
 
 const URGENCY_OPTIONS: { value: AssignmentUrgencyFilter | undefined; label: string }[] = [
@@ -165,8 +156,8 @@ const AssignmentFilterDrawer = ({
                   <Chip
                     selected={!local.moduleId}
                     onPress={() => setLocal((prev) => ({ ...prev, moduleId: undefined }))}
-                    style={chipStyle(!local.moduleId)}
-                    textStyle={chipTextStyle(!local.moduleId)}
+                    style={filterChipStyle(!local.moduleId)}
+                    textStyle={filterChipTextStyle(!local.moduleId)}
                   >
                     All
                   </Chip>
@@ -182,8 +173,8 @@ const AssignmentFilterDrawer = ({
                             moduleId: prev.moduleId === m.id ? undefined : m.id
                           }))
                         }
-                        style={chipStyle(selected)}
-                        textStyle={chipTextStyle(selected)}
+                        style={filterChipStyle(selected)}
+                        textStyle={filterChipTextStyle(selected)}
                       >
                         {m.title}
                       </Chip>
@@ -205,8 +196,8 @@ const AssignmentFilterDrawer = ({
                         key={opt.label}
                         selected={selected}
                         onPress={() => setLocal((prev) => ({ ...prev, status: opt.value }))}
-                        style={chipStyle(selected)}
-                        textStyle={chipTextStyle(selected)}
+                        style={filterChipStyle(selected)}
+                        textStyle={filterChipTextStyle(selected)}
                       >
                         {opt.label}
                       </Chip>
@@ -228,8 +219,8 @@ const AssignmentFilterDrawer = ({
                         key={opt.label}
                         selected={selected}
                         onPress={() => setLocal((prev) => ({ ...prev, urgency: opt.value }))}
-                        style={chipStyle(selected)}
-                        textStyle={chipTextStyle(selected)}
+                        style={filterChipStyle(selected)}
+                        textStyle={filterChipTextStyle(selected)}
                       >
                         {opt.label}
                       </Chip>
@@ -252,7 +243,12 @@ const AssignmentFilterDrawer = ({
               <Button onPress={onDismiss} mode="text" textColor={Colors.sway.darkGrey}>
                 Cancel
               </Button>
-              <Button onPress={handleApply} mode="contained" buttonColor={Colors.sway.bright} textColor="black">
+              <Button
+                onPress={handleApply}
+                mode="contained"
+                buttonColor={Colors.sway.bright}
+                textColor={Colors.primary.black}
+              >
                 Apply
               </Button>
             </View>

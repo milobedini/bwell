@@ -16,6 +16,8 @@ import type { ActionMenuItem } from '@/components/ui/ActionMenu';
 import ActionMenu from '@/components/ui/ActionMenu';
 import { Colors } from '@/constants/Colors';
 import { useRemoveAssignment } from '@/hooks/useAssignments';
+import { AssignmentStatus } from '@/types/types';
+import { filterChipStyle, filterChipTextStyle } from '@/utils/chipStyles';
 import type { AssignmentSortOption, MyAssignmentView } from '@milobedini/shared-types';
 
 import { ThemedText } from '../ThemedText';
@@ -29,6 +31,7 @@ type AssignmentSection = {
   title: string;
   patientId: string;
   data: MyAssignmentView[];
+  assignmentCount: number;
   overdueCount: number;
 };
 
@@ -78,15 +81,8 @@ const SortChips = memo(function SortChips({
           selected={value === opt.value}
           onPress={() => onChange(opt.value)}
           compact
-          style={{
-            backgroundColor: value === opt.value ? Colors.tint.teal : 'transparent',
-            borderColor: value === opt.value ? Colors.sway.bright : Colors.chip.darkCardAlt,
-            borderWidth: 1
-          }}
-          textStyle={{
-            color: value === opt.value ? Colors.sway.bright : Colors.sway.darkGrey,
-            fontSize: 13
-          }}
+          style={filterChipStyle(value === opt.value)}
+          textStyle={filterChipTextStyle(value === opt.value)}
         >
           {opt.label}
         </Chip>
@@ -117,7 +113,7 @@ const ActiveFilterChips = memo(function ActiveFilterChips({
     chips.push({ key: 'moduleId', label: `Module: ${moduleName}` });
   }
   if (filters.status) {
-    const label = filters.status === 'in_progress' ? 'In Progress' : 'Assigned';
+    const label = filters.status === AssignmentStatus.IN_PROGRESS ? 'In Progress' : 'Assigned';
     chips.push({ key: 'status', label: `Status: ${label}` });
   }
   if (filters.urgency) {
@@ -167,11 +163,13 @@ const groupByPatient = (items: MyAssignmentView[]): AssignmentSection[] => {
         title: item.user.name ?? item.user.username,
         patientId: pid,
         data: [],
+        assignmentCount: 0,
         overdueCount: 0
       });
     }
     const group = map.get(pid)!;
     group.data.push(item);
+    group.assignmentCount += 1;
     if (item.dueAt && new Date(item.dueAt).getTime() < now) {
       group.overdueCount += 1;
     }
@@ -201,6 +199,7 @@ const AssignmentsListTherapist = ({
   isError
 }: AssignmentsListTherapistProps) => {
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
+  const [allCollapsed, setAllCollapsed] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -211,24 +210,40 @@ const AssignmentsListTherapist = ({
 
   const selectedAssignment = useMemo(() => items.find((a) => a._id === selectedId) ?? null, [items, selectedId]);
 
-  const allExpanded = collapsedSections.size === 0;
+  const allExpanded = !allCollapsed && collapsedSections.size === 0;
 
-  const toggleSection = useCallback((patientId: string) => {
-    setCollapsedSections((prev) => {
-      const next = new Set(prev);
-      if (next.has(patientId)) next.delete(patientId);
-      else next.add(patientId);
-      return next;
-    });
-  }, []);
+  const isSectionCollapsed = useCallback(
+    (patientId: string) => allCollapsed || collapsedSections.has(patientId),
+    [allCollapsed, collapsedSections]
+  );
+
+  const toggleSection = useCallback(
+    (patientId: string) => {
+      if (allCollapsed) {
+        // Transition from allCollapsed to per-section: collapse all except the toggled one
+        setAllCollapsed(false);
+        setCollapsedSections(new Set(sections.map((s) => s.patientId).filter((id) => id !== patientId)));
+      } else {
+        setCollapsedSections((prev) => {
+          const next = new Set(prev);
+          if (next.has(patientId)) next.delete(patientId);
+          else next.add(patientId);
+          return next;
+        });
+      }
+    },
+    [allCollapsed, sections]
+  );
 
   const toggleAll = useCallback(() => {
     if (allExpanded) {
-      setCollapsedSections(new Set(sections.map((s) => s.patientId)));
+      setAllCollapsed(true);
+      setCollapsedSections(new Set());
     } else {
+      setAllCollapsed(false);
       setCollapsedSections(new Set());
     }
-  }, [allExpanded, sections]);
+  }, [allExpanded]);
 
   const closeMenu = useCallback(() => {
     setMenuOpen(false);
@@ -278,13 +293,17 @@ const AssignmentsListTherapist = ({
     () =>
       sections.map((s) => ({
         ...s,
-        data: collapsedSections.has(s.patientId) ? [] : s.data
+        data: isSectionCollapsed(s.patientId) ? [] : s.data
       })),
-    [sections, collapsedSections]
+    [sections, isSectionCollapsed]
   );
 
   const renderItem = useCallback(
-    ({ item }: SectionListRenderItemInfo<MyAssignmentView>) => <AssignmentCard item={item} onOpenMenu={openMenu} />,
+    ({ item }: SectionListRenderItemInfo<MyAssignmentView>) => (
+      <View className="bg-chip-darkCard pt-2">
+        <AssignmentCard item={item} onOpenMenu={openMenu} />
+      </View>
+    ),
     [openMenu]
   );
 
@@ -292,35 +311,39 @@ const AssignmentsListTherapist = ({
     ({ section }: { section: SectionListData<MyAssignmentView, AssignmentSection> }) => (
       <PatientGroupHeader
         patientName={section.title}
-        assignmentCount={sections.find((s) => s.patientId === section.patientId)?.data.length ?? 0}
+        assignmentCount={section.assignmentCount}
         overdueCount={section.overdueCount}
-        isExpanded={!collapsedSections.has(section.patientId)}
+        isExpanded={!isSectionCollapsed(section.patientId)}
         onToggle={() => toggleSection(section.patientId)}
       />
     ),
-    [sections, collapsedSections, toggleSection]
+    [isSectionCollapsed, toggleSection]
   );
 
   const renderSectionFooter = useCallback(
     ({ section }: { section: SectionListData<MyAssignmentView, AssignmentSection> }) => {
-      if (collapsedSections.has(section.patientId)) return <View className="h-3" />;
-      return <View className="mb-3 h-px" />;
+      if (isSectionCollapsed(section.patientId)) return <View className="mb-3 rounded-b-xl bg-chip-darkCard pb-1" />;
+      return <View className="mb-3 rounded-b-xl bg-chip-darkCard pb-2" />;
     },
-    [collapsedSections]
+    [isSectionCollapsed]
   );
+
+  const keyExtractor = useCallback((item: MyAssignmentView) => item._id, []);
 
   const handleEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) fetchNextPage();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   useEffect(() => {
-    if (isError && sections.length > 0) {
+    if (isError && items.length > 0) {
       toast.error('Failed to refresh', {
         duration: TOAST_DURATIONS.error,
         styles: TOAST_STYLES.error
       });
     }
-  }, [isError, sections]);
+    // Only fire when isError transitions — items is read but not a trigger
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isError]);
 
   return (
     <>
@@ -359,7 +382,7 @@ const AssignmentsListTherapist = ({
       {/* List */}
       <SectionList
         sections={filteredSections}
-        keyExtractor={(item) => item._id}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
         renderSectionFooter={renderSectionFooter}

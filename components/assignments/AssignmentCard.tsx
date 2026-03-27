@@ -115,10 +115,7 @@ const AssignmentCardBase = ({ item, onOpenMenu }: AssignmentCardProps) => {
         push
         withAnchor
       >
-        <Pressable
-          className="mx-3 mb-2 overflow-hidden rounded-lg active:opacity-80"
-          style={{ backgroundColor: Colors.chip.pill }}
-        >
+        <Pressable className="mx-3 overflow-hidden rounded-lg border border-chip-darkCardAlt bg-chip-pill active:opacity-80">
           {cardContent}
         </Pressable>
       </Link>
@@ -126,9 +123,7 @@ const AssignmentCardBase = ({ item, onOpenMenu }: AssignmentCardProps) => {
   }
 
   return (
-    <View className="mx-3 mb-2 overflow-hidden rounded-lg" style={{ backgroundColor: Colors.chip.pill }}>
-      {cardContent}
-    </View>
+    <View className="mx-3 overflow-hidden rounded-lg border border-chip-darkCardAlt bg-chip-pill">{cardContent}</View>
   );
 };
 
