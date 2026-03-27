@@ -45,7 +45,7 @@ const AssignmentListItemPatientBase = ({ item, index, completed, onStart }: Assi
         <Link
           asChild
           href={{
-            pathname: '/attempts/[id]',
+            pathname: '/assignments/[id]',
             params: {
               id: item.latestAttempt?._id as string,
               assignmentId: item._id,
@@ -69,7 +69,7 @@ const AssignmentListItemPatientBase = ({ item, index, completed, onStart }: Assi
               asChild
               withAnchor
               href={{
-                pathname: '/attempts/[id]',
+                pathname: '/assignments/[id]',
                 params: {
                   id: item.latestAttempt?._id as string,
                   assignmentId: item._id,
@@ -106,7 +106,7 @@ const AssignmentsListPatient = ({ data, completed }: AssignmentsListPatientProps
         {
           onSuccess: (res) =>
             router.push({
-              pathname: '/(main)/(tabs)/attempts/[id]',
+              pathname: '/(main)/(tabs)/assignments/[id]',
               params: {
                 id: res.attempt._id,
                 assignmentId: assignment._id
