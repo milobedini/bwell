@@ -17,46 +17,9 @@ The app has three tiers (from `docs/proposal.pdf`):
 - **Primary:** Depression, Generalised Anxiety (GAD-7), Panic Disorder (PDSS), OCD, Health Anxiety, Stress, Phobias, PTSD, Agoraphobia, Social Anxiety
 - **Additional:** Sleep, Assertiveness, ACT
 
-### Current build status
-
-**Done:**
-- Auth (register, login, email verification, logout, 401 auto-clear)
-- Role system (Patient, Therapist, Admin) with therapist verification
-- Therapist-patient relationship (assign/remove clients)
-- Assignment system (due dates, recurrence, notes)
-- Questionnaire engine (scored MCQ, horizontal pager, auto-save, score bands) — supports PHQ-9, GAD-7, PDSS
-- Attempt lifecycle (start → auto-save → submit → view)
-- Therapist timeline (paginated patient history, filterable, severity-tinted attempt cards with score band colour mapping)
-- Admin dashboard (stats, therapist verification)
-- Onboarding carousel + welcome flow
-- Activity Diary (weekly grid, day chips with fill indicators, numeric fields, reflection prompts, editable user note, collapsible weekly summary, slot mood tinting, keyboard toolbar with prev/next navigation, modular presenter architecture with extracted hooks/components, FlatList performance tuning)
-- UI component system (StatusChip base, EmptyState component, Pressable buttons with hover/focus/disabled states, colour tokens in tailwind config, web-aligned font scale, ActionMenu bottom sheet)
-- Admin All Users (search, filtering, sorting, infinite scroll with lazy loading)
-- Global Paper dark theme (MD3DarkTheme, dialog surfaces, dark-aware text)
-- Therapist Home Dashboard (triage buckets — needs attention/completed/inactive, stat pills, client cards with score deltas, assignment dots, progress bars, bucket-driven border colours, pull-to-refresh)
-- Patient Dashboard (focus card with priority assignment, effort strip with weekly completion + on-time streak, coming up list with start/continue actions, progress section with Skia sparkline score trends, pull-to-refresh, empty/populated states)
-- Profile screen (therapist: Your Clients + All Patients navigation)
-- Performance: lazy tabs, React.memo/useCallback on FlatList components, expo-image migration, Hermes engine
-
-**In progress / partial:** (none currently)
-
-**Not yet built (working down the proposal):**
-- 5 Areas Model (interactive CBT cycle: Situation → Thoughts → Emotions → Behaviours → Physical)
-- General Goals (goal + current/mid/end ratings 0-10, reflection prompts)
-- Weekly Goals (to-do list, tick off, tie to activity diary)
-- Thinking Traps (learn traps, identify patterns, reflect)
-- Thought Monitoring (log unhelpful thoughts, tag with thinking trap)
-- Thought Challenging (structured evidence for/against worksheet)
-- Longitudinal Model / Extended CBT Cycle (Beck formulation)
-- Belief Change Evidence Table (old belief vs new belief evidence)
-- Modifying Unhelpful Beliefs (structured worksheet)
-- Psychoeducation presenter (module type enum exists, no UI)
-- Exercise presenter (module type enum exists, no UI)
-- Self-help program recommendation (suggest programs from questionnaire scores)
-
 ## Stack
 
-- **Framework:** Expo SDK 54, React Native 0.81, React 19, expo-router (file-based routing)
+- **Framework:** Expo SDK 54, React Native 0.81.5, React 19.1, expo-router (file-based routing)
 - **Language:** TypeScript (strict mode)
 - **Styling:** NativeWind (Tailwind CSS) — prefer className over StyleSheet where possible
 - **State:** Zustand (client/auth), TanStack React Query (server state)
@@ -92,17 +55,11 @@ The app has three tiers (from `docs/proposal.pdf`):
 
 ### Patterns
 
+- UI patterns (Pressable, ThemedText, FlatList, images, action menus, Paper theme, lazy tabs) are documented in `.claude/rules/figma-design-system.md`
 - **Infinite scroll:** Use `useInfiniteQuery` with `initialPageParam: 1` and `getNextPageParam` from `page`/`totalPages`. Flatten pages via `data.pages.flatMap(p => p.items)`. See `useAllUsers` for reference.
 - **Infinite scroll + search:** Use `keepPreviousData` with `useInfiniteQuery` to prevent full-screen flashes on param changes. Use `isLoading` (not `isPending`) for initial full-screen loaders. Guard empty states with `!isFetching && items.length === 0`. See `useAllUsers` + `AllUsersList` for reference.
 - **Value debounce:** Use `useDebounce(value, delay)` from `hooks/useDebounce.ts` for search inputs. Distinct from callback-based `useDebouncedCallback` in `utils/debounce.ts`.
 - **Filter drawers:** Slide-in from right using `Animated.View` + `useWindowDimensions()`. See `AttemptFilterDrawer` (timeline) and `UserFilterDrawer` (admin users).
-- **Paper dark theme:** Global `MD3DarkTheme` is configured in `_layout.tsx` with app color tokens. Dialog backgrounds use `surfaceContainerHigh` / `elevation.level3` (set to `Colors.chip.darkCard`). When adding Paper `TextInput` inside dialogs, set `style={{ backgroundColor: Colors.chip.darkCard }}` to match the dialog surface. Do not use `ThemedText`'s `onLight` prop inside dialogs — they are dark-themed.
-- **ThemedText color overrides:** To change text color on `ThemedText`, use the `style` prop (e.g., `style={{ color: Colors.sway.darkGrey }}`), not NativeWind `className` color classes. The `styleMap` in `ThemedText` sets `color` via `StyleSheet.create`, which takes precedence over NativeWind — `className="text-sway-darkGrey"` will be silently ignored.
-- **FlatList performance:** Wrap list item components in `React.memo`. Extract `renderItem` to `useCallback` — never use inline arrow functions. Extract `ItemSeparatorComponent` to a stable const outside the component. See `ModulesList`, `AssignmentsListTherapist` for reference.
-- **Images:** Use `Image` from `expo-image` (not `react-native`). Use `contentFit` prop (not `resizeMode`). Dimensions go in `style`, not as direct props. For bundled assets, keep `ImageSourcePropType` from react-native (expo-image's `ImageSource` is object-only and incompatible with `require()` return type). Note: `ImageProps` from react-native is NOT compatible with expo-image's `Image` component (type conflicts on `tintColor` etc.) — use expo-image's `ImageProps` when typing component props that spread onto expo-image `Image`.
-- **Action menus:** Use `ActionMenu` from `components/ui/ActionMenu.tsx` for contextual actions on list items (dots menu → slide-up card). Props: `title`, `subtitle`, `actions` (with `icon`, `label`, `variant: 'default' | 'destructive'`). Always dismiss ActionMenu before opening another modal to avoid z-index overlap.
-- **Lazy tabs:** Tab navigator uses `lazy: true` in screenOptions — non-home tabs defer mounting until first focused.
-- **Pressable pressed/disabled states:** Never use `style={({ pressed }) => ...}` callbacks on Pressable — NativeWind's `className` processing conflicts with style callbacks, causing neither to render. Use NativeWind modifiers instead: `active:bg-chip-pillPressed`, `active:opacity-70`, `disabled:opacity-40`. For pressed state on children, use `group` on the Pressable and `group-active:opacity-70` on children.
 
 ## Git Workflow
 
