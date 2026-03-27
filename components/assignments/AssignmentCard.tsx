@@ -106,7 +106,7 @@ const AssignmentCardBase = ({ item, onOpenMenu }: AssignmentCardProps) => {
       <Link
         asChild
         href={{
-          pathname: '/attempts/[id]',
+          pathname: '/assignments/[id]',
           params: {
             id: item.latestAttempt._id,
             headerTitle: item.latestAttempt.completedAt
