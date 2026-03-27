@@ -71,8 +71,7 @@ const AssignmentCardBase = ({ item, onOpenMenu }: AssignmentCardProps) => {
           </View>
           <Pressable
             onPress={handleMenu}
-            className="h-8 w-8 items-center justify-center rounded-lg active:opacity-70"
-            style={{ backgroundColor: Colors.chip.darkCardAlt }}
+            className="h-8 w-8 items-center justify-center rounded-lg bg-chip-darkCardAlt active:opacity-70"
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <MaterialCommunityIcons name="dots-vertical" size={16} color={Colors.sway.darkGrey} />
