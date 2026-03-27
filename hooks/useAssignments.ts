@@ -68,7 +68,7 @@ export const useUpdateAssignmentStatus = (assignmentId: string) => {
 
   return useMutationWithToast<UpdateAssignmentStatusResponse, AxiosError, UpdateAssignmentStatusInput>({
     mutationFn: async (status): Promise<UpdateAssignmentStatusResponse> => {
-      const { data } = await api.patch<UpdateAssignmentStatusResponse>(`assignments/${assignmentId}`, status);
+      const { data } = await api.patch<UpdateAssignmentStatusResponse>(`/assignments/${assignmentId}`, status);
       return data;
     },
     toast: { pending: 'Updating assignment...', success: 'Assignment updated', error: 'Update failed' },
@@ -84,7 +84,7 @@ export const useRemoveAssignment = () => {
 
   return useMutationWithToast<BasicMutationResponse, AxiosError, { assignmentId: string }>({
     mutationFn: async ({ assignmentId }): Promise<BasicMutationResponse> => {
-      const { data } = await api.delete<BasicMutationResponse>(`assignments/${assignmentId}`);
+      const { data } = await api.delete<BasicMutationResponse>(`/assignments/${assignmentId}`);
       return data;
     },
     toast: { pending: 'Removing assignment...', success: 'Assignment removed', error: 'Failed to remove assignment' },
@@ -147,7 +147,7 @@ export const useUpdateAssignment = () => {
     { assignmentId: string; updates: UpdateAssignmentInput }
   >({
     mutationFn: async ({ assignmentId, updates }) => {
-      const { data } = await api.patch(`assignments/${assignmentId}`, updates);
+      const { data } = await api.patch(`/assignments/${assignmentId}`, updates);
       return data;
     },
     toast: {

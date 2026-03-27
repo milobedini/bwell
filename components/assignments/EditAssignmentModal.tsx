@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Portal, TextInput } from 'react-native-paper';
 import { AnimatePresence, MotiView } from 'moti';
@@ -21,6 +21,11 @@ const EditAssignmentModal = ({ visible, onDismiss, assignment }: EditAssignmentM
   const [notes, setNotes] = useState('');
   const [recurrence, setRecurrence] = useState<AssignmentRecurrence | undefined>(undefined);
 
+  // Keep last assignment so AnimatePresence can render exit animation
+  const lastAssignment = useRef<MyAssignmentView | null>(null);
+  if (assignment) lastAssignment.current = assignment;
+  const displayAssignment = assignment ?? lastAssignment.current;
+
   const { mutate: updateAssignment, isPending } = useUpdateAssignment();
 
   useEffect(() => {
@@ -42,13 +47,13 @@ const EditAssignmentModal = ({ visible, onDismiss, assignment }: EditAssignmentM
           recurrence
         }
       },
-      { onSuccess: onDismiss }
+      { onSuccess: onDismiss, onError: onDismiss }
     );
   }, [assignment, dueAt, notes, recurrence, updateAssignment, onDismiss]);
 
-  if (!assignment) return null;
+  if (!displayAssignment) return null;
 
-  const patientName = assignment.user.name ?? assignment.user.username;
+  const patientName = displayAssignment.user.name ?? displayAssignment.user.username;
 
   return (
     <Portal>
@@ -83,7 +88,7 @@ const EditAssignmentModal = ({ visible, onDismiss, assignment }: EditAssignmentM
                   Edit Assignment
                 </ThemedText>
                 <ThemedText type="small" className="mt-1 text-center" style={{ color: Colors.sway.darkGrey }}>
-                  {assignment.module.title} — {patientName}
+                  {displayAssignment.module.title} — {patientName}
                 </ThemedText>
               </View>
 

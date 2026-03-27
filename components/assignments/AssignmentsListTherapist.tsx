@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -16,7 +16,6 @@ import type { ActionMenuItem } from '@/components/ui/ActionMenu';
 import ActionMenu from '@/components/ui/ActionMenu';
 import { Colors } from '@/constants/Colors';
 import { useRemoveAssignment } from '@/hooks/useAssignments';
-import { AssignmentStatus } from '@/types/types';
 import { filterChipStyle, filterChipTextStyle } from '@/utils/chipStyles';
 import type { AssignmentSortOption, MyAssignmentView } from '@milobedini/shared-types';
 
@@ -72,7 +71,10 @@ const SortChips = memo(function SortChips({
 }) {
   return (
     <View className="flex-row items-center gap-2 px-4 py-2">
-      <ThemedText type="small" className="text-xs uppercase tracking-wide text-sway-darkGrey">
+      <ThemedText
+        type="small"
+        style={{ fontSize: 12, color: Colors.sway.darkGrey, textTransform: 'uppercase', letterSpacing: 1 }}
+      >
         Sort:
       </ThemedText>
       {SORT_OPTIONS.map((opt) => (
@@ -104,27 +106,21 @@ const ActiveFilterChips = memo(function ActiveFilterChips({
   onClear: (key: keyof AssignmentFilterValues) => void;
   onClearAll: () => void;
 }) {
-  const chips: { key: keyof AssignmentFilterValues; label: string }[] = [];
+  const urgencyLabels: Record<string, string> = {
+    overdue: 'Overdue',
+    due_soon: 'Due Soon',
+    on_track: 'On Track',
+    no_due_date: 'No Due Date'
+  };
 
-  if (filters.patientId && patientName) {
-    chips.push({ key: 'patientId', label: `Patient: ${patientName}` });
-  }
-  if (filters.moduleId && moduleName) {
-    chips.push({ key: 'moduleId', label: `Module: ${moduleName}` });
-  }
-  if (filters.status) {
-    const label = filters.status === AssignmentStatus.IN_PROGRESS ? 'In Progress' : 'Assigned';
-    chips.push({ key: 'status', label: `Status: ${label}` });
-  }
-  if (filters.urgency) {
-    const labels: Record<string, string> = {
-      overdue: 'Overdue',
-      due_soon: 'Due Soon',
-      on_track: 'On Track',
-      no_due_date: 'No Due Date'
-    };
-    chips.push({ key: 'urgency', label: `Urgency: ${labels[filters.urgency]}` });
-  }
+  const chips = [
+    filters.patientId && patientName ? { key: 'patientId' as const, label: `Patient: ${patientName}` } : null,
+    filters.moduleId && moduleName ? { key: 'moduleId' as const, label: `Module: ${moduleName}` } : null,
+    filters.status
+      ? { key: 'status' as const, label: `Status: ${filters.status === 'in_progress' ? 'In Progress' : 'Assigned'}` }
+      : null,
+    filters.urgency ? { key: 'urgency' as const, label: `Urgency: ${urgencyLabels[filters.urgency]}` } : null
+  ].filter((c): c is { key: keyof AssignmentFilterValues; label: string } => c !== null);
 
   if (chips.length === 0) return null;
 
@@ -205,6 +201,9 @@ const AssignmentsListTherapist = ({
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const { mutate: removeAssignment } = useRemoveAssignment();
+
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
 
   const sections = useMemo(() => groupByPatient(items), [items]);
 
@@ -334,14 +333,12 @@ const AssignmentsListTherapist = ({
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   useEffect(() => {
-    if (isError && items.length > 0) {
+    if (isError && itemsRef.current.length > 0) {
       toast.error('Failed to refresh', {
         duration: TOAST_DURATIONS.error,
         styles: TOAST_STYLES.error
       });
     }
-    // Only fire when isError transitions — items is read but not a trigger
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isError]);
 
   return (

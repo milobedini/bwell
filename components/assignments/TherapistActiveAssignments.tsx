@@ -25,7 +25,7 @@ const TherapistActiveAssignments = () => {
   const {
     items,
     totalItems,
-    isPending,
+    isLoading,
     isError,
     isRefetching,
     refetch,
@@ -82,7 +82,7 @@ const TherapistActiveAssignments = () => {
 
   const hasActiveFilters = Object.values(filters).some(Boolean);
 
-  if (isPending) return <LoadingIndicator marginBottom={0} />;
+  if (isLoading) return <LoadingIndicator marginBottom={0} />;
   if (isError && !items.length) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
 
   return (
@@ -122,7 +122,7 @@ const TherapistActiveAssignments = () => {
           moduleName={selectedModuleName}
           isRefetching={isRefetching}
           isFetching={isFetching}
-          isPending={isPending}
+          isPending={isLoading}
           isFetchingNextPage={isFetchingNextPage}
           hasNextPage={hasNextPage ?? false}
           fetchNextPage={fetchNextPage}

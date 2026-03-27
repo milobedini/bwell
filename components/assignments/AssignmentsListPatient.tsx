@@ -4,8 +4,8 @@ import { clsx } from 'clsx';
 import { Link, useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { useStartModuleAttempt } from '@/hooks/useAttempts';
-import { AssignmentStatus } from '@/types/types';
 import { dateString } from '@/utils/dates';
+import type { AssignmentStatus } from '@milobedini/shared-types';
 import { MyAssignmentView } from '@milobedini/shared-types';
 
 import ThemedButton from '../ThemedButton';
@@ -21,7 +21,7 @@ type AssignmentListItemPatientProps = {
 
 const AssignmentListItemPatientBase = ({ item, index, completed, onStart }: AssignmentListItemPatientProps) => {
   const bgColor = index % 2 === 0 ? '' : 'bg-sway-buttonBackground';
-  const isInProgress = item.status === AssignmentStatus.IN_PROGRESS;
+  const isInProgress = item.status === 'in_progress';
 
   return (
     <View className={clsx('gap-1 p-4', bgColor)}>

@@ -109,22 +109,22 @@ const AssignmentCardBase = ({ item, onOpenMenu }: AssignmentCardProps) => {
           pathname: '/attempts/[id]',
           params: {
             id: item.latestAttempt._id,
-            headerTitle: `${item.module.title} (${dateString(item.latestAttempt.completedAt || '')})`
+            headerTitle: item.latestAttempt.completedAt
+              ? `${item.module.title} (${dateString(item.latestAttempt.completedAt)})`
+              : `${item.module.title} (In progress)`
           }
         }}
         push
         withAnchor
       >
-        <Pressable className="mx-3 overflow-hidden rounded-lg border border-chip-darkCardAlt bg-chip-pill active:opacity-80">
+        <Pressable className="overflow-hidden rounded-lg border border-chip-darkCardAlt bg-chip-pill active:opacity-80">
           {cardContent}
         </Pressable>
       </Link>
     );
   }
 
-  return (
-    <View className="mx-3 overflow-hidden rounded-lg border border-chip-darkCardAlt bg-chip-pill">{cardContent}</View>
-  );
+  return <View className="overflow-hidden rounded-lg border border-chip-darkCardAlt bg-chip-pill">{cardContent}</View>;
 };
 
 const AssignmentCard = memo(AssignmentCardBase);
