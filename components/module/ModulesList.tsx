@@ -2,8 +2,8 @@ import { memo, useCallback } from 'react';
 import { FlatList, View } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { Link, useLocalSearchParams } from 'expo-router';
-import { AccessPolicy, AssignmentStatus } from '@/types/types';
-import type { AvailableModulesItem } from '@milobedini/shared-types';
+import { AccessPolicy } from '@/types/types';
+import type { AssignmentStatus, AvailableModulesItem } from '@milobedini/shared-types';
 
 import ThemedButton from '../ThemedButton';
 import { ThemedText } from '../ThemedText';

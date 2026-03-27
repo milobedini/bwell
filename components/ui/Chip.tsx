@@ -2,8 +2,8 @@ import type { ComponentProps, ReactNode } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { Colors } from '@/constants/Colors';
-import { AccessPolicy, AssignmentStatus, CanStartReason } from '@/types/types';
-import type { AssignmentRecurrence, AvailableModulesItem } from '@milobedini/shared-types';
+import { AccessPolicy, CanStartReason } from '@/types/types';
+import type { AssignmentRecurrence, AssignmentStatus, AvailableModulesItem } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 
@@ -120,7 +120,7 @@ type AssignmentStatusChipProps = {
 
 const AssignmentStatusChip = ({ status }: AssignmentStatusChipProps) => {
   switch (status) {
-    case AssignmentStatus.ASSIGNED:
+    case 'assigned':
       return (
         <StatusChip
           label="Assigned"
@@ -129,7 +129,7 @@ const AssignmentStatusChip = ({ status }: AssignmentStatusChipProps) => {
           icon="clipboard-text-clock"
         />
       );
-    case AssignmentStatus.IN_PROGRESS:
+    case 'in_progress':
       return (
         <View className="self-start rounded-2xl" style={{ backgroundColor: Colors.primary.warning }}>
           <StatusChip

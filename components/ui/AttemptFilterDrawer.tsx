@@ -13,6 +13,7 @@ import { Button, Chip, Divider, IconButton, Portal, Surface, TextInput } from 'r
 import Constants from 'expo-constants';
 import { Colors } from '@/constants/Colors';
 import { type AttemptFilterDrawerValues, DEFAULT_FILTERS, type DrawerStatusOption } from '@/constants/Filters';
+import { filterChipStyle, filterChipTextStyle } from '@/utils/chipStyles';
 import { clamp } from '@/utils/helpers';
 
 import { ThemedText } from '../ThemedText';
@@ -34,17 +35,6 @@ export type AttemptFilterDrawerProps = {
   showLimit?: boolean;
   title?: string;
 };
-
-const chipStyle = (selected: boolean) => ({
-  backgroundColor: selected ? Colors.tint.teal : Colors.chip.darkCard,
-  borderColor: selected ? Colors.sway.bright : Colors.chip.darkCardAlt,
-  borderWidth: 1
-});
-
-const chipTextStyle = (selected: boolean) => ({
-  color: selected ? Colors.sway.bright : Colors.sway.darkGrey,
-  fontSize: 13
-});
 
 export const AttemptFilterDrawer = ({
   visible,
@@ -161,8 +151,8 @@ export const AttemptFilterDrawer = ({
                         key={opt}
                         selected={selected}
                         onPress={() => setStatus(opt)}
-                        style={chipStyle(selected)}
-                        textStyle={chipTextStyle(selected)}
+                        style={filterChipStyle(selected)}
+                        textStyle={filterChipTextStyle(selected)}
                       >
                         {opt}
                       </Chip>
@@ -199,8 +189,8 @@ export const AttemptFilterDrawer = ({
                     <Chip
                       selected={!local.moduleId}
                       onPress={() => setLocal((prev) => ({ ...prev, moduleId: undefined }))}
-                      style={chipStyle(!local.moduleId)}
-                      textStyle={chipTextStyle(!local.moduleId)}
+                      style={filterChipStyle(!local.moduleId)}
+                      textStyle={filterChipTextStyle(!local.moduleId)}
                     >
                       Any
                     </Chip>
@@ -216,8 +206,8 @@ export const AttemptFilterDrawer = ({
                               moduleId: prev.moduleId === m.id ? undefined : m.id
                             }))
                           }
-                          style={chipStyle(selected)}
-                          textStyle={chipTextStyle(selected)}
+                          style={filterChipStyle(selected)}
+                          textStyle={filterChipTextStyle(selected)}
                         >
                           {m.title}
                         </Chip>
@@ -244,8 +234,8 @@ export const AttemptFilterDrawer = ({
                     <Chip
                       selected={!local.severity}
                       onPress={() => setLocal((prev) => ({ ...prev, severity: undefined }))}
-                      style={chipStyle(!local.severity)}
-                      textStyle={chipTextStyle(!local.severity)}
+                      style={filterChipStyle(!local.severity)}
+                      textStyle={filterChipTextStyle(!local.severity)}
                     >
                       Any
                     </Chip>
@@ -261,8 +251,8 @@ export const AttemptFilterDrawer = ({
                               severity: prev.severity === sev ? undefined : sev
                             }))
                           }
-                          style={chipStyle(selected)}
-                          textStyle={chipTextStyle(selected)}
+                          style={filterChipStyle(selected)}
+                          textStyle={filterChipTextStyle(selected)}
                         >
                           {sev.charAt(0).toUpperCase() + sev.slice(1)}
                         </Chip>
