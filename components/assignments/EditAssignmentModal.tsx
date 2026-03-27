@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Modal, Pressable, ScrollView, View } from 'react-native';
-import { Button, TextInput } from 'react-native-paper';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Button, Portal, TextInput } from 'react-native-paper';
 import { AnimatePresence, MotiView } from 'moti';
 import { Colors } from '@/constants/Colors';
 import { useUpdateAssignment } from '@/hooks/useAssignments';
@@ -51,24 +51,24 @@ const EditAssignmentModal = ({ visible, onDismiss, assignment }: EditAssignmentM
   const patientName = assignment.user.name ?? assignment.user.username;
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={onDismiss} statusBarTranslucent>
-      <View className="flex-1 justify-end">
-        <AnimatePresence>
-          {visible && (
-            <MotiView
-              from={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ type: 'timing', duration: 200 }}
-              className="absolute inset-0"
-            >
-              <Pressable onPress={onDismiss} className="flex-1" style={{ backgroundColor: Colors.overlay.medium }} />
-            </MotiView>
-          )}
-        </AnimatePresence>
+    <Portal>
+      <AnimatePresence>
+        {visible && (
+          <MotiView
+            from={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ type: 'timing', duration: 200 }}
+            style={StyleSheet.absoluteFill}
+          >
+            <Pressable onPress={onDismiss} className="flex-1" style={{ backgroundColor: Colors.overlay.medium }} />
+          </MotiView>
+        )}
+      </AnimatePresence>
 
-        <AnimatePresence>
-          {visible && (
+      <AnimatePresence>
+        {visible && (
+          <View style={styles.sheetContainer} pointerEvents="box-none">
             <MotiView
               from={{ translateY: 400, opacity: 0 }}
               animate={{ translateY: 0, opacity: 1 }}
@@ -129,11 +129,18 @@ const EditAssignmentModal = ({ visible, onDismiss, assignment }: EditAssignmentM
                 </Button>
               </View>
             </MotiView>
-          )}
-        </AnimatePresence>
-      </View>
-    </Modal>
+          </View>
+        )}
+      </AnimatePresence>
+    </Portal>
   );
 };
+
+const styles = StyleSheet.create({
+  sheetContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'flex-end'
+  }
+});
 
 export default EditAssignmentModal;

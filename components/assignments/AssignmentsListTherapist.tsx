@@ -201,7 +201,7 @@ const AssignmentsListTherapist = ({
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
   const [allCollapsed, setAllCollapsed] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
+  const [editAssignment, setEditAssignment] = useState<MyAssignmentView | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const { mutate: removeAssignment } = useRemoveAssignment();
@@ -256,10 +256,10 @@ const AssignmentsListTherapist = ({
   }, []);
 
   const handleEdit = useCallback(() => {
-    setMenuOpen(false);
-    // Delay slightly to avoid z-index overlap between ActionMenu closing and modal opening
-    setTimeout(() => setEditOpen(true), 150);
-  }, []);
+    // Capture assignment before menu dismiss clears selectedId
+    const assignment = items.find((a) => a._id === selectedId) ?? null;
+    setEditAssignment(assignment);
+  }, [items, selectedId]);
 
   const handleRemove = useCallback(() => {
     if (!selectedId) return;
@@ -267,8 +267,7 @@ const AssignmentsListTherapist = ({
   }, [removeAssignment, selectedId, closeMenu]);
 
   const closeEdit = useCallback(() => {
-    setEditOpen(false);
-    setSelectedId(null);
+    setEditAssignment(null);
   }, []);
 
   const actions: ActionMenuItem[] = useMemo(
@@ -441,7 +440,7 @@ const AssignmentsListTherapist = ({
       />
 
       {/* Edit modal */}
-      <EditAssignmentModal visible={editOpen} onDismiss={closeEdit} assignment={selectedAssignment} />
+      <EditAssignmentModal visible={!!editAssignment} onDismiss={closeEdit} assignment={editAssignment} />
     </>
   );
 };
