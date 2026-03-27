@@ -7,7 +7,9 @@ description: Use when user says "update status", "sync claude md", "update build
 
 ## Overview
 
-Updates the **"Current build status"** section of `CLAUDE.md`, the **"Recent Milestones"** section of `README.md`, **audits all other documented sections** (Architecture, Stack, README Architecture, etc.) against the actual codebase to catch drift, and **syncs the Figma design system rules** (`.claude/rules/figma-design-system.md`) with the current codebase.
+**Audits all documented sections** (Architecture, Stack, Commands, etc.) in `CLAUDE.md` and `README.md` against the actual codebase to catch drift, **syncs the Figma design system rules** (`.claude/rules/figma-design-system.md`) with the current codebase, and **updates README milestones**.
+
+Build status is tracked in PM briefs (`docs/pm/`) and `README.md` — not in `CLAUDE.md`.
 
 ## Workflow
 
@@ -16,22 +18,16 @@ digraph update_status {
   rankdir=TB;
   "1. Find last CLAUDE.md update" [shape=box];
   "2. Get git log since then" [shape=box];
-  "3. Read executed plans" [shape=box];
-  "4. Cross-ref proposal" [shape=box];
-  "5. Update CLAUDE.md status" [shape=box];
-  "6. Audit documented sections" [shape=box];
-  "7. Audit Figma design system" [shape=box];
-  "8. Update README milestones" [shape=box];
-  "9. Show diff for approval" [shape=box];
+  "3. Audit CLAUDE.md sections" [shape=box];
+  "4. Audit Figma design system" [shape=box];
+  "5. Update README milestones + features" [shape=box];
+  "6. Show diff for approval" [shape=box];
 
   "1. Find last CLAUDE.md update" -> "2. Get git log since then";
-  "2. Get git log since then" -> "3. Read executed plans";
-  "3. Read executed plans" -> "4. Cross-ref proposal";
-  "4. Cross-ref proposal" -> "5. Update CLAUDE.md status";
-  "5. Update CLAUDE.md status" -> "6. Audit documented sections";
-  "6. Audit documented sections" -> "7. Audit Figma design system";
-  "7. Audit Figma design system" -> "8. Update README milestones";
-  "8. Update README milestones" -> "9. Show diff for approval";
+  "2. Get git log since then" -> "3. Audit CLAUDE.md sections";
+  "3. Audit CLAUDE.md sections" -> "4. Audit Figma design system";
+  "4. Audit Figma design system" -> "5. Update README milestones + features";
+  "5. Update README milestones + features" -> "6. Show diff for approval";
 }
 ```
 
@@ -57,44 +53,19 @@ git log <hash>..HEAD --oneline
 git log <hash>..HEAD --stat
 ```
 
-### 3. Read executed plans
+Also check `docs/superpowers/plans/` for any plan files dated after the last CLAUDE.md update — these contain structured descriptions of what was built.
 
-Check `docs/superpowers/plans/` for any plan files dated after the last CLAUDE.md update. These contain structured descriptions of what was built and are the most reliable source of truth for feature completions.
+### 3. Audit CLAUDE.md sections against the codebase
 
-### 4. Cross-reference with the proposal
-
-Read the current CLAUDE.md "Not yet built" list and compare against what the git history and plans show was completed. The product vision in CLAUDE.md (sourced from `docs/proposal.pdf`) defines the target — use it to understand what "done" means for each item.
-
-### 5. Update CLAUDE.md — build status
-
-Edit these three sub-sections under `### Current build status`:
-
-- **Done:** — Move items here from "In progress" or "Not yet built" when fully implemented. Use the same concise format as existing entries (feature name + parenthetical summary of what's included).
-- **In progress / partial:** — Add or update items that are partially built. Include what exists and what's missing.
-- **Not yet built:** — Remove items that moved to Done or In progress.
-
-### 6. Audit documented sections against the codebase
-
-This step catches drift in sections that describe *how things work*, not *what's been built*. For each section below, read the relevant source files and verify the documentation is still accurate.
-
-#### CLAUDE.md sections to audit
+This step catches drift in sections that describe *how things work*. For each section below, read the relevant source files and verify the documentation is still accurate.
 
 | Section | Verify against |
 |---------|---------------|
 | **Architecture** | `app/_layout.tsx` (QueryClient config), `api/api.ts` (interceptors), `app/(main)/_layout.tsx` (route guards), `components/attempts/presenters/` (presenter pattern) |
 | **Stack** | `package.json` dependencies — check versions and that all listed libraries are still used |
+| **Patterns** | Verify data-fetching patterns still match actual hook implementations |
 | **Code Conventions** | Spot-check recent files for any new conventions adopted but not documented |
 | **Commands** | `package.json` scripts — check all listed commands still work |
-
-#### README sections to audit
-
-| Section | Verify against |
-|---------|---------------|
-| **Architecture** | Must match CLAUDE.md Architecture (single source of truth) — rewrite README's Architecture to be a concise mirror of CLAUDE.md's |
-| **Tech Stack** | Must match CLAUDE.md Stack |
-| **Project Structure** | Run `ls` on `app/`, `components/`, `hooks/` — check for new top-level directories or renamed folders |
-| **Features** | Should reflect current Done list from CLAUDE.md build status |
-| **Scripts** | Must match CLAUDE.md Commands |
 
 #### How to audit
 
@@ -109,7 +80,7 @@ Common drift patterns to watch for:
 - New app routes or directories not in Project Structure
 - Removed or renamed scripts not updated in Commands
 
-### 7. Audit Figma design system rules
+### 4. Audit Figma design system rules
 
 Audit `.claude/rules/figma-design-system.md` against the actual codebase to catch drift. This file is loaded as context for every Figma implementation task, so stale information directly causes incorrect code generation.
 
@@ -140,7 +111,9 @@ Common drift patterns:
 - ThemedButton variants added/changed but not in Button Hierarchy
 - Chip color pairs added or renamed
 
-### 8. Update README — recent milestones
+### 5. Update README
+
+#### Recent milestones
 
 Add or update a `## Recent Milestones` section in `README.md`, placed **after the Features section and before the Tech Stack section**.
 
@@ -158,10 +131,19 @@ Rules:
 - Date = the merge/completion date from git history
 - Group related commits into single milestones (don't list individual commits)
 
-### 9. Show diff for approval
+#### Other README sections to audit
+
+| Section | Verify against |
+|---------|---------------|
+| **Architecture** | Must match CLAUDE.md Architecture (single source of truth) — rewrite README's Architecture to be a concise mirror of CLAUDE.md's |
+| **Tech Stack** | Must match CLAUDE.md Stack |
+| **Project Structure** | Run `ls` on `app/`, `components/`, `hooks/` — check for new top-level directories or renamed folders |
+| **Features** | Should reflect what's actually built — cross-reference git history and PM briefs in `docs/pm/` |
+| **Scripts** | Must match CLAUDE.md Commands |
+
+### 6. Show diff for approval
 
 After editing all files, show the user a summary of what changed:
-- Items moved between status categories
 - Documentation corrections from the audit (list each fix with before → after)
 - Figma design system updates (new/changed/removed tokens, components, types)
 - New milestones added to README
@@ -171,7 +153,6 @@ After editing all files, show the user a summary of what changed:
 
 ## Edge cases
 
-- **No changes since last update:** Still run the audits (steps 6–7) — documentation can drift even without new features. Only skip if user explicitly says "just milestones".
-- **Ambiguous completion:** If a feature seems partially done but you're not sure, keep it in "In progress" and flag it for the user.
+- **No changes since last update:** Still run the audits (steps 3–4) — documentation can drift even without new features. Only skip if user explicitly says "just milestones".
 - **Backend-only changes:** If commits are in the backend repo (`../cbt/`), note them but don't update frontend build status — this skill tracks the frontend app.
 - **Audit finds nothing wrong:** Report "all sections verified, no drift found" — don't make cosmetic edits.
