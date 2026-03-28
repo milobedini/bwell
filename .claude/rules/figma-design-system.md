@@ -19,7 +19,7 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 - Feature-specific components go in `components/<feature>/` (e.g., `components/diary/`, `components/admin/`)
 - Module presenters go in `components/attempts/presenters/`
 - Shared layout wrappers: `Container` (headerless screens), `ContentContainer` (screens with visible header)
-- Always check for existing components before creating new ones — reuse `ThemedText`, `ThemedButton`, `StatusChip`, `EmptyState`, `IconButton`, `Collapsible`, `SelectField`, `ActionMenu`, `Chip`, `DueDateField`, `RecurrenceField`, `SearchPickerDialog`, `KeyboardAvoidingWrapper`
+- Always check for existing components before creating new ones — reuse `ThemedText`, `ThemedButton`, `StatusChip`, `AssignmentStatusChip`, `EmptyState`, `IconButton`, `Collapsible`, `SelectField`, `ActionMenu`, `Chip`, `DueDateField`, `RecurrenceField`, `SearchPickerDialog`, `KeyboardAvoidingWrapper`
 
 ## Color Tokens
 
@@ -149,6 +149,7 @@ When translating Figma designs to code, apply these HIG principles:
 - Disabled: automatically uses `bg-sway-darkGrey`
 - Hero/branded: `PrimaryButton` — wide button with optional logo, border, translucent bg (onboarding, welcome screens)
 - Profile/settings: `SecondaryButton` — full-width rounded button with translucent bg
+- Note: `ThemedButton`, `PrimaryButton`, and `SecondaryButton` are in `components/ThemedButton.tsx` (not `components/ui/`)
 - Contextual actions: use `ActionMenu` bottom sheet for list item actions (replaced FabGroup)
 - IMPORTANT: Never use `style={({ pressed }) => ...}` callbacks on Pressable — NativeWind's `className` conflicts with style callbacks, causing neither to render. Use NativeWind modifiers: `active:bg-*`, `active:opacity-*`, `disabled:opacity-*`. For pressed state on children, use `group` on the Pressable and `group-active:opacity-*` on children.
 
