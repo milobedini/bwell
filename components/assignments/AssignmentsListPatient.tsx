@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import { Link, useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { useStartModuleAttempt } from '@/hooks/useAttempts';
+import { usePrefetchMyAttemptDetail } from '@/hooks/usePrefetch';
 import { dateString } from '@/utils/dates';
 import type { AssignmentStatus } from '@milobedini/shared-types';
 import { MyAssignmentView } from '@milobedini/shared-types';
@@ -17,9 +18,16 @@ type AssignmentListItemPatientProps = {
   index: number;
   completed?: boolean;
   onStart: (assignment: MyAssignmentView) => void;
+  onPrefetch: (attemptId: string) => void;
 };
 
-const AssignmentListItemPatientBase = ({ item, index, completed, onStart }: AssignmentListItemPatientProps) => {
+const AssignmentListItemPatientBase = ({
+  item,
+  index,
+  completed,
+  onStart,
+  onPrefetch
+}: AssignmentListItemPatientProps) => {
   const bgColor = index % 2 === 0 ? '' : 'bg-sway-buttonBackground';
   const isInProgress = item.status === 'in_progress';
 
@@ -54,7 +62,12 @@ const AssignmentListItemPatientBase = ({ item, index, completed, onStart }: Assi
           }}
           withAnchor
         >
-          <ThemedButton title={'View attempt'} compact className="mt-4 self-start" />
+          <ThemedButton
+            title={'View attempt'}
+            compact
+            className="mt-4 self-start"
+            onPress={() => item.latestAttempt?._id && onPrefetch(item.latestAttempt._id)}
+          />
         </Link>
       )}
       {!completed && (
@@ -77,7 +90,12 @@ const AssignmentListItemPatientBase = ({ item, index, completed, onStart }: Assi
                 }
               }}
             >
-              <ThemedButton title="Continue" compact className="mt-4 w-1/3" />
+              <ThemedButton
+                title="Continue"
+                compact
+                className="mt-4 w-1/3"
+                onPress={() => item.latestAttempt?._id && onPrefetch(item.latestAttempt._id)}
+              />
             </Link>
           ) : (
             <ThemedButton title="Start" compact className="mt-4 w-1/3" onPress={() => onStart(item)} />
@@ -98,6 +116,7 @@ type AssignmentsListPatientProps = {
 const AssignmentsListPatient = ({ data, completed }: AssignmentsListPatientProps) => {
   const router = useRouter();
   const { mutate: startAttempt } = useStartModuleAttempt();
+  const prefetchDetail = usePrefetchMyAttemptDetail();
 
   const createAttemptFromAssignment = useCallback(
     (assignment: MyAssignmentView) => {
@@ -125,9 +144,10 @@ const AssignmentsListPatient = ({ data, completed }: AssignmentsListPatientProps
         index={index}
         completed={completed}
         onStart={createAttemptFromAssignment}
+        onPrefetch={prefetchDetail}
       />
     ),
-    [completed, createAttemptFromAssignment]
+    [completed, createAttemptFromAssignment, prefetchDetail]
   );
 
   return <FlatList data={data} keyExtractor={(item) => item._id} renderItem={renderItem} />;

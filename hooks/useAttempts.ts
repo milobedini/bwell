@@ -20,6 +20,17 @@ import { type InfiniteData, keepPreviousData, useInfiniteQuery, useQuery, useQue
 import { useMutationWithToast } from './useMutationWithToast';
 import { useIsLoggedIn } from './useUsers';
 
+// Fetch functions — exported for prefetch use
+export const fetchMyAttemptDetail = async (attemptId: string): Promise<AttemptDetailResponse> => {
+  const { data } = await api.get<AttemptDetailResponse>(`/attempts/${attemptId}`);
+  return data;
+};
+
+export const fetchTherapistAttemptDetail = async (attemptId: string): Promise<AttemptDetailResponse> => {
+  const { data } = await api.get<AttemptDetailResponse>(`/attempts/therapist/${attemptId}`);
+  return data;
+};
+
 // QUERIES
 export type MyAttemptOptions = {
   moduleId?: string;
@@ -189,10 +200,7 @@ export const useGetMyAttemptDetail = (attemptId: string) => {
 
   return useQuery<AttemptDetailResponse>({
     queryKey: ['attempts', 'detail', 'mine', attemptId],
-    queryFn: async (): Promise<AttemptDetailResponse> => {
-      const { data } = await api.get<AttemptDetailResponse>(`/attempts/${attemptId}`);
-      return data;
-    },
+    queryFn: () => fetchMyAttemptDetail(attemptId),
     enabled: isLoggedIn
   });
 };
@@ -202,10 +210,7 @@ export const useTherapistGetAttemptDetail = (attemptId: string) => {
 
   return useQuery<AttemptDetailResponse>({
     queryKey: ['attempts', 'detail', 'therapist', attemptId],
-    queryFn: async (): Promise<AttemptDetailResponse> => {
-      const { data } = await api.get<AttemptDetailResponse>(`/attempts/therapist/${attemptId}`);
-      return data;
-    },
+    queryFn: () => fetchTherapistAttemptDetail(attemptId),
     enabled: isLoggedIn
   });
 };

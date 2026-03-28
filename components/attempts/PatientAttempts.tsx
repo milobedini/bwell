@@ -7,6 +7,7 @@ import { View } from 'moti';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useGetMyAttempts } from '@/hooks/useAttempts';
+import { usePrefetchMyAttemptDetail } from '@/hooks/usePrefetch';
 import { AttemptStatusInput } from '@/types/types';
 import type { AttemptListItem } from '@milobedini/shared-types';
 
@@ -56,15 +57,17 @@ const PatientAttempts = () => {
     }, [])
   );
 
+  const prefetchDetail = usePrefetchMyAttemptDetail();
   const { data, isPending, isError } = useGetMyAttempts({ status: view });
   const attempts = data?.attempts;
 
   const handleAttemptPress = useCallback(
     (id: string, title: string) => {
+      prefetchDetail(id);
       pushedChild.current = true;
       router.push({ pathname: '/attempts/[id]', params: { id, headerTitle: title } });
     },
-    [router]
+    [router, prefetchDetail]
   );
 
   const renderItem = useCallback(

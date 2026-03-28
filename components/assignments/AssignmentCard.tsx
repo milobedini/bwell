@@ -2,6 +2,7 @@ import { type ComponentProps, memo, useCallback } from 'react';
 import { Pressable, View } from 'react-native';
 import { Link } from 'expo-router';
 import { Colors } from '@/constants/Colors';
+import { usePrefetchTherapistAttemptDetail } from '@/hooks/usePrefetch';
 import { dateString } from '@/utils/dates';
 import type { MyAssignmentView } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
@@ -43,6 +44,7 @@ type AssignmentCardProps = {
 };
 
 const AssignmentCardBase = ({ item, onOpenMenu }: AssignmentCardProps) => {
+  const prefetchDetail = usePrefetchTherapistAttemptDetail();
   const urgencyColor = getUrgencyColor(item.dueAt);
   const icon = getModuleIcon(item.module.type);
   const attemptStatus = getAttemptStatusLabel(item.latestAttempt);
@@ -117,7 +119,10 @@ const AssignmentCardBase = ({ item, onOpenMenu }: AssignmentCardProps) => {
         push
         withAnchor
       >
-        <Pressable className="overflow-hidden rounded-lg border border-chip-darkCardAlt bg-chip-pill active:opacity-80">
+        <Pressable
+          onPress={() => prefetchDetail(item.latestAttempt!._id)}
+          className="overflow-hidden rounded-lg border border-chip-darkCardAlt bg-chip-pill active:opacity-80"
+        >
           {cardContent}
         </Pressable>
       </Link>

@@ -15,6 +15,7 @@ import { TOAST_DURATIONS, TOAST_STYLES } from '@/components/toast/toastOptions';
 import { Colors } from '@/constants/Colors';
 import { type AttemptFilterDrawerValues, DEFAULT_FILTERS, type SortOption } from '@/constants/Filters';
 import { useTherapistAttemptModules, useTherapistGetLatestAttempts } from '@/hooks/useAttempts';
+import { usePrefetchTherapistAttemptDetail } from '@/hooks/usePrefetch';
 import { useClients } from '@/hooks/useUsers';
 import { dateString, groupByDate, timeAgo } from '@/utils/dates';
 import { getSeverityColors } from '@/utils/severity';
@@ -44,7 +45,13 @@ const getModuleIcon = (moduleType?: string): MCIName =>
 
 const ItemSeparator = () => <View className="h-3" />;
 
-const TherapistAttemptListItemBase = ({ item }: { item: TherapistLatestRow }) => {
+const TherapistAttemptListItemBase = ({
+  item,
+  onPrefetch
+}: {
+  item: TherapistLatestRow;
+  onPrefetch: (attemptId: string) => void;
+}) => {
   const severity = getSeverityColors(item.scoreBandLabel);
   const { relative, formatted } = timeAgo(item.completedAt || '');
   const icon = getModuleIcon(item.moduleType);
@@ -62,7 +69,10 @@ const TherapistAttemptListItemBase = ({ item }: { item: TherapistLatestRow }) =>
       push
       withAnchor
     >
-      <Pressable className="overflow-hidden rounded-xl bg-chip-darkCard active:opacity-80">
+      <Pressable
+        onPress={() => onPrefetch(item._id)}
+        className="overflow-hidden rounded-xl bg-chip-darkCard active:opacity-80"
+      >
         <View className="flex-row">
           {/* Severity accent border */}
           <View className="w-1 rounded-l-xl" style={{ backgroundColor: severity.border }} />
@@ -241,6 +251,7 @@ const TherapistLatestAttempts = () => {
   const [sort, setSort] = useState<SortOption>('newest');
   const [filters, setFilters] = useState<AttemptFilterDrawerValues>(DEFAULT_FILTERS);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const prefetchDetail = usePrefetchTherapistAttemptDetail();
 
   const {
     rows,
@@ -299,8 +310,10 @@ const TherapistLatestAttempts = () => {
   const handleClearAll = useCallback(() => setFilters(DEFAULT_FILTERS), []);
 
   const renderItem = useCallback(
-    ({ item }: SectionListRenderItemInfo<TherapistLatestRow>) => <TherapistAttemptListItem item={item} />,
-    []
+    ({ item }: SectionListRenderItemInfo<TherapistLatestRow>) => (
+      <TherapistAttemptListItem item={item} onPrefetch={prefetchDetail} />
+    ),
+    [prefetchDetail]
   );
 
   const renderSectionHeader = useCallback(
