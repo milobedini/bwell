@@ -66,13 +66,45 @@ export const useCreateAssignment = () => {
 export const useUpdateAssignmentStatus = (assignmentId: string) => {
   const queryClient = useQueryClient();
 
-  return useMutationWithToast<UpdateAssignmentStatusResponse, AxiosError, UpdateAssignmentStatusInput>({
+  return useMutationWithToast<
+    UpdateAssignmentStatusResponse,
+    AxiosError,
+    UpdateAssignmentStatusInput,
+    { previousAssignments: [readonly unknown[], MyAssignmentView[] | undefined][] }
+  >({
     mutationFn: async (status): Promise<UpdateAssignmentStatusResponse> => {
       const { data } = await api.patch<UpdateAssignmentStatusResponse>(`/assignments/${assignmentId}`, status);
       return data;
     },
     toast: { pending: 'Updating assignment...', success: 'Assignment updated', error: 'Update failed' },
-    onSuccess: () => {
+    onMutate: async (newStatus) => {
+      await queryClient.cancelQueries({ queryKey: ['assignments'] });
+
+      // Only snapshot flat-array queries — skip infinite query at ['assignments', 'therapist', ...]
+      const assignmentQueries = queryClient
+        .getQueriesData<MyAssignmentView[]>({ queryKey: ['assignments'] })
+        .filter(([, data]) => Array.isArray(data));
+
+      const previousAssignments = assignmentQueries.map(
+        ([key, data]) => [key, data] as [readonly unknown[], MyAssignmentView[] | undefined]
+      );
+
+      assignmentQueries.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<MyAssignmentView[]>(
+          key,
+          data.map((a) => (a._id === assignmentId ? { ...a, status: newStatus.status } : a))
+        );
+      });
+
+      return { previousAssignments };
+    },
+    onError: (_err, _vars, context) => {
+      context?.previousAssignments.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['assignments'] });
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       queryClient.invalidateQueries({ queryKey: ['modules'] });

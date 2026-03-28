@@ -241,12 +241,45 @@ export const useStartModuleAttempt = () => {
 export const useSaveModuleAttempt = (attemptId: string) => {
   const qc = useQueryClient();
 
-  return useMutationWithToast<SaveProgressResponse, AxiosError, SaveProgressInput>({
+  return useMutationWithToast<
+    SaveProgressResponse,
+    AxiosError,
+    SaveProgressInput,
+    { previousDetail: AttemptDetailResponse | undefined }
+  >({
     mutationFn: async (responses): Promise<SaveProgressResponse> => {
       const { data } = await api.patch<SaveProgressResponse>(`attempts/${attemptId}`, responses);
       return data;
     },
-    onSuccess: () => {
+    onMutate: async (newResponses) => {
+      const detailKey = ['attempts', 'detail', 'mine', attemptId];
+      await qc.cancelQueries({ queryKey: detailKey });
+
+      const previousDetail = qc.getQueryData<AttemptDetailResponse>(detailKey);
+
+      // Optimistically update answers and userNote only.
+      // diaryEntries are excluded — they map to a nested diary structure
+      // on the response that can't be cheaply reconstructed. onSettled
+      // invalidation corrects the cache after the server responds.
+      if (previousDetail) {
+        qc.setQueryData<AttemptDetailResponse>(detailKey, {
+          ...previousDetail,
+          attempt: {
+            ...previousDetail.attempt,
+            ...(newResponses.answers ? { answers: newResponses.answers } : {}),
+            ...(newResponses.userNote !== undefined ? { userNote: newResponses.userNote } : {})
+          }
+        });
+      }
+
+      return { previousDetail };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previousDetail) {
+        qc.setQueryData(['attempts', 'detail', 'mine', attemptId], context.previousDetail);
+      }
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ['attempts', 'detail'] });
       qc.invalidateQueries({ queryKey: ['attempts', 'mine'] });
       qc.invalidateQueries({ queryKey: ['attempts', 'therapist', 'patient-timeline'] });

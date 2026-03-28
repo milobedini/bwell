@@ -120,7 +120,7 @@ const AssignmentCardBase = ({ item, onOpenMenu }: AssignmentCardProps) => {
         withAnchor
       >
         <Pressable
-          onPress={() => prefetchDetail(item.latestAttempt!._id)}
+          onPress={() => item.latestAttempt?._id && prefetchDetail(item.latestAttempt._id)}
           className="overflow-hidden rounded-lg border border-chip-darkCardAlt bg-chip-pill active:opacity-80"
         >
           {cardContent}
