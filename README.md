@@ -36,6 +36,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 - Triage dashboard with client status buckets (needs attention, completed, inactive), stat pills, and score deltas
 - Manage a client list from the patient pool
 - Assign and remove modules for each client
+- Manage assignments with sort, filter, edit (due date, notes, recurrence), and collapsible patient groups
 - Review patient submissions and progress timelines
 - View latest attempt submissions across all clients
 
@@ -47,6 +48,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ## Recent Milestones
 
+- **Therapist assignments redesign** — SectionList grouped by patient, sort/filter drawer, edit modal (due date, notes, recurrence), collapsible sections, shared chip styles (2026-03-27)
 - **Patient dashboard** — focus card, effort strip, coming up list, Skia sparkline score trends, pull-to-refresh (2026-03-26)
 - **Therapist dashboard** — triage buckets with client cards, stat pills, score deltas, assignment dots, progress bars (2026-03-25)
 - **Diary keyboard toolbar** — native-style prev/next chevron navigation for numeric fields, keyboard-aware positioning (2026-03-24)
@@ -56,9 +58,6 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 - **ActionMenu refactor** — replaced FabGroup with bottom sheet ActionMenu, added tint colour tokens (2026-03-21)
 - **Admin All Users** — search, filtering, sorting, and infinite scroll for user management (2026-03-20)
 - **Query refactor** — restored default refetchOnMount, dropped refetchType workaround (2026-03-19)
-- **UI bug fixes** — resolved stale data, layout gaps, row widths, chip styling, therapist note input (2026-03-19)
-- **UI/UX polish pass** — StatusChip rewrite, EmptyState component, Pressable buttons, web font alignment, colour tokens (2026-03-18)
-- **Activity Diary enhancements** — reflection prompts, editable user note, day chip fill indicators, collapsible weekly summary, slot mood tinting (2026-03-18)
 
 ## Tech Stack
 

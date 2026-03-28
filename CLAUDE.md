@@ -42,7 +42,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - `constants/` — Colors, shared constants
 - `stores/` — Zustand stores
 - `types/` — local TypeScript types
-- `utils/` — helper functions (date formatting, severity colours, role checks, debounce)
+- `utils/` — helper functions (date formatting, severity colours, role checks, debounce, shared chip styles)
 
 - Query defaults (1-hour staleTime, refetchOnWindowFocus/refetchOnReconnect disabled) are centralized in `QueryClient` in `app/_layout.tsx` — only override in hooks when a shorter staleTime is needed
 - Use `invalidateQueries` (not `refetchQueries`) in mutation `onSuccess` callbacks for consistency
@@ -59,7 +59,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - **Infinite scroll:** Use `useInfiniteQuery` with `initialPageParam: 1` and `getNextPageParam` from `page`/`totalPages`. Flatten pages via `data.pages.flatMap(p => p.items)`. See `useAllUsers` for reference.
 - **Infinite scroll + search:** Use `keepPreviousData` with `useInfiniteQuery` to prevent full-screen flashes on param changes. Use `isLoading` (not `isPending`) for initial full-screen loaders. Guard empty states with `!isFetching && items.length === 0`. See `useAllUsers` + `AllUsersList` for reference.
 - **Value debounce:** Use `useDebounce(value, delay)` from `hooks/useDebounce.ts` for search inputs. Distinct from callback-based `useDebouncedCallback` in `utils/debounce.ts`.
-- **Filter drawers:** Slide-in from right using `Animated.View` + `useWindowDimensions()`. See `AttemptFilterDrawer` (timeline) and `UserFilterDrawer` (admin users).
+- **Filter drawers:** Slide-in from right using `Animated.View` + `useWindowDimensions()`. See `AttemptFilterDrawer` (timeline), `UserFilterDrawer` (admin users), and `AssignmentFilterDrawer` (therapist assignments). Shared chip styles extracted to `utils/chipStyles.ts`.
 
 ## Git Workflow
 
