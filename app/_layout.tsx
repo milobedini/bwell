@@ -1,13 +1,16 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { MD3DarkTheme, PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Constants from 'expo-constants';
 import { Slot } from 'expo-router';
 import { Toaster } from 'sonner-native';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import FontsContainer from '@/components/FontsContainer';
 import { Colors } from '@/constants/Colors';
 import { getDeviceDatesLocaleKey, registerDatesTranslations } from '@/utils/locales';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { asyncStoragePersister, persistDehydrateOptions } from '@/utils/queryPersister';
+import { QueryClient } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 
 import 'react-native-reanimated';
 
@@ -17,6 +20,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 60, // 1 hour
+      gcTime: 1000 * 60 * 60 * 24, // 24 hours — must be >= persister maxAge
       refetchOnWindowFocus: false,
       refetchOnReconnect: false
     }
@@ -50,7 +54,15 @@ const deviceDatesLocaleKey = getDeviceDatesLocaleKey(available);
 
 export default function RootLayout() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{
+        persister: asyncStoragePersister,
+        maxAge: 1000 * 60 * 60 * 24,
+        buster: Constants.expoConfig?.version ?? '1',
+        dehydrateOptions: persistDehydrateOptions
+      }}
+    >
       <ErrorBoundary>
         <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.sway.dark }}>
           <SafeAreaProvider>
@@ -79,7 +91,7 @@ export default function RootLayout() {
           </SafeAreaProvider>
         </GestureHandlerRootView>
       </ErrorBoundary>
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }
 
