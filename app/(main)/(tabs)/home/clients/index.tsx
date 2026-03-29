@@ -135,7 +135,10 @@ const AllClients = () => {
         icon: 'account-off-outline',
         label: 'Remove as client',
         onPress: handleRemoveClient,
-        variant: 'destructive' as const
+        variant: 'destructive' as const,
+        confirmTitle: 'Remove client?',
+        confirmDescription: 'This will remove the therapist-client relationship. The patient record will remain.',
+        confirmLabel: 'Remove'
       }
     ],
     [handleCreateAssignment, handleEmailClient, handleRemoveClient]
