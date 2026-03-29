@@ -54,6 +54,7 @@ const ActionMenu = ({ visible, onDismiss, title, subtitle, actions }: ActionMenu
 
   const handleConfirm = useCallback(() => {
     if (pendingAction) {
+      setPendingAction(null);
       handleAction(pendingAction.onPress);
     }
   }, [pendingAction, handleAction]);
