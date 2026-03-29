@@ -115,7 +115,12 @@ const AllPatients = () => {
         icon: isClient ? 'star-off' : 'star',
         label: isClient ? 'Remove as client' : 'Add as client',
         onPress: handleAddRemoveClient,
-        variant: isClient ? ('destructive' as const) : ('default' as const)
+        variant: isClient ? ('destructive' as const) : ('default' as const),
+        ...(isClient && {
+          confirmTitle: 'Remove client?',
+          confirmDescription: 'This will remove the therapist-client relationship. The patient record will remain.',
+          confirmLabel: 'Remove'
+        })
       },
       {
         icon: 'email-outline',
