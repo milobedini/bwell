@@ -55,7 +55,6 @@ const ActionMenu = ({ visible, onDismiss, title, subtitle, actions }: ActionMenu
   const handleConfirm = useCallback(() => {
     if (pendingAction) {
       handleAction(pendingAction.onPress);
-      setPendingAction(null);
     }
   }, [pendingAction, handleAction]);
 
@@ -169,10 +168,9 @@ const ActionMenu = ({ visible, onDismiss, title, subtitle, actions }: ActionMenu
                   <>
                     <Pressable
                       onPress={handleConfirm}
-                      className="items-center rounded-xl py-4 active:opacity-70"
-                      style={{ backgroundColor: Colors.tint.error }}
+                      className="items-center rounded-xl bg-error py-4 active:opacity-70"
                     >
-                      <ThemedText type="button" style={{ color: Colors.primary.error }}>
+                      <ThemedText type="button" style={{ color: Colors.sway.lightGrey }}>
                         {pendingAction.confirmLabel ?? pendingAction.label}
                       </ThemedText>
                     </Pressable>
