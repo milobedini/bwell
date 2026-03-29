@@ -280,7 +280,10 @@ const AssignmentsListTherapist = ({
         icon: 'delete-outline' as const,
         label: 'Remove assignment',
         onPress: handleRemove,
-        variant: 'destructive' as const
+        variant: 'destructive' as const,
+        confirmTitle: 'Remove assignment?',
+        confirmDescription: 'This will permanently delete the assignment and any associated progress.',
+        confirmLabel: 'Remove'
       }
     ],
     [handleEdit, handleRemove]
