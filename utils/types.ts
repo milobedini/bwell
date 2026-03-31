@@ -9,3 +9,7 @@ export function isQuestionnaireAttempt(
 export function isDiaryAttempt(a: AttemptDetailResponseItem): a is AttemptDetailResponseItem & { diary: DiaryDetail } {
   return a.moduleType === 'activity_diary' && !!a.diary;
 }
+
+export const isReadingAttempt = (a: AttemptDetailResponseItem): boolean => {
+  return a.moduleType === 'reading';
+};

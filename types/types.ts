@@ -6,8 +6,7 @@ enum UserRole {
 
 enum ModuleType {
   QUESTIONNAIRE = 'questionnaire',
-  EXERCISE = 'exercise',
-  PSYCHO_EDUCATION = 'psychoeducation'
+  READING = 'reading'
 }
 
 enum AccessPolicy {
