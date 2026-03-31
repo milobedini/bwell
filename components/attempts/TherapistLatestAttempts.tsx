@@ -35,8 +35,7 @@ type AttemptSection = { title: string; data: TherapistLatestRow[] };
 const MODULE_TYPE_ICONS: Record<string, MCIName> = {
   questionnaire: 'clipboard-text-outline',
   activity_diary: 'calendar-week',
-  psychoeducation: 'book-open-outline',
-  exercise: 'pencil-outline'
+  reading: 'book-open-outline',
 };
 
 const getModuleIcon = (moduleType?: string): MCIName =>
