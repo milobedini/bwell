@@ -1,4 +1,4 @@
-import { type ComponentProps, memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -17,6 +17,7 @@ import { type AttemptFilterDrawerValues, DEFAULT_FILTERS, type SortOption } from
 import { useTherapistAttemptModules, useTherapistGetLatestAttempts } from '@/hooks/useAttempts';
 import { useClients } from '@/hooks/useUsers';
 import { dateString, groupByDate, timeAgo } from '@/utils/dates';
+import { getModuleIcon } from '@/utils/moduleIcons';
 import { getSeverityColors } from '@/utils/severity';
 import type { TherapistLatestRow } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
@@ -28,18 +29,7 @@ import { ThemedText } from '../ThemedText';
 import { AttemptFilterDrawer } from '../ui/AttemptFilterDrawer';
 import EmptyState from '../ui/EmptyState';
 
-type MCIName = ComponentProps<typeof MaterialCommunityIcons>['name'];
-
 type AttemptSection = { title: string; data: TherapistLatestRow[] };
-
-const MODULE_TYPE_ICONS: Record<string, MCIName> = {
-  questionnaire: 'clipboard-text-outline',
-  activity_diary: 'calendar-week',
-  reading: 'book-open-outline'
-};
-
-const getModuleIcon = (moduleType?: string): MCIName =>
-  (moduleType && MODULE_TYPE_ICONS[moduleType]) || 'file-document-outline';
 
 const ItemSeparator = () => <View className="h-3" />;
 

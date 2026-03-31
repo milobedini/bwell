@@ -10,6 +10,8 @@ export function isDiaryAttempt(a: AttemptDetailResponseItem): a is AttemptDetail
   return a.moduleType === 'activity_diary' && !!a.diary;
 }
 
-export const isReadingAttempt = (a: AttemptDetailResponseItem): boolean => {
+export function isReadingAttempt(
+  a: AttemptDetailResponseItem
+): a is AttemptDetailResponseItem & { moduleType: 'reading' } {
   return a.moduleType === 'reading';
-};
+}

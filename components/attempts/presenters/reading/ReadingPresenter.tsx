@@ -1,15 +1,7 @@
-import { useCallback, useRef, useState } from 'react';
-import {
-  Linking,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  View
-} from 'react-native';
+import { useState } from 'react';
+import { Linking, StyleSheet, TextInput, View } from 'react-native';
 import Markdown from 'react-native-markdown-display';
-import { useSharedValue } from 'react-native-reanimated';
+import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
@@ -18,6 +10,11 @@ import { useSubmitAttempt } from '@/hooks/useAttempts';
 import { AttemptDetailResponseItem } from '@milobedini/shared-types';
 
 import ReadingProgressBar from './ReadingProgressBar';
+
+const handleLinkPress = (url: string) => {
+  Linking.openURL(url);
+  return false;
+};
 
 type ReadingPresenterProps = {
   attempt: AttemptDetailResponseItem;
@@ -92,21 +89,18 @@ const markdownStyles = StyleSheet.create({
 
 const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps) => {
   const router = useRouter();
-  const scrollRef = useRef<ScrollView>(null);
   const progress = useSharedValue(0);
   const [readerNote, setReaderNote] = useState(attempt.readerNote ?? '');
   const submitMutation = useSubmitAttempt(attempt._id);
 
   const content = attempt.moduleSnapshot?.content ?? '';
 
-  const handleScroll = useCallback(
-    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
-      const scrollableHeight = contentSize.height - layoutMeasurement.height;
-      progress.value = scrollableHeight > 0 ? contentOffset.y / scrollableHeight : 1;
-    },
-    [progress]
-  );
+  const handleScroll = useAnimatedScrollHandler({
+    onScroll: (e) => {
+      const scrollableHeight = e.contentSize.height - e.layoutMeasurement.height;
+      progress.value = scrollableHeight > 0 ? e.contentOffset.y / scrollableHeight : 1;
+    }
+  });
 
   const handleSubmit = () => {
     submitMutation.mutate({ readerNote: readerNote.trim() || undefined }, { onSuccess: () => router.back() });
@@ -116,8 +110,7 @@ const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps)
 
   return (
     <View className="flex-1 bg-sway-dark">
-      <ScrollView
-        ref={scrollRef}
+      <Animated.ScrollView
         className="flex-1 px-4"
         onScroll={handleScroll}
         scrollEventThrottle={16}
@@ -142,13 +135,7 @@ const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps)
         )}
 
         {content ? (
-          <Markdown
-            style={markdownStyles}
-            onLinkPress={(url) => {
-              Linking.openURL(url);
-              return false;
-            }}
-          >
+          <Markdown style={markdownStyles} onLinkPress={handleLinkPress}>
             {content}
           </Markdown>
         ) : (
@@ -199,7 +186,7 @@ const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps)
             />
           </View>
         )}
-      </ScrollView>
+      </Animated.ScrollView>
     </View>
   );
 };
