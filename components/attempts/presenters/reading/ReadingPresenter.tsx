@@ -1,9 +1,16 @@
 import { useCallback, useRef, useState } from 'react';
-import { Linking, NativeScrollEvent, NativeSyntheticEvent, ScrollView, TextInput, View } from 'react-native';
-import { EnrichedMarkdownText } from 'react-native-enriched-markdown';
+import {
+  Linking,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  View
+} from 'react-native';
+import Markdown from 'react-native-markdown-display';
 import { useSharedValue } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
-import Container from '@/components/Container';
 import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
@@ -18,22 +25,21 @@ type ReadingPresenterProps = {
   patientName?: string;
 };
 
-const markdownStyle = {
-  paragraph: {
+const markdownStyles = StyleSheet.create({
+  body: {
+    color: Colors.sway.lightGrey,
     fontSize: 18,
     fontFamily: 'Lato-Regular',
-    color: Colors.sway.lightGrey,
-    lineHeight: 28,
-    marginBottom: 12
+    lineHeight: 28
   },
-  h2: {
+  heading2: {
     fontSize: 24,
     fontFamily: 'Lato-Black',
     color: Colors.sway.lightGrey,
     marginTop: 24,
     marginBottom: 8
   },
-  h3: {
+  heading3: {
     fontSize: 20,
     fontFamily: 'Lato-Black',
     color: Colors.sway.lightGrey,
@@ -50,17 +56,15 @@ const markdownStyle = {
     color: Colors.sway.bright
   },
   blockquote: {
-    fontSize: 18,
-    fontFamily: 'Lato-Regular',
-    color: Colors.sway.lightGrey,
-    borderColor: Colors.sway.bright,
-    borderWidth: 3,
-    gapWidth: 12,
     backgroundColor: Colors.chip.darkCard,
-    marginBottom: 12
+    borderLeftColor: Colors.sway.bright,
+    borderLeftWidth: 3,
+    paddingLeft: 12,
+    paddingVertical: 8,
+    marginVertical: 8
   },
-  thematicBreak: {
-    color: Colors.chip.darkCardAlt,
+  hr: {
+    backgroundColor: Colors.chip.darkCardAlt,
     height: 1,
     marginTop: 16,
     marginBottom: 16
@@ -68,13 +72,23 @@ const markdownStyle = {
   image: {
     borderRadius: 8
   },
-  list: {
-    fontSize: 18,
-    fontFamily: 'Lato-Regular',
+  bullet_list_icon: {
     color: Colors.sway.lightGrey,
+    fontSize: 8,
+    marginTop: 10
+  },
+  ordered_list_icon: {
+    color: Colors.sway.lightGrey,
+    fontSize: 18,
+    fontFamily: 'Lato-Regular'
+  },
+  list_item: {
+    marginBottom: 4
+  },
+  paragraph: {
     marginBottom: 12
   }
-};
+});
 
 const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps) => {
   const router = useRouter();
@@ -101,26 +115,15 @@ const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps)
   const isEdit = mode === 'edit';
 
   return (
-    <Container>
-      {isEdit && <ReadingProgressBar progress={progress} />}
-
+    <View className="flex-1 bg-sway-dark">
       <ScrollView
         ref={scrollRef}
         className="flex-1 px-4"
         onScroll={handleScroll}
         scrollEventThrottle={16}
         contentContainerStyle={{ paddingBottom: 40 }}
+        stickyHeaderIndices={isEdit ? [1] : undefined}
       >
-        {patientName && (
-          <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginBottom: 4 }}>
-            {patientName}
-          </ThemedText>
-        )}
-
-        <ThemedText type="title" style={{ marginBottom: 16 }}>
-          {attempt.moduleSnapshot?.title ?? attempt.module?.title ?? 'Reading'}
-        </ThemedText>
-
         {attempt.moduleSnapshot?.disclaimer && (
           <View
             className="mb-4 rounded-lg p-3"
@@ -132,12 +135,22 @@ const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps)
           </View>
         )}
 
+        {isEdit && (
+          <View className="bg-sway-dark pb-3 pt-1">
+            <ReadingProgressBar progress={progress} />
+          </View>
+        )}
+
         {content ? (
-          <EnrichedMarkdownText
-            markdown={content}
-            markdownStyle={markdownStyle}
-            onLinkPress={({ url }) => Linking.openURL(url)}
-          />
+          <Markdown
+            style={markdownStyles}
+            onLinkPress={(url) => {
+              Linking.openURL(url);
+              return false;
+            }}
+          >
+            {content}
+          </Markdown>
         ) : (
           <ThemedText style={{ color: Colors.sway.darkGrey }}>No content available.</ThemedText>
         )}
@@ -187,7 +200,7 @@ const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps)
           </View>
         )}
       </ScrollView>
-    </Container>
+    </View>
   );
 };
 

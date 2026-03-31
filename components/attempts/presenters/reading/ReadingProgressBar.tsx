@@ -8,15 +8,12 @@ type ReadingProgressBarProps = {
 
 const ReadingProgressBar = ({ progress }: ReadingProgressBarProps) => {
   const animatedStyle = useAnimatedStyle(() => ({
-    width: `${Math.min(progress.value * 100, 100)}%`
+    width: `${Math.min(progress.value, 1) * 100}%`
   }));
 
   return (
-    <View className="h-[3px] w-full" style={{ backgroundColor: Colors.chip.darkCard }}>
-      <Animated.View
-        className="h-full rounded-r-full"
-        style={[{ backgroundColor: Colors.sway.bright }, animatedStyle]}
-      />
+    <View className="h-1 overflow-hidden rounded-full" style={{ backgroundColor: Colors.chip.darkCard }}>
+      <Animated.View className="h-1 rounded-full" style={[{ backgroundColor: Colors.sway.bright }, animatedStyle]} />
     </View>
   );
 };
