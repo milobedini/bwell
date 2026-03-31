@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import Animated, { useAnimatedStyle, SharedValue } from 'react-native-reanimated';
+import Animated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 import { Colors } from '@/constants/Colors';
 
 type ReadingProgressBarProps = {
@@ -8,7 +8,7 @@ type ReadingProgressBarProps = {
 
 const ReadingProgressBar = ({ progress }: ReadingProgressBarProps) => {
   const animatedStyle = useAnimatedStyle(() => ({
-    width: `${Math.min(progress.value * 100, 100)}%`,
+    width: `${Math.min(progress.value * 100, 100)}%`
   }));
 
   return (

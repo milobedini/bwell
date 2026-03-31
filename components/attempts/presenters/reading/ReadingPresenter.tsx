@@ -1,15 +1,15 @@
 import { useCallback, useRef, useState } from 'react';
 import { Linking, NativeScrollEvent, NativeSyntheticEvent, ScrollView, TextInput, View } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useSharedValue } from 'react-native-reanimated';
 import { EnrichedMarkdownText } from 'react-native-enriched-markdown';
+import { useSharedValue } from 'react-native-reanimated';
+import { useRouter } from 'expo-router';
+import Container from '@/components/Container';
+import ThemedButton from '@/components/ThemedButton';
+import { ThemedText } from '@/components/ThemedText';
+import { Colors } from '@/constants/Colors';
+import { useSubmitAttempt } from '@/hooks/useAttempts';
 import { AttemptDetailResponseItem } from '@milobedini/shared-types';
 
-import Container from '@/components/Container';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedButton } from '@/components/ThemedButton';
-import { useSubmitAttempt } from '@/hooks/useAttempts';
-import { Colors } from '@/constants/Colors';
 import ReadingProgressBar from './ReadingProgressBar';
 
 type ReadingPresenterProps = {
@@ -24,30 +24,30 @@ const markdownStyle = {
     fontFamily: 'Lato-Regular',
     color: Colors.sway.lightGrey,
     lineHeight: 28,
-    marginBottom: 12,
+    marginBottom: 12
   },
   h2: {
     fontSize: 24,
     fontFamily: 'Lato-Black',
     color: Colors.sway.lightGrey,
     marginTop: 24,
-    marginBottom: 8,
+    marginBottom: 8
   },
   h3: {
     fontSize: 20,
     fontFamily: 'Lato-Black',
     color: Colors.sway.lightGrey,
     marginTop: 20,
-    marginBottom: 6,
+    marginBottom: 6
   },
   strong: {
-    fontFamily: 'Lato-Bold',
+    fontFamily: 'Lato-Bold'
   },
   em: {
-    fontFamily: 'Lato-Italic',
+    fontFamily: 'Lato-Italic'
   },
   link: {
-    color: Colors.sway.bright,
+    color: Colors.sway.bright
   },
   blockquote: {
     fontSize: 18,
@@ -57,23 +57,23 @@ const markdownStyle = {
     borderWidth: 3,
     gapWidth: 12,
     backgroundColor: Colors.chip.darkCard,
-    marginBottom: 12,
+    marginBottom: 12
   },
   thematicBreak: {
     color: Colors.chip.darkCardAlt,
     height: 1,
     marginTop: 16,
-    marginBottom: 16,
+    marginBottom: 16
   },
   image: {
-    borderRadius: 8,
+    borderRadius: 8
   },
   list: {
     fontSize: 18,
     fontFamily: 'Lato-Regular',
     color: Colors.sway.lightGrey,
-    marginBottom: 12,
-  },
+    marginBottom: 12
+  }
 };
 
 const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps) => {
@@ -91,14 +91,11 @@ const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps)
       const scrollableHeight = contentSize.height - layoutMeasurement.height;
       progress.value = scrollableHeight > 0 ? contentOffset.y / scrollableHeight : 1;
     },
-    [progress],
+    [progress]
   );
 
   const handleSubmit = () => {
-    submitMutation.mutate(
-      { readerNote: readerNote.trim() || undefined },
-      { onSuccess: () => router.back() },
-    );
+    submitMutation.mutate({ readerNote: readerNote.trim() || undefined }, { onSuccess: () => router.back() });
   };
 
   const isEdit = mode === 'edit';
@@ -126,7 +123,7 @@ const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps)
 
         {attempt.moduleSnapshot?.disclaimer && (
           <View
-            className="rounded-lg p-3 mb-4"
+            className="mb-4 rounded-lg p-3"
             style={{ backgroundColor: Colors.tint.info, borderColor: Colors.primary.info, borderWidth: 1 }}
           >
             <ThemedText type="small" style={{ color: Colors.primary.info }}>
@@ -158,7 +155,7 @@ const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps)
                 fontFamily: 'Lato-Regular',
                 fontSize: 16,
                 minHeight: 100,
-                textAlignVertical: 'top',
+                textAlignVertical: 'top'
               }}
               value={readerNote}
               onChangeText={setReaderNote}
@@ -183,9 +180,8 @@ const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps)
         {isEdit && (
           <View className="mt-6">
             <ThemedButton
-              title="Mark as Complete"
+              title={submitMutation.isPending ? 'Submitting...' : 'Mark as Complete'}
               onPress={handleSubmit}
-              loading={submitMutation.isPending}
               disabled={submitMutation.isPending}
             />
           </View>
