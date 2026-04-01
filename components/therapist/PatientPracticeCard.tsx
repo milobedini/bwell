@@ -49,10 +49,10 @@ const PatientPracticeCardBase = ({ item, sparkline, patientId }: PatientPractice
   const isInProgress = item.status === 'in_progress';
   const icon = getModuleIcon(item.moduleType);
 
-  const hasAttempt = !!item.latestAttempt?.attemptId;
+  const canNavigate = item.status !== 'not_started' && !!item.latestAttempt?.attemptId;
 
   const handlePress = () => {
-    if (!hasAttempt) return; // Nothing to view for not-started items
+    if (!canNavigate) return;
     router.push({
       pathname: '/(main)/(tabs)/review/[id]',
       params: { id: item.latestAttempt!.attemptId, patientId }
@@ -81,7 +81,7 @@ const PatientPracticeCardBase = ({ item, sparkline, patientId }: PatientPractice
   return (
     <Pressable
       onPress={handlePress}
-      disabled={!hasAttempt}
+      disabled={!canNavigate}
       className="active:opacity-80"
       style={{ backgroundColor: Colors.chip.darkCard, borderRadius: 12, padding: 12 }}
     >
@@ -148,7 +148,7 @@ const PatientPracticeCardBase = ({ item, sparkline, patientId }: PatientPractice
           ) : null}
           {sparkline && sparkline.length > 1 ? (
             <Sparkline values={sparkline} />
-          ) : hasAttempt ? (
+          ) : canNavigate ? (
             <MaterialCommunityIcons name="chevron-right" size={18} color={Colors.sway.darkGrey} />
           ) : null}
         </View>
