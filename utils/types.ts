@@ -10,8 +10,9 @@ export function isDiaryAttempt(a: AttemptDetailResponseItem): a is AttemptDetail
   return a.moduleType === 'activity_diary' && !!a.diary;
 }
 
-export function isReadingAttempt(
-  a: AttemptDetailResponseItem
-): a is AttemptDetailResponseItem & { moduleType: 'reading' } {
-  return a.moduleType === 'reading';
+export function isReadingAttempt(a: AttemptDetailResponseItem): a is AttemptDetailResponseItem & {
+  moduleType: 'reading';
+  moduleSnapshot: NonNullable<AttemptDetailResponseItem['moduleSnapshot']>;
+} {
+  return a.moduleType === 'reading' && !!a.moduleSnapshot;
 }

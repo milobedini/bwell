@@ -3,16 +3,18 @@ import { Linking, StyleSheet, TextInput, View } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
+import ContentContainer from '@/components/ContentContainer';
 import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
+import { renderErrorToast } from '@/components/toast/toastOptions';
 import { Colors } from '@/constants/Colors';
 import { useSubmitAttempt } from '@/hooks/useAttempts';
-import { AttemptDetailResponseItem } from '@milobedini/shared-types';
+import type { AttemptDetailResponseItem } from '@milobedini/shared-types';
 
 import ReadingProgressBar from './ReadingProgressBar';
 
 const handleLinkPress = (url: string) => {
-  Linking.openURL(url);
+  Linking.openURL(url).catch(renderErrorToast);
   return false;
 };
 
@@ -94,6 +96,7 @@ const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps)
   const submitMutation = useSubmitAttempt(attempt._id);
 
   const content = attempt.moduleSnapshot?.content ?? '';
+  const hasDisclaimer = !!attempt.moduleSnapshot?.disclaimer;
 
   const handleScroll = useAnimatedScrollHandler({
     onScroll: (e) => {
@@ -109,13 +112,13 @@ const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps)
   const isEdit = mode === 'edit';
 
   return (
-    <View className="flex-1 bg-sway-dark">
+    <ContentContainer padded={false}>
       <Animated.ScrollView
         className="flex-1 px-4"
         onScroll={handleScroll}
         scrollEventThrottle={16}
         contentContainerStyle={{ paddingBottom: 40 }}
-        stickyHeaderIndices={isEdit ? [1] : undefined}
+        stickyHeaderIndices={isEdit ? [hasDisclaimer ? 1 : 0] : undefined}
       >
         {attempt.moduleSnapshot?.disclaimer && (
           <View
@@ -187,7 +190,7 @@ const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps)
           </View>
         )}
       </Animated.ScrollView>
-    </View>
+    </ContentContainer>
   );
 };
 

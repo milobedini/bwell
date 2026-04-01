@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import Container from '@/components/Container';
 import EmptyState from '@/components/ui/EmptyState';
 import { isDiaryAttempt, isQuestionnaireAttempt, isReadingAttempt } from '@/utils/types';
-import { AttemptDetailResponseItem } from '@milobedini/shared-types';
+import type { AttemptDetailResponseItem } from '@milobedini/shared-types';
 
 import ActivityDiaryPresenter from './diary/ActivityDiaryPresenter';
 import QuestionnairePresenter from './questionnaires/QuestionnairePresenter';

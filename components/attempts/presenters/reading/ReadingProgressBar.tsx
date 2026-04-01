@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import Animated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
+import Animated, { type SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 import { Colors } from '@/constants/Colors';
 
 type ReadingProgressBarProps = {
