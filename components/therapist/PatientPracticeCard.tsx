@@ -8,7 +8,7 @@ import type { PracticeItem } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
 import { ThemedText } from '../ThemedText';
-import Sparkline from '../ui/Sparkline';
+import BarSparkline from '../ui/BarSparkline';
 
 type PatientPracticeCardProps = {
   item: PracticeItem;
@@ -124,7 +124,7 @@ const PatientPracticeCardBase = ({ item, sparkline, patientName }: PatientPracti
             </View>
           ) : null}
           {sparkline && sparkline.length > 1 ? (
-            <Sparkline values={sparkline} barCount={SPARKLINE_BAR_COUNT} maxHeight={SPARKLINE_MAX_HEIGHT} />
+            <BarSparkline values={sparkline} barCount={SPARKLINE_BAR_COUNT} maxHeight={SPARKLINE_MAX_HEIGHT} />
           ) : canNavigate ? (
             <MaterialCommunityIcons name="chevron-right" size={18} color={Colors.sway.darkGrey} />
           ) : null}

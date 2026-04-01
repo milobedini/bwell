@@ -2,14 +2,14 @@ import { memo } from 'react';
 import { View } from 'react-native';
 import { Colors } from '@/constants/Colors';
 
-type SparklineProps = {
+type BarSparklineProps = {
   values: number[];
   maxValue?: number;
   barCount?: number;
   maxHeight?: number;
 };
 
-const SparklineBase = ({ values, maxValue, barCount, maxHeight = 24 }: SparklineProps) => {
+const BarSparklineBase = ({ values, maxValue, barCount, maxHeight = 24 }: BarSparklineProps) => {
   const bars = barCount ? values.slice(-barCount) : values;
   const resolvedMax = Math.max(...bars, maxValue ?? 1, 1);
 
@@ -34,6 +34,6 @@ const SparklineBase = ({ values, maxValue, barCount, maxHeight = 24 }: Sparkline
   );
 };
 
-const Sparkline = memo(SparklineBase);
+const BarSparkline = memo(BarSparklineBase);
 
-export default Sparkline;
+export default BarSparkline;

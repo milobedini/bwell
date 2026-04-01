@@ -9,10 +9,8 @@ import ContentContainer from '../ContentContainer';
 import { LoadingIndicator } from '../LoadingScreen';
 import PracticeItem from '../practice/PracticeItem';
 import { ThemedText } from '../ThemedText';
+import BarSparkline from '../ui/BarSparkline';
 import EmptyState from '../ui/EmptyState';
-import Sparkline from '../ui/Sparkline';
-
-const MAX_PHQ9_SCORE = 27;
 
 type ScoreTrendCardProps = {
   trend: ScoreTrendItem;
@@ -40,7 +38,7 @@ const ScoreTrendCard = ({ trend }: ScoreTrendCardProps) => {
             ) : null}
           </View>
         </View>
-        {trend.sparkline.length > 0 ? <Sparkline values={trend.sparkline} maxValue={MAX_PHQ9_SCORE} /> : null}
+        {trend.sparkline.length > 0 ? <BarSparkline values={trend.sparkline} /> : null}
       </View>
     </View>
   );
@@ -60,7 +58,10 @@ const JourneyScreen = () => {
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const renderItem = useCallback(({ item }: { item: PracticeItemType }) => <PracticeItem item={item} />, []);
+  const renderItem = useCallback(
+    ({ item }: { item: PracticeItemType }) => <PracticeItem item={item} basePath="/(main)/(tabs)/journey/[id]" />,
+    []
+  );
 
   const keyExtractor = useCallback((item: PracticeItemType) => item.assignmentId, []);
 

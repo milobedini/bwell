@@ -11,9 +11,10 @@ import { ThemedText } from '../ThemedText';
 
 type PracticeItemProps = {
   item: PracticeItemType;
+  basePath?: '/(main)/(tabs)/practice/[id]' | '/(main)/(tabs)/journey/[id]';
 };
 
-const PracticeItemBase = ({ item }: PracticeItemProps) => {
+const PracticeItemBase = ({ item, basePath = '/(main)/(tabs)/practice/[id]' }: PracticeItemProps) => {
   const router = useRouter();
   const isCompleted = item.status === 'completed';
   const isInProgress = item.status === 'in_progress';
@@ -21,8 +22,12 @@ const PracticeItemBase = ({ item }: PracticeItemProps) => {
 
   const handlePress = () => {
     router.push({
-      pathname: '/(main)/(tabs)/practice/[id]',
-      params: { id: item.assignmentId, headerTitle: item.moduleTitle }
+      pathname: basePath,
+      params: {
+        id: item.assignmentId,
+        headerTitle: item.moduleTitle,
+        ...(item.latestAttempt?.attemptId ? { attemptId: item.latestAttempt.attemptId } : {})
+      }
     });
   };
 

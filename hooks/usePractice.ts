@@ -10,19 +10,25 @@ import type {
 } from '@milobedini/shared-types';
 import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
+import { useIsLoggedIn } from './useUsers';
+
 // Patient: unified practice view
-export const useMyPractice = () =>
-  useQuery({
+export const useMyPractice = () => {
+  const isLoggedIn = useIsLoggedIn();
+  return useQuery({
     queryKey: ['practice'],
     queryFn: async () => {
       const { data } = await api.get<PracticeResponse>('/user/practice');
       return data;
-    }
+    },
+    enabled: isLoggedIn
   });
+};
 
 // Patient: completed history (cursor-paginated)
-export const useMyPracticeHistory = (filters: Omit<PracticeHistoryQuery, 'cursor'> = {}) =>
-  useInfiniteQuery({
+export const useMyPracticeHistory = (filters: Omit<PracticeHistoryQuery, 'cursor'> = {}) => {
+  const isLoggedIn = useIsLoggedIn();
+  return useInfiniteQuery({
     queryKey: ['practice', 'history', filters],
     queryFn: async ({ pageParam }) => {
       const params: Record<string, string> = {};
@@ -36,12 +42,14 @@ export const useMyPracticeHistory = (filters: Omit<PracticeHistoryQuery, 'cursor
     },
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    enabled: isLoggedIn,
     select: (data) => ({
       pages: data.pages,
       items: data.pages.flatMap((p) => p.items),
       nextCursor: data.pages[data.pages.length - 1]?.nextCursor
     })
   });
+};
 
 // Therapist: patient practice view
 export const usePatientPractice = (patientId: string | undefined) =>
@@ -55,18 +63,22 @@ export const usePatientPractice = (patientId: string | undefined) =>
   });
 
 // Therapist: available module types for filter drawers
-export const useTherapistReviewModules = () =>
-  useQuery({
+export const useTherapistReviewModules = () => {
+  const isLoggedIn = useIsLoggedIn();
+  return useQuery({
     queryKey: ['review', 'modules'],
     queryFn: async () => {
       const { data } = await api.get<TherapistAttemptModulesResponse>('/user/therapist/attempts/modules');
       return data.modules;
-    }
+    },
+    enabled: isLoggedIn
   });
+};
 
 // Therapist: review feed
-export const useTherapistReview = (filters: Omit<ReviewFilters, 'cursor'> = {}) =>
-  useInfiniteQuery({
+export const useTherapistReview = (filters: Omit<ReviewFilters, 'cursor'> = {}) => {
+  const isLoggedIn = useIsLoggedIn();
+  return useInfiniteQuery({
     queryKey: ['review', filters],
     queryFn: async ({ pageParam }) => {
       const params: Record<string, string> = {};
@@ -94,5 +106,7 @@ export const useTherapistReview = (filters: Omit<ReviewFilters, 'cursor'> = {}) 
         nextCursor: lastPage?.submissions.nextCursor,
         total: lastPage?.submissions.total ?? 0
       };
-    }
+    },
+    enabled: isLoggedIn
   });
+};

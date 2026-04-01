@@ -10,7 +10,7 @@ import {
   View
 } from 'react-native';
 import { Button, Chip, Divider, IconButton, Portal, Surface } from 'react-native-paper';
-import Constants from 'expo-constants';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/Colors';
 import { filterChipStyle, filterChipTextStyle } from '@/utils/chipStyles';
 import type { SeverityOption } from '@milobedini/shared-types';
@@ -49,6 +49,7 @@ const ReviewFilterDrawer = ({
   moduleChoices
 }: ReviewFilterDrawerProps) => {
   const { width: screenWidth } = useWindowDimensions();
+  const { top: safeTop } = useSafeAreaInsets();
   const drawerWidth = Math.min(420, Math.floor(screenWidth * 0.9));
   const [local, setLocal] = useState<ReviewFilterValues>(values);
   const [patientPickerOpen, setPatientPickerOpen] = useState(false);
@@ -101,7 +102,7 @@ const ReviewFilterDrawer = ({
           style={[styles.drawerContainer, { width: drawerWidth, transform: [{ translateX }] }]}
           pointerEvents={visible ? 'auto' : 'none'}
         >
-          <Surface elevation={3} style={styles.surface}>
+          <Surface elevation={3} style={[styles.surface, { paddingTop: safeTop }]}>
             <View style={styles.header}>
               <ThemedText type="subtitle">Filters</ThemedText>
               <IconButton icon="close" onPress={onDismiss} />
@@ -217,7 +218,12 @@ const ReviewFilterDrawer = ({
               <Button onPress={onDismiss} mode="text" textColor={Colors.sway.darkGrey}>
                 Cancel
               </Button>
-              <Button onPress={handleApply} mode="contained" buttonColor={Colors.sway.bright} textColor="black">
+              <Button
+                onPress={handleApply}
+                mode="contained"
+                buttonColor={Colors.sway.bright}
+                textColor={Colors.primary.black}
+              >
                 Apply
               </Button>
             </View>
@@ -254,8 +260,7 @@ const styles = StyleSheet.create({
   surface: {
     flex: 1,
     padding: 16,
-    backgroundColor: Colors.sway.dark,
-    paddingTop: Constants.statusBarHeight
+    backgroundColor: Colors.sway.dark
   },
   header: {
     flexDirection: 'row',

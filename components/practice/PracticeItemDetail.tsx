@@ -11,9 +11,10 @@ import { ThemedText } from '../ThemedText';
 
 type PracticeItemDetailProps = {
   assignmentId: string;
+  attemptIdParam?: string;
 };
 
-const PracticeItemDetail = ({ assignmentId }: PracticeItemDetailProps) => {
+const PracticeItemDetail = ({ assignmentId, attemptIdParam }: PracticeItemDetailProps) => {
   const { data: practiceData, isPending: isPracticePending } = useMyPractice();
   const { mutate: startAttempt, isPending: isStarting } = useStartModuleAttempt();
 
@@ -39,20 +40,24 @@ const PracticeItemDetail = ({ assignmentId }: PracticeItemDetailProps) => {
     );
   }, [item, existingAttemptId, startedAttemptId, isStarting, startAttempt]);
 
-  const resolvedAttemptId = existingAttemptId ?? startedAttemptId;
+  // Use param directly (e.g. from Journey tab) or resolve from practice data
+  const resolvedAttemptId = attemptIdParam ?? existingAttemptId ?? startedAttemptId ?? '';
 
-  const { data: attemptData, isPending: isAttemptPending } = useGetMyAttemptDetail(resolvedAttemptId ?? '');
+  const { data: attemptData, isPending: isAttemptPending } = useGetMyAttemptDetail(resolvedAttemptId);
 
   const mode = useMemo<'view' | 'edit'>(() => {
     if (attemptData?.attempt?.status === AttemptStatus.STARTED) return 'edit';
     return 'view';
   }, [attemptData?.attempt?.status]);
 
-  if (isPracticePending || (item && !resolvedAttemptId) || (resolvedAttemptId && isAttemptPending)) {
+  // When attemptIdParam is provided, skip waiting for practice data lookup
+  const isLookingUpItem = !attemptIdParam && (isPracticePending || (item && !resolvedAttemptId));
+
+  if (isLookingUpItem || (resolvedAttemptId && isAttemptPending)) {
     return <LoadingIndicator marginBottom={0} />;
   }
 
-  if (!item) {
+  if (!attemptIdParam && !item) {
     return (
       <ContentContainer centered>
         <ThemedText type="default">Practice item not found.</ThemedText>
