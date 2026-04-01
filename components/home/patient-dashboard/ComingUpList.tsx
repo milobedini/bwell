@@ -19,13 +19,13 @@ const AssignmentRow = memo(({ assignment }: { assignment: MyAssignmentView }) =>
     // If there's an in-progress draft, navigate to that attempt
     if (assignment.latestAttempt && !assignment.latestAttempt.completedAt) {
       router.push({
-        pathname: '/(main)/(tabs)/attempts/[id]',
+        pathname: '/(main)/(tabs)/journey/[id]',
         params: { id: assignment.latestAttempt._id, assignmentId: assignment._id }
       });
       return;
     }
-    // Otherwise go to assignments tab
-    router.push('/(main)/(tabs)/assignments');
+    // Otherwise go to practice tab
+    router.push('/(main)/(tabs)/practice');
   }, [assignment, router]);
 
   const label = assignment.dueAt ? dueLabel(assignment.dueAt) : 'No due date';
@@ -57,7 +57,7 @@ const ComingUpList = memo(({ assignments, hasMore, remainingCount }: ComingUpLis
   const router = useRouter();
 
   const goToAssignments = useCallback(() => {
-    router.push('/(main)/(tabs)/assignments');
+    router.push('/(main)/(tabs)/practice');
   }, [router]);
 
   if (assignments.length === 0) return null;
