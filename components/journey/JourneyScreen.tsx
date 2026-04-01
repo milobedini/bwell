@@ -10,35 +10,9 @@ import { LoadingIndicator } from '../LoadingScreen';
 import PracticeItem from '../practice/PracticeItem';
 import { ThemedText } from '../ThemedText';
 import EmptyState from '../ui/EmptyState';
+import Sparkline from '../ui/Sparkline';
 
 const MAX_PHQ9_SCORE = 27;
-
-type SparklineProps = {
-  values: number[];
-};
-
-const Sparkline = ({ values }: SparklineProps) => {
-  const maxValue = Math.max(...values, 1);
-
-  return (
-    <View className="flex-row items-end gap-1" style={{ height: 24 }}>
-      {values.map((value, index) => {
-        const isLast = index === values.length - 1;
-        const heightPercent = Math.max(value / Math.max(maxValue, MAX_PHQ9_SCORE), 0.05);
-        return (
-          <View
-            key={index}
-            className="w-1.5 rounded-full"
-            style={{
-              height: `${Math.round(heightPercent * 100)}%`,
-              backgroundColor: isLast ? Colors.sway.bright : Colors.sway.darkGrey
-            }}
-          />
-        );
-      })}
-    </View>
-  );
-};
 
 type ScoreTrendCardProps = {
   trend: ScoreTrendItem;
@@ -66,14 +40,14 @@ const ScoreTrendCard = ({ trend }: ScoreTrendCardProps) => {
             ) : null}
           </View>
         </View>
-        {trend.sparkline.length > 0 ? <Sparkline values={trend.sparkline} /> : null}
+        {trend.sparkline.length > 0 ? <Sparkline values={trend.sparkline} maxValue={MAX_PHQ9_SCORE} /> : null}
       </View>
     </View>
   );
 };
 
 const JourneyScreen = () => {
-  const { data: trendsData, isFetching: isFetchingTrends } = useScoreTrends();
+  const { data: trendsData } = useScoreTrends();
   const { data, isLoading, isFetching, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
     useMyPracticeHistory();
 
@@ -116,7 +90,7 @@ const JourneyScreen = () => {
               <ScoreTrendCard key={trend.moduleId} trend={trend} />
             ))}
           </View>
-        ) : !isFetchingTrends ? null : null}
+        ) : null}
 
         <ThemedText
           type="smallBold"
@@ -131,7 +105,7 @@ const JourneyScreen = () => {
         </ThemedText>
       </View>
     ),
-    [trends, isFetchingTrends]
+    [trends]
   );
 
   if (isLoading) return <LoadingIndicator marginBottom={0} />;

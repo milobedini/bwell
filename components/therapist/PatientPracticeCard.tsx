@@ -8,6 +8,7 @@ import type { PracticeItem } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
 import { ThemedText } from '../ThemedText';
+import Sparkline from '../ui/Sparkline';
 
 type PatientPracticeCardProps = {
   item: PracticeItem;
@@ -18,31 +19,6 @@ type PatientPracticeCardProps = {
 
 const SPARKLINE_BAR_COUNT = 5;
 const SPARKLINE_MAX_HEIGHT = 20;
-
-const Sparkline = ({ values }: { values: number[] }) => {
-  const maxValue = Math.max(...values, 1);
-  const bars = values.slice(-SPARKLINE_BAR_COUNT);
-
-  return (
-    <View className="flex-row items-end gap-0.5" style={{ height: SPARKLINE_MAX_HEIGHT }}>
-      {bars.map((value, index) => {
-        const isLast = index === bars.length - 1;
-        const height = Math.max(3, Math.round((value / maxValue) * SPARKLINE_MAX_HEIGHT));
-        return (
-          <View
-            key={index}
-            style={{
-              width: 4,
-              height,
-              borderRadius: 2,
-              backgroundColor: isLast ? Colors.sway.bright : Colors.sway.darkGrey
-            }}
-          />
-        );
-      })}
-    </View>
-  );
-};
 
 const PatientPracticeCardBase = ({ item, sparkline, patientName }: PatientPracticeCardProps) => {
   const router = useRouter();
@@ -148,7 +124,7 @@ const PatientPracticeCardBase = ({ item, sparkline, patientName }: PatientPracti
             </View>
           ) : null}
           {sparkline && sparkline.length > 1 ? (
-            <Sparkline values={sparkline} />
+            <Sparkline values={sparkline} barCount={SPARKLINE_BAR_COUNT} maxHeight={SPARKLINE_MAX_HEIGHT} />
           ) : canNavigate ? (
             <MaterialCommunityIcons name="chevron-right" size={18} color={Colors.sway.darkGrey} />
           ) : null}

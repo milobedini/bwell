@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { FlatList, TextInput, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import ContentContainer from '@/components/ContentContainer';
@@ -24,11 +24,11 @@ const ClientRow = ({
   onMenuPress
 }: {
   client: AuthUser;
-  onPress: () => void;
+  onPress: (client: AuthUser) => void;
   onMenuPress: (id: string) => void;
 }) => (
   <TouchableOpacity
-    onPress={onPress}
+    onPress={() => onPress(client)}
     className="mb-1 flex-row items-center justify-between rounded-xl px-4 py-4 active:opacity-80"
     style={{ backgroundColor: Colors.chip.darkCard }}
   >
@@ -60,7 +60,7 @@ const ClientRow = ({
   </TouchableOpacity>
 );
 
-const MemoClientRow = React.memo(ClientRow);
+const MemoClientRow = memo(ClientRow);
 
 const sortByName = (a: AuthUser, b: AuthUser): number => {
   const nameA = (a.name || a.username || '').toLowerCase();
@@ -77,7 +77,6 @@ const PatientsIndexScreen = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [pickerPatient, setPickerPatient] = useState<AuthUser | null>(null);
   const [searchText, setSearchText] = useState('');
   const debouncedSearch = useDebounce(searchText.trim().toLowerCase(), 250);
 
@@ -115,7 +114,6 @@ const PatientsIndexScreen = () => {
 
   const handleCreateAssignment = useCallback(() => {
     if (selectedClient) {
-      setPickerPatient(selectedClient);
       setMenuOpen(false);
       setPickerOpen(true);
     }
@@ -172,7 +170,7 @@ const PatientsIndexScreen = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: AuthUser }) => (
-      <MemoClientRow client={item} onPress={() => handleClientPress(item)} onMenuPress={handleMenuPress} />
+      <MemoClientRow client={item} onPress={handleClientPress} onMenuPress={handleMenuPress} />
     ),
     [handleClientPress, handleMenuPress]
   );
@@ -232,14 +230,14 @@ const PatientsIndexScreen = () => {
         actions={actions}
       />
 
-      {pickerPatient && (
+      {pickerOpen && selectedClient && (
         <ModulePicker
           visible={pickerOpen}
           onDismiss={() => {
             setPickerOpen(false);
             setSelectedClientId(null);
           }}
-          patient={pickerPatient}
+          patient={selectedClient}
         />
       )}
     </ContentContainer>

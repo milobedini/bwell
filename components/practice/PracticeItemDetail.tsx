@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { View } from 'react-native';
 import AttemptPresenter from '@/components/attempts/presenters/AttemptPresenter';
 import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
@@ -16,12 +15,10 @@ type PracticeItemDetailProps = {
 
 const PracticeItemDetail = ({ assignmentId }: PracticeItemDetailProps) => {
   const { data: practiceData, isPending: isPracticePending } = useMyPractice();
-  const startAttempt = useStartModuleAttempt();
+  const { mutate: startAttempt, isPending: isStarting } = useStartModuleAttempt();
 
-  // Track the attemptId once we have it (either from existing or from mutation)
-  const [resolvedAttemptId, setResolvedAttemptId] = useState<string | undefined>();
+  const [startedAttemptId, setStartedAttemptId] = useState<string | undefined>();
 
-  // Find the practice item across all buckets
   const item = useMemo(() => {
     if (!practiceData) return undefined;
     return (
@@ -32,23 +29,17 @@ const PracticeItemDetail = ({ assignmentId }: PracticeItemDetailProps) => {
     );
   }, [practiceData, assignmentId]);
 
-  // If item has an existing attempt, use it
+  const existingAttemptId = item?.latestAttempt?.attemptId;
+
   useEffect(() => {
-    if (!item) return;
-    if (item.latestAttempt?.attemptId) {
-      setResolvedAttemptId(item.latestAttempt.attemptId);
-      return;
-    }
-    // Auto-start for not_started items
-    if (item.status === 'not_started' && !startAttempt.isPending && !resolvedAttemptId) {
-      startAttempt.mutate(
-        { moduleId: item.moduleId, assignmentId: item.assignmentId },
-        {
-          onSuccess: (res) => setResolvedAttemptId(res.attempt._id)
-        }
-      );
-    }
-  }, [item, startAttempt, resolvedAttemptId]);
+    if (!item || existingAttemptId || startedAttemptId || item.status !== 'not_started' || isStarting) return;
+    startAttempt(
+      { moduleId: item.moduleId, assignmentId: item.assignmentId },
+      { onSuccess: (res) => setStartedAttemptId(res.attempt._id) }
+    );
+  }, [item, existingAttemptId, startedAttemptId, isStarting, startAttempt]);
+
+  const resolvedAttemptId = existingAttemptId ?? startedAttemptId;
 
   const { data: attemptData, isPending: isAttemptPending } = useGetMyAttemptDetail(resolvedAttemptId ?? '');
 
@@ -73,11 +64,7 @@ const PracticeItemDetail = ({ assignmentId }: PracticeItemDetailProps) => {
     return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
   }
 
-  return (
-    <View className="flex-1">
-      <AttemptPresenter attempt={attemptData.attempt} mode={mode} />
-    </View>
-  );
+  return <AttemptPresenter attempt={attemptData.attempt} mode={mode} />;
 };
 
 export default PracticeItemDetail;

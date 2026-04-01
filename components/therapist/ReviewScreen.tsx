@@ -14,7 +14,7 @@ import { Colors } from '@/constants/Colors';
 import { useTherapistReview } from '@/hooks/usePractice';
 import { useClients } from '@/hooks/useUsers';
 import { filterChipStyle, filterChipTextStyle } from '@/utils/chipStyles';
-import { timeAgo } from '@/utils/dates';
+import { type DateSection, groupByDate, timeAgo } from '@/utils/dates';
 import { getModuleIcon } from '@/utils/moduleIcons';
 import { getSeverityColors } from '@/utils/severity';
 import type { ReviewItem, SortOption } from '@milobedini/shared-types';
@@ -29,8 +29,6 @@ import EmptyState from '../ui/EmptyState';
 import NeedsAttentionSection from './NeedsAttentionSection';
 import ReviewFilterDrawer, { DEFAULT_REVIEW_FILTERS, type ReviewFilterValues } from './ReviewFilterDrawer';
 
-type ReviewSection = { title: string; data: ReviewItem[] };
-
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'newest', label: 'Newest' },
   { value: 'oldest', label: 'Oldest' },
@@ -39,68 +37,7 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 
 const ItemSeparator = () => <View className="h-3" />;
 
-// Fixed-order bucket keys (newest → oldest)
-const FIXED_KEYS = ['Today', 'Yesterday', 'This Week', 'Last Week', 'This Month'] as const;
-
-// Group ReviewItems by completedAt date, maintaining fixed chronological order
-const groupReviewByDate = (items: ReviewItem[]): ReviewSection[] => {
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const yesterday = new Date(today.getTime() - 86_400_000);
-  const dow = today.getDay() || 7;
-  const thisWeekStart = new Date(today.getTime() - (dow - 1) * 86_400_000);
-  const lastWeekStart = new Date(thisWeekStart.getTime() - 7 * 86_400_000);
-  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-  const buckets = new Map<string, ReviewItem[]>();
-
-  const getKey = (dateStr?: string): string => {
-    if (!dateStr) return 'Unknown';
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return 'Unknown';
-    if (d >= today) return 'Today';
-    if (d >= yesterday) return 'Yesterday';
-    if (d >= thisWeekStart) return 'This Week';
-    if (d >= lastWeekStart) return 'Last Week';
-    if (d >= thisMonthStart) return 'This Month';
-    return new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' }).format(d);
-  };
-
-  // Track named-month keys with their date for sorting
-  const monthKeyDates = new Map<string, Date>();
-
-  for (const item of items) {
-    const dateStr = item.latestAttempt?.completedAt;
-    const key = getKey(dateStr);
-    if (!buckets.has(key)) {
-      buckets.set(key, []);
-      if (!(FIXED_KEYS as readonly string[]).includes(key) && key !== 'Unknown' && dateStr) {
-        monthKeyDates.set(key, new Date(dateStr));
-      }
-    }
-    buckets.get(key)!.push(item);
-  }
-
-  // Sort month keys newest-first by their representative date
-  const sortedMonthKeys = Array.from(monthKeyDates.entries())
-    .sort((a, b) => b[1].getTime() - a[1].getTime())
-    .map(([key]) => key);
-
-  // Build sections: fixed keys → sorted month keys → unknown
-  const sections: ReviewSection[] = [];
-  for (const key of FIXED_KEYS) {
-    const data = buckets.get(key);
-    if (data?.length) sections.push({ title: key, data });
-  }
-  for (const key of sortedMonthKeys) {
-    const data = buckets.get(key);
-    if (data?.length) sections.push({ title: key, data });
-  }
-  const unknown = buckets.get('Unknown');
-  if (unknown?.length) sections.push({ title: 'Earlier', data: unknown });
-
-  return sections;
-};
+const getReviewDate = (item: ReviewItem) => item.latestAttempt?.completedAt;
 
 const ReviewListItemBase = ({ item }: { item: ReviewItem }) => {
   const severity = getSeverityColors(item.latestAttempt?.scoreBandLabel);
@@ -294,7 +231,7 @@ const ReviewScreen = () => {
     [moduleChoices, filters.moduleId]
   );
 
-  const sections = useMemo(() => groupReviewByDate(submissions), [submissions]);
+  const sections = useMemo(() => groupByDate(submissions, getReviewDate), [submissions]);
 
   const renderItem = useCallback(
     ({ item }: SectionListRenderItemInfo<ReviewItem>) => <ReviewListItem item={item} />,
@@ -302,7 +239,9 @@ const ReviewScreen = () => {
   );
 
   const renderSectionHeader = useCallback(
-    ({ section }: { section: SectionListData<ReviewItem, ReviewSection> }) => <SectionHeader title={section.title} />,
+    ({ section }: { section: SectionListData<ReviewItem, DateSection<ReviewItem>> }) => (
+      <SectionHeader title={section.title} />
+    ),
     []
   );
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   KeyboardAvoidingView,
@@ -53,13 +53,15 @@ const ReviewFilterDrawer = ({
   const [local, setLocal] = useState<ReviewFilterValues>(values);
   const [patientPickerOpen, setPatientPickerOpen] = useState(false);
 
-  const selectedPatientName = patientChoices?.find((p) => p.id === local.patientId)?.name;
+  const selectedPatientName = useMemo(
+    () => patientChoices?.find((p) => p.id === local.patientId)?.name,
+    [patientChoices, local.patientId]
+  );
 
-  const patientPickerItems = (patientChoices ?? []).map((p) => ({
-    _id: p.id,
-    title: p.name,
-    subtitle: p.email
-  }));
+  const patientPickerItems = useMemo(
+    () => (patientChoices ?? []).map((p) => ({ _id: p.id, title: p.name, subtitle: p.email })),
+    [patientChoices]
+  );
 
   const translateX = useRef(new Animated.Value(drawerWidth)).current;
 
