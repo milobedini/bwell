@@ -4,13 +4,13 @@ import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { dueLabel } from '@/utils/dates';
-import type { MyAssignmentView } from '@milobedini/shared-types';
+import type { PracticeItem } from '@milobedini/shared-types';
 
 type FocusCardProps = {
-  assignment: MyAssignmentView | null;
+  assignment: PracticeItem | null;
 };
 
-const getUrgency = (assignment: MyAssignmentView) => {
+const getUrgency = (assignment: PracticeItem) => {
   if (!assignment.dueAt) return 'future' as const;
   const now = new Date();
   const due = new Date(assignment.dueAt);
@@ -52,14 +52,10 @@ const FocusCard = memo(({ assignment }: FocusCardProps) => {
       router.push('/(main)/(tabs)/programs');
       return;
     }
-    if (assignment.latestAttempt && !assignment.latestAttempt.completedAt) {
-      router.push({
-        pathname: '/(main)/(tabs)/attempts/[id]',
-        params: { id: assignment.latestAttempt._id, assignmentId: assignment._id }
-      });
-      return;
-    }
-    router.push('/(main)/(tabs)/assignments');
+    router.push({
+      pathname: '/(main)/(tabs)/home/practice/[id]',
+      params: { id: assignment.assignmentId, headerTitle: assignment.moduleTitle }
+    });
   }, [assignment, router]);
 
   // "All caught up" state
@@ -106,11 +102,11 @@ const FocusCard = memo(({ assignment }: FocusCardProps) => {
         {styles.label}
       </ThemedText>
       <ThemedText type="smallTitle" className="mb-1">
-        {assignment.module.title}
+        {assignment.moduleTitle}
       </ThemedText>
       <ThemedText type="small" className="mb-3.5" style={{ color: Colors.sway.darkGrey }}>
         {assignment.dueAt ? dueLabel(assignment.dueAt) : 'No due date'}
-        {assignment.therapist?.name ? ` · From ${assignment.therapist.name}` : ''}
+        {assignment.therapistName ? ` · From ${assignment.therapistName}` : ''}
       </ThemedText>
       <Pressable
         onPress={handlePress}

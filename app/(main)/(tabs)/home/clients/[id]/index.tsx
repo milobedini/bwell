@@ -101,7 +101,7 @@ const ClientDetail = () => {
                 <Link
                   asChild
                   href={{
-                    pathname: '/attempts/[id]',
+                    pathname: '/review/[id]',
                     params: {
                       id: item._id,
                       headerTitle: `${item.module.title} (${dateString(item.completedAt || item.lastInteractionAt)})`

@@ -1,13 +1,12 @@
 import { useCallback, useMemo } from 'react';
-import { useViewMyAssignments } from '@/hooks/useAssignments';
+import { useMyPractice } from '@/hooks/usePractice';
 import { useScoreTrends } from '@/hooks/useScoreTrends';
-import { AssignmentStatusSearchOptions } from '@/types/types';
 import { getWeekStart } from '@/utils/dates';
-import type { MyAssignmentView, ScoreTrendItem } from '@milobedini/shared-types';
+import type { PracticeItem, ScoreTrendItem } from '@milobedini/shared-types';
 
 export type PatientDashboardData = {
-  focusAssignment: MyAssignmentView | null;
-  upcomingAssignments: MyAssignmentView[]; // excludes focus card item, max 3
+  focusAssignment: PracticeItem | null;
+  upcomingAssignments: PracticeItem[]; // excludes focus card item, max 3
   weeklyCompletion: { completed: number; total: number };
   onTimeStreak: { current: number; history: ('on_time' | 'late')[] };
   scoreTrends: ScoreTrendItem[];
@@ -16,7 +15,7 @@ export type PatientDashboardData = {
   hasData: boolean;
 };
 
-const getFocusAssignment = (assignments: MyAssignmentView[]): MyAssignmentView | null => {
+const getFocusAssignment = (assignments: PracticeItem[]): PracticeItem | null => {
   const now = new Date();
 
   // 1. Overdue (oldest first)
@@ -31,7 +30,7 @@ const getFocusAssignment = (assignments: MyAssignmentView[]): MyAssignmentView |
     .sort((a, b) => new Date(a.dueAt!).getTime() - new Date(b.dueAt!).getTime());
   if (upcoming.length > 0) return upcoming[0];
 
-  // 3. No due date — just pick the oldest assignment
+  // 3. No due date — just pick the first assignment
   const noDue = assignments.filter((a) => !a.dueAt);
   if (noDue.length > 0) return noDue[0];
 
@@ -39,22 +38,20 @@ const getFocusAssignment = (assignments: MyAssignmentView[]): MyAssignmentView |
 };
 
 const deriveWeeklyCompletion = (
-  completedAssignments: MyAssignmentView[],
-  activeAssignments: MyAssignmentView[]
+  completedItems: PracticeItem[],
+  activeItems: PracticeItem[]
 ): { completed: number; total: number } => {
   const weekStart = new Date(getWeekStart());
-  const completedThisWeek = completedAssignments.filter(
+  const completedThisWeek = completedItems.filter(
     (a) => a.latestAttempt?.completedAt && new Date(a.latestAttempt.completedAt) >= weekStart
   ).length;
-  const total = completedThisWeek + activeAssignments.length;
+  const total = completedThisWeek + activeItems.length;
   return { completed: completedThisWeek, total };
 };
 
-const deriveOnTimeStreak = (
-  completedAssignments: MyAssignmentView[]
-): { current: number; history: ('on_time' | 'late')[] } => {
+const deriveOnTimeStreak = (completedItems: PracticeItem[]): { current: number; history: ('on_time' | 'late')[] } => {
   // Sort by completion date descending (most recent first)
-  const withDue = completedAssignments
+  const withDue = completedItems
     .filter((a) => a.dueAt && a.latestAttempt?.completedAt)
     .sort(
       (a, b) => new Date(b.latestAttempt!.completedAt!).getTime() - new Date(a.latestAttempt!.completedAt!).getTime()
@@ -73,26 +70,30 @@ const deriveOnTimeStreak = (
 };
 
 export const usePatientDashboard = () => {
-  const activeQuery = useViewMyAssignments({ status: AssignmentStatusSearchOptions.ACTIVE });
-  const completedQuery = useViewMyAssignments({ status: AssignmentStatusSearchOptions.COMPLETED });
+  const practiceQuery = useMyPractice();
   const trendsQuery = useScoreTrends();
 
-  const isPending = activeQuery.isPending || completedQuery.isPending || trendsQuery.isPending;
-  const isError = activeQuery.isError || completedQuery.isError || trendsQuery.isError;
-  const isRefetching = activeQuery.isRefetching || completedQuery.isRefetching || trendsQuery.isRefetching;
+  const isPending = practiceQuery.isPending || trendsQuery.isPending;
+  const isError = practiceQuery.isError || trendsQuery.isError;
+  const isRefetching = practiceQuery.isRefetching || trendsQuery.isRefetching;
 
   const refetch = useCallback(() => {
-    activeQuery.refetch();
-    completedQuery.refetch();
+    practiceQuery.refetch();
     trendsQuery.refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeQuery.refetch, completedQuery.refetch, trendsQuery.refetch]);
+  }, [practiceQuery.refetch, trendsQuery.refetch]);
 
   const data = useMemo((): PatientDashboardData | null => {
     if (isPending) return null;
 
-    const activeAssignments = activeQuery.data ?? [];
-    const completedAssignments = completedQuery.data ?? [];
+    const practice = practiceQuery.data;
+    // Active items = today + thisWeek + upcoming buckets
+    const activeAssignments = [
+      ...(practice?.today ?? []),
+      ...(practice?.thisWeek ?? []),
+      ...(practice?.upcoming ?? [])
+    ];
+    const completedAssignments = practice?.recentlyCompleted ?? [];
     const scoreTrends = trendsQuery.data?.trends ?? [];
 
     const hasData = activeAssignments.length > 0 || completedAssignments.length > 0 || scoreTrends.length > 0;
@@ -101,7 +102,7 @@ export const usePatientDashboard = () => {
 
     // Upcoming: active assignments excluding focus card, with due dates, sorted by due date (overdue first), max 3
     const upcomingAssignments = activeAssignments
-      .filter((a) => a._id !== focusAssignment?._id)
+      .filter((a) => a.assignmentId !== focusAssignment?.assignmentId)
       .filter((a) => a.dueAt)
       .sort((a, b) => new Date(a.dueAt!).getTime() - new Date(b.dueAt!).getTime())
       .slice(0, 3);
@@ -116,7 +117,7 @@ export const usePatientDashboard = () => {
       weekStart: getWeekStart(),
       hasData
     };
-  }, [isPending, activeQuery.data, completedQuery.data, trendsQuery.data]);
+  }, [isPending, practiceQuery.data, trendsQuery.data]);
 
   return { data, isPending, isError, isRefetching, refetch };
 };

@@ -15,7 +15,7 @@ const ScoreCard = memo(({ trend }: { trend: ScoreTrendItem }) => {
   const router = useRouter();
 
   const handlePress = useCallback(() => {
-    router.push('/(main)/(tabs)/attempts');
+    router.push('/(main)/(tabs)/journey');
   }, [router]);
 
   const hasPrevious = trend.previousScore !== null;

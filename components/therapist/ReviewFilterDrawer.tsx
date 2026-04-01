@@ -13,78 +13,55 @@ import { Button, Chip, Divider, IconButton, Portal, Surface } from 'react-native
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/Colors';
 import { filterChipStyle, filterChipTextStyle } from '@/utils/chipStyles';
-import type { AssignmentStatus, AssignmentUrgencyFilter } from '@milobedini/shared-types';
+import type { SeverityOption } from '@milobedini/shared-types';
 
 import { ThemedText } from '../ThemedText';
 import SearchPickerDialog from '../ui/SearchPickerDialog';
 import SelectField from '../ui/SelectField';
 
-export type AssignmentFilterValues = {
+export type ReviewFilterValues = {
   patientId?: string;
   moduleId?: string;
-  status?: string;
-  urgency?: AssignmentUrgencyFilter;
+  severity?: SeverityOption;
 };
 
-export const DEFAULT_ASSIGNMENT_FILTERS: AssignmentFilterValues = {
-  patientId: undefined,
-  moduleId: undefined,
-  status: undefined,
-  urgency: undefined
-};
+export const DEFAULT_REVIEW_FILTERS: ReviewFilterValues = {};
 
-type AssignmentFilterDrawerProps = {
+type ReviewFilterDrawerProps = {
   visible: boolean;
   onDismiss: () => void;
-  values: AssignmentFilterValues;
-  onApply: (values: AssignmentFilterValues) => void;
-  onReset: () => void;
-  moduleChoices?: { id: string; title: string }[];
+  values: ReviewFilterValues;
+  onApply: (values: ReviewFilterValues) => void;
+  onReset?: () => void;
   patientChoices?: { id: string; name: string; email: string }[];
+  moduleChoices?: { id: string; title: string }[];
 };
 
-const STATUS_OPTIONS = [
-  { value: undefined, label: 'All' },
-  { value: 'assigned' as AssignmentStatus, label: 'Assigned' },
-  { value: 'in_progress' as AssignmentStatus, label: 'In Progress' }
-] as const;
+const SEVERITY_OPTIONS: SeverityOption[] = ['severe', 'moderate', 'mild'];
 
-const URGENCY_OPTIONS: { value: AssignmentUrgencyFilter | undefined; label: string }[] = [
-  { value: undefined, label: 'All' },
-  { value: 'overdue', label: 'Overdue' },
-  { value: 'due_soon', label: 'Due Soon' },
-  { value: 'on_track', label: 'On Track' },
-  { value: 'no_due_date', label: 'No Due Date' }
-];
-
-const AssignmentFilterDrawer = ({
+const ReviewFilterDrawer = ({
   visible,
   onDismiss,
   values,
   onApply,
   onReset,
-  moduleChoices,
-  patientChoices
-}: AssignmentFilterDrawerProps) => {
+  patientChoices,
+  moduleChoices
+}: ReviewFilterDrawerProps) => {
   const { width: screenWidth } = useWindowDimensions();
   const { top: safeTop } = useSafeAreaInsets();
   const drawerWidth = Math.min(420, Math.floor(screenWidth * 0.9));
-  const [local, setLocal] = useState<AssignmentFilterValues>(values);
+  const [local, setLocal] = useState<ReviewFilterValues>(values);
   const [patientPickerOpen, setPatientPickerOpen] = useState(false);
-
-  const patientPickerItems = useMemo(
-    () =>
-      patientChoices?.map((p) => ({
-        _id: p.id,
-        title: p.name,
-        subtitle: p.email
-      })) ?? [],
-    [patientChoices]
-  );
 
   const selectedPatientName = useMemo(
     () => patientChoices?.find((p) => p.id === local.patientId)?.name,
     [patientChoices, local.patientId]
+  );
+
+  const patientPickerItems = useMemo(
+    () => (patientChoices ?? []).map((p) => ({ _id: p.id, title: p.name, subtitle: p.email })),
+    [patientChoices]
   );
 
   const translateX = useRef(new Animated.Value(drawerWidth)).current;
@@ -103,12 +80,15 @@ const AssignmentFilterDrawer = ({
 
   const handleApply = () => {
     onApply(local);
+    onDismiss();
   };
 
   const handleReset = () => {
-    setLocal(DEFAULT_ASSIGNMENT_FILTERS);
-    onReset();
+    setLocal(DEFAULT_REVIEW_FILTERS);
+    onReset?.();
   };
+
+  const activeFilterCount = [local.patientId, local.moduleId, local.severity].filter(Boolean).length;
 
   return (
     <Portal>
@@ -124,7 +104,7 @@ const AssignmentFilterDrawer = ({
         >
           <Surface elevation={3} style={[styles.surface, { paddingTop: safeTop }]}>
             <View style={styles.header}>
-              <ThemedText type="subtitle">Filter Assignments</ThemedText>
+              <ThemedText type="subtitle">Filters</ThemedText>
               <IconButton icon="close" onPress={onDismiss} />
             </View>
 
@@ -132,97 +112,91 @@ const AssignmentFilterDrawer = ({
 
             <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
               {/* Patient */}
-              <View style={styles.section}>
-                <ThemedText type="smallTitle" style={styles.sectionTitle}>
-                  Patient
-                </ThemedText>
-                <SelectField
-                  label="Patient"
-                  value={selectedPatientName}
-                  placeholder="Any patient"
-                  selected={!!local.patientId}
-                  leftIcon="account-circle-outline"
-                  onPress={() => setPatientPickerOpen(true)}
-                  onClear={() => setLocal((prev) => ({ ...prev, patientId: undefined }))}
-                />
-              </View>
+              {patientChoices && patientChoices.length > 0 && (
+                <View style={styles.section}>
+                  <ThemedText type="smallTitle" style={styles.sectionTitle}>
+                    Patient
+                  </ThemedText>
+                  <SelectField
+                    label="Patient"
+                    value={selectedPatientName}
+                    placeholder="Any patient"
+                    selected={!!local.patientId}
+                    leftIcon="account-circle-outline"
+                    onPress={() => setPatientPickerOpen(true)}
+                    onClear={() => setLocal((prev) => ({ ...prev, patientId: undefined }))}
+                  />
+                </View>
+              )}
 
               {/* Module */}
+              {moduleChoices && moduleChoices.length > 0 && (
+                <View style={styles.section}>
+                  <ThemedText type="smallTitle" style={styles.sectionTitle}>
+                    Module
+                  </ThemedText>
+                  <View style={styles.rowWrap}>
+                    <Chip
+                      selected={!local.moduleId}
+                      onPress={() => setLocal((prev) => ({ ...prev, moduleId: undefined }))}
+                      style={filterChipStyle(!local.moduleId)}
+                      textStyle={filterChipTextStyle(!local.moduleId)}
+                    >
+                      Any
+                    </Chip>
+                    {moduleChoices.map((m) => {
+                      const selected = local.moduleId === m.id;
+                      return (
+                        <Chip
+                          key={m.id}
+                          selected={selected}
+                          onPress={() =>
+                            setLocal((prev) => ({
+                              ...prev,
+                              moduleId: prev.moduleId === m.id ? undefined : m.id
+                            }))
+                          }
+                          style={filterChipStyle(selected)}
+                          textStyle={filterChipTextStyle(selected)}
+                        >
+                          {m.title}
+                        </Chip>
+                      );
+                    })}
+                  </View>
+                </View>
+              )}
+
+              {/* Severity */}
               <View style={styles.section}>
                 <ThemedText type="smallTitle" style={styles.sectionTitle}>
-                  Module
+                  Severity
                 </ThemedText>
                 <View style={styles.rowWrap}>
                   <Chip
-                    selected={!local.moduleId}
-                    onPress={() => setLocal((prev) => ({ ...prev, moduleId: undefined }))}
-                    style={filterChipStyle(!local.moduleId)}
-                    textStyle={filterChipTextStyle(!local.moduleId)}
+                    selected={!local.severity}
+                    onPress={() => setLocal((prev) => ({ ...prev, severity: undefined }))}
+                    style={filterChipStyle(!local.severity)}
+                    textStyle={filterChipTextStyle(!local.severity)}
                   >
-                    All
+                    Any
                   </Chip>
-                  {moduleChoices?.map((m) => {
-                    const selected = local.moduleId === m.id;
+                  {SEVERITY_OPTIONS.map((sev) => {
+                    const selected = local.severity === sev;
                     return (
                       <Chip
-                        key={m.id}
+                        key={sev}
                         selected={selected}
                         onPress={() =>
                           setLocal((prev) => ({
                             ...prev,
-                            moduleId: prev.moduleId === m.id ? undefined : m.id
+                            severity: prev.severity === sev ? undefined : sev
                           }))
                         }
                         style={filterChipStyle(selected)}
                         textStyle={filterChipTextStyle(selected)}
                       >
-                        {m.title}
-                      </Chip>
-                    );
-                  })}
-                </View>
-              </View>
-
-              {/* Status */}
-              <View style={styles.section}>
-                <ThemedText type="smallTitle" style={styles.sectionTitle}>
-                  Status
-                </ThemedText>
-                <View style={styles.rowWrap}>
-                  {STATUS_OPTIONS.map((opt) => {
-                    const selected = local.status === opt.value;
-                    return (
-                      <Chip
-                        key={opt.label}
-                        selected={selected}
-                        onPress={() => setLocal((prev) => ({ ...prev, status: opt.value }))}
-                        style={filterChipStyle(selected)}
-                        textStyle={filterChipTextStyle(selected)}
-                      >
-                        {opt.label}
-                      </Chip>
-                    );
-                  })}
-                </View>
-              </View>
-
-              {/* Urgency */}
-              <View style={styles.section}>
-                <ThemedText type="smallTitle" style={styles.sectionTitle}>
-                  Urgency
-                </ThemedText>
-                <View style={styles.rowWrap}>
-                  {URGENCY_OPTIONS.map((opt) => {
-                    const selected = local.urgency === opt.value;
-                    return (
-                      <Chip
-                        key={opt.label}
-                        selected={selected}
-                        onPress={() => setLocal((prev) => ({ ...prev, urgency: opt.value }))}
-                        style={filterChipStyle(selected)}
-                        textStyle={filterChipTextStyle(selected)}
-                      >
-                        {opt.label}
+                        {sev.charAt(0).toUpperCase() + sev.slice(1)}
                       </Chip>
                     );
                   })}
@@ -236,6 +210,7 @@ const AssignmentFilterDrawer = ({
                 mode="outlined"
                 textColor={Colors.sway.lightGrey}
                 style={{ borderColor: Colors.chip.darkCardAlt }}
+                disabled={activeFilterCount === 0}
               >
                 Reset
               </Button>
@@ -269,6 +244,8 @@ const AssignmentFilterDrawer = ({
   );
 };
 
+export default ReviewFilterDrawer;
+
 const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
@@ -292,10 +269,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 8
   },
-  scrollContent: { flex: 1 },
-  section: { marginTop: 16, gap: 8 },
-  sectionTitle: { marginBottom: 4 },
-  rowWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  scrollContent: {
+    flex: 1
+  },
+  section: {
+    marginTop: 16,
+    gap: 8
+  },
+  sectionTitle: {
+    marginBottom: 4
+  },
+  rowWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8
+  },
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -305,5 +293,3 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.chip.darkCardAlt
   }
 });
-
-export default AssignmentFilterDrawer;

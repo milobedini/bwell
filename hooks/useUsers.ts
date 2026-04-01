@@ -118,17 +118,20 @@ export const useAllPatients = () => {
   });
 };
 
-export const useClients = () => {
+export const useClients = (query?: { q?: string; sort?: string }) => {
   const isLoggedIn = useIsLoggedIn();
 
   return useQuery<PatientsResponse>({
-    queryKey: ['clients'],
+    queryKey: ['clients', query ?? {}],
     queryFn: async (): Promise<PatientsResponse> => {
-      const { data } = await api.get<PatientsResponse>('/user/clients');
+      const params: Record<string, string> = {};
+      if (query?.q) params.q = query.q;
+      if (query?.sort) params.sort = query.sort;
+      const { data } = await api.get<PatientsResponse>('/user/clients', { params });
       return data;
     },
     enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 5 // 5 minutes
+    staleTime: 1000 * 60 * 5
   });
 };
 

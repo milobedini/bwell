@@ -107,16 +107,21 @@ export const formatRelativeTime = (isoDate: string): string => {
   return formatShortDate(isoDate);
 };
 
-type DateSection<T> = {
+export type DateSection<T> = {
   title: string;
   data: T[];
 };
 
-export const groupByDate = <T extends { completedAt?: string }>(rows: T[]): DateSection<T>[] => {
+const FIXED_DATE_KEYS = ['Today', 'Yesterday', 'This Week', 'Last Week', 'This Month'] as const;
+
+export const groupByDate = <T>(
+  rows: T[],
+  getDate: (row: T) => string | undefined = (row: T) => (row as { completedAt?: string }).completedAt
+): DateSection<T>[] => {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterday = new Date(today.getTime() - 86_400_000);
-  const dow = today.getDay() || 7; // Sunday becomes 7 (ISO convention)
+  const dow = today.getDay() || 7;
   const thisWeekStart = new Date(today.getTime() - (dow - 1) * 86_400_000);
   const lastWeekStart = new Date(thisWeekStart.getTime() - 7 * 86_400_000);
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -134,21 +139,40 @@ export const groupByDate = <T extends { completedAt?: string }>(rows: T[]): Date
     if (d >= lastWeekStart) return 'Last Week';
     if (d >= thisMonthStart) return 'This Month';
 
-    // Month name + year for older entries
     return new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' }).format(d);
   };
 
-  const order = rows.reduce<string[]>((acc, row) => {
-    const key = getKey(row.completedAt);
+  const monthKeyDates = new Map<string, Date>();
+
+  for (const row of rows) {
+    const dateStr = getDate(row);
+    const key = getKey(dateStr);
     if (!buckets.has(key)) {
       buckets.set(key, []);
-      acc.push(key);
+      if (!(FIXED_DATE_KEYS as readonly string[]).includes(key) && key !== 'Earlier' && dateStr) {
+        monthKeyDates.set(key, new Date(dateStr));
+      }
     }
     buckets.get(key)!.push(row);
-    return acc;
-  }, []);
+  }
 
-  return order.map((title) => ({ title, data: buckets.get(title)! }));
+  const sortedMonthKeys = Array.from(monthKeyDates.entries())
+    .sort((a, b) => b[1].getTime() - a[1].getTime())
+    .map(([key]) => key);
+
+  const sections: DateSection<T>[] = [];
+  for (const key of FIXED_DATE_KEYS) {
+    const data = buckets.get(key);
+    if (data?.length) sections.push({ title: key, data });
+  }
+  for (const key of sortedMonthKeys) {
+    const data = buckets.get(key);
+    if (data?.length) sections.push({ title: key, data });
+  }
+  const earlier = buckets.get('Earlier');
+  if (earlier?.length) sections.push({ title: 'Earlier', data: earlier });
+
+  return sections;
 };
 
 /** Time-based greeting: "Good morning", "Good afternoon", or "Good evening". */

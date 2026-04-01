@@ -1,48 +1,17 @@
 import type { AxiosError } from 'axios';
 import { api } from '@/api/api';
-import { AssignmentStatusSearchOptions } from '@/types/types';
 import type {
   BasicMutationResponse,
   CreateAssignmentInput,
   CreateAssignmentResponse,
-  MyAssignmentsResponse,
   MyAssignmentView,
-  TherapistAssignmentFilters,
-  TherapistAssignmentsResponse,
   UpdateAssignmentInput,
   UpdateAssignmentStatusInput,
   UpdateAssignmentStatusResponse
 } from '@milobedini/shared-types';
-import { InfiniteData, keepPreviousData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { useMutationWithToast } from './useMutationWithToast';
-import { useIsLoggedIn } from './useUsers';
-
-// QUERIES
-export const useViewTherapistOutstandingAssignments = () => {
-  const isLoggedIn = useIsLoggedIn();
-
-  return useQuery<MyAssignmentView[]>({
-    queryKey: ['assignments'],
-    queryFn: async (): Promise<MyAssignmentView[]> => {
-      const { data } = await api.get<MyAssignmentsResponse>('/assignments/mine');
-      return data.assignments;
-    },
-    enabled: isLoggedIn
-  });
-};
-export const useViewMyAssignments = ({ status }: { status: AssignmentStatusSearchOptions }) => {
-  const isLoggedIn = useIsLoggedIn();
-
-  return useQuery<MyAssignmentView[]>({
-    queryKey: ['assignments', status],
-    queryFn: async (): Promise<MyAssignmentView[]> => {
-      const { data } = await api.get<MyAssignmentsResponse>('/user/assignments', { params: { status } });
-      return data.assignments;
-    },
-    enabled: isLoggedIn
-  });
-};
 
 // MUTATIONS
 export const useCreateAssignment = () => {
@@ -60,6 +29,8 @@ export const useCreateAssignment = () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['modules'] });
+      queryClient.invalidateQueries({ queryKey: ['practice'] });
+      queryClient.invalidateQueries({ queryKey: ['review'] });
     }
   });
 };
@@ -76,6 +47,8 @@ export const useUpdateAssignmentStatus = (assignmentId: string) => {
       queryClient.invalidateQueries({ queryKey: ['assignments'] });
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       queryClient.invalidateQueries({ queryKey: ['modules'] });
+      queryClient.invalidateQueries({ queryKey: ['practice'] });
+      queryClient.invalidateQueries({ queryKey: ['review'] });
     }
   });
 };
@@ -92,50 +65,10 @@ export const useRemoveAssignment = () => {
       queryClient.invalidateQueries({ queryKey: ['assignments'] });
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       queryClient.invalidateQueries({ queryKey: ['modules'] });
+      queryClient.invalidateQueries({ queryKey: ['practice'] });
+      queryClient.invalidateQueries({ queryKey: ['review'] });
     }
   });
-};
-
-type TherapistAssignmentsSelected = {
-  pages: TherapistAssignmentsResponse[];
-  items: MyAssignmentView[];
-  totalItems: number;
-};
-
-export const useTherapistAssignments = (filters: TherapistAssignmentFilters = {}) => {
-  const isLoggedIn = useIsLoggedIn();
-  const { patientId, moduleId, status, urgency, sortBy = 'urgency', limit = 20 } = filters;
-
-  const query = useInfiniteQuery<
-    TherapistAssignmentsResponse,
-    AxiosError,
-    TherapistAssignmentsSelected,
-    readonly ['assignments', 'therapist', TherapistAssignmentFilters],
-    number
-  >({
-    queryKey: ['assignments', 'therapist', { patientId, moduleId, status, urgency, sortBy, limit }] as const,
-    initialPageParam: 1,
-    queryFn: async ({ pageParam }): Promise<TherapistAssignmentsResponse> => {
-      const { data } = await api.get<TherapistAssignmentsResponse>('/assignments/mine', {
-        params: { patientId, moduleId, status, urgency, sortBy, limit, page: pageParam }
-      });
-      return data;
-    },
-    getNextPageParam: (lastPage) => (lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined),
-    select: (infinite: InfiniteData<TherapistAssignmentsResponse, number>): TherapistAssignmentsSelected => ({
-      pages: infinite.pages,
-      items: infinite.pages.flatMap((p) => p.items),
-      totalItems: infinite.pages[0]?.totalItems ?? 0
-    }),
-    placeholderData: keepPreviousData,
-    enabled: isLoggedIn
-  });
-
-  return {
-    ...query,
-    items: query.data?.items ?? [],
-    totalItems: query.data?.totalItems ?? 0
-  };
 };
 
 export const useUpdateAssignment = () => {
@@ -158,6 +91,8 @@ export const useUpdateAssignment = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['assignments'] });
       queryClient.invalidateQueries({ queryKey: ['clients'] });
+      queryClient.invalidateQueries({ queryKey: ['practice'] });
+      queryClient.invalidateQueries({ queryKey: ['review'] });
     }
   });
 };

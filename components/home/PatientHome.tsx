@@ -51,7 +51,7 @@ const PatientHome = () => {
                   title="Take your first questionnaire"
                   onPress={() => router.push('/(main)/(tabs)/programs')}
                 />
-                <SecondaryButton title="View assignments" onPress={() => router.push('/(main)/(tabs)/assignments')} />
+                <SecondaryButton title="View practice" onPress={() => router.push('/(main)/(tabs)/practice')} />
               </View>
             </View>
           </ContentContainer>

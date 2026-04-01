@@ -4,28 +4,22 @@ import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { dueLabel } from '@/utils/dates';
-import type { MyAssignmentView } from '@milobedini/shared-types';
+import type { PracticeItem } from '@milobedini/shared-types';
 
 type ComingUpListProps = {
-  assignments: MyAssignmentView[];
+  assignments: PracticeItem[];
   hasMore: boolean;
   remainingCount: number;
 };
 
-const AssignmentRow = memo(({ assignment }: { assignment: MyAssignmentView }) => {
+const AssignmentRow = memo(({ assignment }: { assignment: PracticeItem }) => {
   const router = useRouter();
 
   const handlePress = useCallback(() => {
-    // If there's an in-progress draft, navigate to that attempt
-    if (assignment.latestAttempt && !assignment.latestAttempt.completedAt) {
-      router.push({
-        pathname: '/(main)/(tabs)/attempts/[id]',
-        params: { id: assignment.latestAttempt._id, assignmentId: assignment._id }
-      });
-      return;
-    }
-    // Otherwise go to assignments tab
-    router.push('/(main)/(tabs)/assignments');
+    router.push({
+      pathname: '/(main)/(tabs)/home/practice/[id]',
+      params: { id: assignment.assignmentId, headerTitle: assignment.moduleTitle }
+    });
   }, [assignment, router]);
 
   const label = assignment.dueAt ? dueLabel(assignment.dueAt) : 'No due date';
@@ -38,7 +32,7 @@ const AssignmentRow = memo(({ assignment }: { assignment: MyAssignmentView }) =>
     >
       <View className="mr-3 flex-1">
         <ThemedText type="default" style={{ fontWeight: '600', fontSize: 15 }}>
-          {assignment.module.title}
+          {assignment.moduleTitle}
         </ThemedText>
         <ThemedText type="small" className="mt-0.5" style={{ color: Colors.sway.darkGrey }}>
           {label}
@@ -57,7 +51,7 @@ const ComingUpList = memo(({ assignments, hasMore, remainingCount }: ComingUpLis
   const router = useRouter();
 
   const goToAssignments = useCallback(() => {
-    router.push('/(main)/(tabs)/assignments');
+    router.push('/(main)/(tabs)/practice');
   }, [router]);
 
   if (assignments.length === 0) return null;
@@ -77,7 +71,7 @@ const ComingUpList = memo(({ assignments, hasMore, remainingCount }: ComingUpLis
         Coming Up
       </ThemedText>
       {assignments.map((a) => (
-        <AssignmentRow key={a._id} assignment={a} />
+        <AssignmentRow key={a.assignmentId} assignment={a} />
       ))}
       {hasMore && (
         <>
@@ -88,7 +82,7 @@ const ComingUpList = memo(({ assignments, hasMore, remainingCount }: ComingUpLis
           </View>
           <Pressable onPress={goToAssignments} className="items-center py-1.5">
             <ThemedText type="small" style={{ color: Colors.sway.bright, fontWeight: '600' }}>
-              View all assignments →
+              View all →
             </ThemedText>
           </Pressable>
         </>

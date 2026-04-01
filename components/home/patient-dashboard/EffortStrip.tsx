@@ -20,7 +20,7 @@ const EffortStrip = memo(({ weeklyCompletion, onTimeStreak }: EffortStripProps) 
   const pct = total > 0 ? (completed / total) * 100 : 0;
 
   const goToAssignments = useCallback(() => {
-    router.push('/(main)/(tabs)/assignments');
+    router.push('/(main)/(tabs)/practice');
   }, [router]);
 
   return (

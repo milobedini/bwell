@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { TextInput, View } from 'react-native';
 import { Divider } from 'react-native-paper';
-import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import ContentContainer from '@/components/ContentContainer';
 import ThemedButton from '@/components/ThemedButton';
 import DueDateField from '@/components/ui/DueDateField';
@@ -16,11 +16,6 @@ import { useClients } from '@/hooks/useUsers';
 import type { AssignmentRecurrence, AuthUser, CreateAssignmentInput, Module } from '@milobedini/shared-types';
 
 const AddAssignment = () => {
-  // User and module select dialogs, dueAt date picker, notes, recurrence picker.
-  //   @react-native-community/datetimepicker
-  // ToggleButton for recurrence.
-  // Notes interface for notes (see Sway). https://github.com/milobedini/sway-app/blob/main/navigators/learn/screens/notes/NotesScreen.tsx
-
   const params = useLocalSearchParams<{
     client?: string;
     module?: string;
@@ -83,10 +78,17 @@ const AddAssignment = () => {
   const handleSubmit = useCallback(() => {
     createAssignment.mutate(input, {
       onSuccess: () => {
-        router.navigate('/(main)/(tabs)/assignments');
+        if (client) {
+          router.replace({
+            pathname: '/(main)/(tabs)/patients/[id]',
+            params: { id: client._id, name: client.name ?? client.username }
+          });
+        } else {
+          router.back();
+        }
       }
     });
-  }, [createAssignment, input, router]);
+  }, [createAssignment, input, router, client]);
 
   return (
     <ContentContainer>
@@ -143,9 +145,7 @@ const AddAssignment = () => {
           centered
           disabled={!client?._id || !module?._id}
         />
-        <Link asChild href={'/assignments'}>
-          <ThemedButton title="Cancel" compact variant="error" centered />
-        </Link>
+        <ThemedButton title="Cancel" compact variant="error" centered onPress={() => router.back()} />
       </View>
 
       {/* Dialogs */}
