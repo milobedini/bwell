@@ -19,18 +19,6 @@ import { useMutationWithToast } from './useMutationWithToast';
 import { useIsLoggedIn } from './useUsers';
 
 // QUERIES
-export const useViewTherapistOutstandingAssignments = () => {
-  const isLoggedIn = useIsLoggedIn();
-
-  return useQuery<MyAssignmentView[]>({
-    queryKey: ['assignments'],
-    queryFn: async (): Promise<MyAssignmentView[]> => {
-      const { data } = await api.get<MyAssignmentsResponse>('/assignments/mine');
-      return data.assignments;
-    },
-    enabled: isLoggedIn
-  });
-};
 export const useViewMyAssignments = ({ status }: { status: AssignmentStatusSearchOptions }) => {
   const isLoggedIn = useIsLoggedIn();
 
@@ -60,6 +48,8 @@ export const useCreateAssignment = () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['modules'] });
+      queryClient.invalidateQueries({ queryKey: ['practice'] });
+      queryClient.invalidateQueries({ queryKey: ['review'] });
     }
   });
 };
@@ -76,6 +66,8 @@ export const useUpdateAssignmentStatus = (assignmentId: string) => {
       queryClient.invalidateQueries({ queryKey: ['assignments'] });
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       queryClient.invalidateQueries({ queryKey: ['modules'] });
+      queryClient.invalidateQueries({ queryKey: ['practice'] });
+      queryClient.invalidateQueries({ queryKey: ['review'] });
     }
   });
 };
@@ -92,6 +84,8 @@ export const useRemoveAssignment = () => {
       queryClient.invalidateQueries({ queryKey: ['assignments'] });
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       queryClient.invalidateQueries({ queryKey: ['modules'] });
+      queryClient.invalidateQueries({ queryKey: ['practice'] });
+      queryClient.invalidateQueries({ queryKey: ['review'] });
     }
   });
 };
@@ -158,6 +152,8 @@ export const useUpdateAssignment = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['assignments'] });
       queryClient.invalidateQueries({ queryKey: ['clients'] });
+      queryClient.invalidateQueries({ queryKey: ['practice'] });
+      queryClient.invalidateQueries({ queryKey: ['review'] });
     }
   });
 };

@@ -229,6 +229,8 @@ export const useStartModuleAttempt = () => {
       qc.invalidateQueries({ queryKey: ['attempts', 'mine'] });
       qc.invalidateQueries({ queryKey: ['attempts', 'therapist'] });
       qc.invalidateQueries({ queryKey: ['clients'] });
+      qc.invalidateQueries({ queryKey: ['practice'] });
+      qc.invalidateQueries({ queryKey: ['review'] });
     },
     toast: { pending: 'Starting attempt...', success: 'Attempt started', error: 'Failed to start attempt' }
   });
@@ -266,6 +268,8 @@ export const useSubmitAttempt = (attemptId: string) => {
       qc.invalidateQueries({ queryKey: ['clients'] });
       qc.invalidateQueries({ queryKey: ['attempts', 'therapist', 'patient-timeline'] });
       qc.invalidateQueries({ queryKey: ['score-trends'] });
+      qc.invalidateQueries({ queryKey: ['practice'] });
+      qc.invalidateQueries({ queryKey: ['review'] });
     },
     toast: { pending: 'Submitting...', success: 'Submitted successfully', error: 'Submission failed' }
   });
