@@ -22,7 +22,7 @@ const PracticeItemBase = ({ item }: PracticeItemProps) => {
   const handlePress = () => {
     router.push({
       pathname: '/(main)/(tabs)/practice/[id]',
-      params: { id: item.assignmentId }
+      params: { id: item.assignmentId, headerTitle: item.moduleTitle }
     });
   };
 

@@ -29,7 +29,7 @@ const AttentionItemBase = ({ item }: AttentionItemProps) => {
 
   const handlePress = () => {
     if (attemptId) {
-      router.push({ pathname: '/review/[id]', params: { id: attemptId } });
+      router.push({ pathname: '/review/[id]', params: { id: attemptId, headerTitle: item.patientName } });
     }
   };
 

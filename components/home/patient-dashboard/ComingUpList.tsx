@@ -16,16 +16,10 @@ const AssignmentRow = memo(({ assignment }: { assignment: PracticeItem }) => {
   const router = useRouter();
 
   const handlePress = useCallback(() => {
-    // If there's an in-progress draft, navigate to that attempt
-    if (assignment.latestAttempt && !assignment.latestAttempt.completedAt) {
-      router.push({
-        pathname: '/(main)/(tabs)/practice/[id]',
-        params: { id: assignment.assignmentId }
-      });
-      return;
-    }
-    // Otherwise go to practice tab
-    router.push('/(main)/(tabs)/practice');
+    router.push({
+      pathname: '/(main)/(tabs)/home/practice/[id]',
+      params: { id: assignment.assignmentId, headerTitle: assignment.moduleTitle }
+    });
   }, [assignment, router]);
 
   const label = assignment.dueAt ? dueLabel(assignment.dueAt) : 'No due date';

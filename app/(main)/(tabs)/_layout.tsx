@@ -105,13 +105,13 @@ export default function MainTabsLayout() {
         }}
       />
 
-      {/* Programs — visible to patients and admin, hidden for therapists */}
+      {/* Programs — accessible via deep links but hidden from tab bar */}
       <Tabs.Screen
         name="programs"
         options={{
           title: 'Programs',
           tabBarIcon: ({ color, size }) => <Ionicons name="albums" color={color} size={size} />,
-          href: therapist ? null : undefined
+          href: null
         }}
       />
 

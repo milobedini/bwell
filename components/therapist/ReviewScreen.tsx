@@ -8,10 +8,11 @@ import {
   type SectionListRenderItemInfo,
   View
 } from 'react-native';
-import { Chip } from 'react-native-paper';
+import { Chip, IconButton } from 'react-native-paper';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { useTherapistReview } from '@/hooks/usePractice';
+import { useClients } from '@/hooks/useUsers';
 import { filterChipStyle, filterChipTextStyle } from '@/utils/chipStyles';
 import { timeAgo } from '@/utils/dates';
 import { getModuleIcon } from '@/utils/moduleIcons';
@@ -26,6 +27,7 @@ import { ThemedText } from '../ThemedText';
 import EmptyState from '../ui/EmptyState';
 
 import NeedsAttentionSection from './NeedsAttentionSection';
+import ReviewFilterDrawer, { DEFAULT_REVIEW_FILTERS, type ReviewFilterValues } from './ReviewFilterDrawer';
 
 type ReviewSection = { title: string; data: ReviewItem[] };
 
@@ -37,7 +39,10 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 
 const ItemSeparator = () => <View className="h-3" />;
 
-// Group ReviewItems by the completedAt date from their latestAttempt
+// Fixed-order bucket keys (newest → oldest)
+const FIXED_KEYS = ['Today', 'Yesterday', 'This Week', 'Last Week', 'This Month'] as const;
+
+// Group ReviewItems by completedAt date, maintaining fixed chronological order
 const groupReviewByDate = (items: ReviewItem[]): ReviewSection[] => {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -50,9 +55,9 @@ const groupReviewByDate = (items: ReviewItem[]): ReviewSection[] => {
   const buckets = new Map<string, ReviewItem[]>();
 
   const getKey = (dateStr?: string): string => {
-    if (!dateStr) return 'Earlier';
+    if (!dateStr) return 'Unknown';
     const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return 'Earlier';
+    if (isNaN(d.getTime())) return 'Unknown';
     if (d >= today) return 'Today';
     if (d >= yesterday) return 'Yesterday';
     if (d >= thisWeekStart) return 'This Week';
@@ -61,17 +66,40 @@ const groupReviewByDate = (items: ReviewItem[]): ReviewSection[] => {
     return new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' }).format(d);
   };
 
-  const order = items.reduce<string[]>((acc, item) => {
-    const key = getKey(item.latestAttempt?.completedAt);
+  // Track named-month keys with their date for sorting
+  const monthKeyDates = new Map<string, Date>();
+
+  for (const item of items) {
+    const dateStr = item.latestAttempt?.completedAt;
+    const key = getKey(dateStr);
     if (!buckets.has(key)) {
       buckets.set(key, []);
-      acc.push(key);
+      if (!(FIXED_KEYS as readonly string[]).includes(key) && key !== 'Unknown' && dateStr) {
+        monthKeyDates.set(key, new Date(dateStr));
+      }
     }
     buckets.get(key)!.push(item);
-    return acc;
-  }, []);
+  }
 
-  return order.map((title) => ({ title, data: buckets.get(title)! }));
+  // Sort month keys newest-first by their representative date
+  const sortedMonthKeys = Array.from(monthKeyDates.entries())
+    .sort((a, b) => b[1].getTime() - a[1].getTime())
+    .map(([key]) => key);
+
+  // Build sections: fixed keys → sorted month keys → unknown
+  const sections: ReviewSection[] = [];
+  for (const key of FIXED_KEYS) {
+    const data = buckets.get(key);
+    if (data?.length) sections.push({ title: key, data });
+  }
+  for (const key of sortedMonthKeys) {
+    const data = buckets.get(key);
+    if (data?.length) sections.push({ title: key, data });
+  }
+  const unknown = buckets.get('Unknown');
+  if (unknown?.length) sections.push({ title: 'Earlier', data: unknown });
+
+  return sections;
 };
 
 const ReviewListItemBase = ({ item }: { item: ReviewItem }) => {
@@ -82,7 +110,7 @@ const ReviewListItemBase = ({ item }: { item: ReviewItem }) => {
 
   const handlePress = () => {
     if (attemptId) {
-      router.push({ pathname: '/review/[id]', params: { id: attemptId } });
+      router.push({ pathname: '/review/[id]', params: { id: attemptId, headerTitle: item.patientName } });
     }
   };
 
@@ -144,10 +172,11 @@ const ReviewListItem = memo(ReviewListItemBase);
 const SectionHeader = memo(function SectionHeader({ title }: { title: string }) {
   return (
     <View
-      className="border-b px-4 pb-2 pt-3"
+      className="border-b pb-2 pt-3"
       style={{
         backgroundColor: Colors.sway.dark,
-        borderBottomColor: Colors.chip.darkCardAlt
+        borderBottomColor: Colors.chip.darkCardAlt,
+        marginBottom: 12
       }}
     >
       <ThemedText
@@ -160,12 +189,73 @@ const SectionHeader = memo(function SectionHeader({ title }: { title: string }) 
   );
 });
 
+const ActiveFilterChips = memo(function ActiveFilterChips({
+  filters,
+  patientName,
+  moduleName,
+  onClear,
+  onClearAll
+}: {
+  filters: ReviewFilterValues;
+  patientName?: string;
+  moduleName?: string;
+  onClear: (key: keyof ReviewFilterValues) => void;
+  onClearAll: () => void;
+}) {
+  const chips: { key: keyof ReviewFilterValues; label: string }[] = [];
+
+  if (filters.patientId && patientName) {
+    chips.push({ key: 'patientId', label: `Patient: ${patientName}` });
+  }
+  if (filters.moduleId && moduleName) {
+    chips.push({ key: 'moduleId', label: `Module: ${moduleName}` });
+  }
+  if (filters.severity) {
+    chips.push({
+      key: 'severity',
+      label: `Severity: ${filters.severity.charAt(0).toUpperCase() + filters.severity.slice(1)}`
+    });
+  }
+
+  if (chips.length === 0) return null;
+
+  return (
+    <View className="flex-row flex-wrap items-center gap-1.5 pb-2">
+      {chips.map((c) => (
+        <Pressable
+          key={c.key}
+          onPress={() => onClear(c.key)}
+          className="flex-row items-center gap-1 rounded-full px-2.5 py-1"
+          style={{ backgroundColor: Colors.tint.teal }}
+        >
+          <ThemedText style={{ fontSize: 12, color: Colors.sway.bright }}>{c.label}</ThemedText>
+          <ThemedText style={{ fontSize: 12, color: Colors.sway.bright, opacity: 0.6 }}>✕</ThemedText>
+        </Pressable>
+      ))}
+      {chips.length >= 2 && (
+        <Pressable onPress={onClearAll}>
+          <ThemedText style={{ fontSize: 12, color: Colors.sway.darkGrey, marginLeft: 4 }}>Clear all</ThemedText>
+        </Pressable>
+      )}
+    </View>
+  );
+});
+
 const ReviewScreen = () => {
   const [sort, setSort] = useState<SortOption>('newest');
+  const [filters, setFilters] = useState<ReviewFilterValues>(DEFAULT_REVIEW_FILTERS);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const { data: clientsData } = useClients();
+
+  const patientChoices = useMemo(
+    () => clientsData?.map((c) => ({ id: c._id, name: c.name || c.username, email: c.email })) ?? [],
+    [clientsData]
+  );
 
   const {
     data,
-    isPending,
+    isLoading,
     isError,
     isRefetching,
     refetch,
@@ -173,10 +263,36 @@ const ReviewScreen = () => {
     fetchNextPage,
     isFetchingNextPage,
     isFetching
-  } = useTherapistReview({ sort });
+  } = useTherapistReview({
+    sort,
+    patientId: filters.patientId,
+    moduleId: filters.moduleId,
+    severity: filters.severity
+  });
 
   const needsAttention = useMemo(() => data?.needsAttention ?? [], [data?.needsAttention]);
   const submissions = useMemo(() => data?.submissions ?? [], [data?.submissions]);
+
+  // Derive unique module choices from all submissions
+  const moduleChoices = useMemo(() => {
+    const seen = new Map<string, string>();
+    for (const item of submissions) {
+      if (!seen.has(item.moduleId)) {
+        seen.set(item.moduleId, item.moduleTitle);
+      }
+    }
+    return Array.from(seen, ([id, title]) => ({ id, title }));
+  }, [submissions]);
+
+  const selectedPatientName = useMemo(
+    () => patientChoices.find((p) => p.id === filters.patientId)?.name,
+    [patientChoices, filters.patientId]
+  );
+
+  const selectedModuleName = useMemo(
+    () => moduleChoices.find((m) => m.id === filters.moduleId)?.title,
+    [moduleChoices, filters.moduleId]
+  );
 
   const sections = useMemo(() => groupReviewByDate(submissions), [submissions]);
 
@@ -194,13 +310,33 @@ const ReviewScreen = () => {
     if (hasNextPage && !isFetchingNextPage) fetchNextPage();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  if (isPending) return <LoadingIndicator marginBottom={0} />;
+  const handleClearFilter = useCallback((key: keyof ReviewFilterValues) => {
+    setFilters((prev) => ({ ...prev, [key]: undefined }));
+  }, []);
+
+  const handleClearAll = useCallback(() => setFilters(DEFAULT_REVIEW_FILTERS), []);
+
+  // Only show full-screen loader on initial load (no cached data yet)
+  if (isLoading) return <LoadingIndicator marginBottom={0} />;
   if (isError && !sections.length) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
 
   const listHeader = (
     <View>
       {/* Needs Attention section */}
       {needsAttention.length > 0 && <NeedsAttentionSection items={needsAttention} />}
+
+      {/* Header: count + filter button */}
+      <View className="flex-row items-center justify-between pt-2">
+        <ThemedText type="small" style={{ color: Colors.sway.darkGrey, opacity: isFetching && !isLoading ? 0.4 : 1 }}>
+          {data?.total ?? 0} {(data?.total ?? 0) === 1 ? 'submission' : 'submissions'}
+        </ThemedText>
+        <IconButton
+          icon="filter-variant"
+          iconColor={Colors.sway.lightGrey}
+          onPress={() => setDrawerOpen(true)}
+          style={{ backgroundColor: Colors.sway.buttonBackgroundSolid }}
+        />
+      </View>
 
       {/* Sort chips */}
       <View className="flex-row items-center gap-2 py-2">
@@ -224,8 +360,17 @@ const ReviewScreen = () => {
         ))}
       </View>
 
+      {/* Active filter chips */}
+      <ActiveFilterChips
+        filters={filters}
+        patientName={selectedPatientName}
+        moduleName={selectedModuleName}
+        onClear={handleClearFilter}
+        onClearAll={handleClearAll}
+      />
+
       {/* All Submissions header */}
-      <View className="border-b pb-2 pt-1" style={{ borderBottomColor: Colors.chip.darkCardAlt }}>
+      <View className="border-b pb-2 pt-1" style={{ borderBottomColor: Colors.chip.darkCardAlt, marginBottom: 12 }}>
         <ThemedText
           type="smallBold"
           style={{ color: Colors.sway.darkGrey, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.8 }}
@@ -235,6 +380,9 @@ const ReviewScreen = () => {
       </View>
     </View>
   );
+
+  // Dim list content while filter/sort refetch is in progress (but not during pagination)
+  const isFilterRefetching = isFetching && !isFetchingNextPage && !isLoading;
 
   return (
     <ContentContainer>
@@ -250,13 +398,14 @@ const ReviewScreen = () => {
       ) : (
         <SectionList
           sections={sections}
+          showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.assignmentId}
           renderItem={renderItem}
           renderSectionHeader={renderSectionHeader}
           ItemSeparatorComponent={ItemSeparator}
           stickySectionHeadersEnabled
           ListHeaderComponent={listHeader}
-          contentContainerStyle={{ paddingBottom: 16 }}
+          contentContainerStyle={{ paddingBottom: 16, opacity: isFilterRefetching ? 0.5 : 1 }}
           refreshControl={
             <RefreshControl
               refreshing={isRefetching && !isFetchingNextPage}
@@ -268,10 +417,22 @@ const ReviewScreen = () => {
           onEndReached={handleEndReached}
           onEndReachedThreshold={0.3}
           ListFooterComponent={
-            isFetchingNextPage ? <ActivityIndicator color={Colors.sway.bright} style={{ paddingVertical: 16 }} /> : null
+            isFetchingNextPage || isFilterRefetching ? (
+              <ActivityIndicator color={Colors.sway.bright} style={{ paddingVertical: 16 }} />
+            ) : null
           }
         />
       )}
+
+      <ReviewFilterDrawer
+        visible={drawerOpen}
+        onDismiss={() => setDrawerOpen(false)}
+        values={filters}
+        onApply={setFilters}
+        onReset={() => setFilters(DEFAULT_REVIEW_FILTERS)}
+        patientChoices={patientChoices}
+        moduleChoices={moduleChoices}
+      />
     </ContentContainer>
   );
 };

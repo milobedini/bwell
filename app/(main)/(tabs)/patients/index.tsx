@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { FlatList, TouchableOpacity, View } from 'react-native';
+import { FlatList, TextInput, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
@@ -11,6 +11,7 @@ import type { ActionMenuItem } from '@/components/ui/ActionMenu';
 import ActionMenu from '@/components/ui/ActionMenu';
 import EmptyState from '@/components/ui/EmptyState';
 import { Colors } from '@/constants/Colors';
+import { useDebounce } from '@/hooks/useDebounce';
 import { useAddRemoveTherapist, useClients } from '@/hooks/useUsers';
 import { useAuthStore } from '@/stores/authStore';
 import { pickClientAndCompose } from '@/utils/mail';
@@ -61,6 +62,12 @@ const ClientRow = ({
 
 const MemoClientRow = React.memo(ClientRow);
 
+const sortByName = (a: AuthUser, b: AuthUser): number => {
+  const nameA = (a.name || a.username || '').toLowerCase();
+  const nameB = (b.name || b.username || '').toLowerCase();
+  return nameA.localeCompare(nameB);
+};
+
 const PatientsIndexScreen = () => {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
@@ -71,6 +78,19 @@ const PatientsIndexScreen = () => {
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerPatient, setPickerPatient] = useState<AuthUser | null>(null);
+  const [searchText, setSearchText] = useState('');
+  const debouncedSearch = useDebounce(searchText.trim().toLowerCase(), 250);
+
+  const filteredClients = useMemo(() => {
+    if (!clients) return [];
+    const sorted = [...clients].sort(sortByName);
+    if (!debouncedSearch) return sorted;
+    return sorted.filter((c) => {
+      const name = (c.name || c.username || '').toLowerCase();
+      const email = (c.email || '').toLowerCase();
+      return name.includes(debouncedSearch) || email.includes(debouncedSearch);
+    });
+  }, [clients, debouncedSearch]);
 
   const selectedClient = useMemo(() => clients?.find((p) => p._id === selectedClientId), [clients, selectedClientId]);
 
@@ -171,11 +191,37 @@ const PatientsIndexScreen = () => {
 
   return (
     <ContentContainer>
+      {/* Search bar */}
+      <View
+        className="mx-1 mb-2 mt-2 flex-row items-center gap-2 rounded-xl px-3"
+        style={{ backgroundColor: Colors.chip.darkCard }}
+      >
+        <Icon name="magnify" size={20} color={Colors.sway.darkGrey} />
+        <TextInput
+          value={searchText}
+          onChangeText={setSearchText}
+          placeholder="Search patients..."
+          placeholderTextColor={Colors.sway.darkGrey}
+          style={{ flex: 1, color: Colors.sway.lightGrey, paddingVertical: 12, fontSize: 16 }}
+          autoCapitalize="none"
+          autoCorrect={false}
+          returnKeyType="search"
+        />
+        {searchText.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchText('')} hitSlop={8}>
+            <Icon name="close-circle" size={18} color={Colors.sway.darkGrey} />
+          </TouchableOpacity>
+        )}
+      </View>
+
       <FlatList
-        data={clients}
+        data={filteredClients}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         contentContainerClassName="gap-2 px-1 pt-2"
+        ListEmptyComponent={
+          <EmptyState icon="account-search-outline" title="No matches" subtitle="Try a different search term" />
+        }
       />
 
       <ActionMenu

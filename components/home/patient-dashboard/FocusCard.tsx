@@ -52,14 +52,10 @@ const FocusCard = memo(({ assignment }: FocusCardProps) => {
       router.push('/(main)/(tabs)/programs');
       return;
     }
-    if (assignment.latestAttempt && !assignment.latestAttempt.completedAt) {
-      router.push({
-        pathname: '/(main)/(tabs)/practice/[id]',
-        params: { id: assignment.assignmentId }
-      });
-      return;
-    }
-    router.push('/(main)/(tabs)/practice');
+    router.push({
+      pathname: '/(main)/(tabs)/home/practice/[id]',
+      params: { id: assignment.assignmentId, headerTitle: assignment.moduleTitle }
+    });
   }, [assignment, router]);
 
   // "All caught up" state

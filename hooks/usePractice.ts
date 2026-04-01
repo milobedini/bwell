@@ -7,7 +7,7 @@ import type {
   ReviewFilters,
   ReviewResponse
 } from '@milobedini/shared-types';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
 // Patient: unified practice view
 export const useMyPractice = () =>
@@ -73,6 +73,7 @@ export const useTherapistReview = (filters: Omit<ReviewFilters, 'cursor'> = {}) 
     },
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.submissions.nextCursor ?? undefined,
+    placeholderData: keepPreviousData,
     select: (data) => {
       const lastPage = data.pages[data.pages.length - 1];
       return {
