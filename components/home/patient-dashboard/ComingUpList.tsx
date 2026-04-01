@@ -88,7 +88,7 @@ const ComingUpList = memo(({ assignments, hasMore, remainingCount }: ComingUpLis
           </View>
           <Pressable onPress={goToAssignments} className="items-center py-1.5">
             <ThemedText type="small" style={{ color: Colors.sway.bright, fontWeight: '600' }}>
-              View all assignments →
+              View all →
             </ThemedText>
           </Pressable>
         </>
