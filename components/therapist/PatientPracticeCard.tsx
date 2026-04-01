@@ -146,11 +146,11 @@ const PatientPracticeCardBase = ({ item, sparkline, patientId }: PatientPractice
               </ThemedText>
             </View>
           ) : null}
-          {sparkline && sparkline.length > 0 ? (
+          {sparkline && sparkline.length > 1 ? (
             <Sparkline values={sparkline} />
-          ) : (
+          ) : hasAttempt ? (
             <MaterialCommunityIcons name="chevron-right" size={18} color={Colors.sway.darkGrey} />
-          )}
+          ) : null}
         </View>
       </View>
     </Pressable>
