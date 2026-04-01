@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { TextInput, View } from 'react-native';
 import { Divider } from 'react-native-paper';
-import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import ContentContainer from '@/components/ContentContainer';
 import ThemedButton from '@/components/ThemedButton';
 import DueDateField from '@/components/ui/DueDateField';
@@ -78,7 +78,7 @@ const AddAssignment = () => {
   const handleSubmit = useCallback(() => {
     createAssignment.mutate(input, {
       onSuccess: () => {
-        router.navigate('/(main)/(tabs)/patients');
+        router.back();
       }
     });
   }, [createAssignment, input, router]);
@@ -138,9 +138,7 @@ const AddAssignment = () => {
           centered
           disabled={!client?._id || !module?._id}
         />
-        <Link asChild href={'/patients'}>
-          <ThemedButton title="Cancel" compact variant="error" centered />
-        </Link>
+        <ThemedButton title="Cancel" compact variant="error" centered onPress={() => router.back()} />
       </View>
 
       {/* Dialogs */}
