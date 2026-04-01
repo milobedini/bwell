@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { useMyPracticeHistory } from '@/hooks/usePractice';
@@ -78,7 +78,7 @@ const JourneyScreen = () => {
     useMyPracticeHistory();
 
   const items = data?.items ?? [];
-  const trends = trendsData?.trends ?? [];
+  const trends = useMemo(() => trendsData?.trends ?? [], [trendsData?.trends]);
 
   const handleEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
