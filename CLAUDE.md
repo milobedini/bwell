@@ -35,8 +35,9 @@ The app has three tiers (from `docs/proposal.pdf`):
 ### Directory Structure
 
 - `app/` — expo-router pages (`(auth)/`, `(main)/`, `(welcome)/`)
+- `app/(main)/(tabs)/` — authenticated tab navigator: `home/`, `journey/`, `practice/`, `patients/`, `review/`, `programs/`, `all-users/`, `profile/`
 - `components/` — shared and feature-specific components
-- `components/attempts/presenters/` — module-type presenter components
+- `components/attempts/presenters/` — module-type presenter components (questionnaires, diary, reading)
 - `hooks/` — custom React hooks (data fetching, mutations)
 - `api/` — Axios instance and API helpers
 - `constants/` — Colors, shared constants
@@ -59,7 +60,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - **Infinite scroll:** Use `useInfiniteQuery` with `initialPageParam: 1` and `getNextPageParam` from `page`/`totalPages`. Flatten pages via `data.pages.flatMap(p => p.items)`. See `useAllUsers` for reference.
 - **Infinite scroll + search:** Use `keepPreviousData` with `useInfiniteQuery` to prevent full-screen flashes on param changes. Use `isLoading` (not `isPending`) for initial full-screen loaders. Guard empty states with `!isFetching && items.length === 0`. See `useAllUsers` + `AllUsersList` for reference.
 - **Value debounce:** Use `useDebounce(value, delay)` from `hooks/useDebounce.ts` for search inputs. Distinct from callback-based `useDebouncedCallback` in `utils/debounce.ts`.
-- **Filter drawers:** Slide-in from right using `Animated.View` + `useWindowDimensions()`. See `AttemptFilterDrawer` (timeline), `UserFilterDrawer` (admin users), and `AssignmentFilterDrawer` (therapist assignments). Shared chip styles extracted to `utils/chipStyles.ts`.
+- **Filter drawers:** Slide-in from right using `Animated.View` + `useWindowDimensions()`. See `AttemptFilterDrawer` (timeline), `UserFilterDrawer` (admin users), and `ReviewFilterDrawer` (therapist review). Shared chip styles extracted to `utils/chipStyles.ts`.
 - **Destructive action confirmation:** `ActionMenu` has a built-in confirmation step for destructive actions. Set `variant: 'destructive'` on an action item and optionally provide `confirmTitle`, `confirmDescription`, and `confirmLabel` props for custom confirmation UI.
 
 ## Git Workflow

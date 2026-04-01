@@ -19,7 +19,7 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 - Feature-specific components go in `components/<feature>/` (e.g., `components/diary/`, `components/admin/`)
 - Module presenters go in `components/attempts/presenters/`
 - Shared layout wrappers: `Container` (headerless screens), `ContentContainer` (screens with visible header)
-- Always check for existing components before creating new ones — reuse `ThemedText`, `ThemedButton`, `StatusChip`, `AssignmentStatusChip`, `EmptyState`, `IconButton`, `Collapsible`, `SelectField`, `ActionMenu`, `Chip`, `DueDateField`, `RecurrenceField`, `SearchPickerDialog`, `KeyboardAvoidingWrapper`
+- Always check for existing components before creating new ones — reuse `ThemedText`, `ThemedButton`, `StatusChip`, `AssignmentStatusChip`, `EmptyState`, `IconButton`, `Collapsible`, `SelectField`, `ActionMenu`, `Chip`, `DueDateField`, `RecurrenceField`, `SearchPickerDialog`, `KeyboardAvoidingWrapper`, `BarSparkline`
 
 ## Color Tokens
 

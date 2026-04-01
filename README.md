@@ -25,19 +25,19 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ### Patient
 
-- Personalised dashboard with focus card, effort metrics, upcoming assignments, and score trends
+- Personalised dashboard with focus card, effort metrics, upcoming practice, and score trends
+- Journey tab with score sparklines and progress history
+- Practice tab with active and completed practice items
 - Browse programs and modules
 - Complete assigned questionnaires and reading content
-- Track active and completed assignments
-- View attempt history
+- View attempt history and detailed practice item submissions
 
 ### Therapist
 
 - Triage dashboard with client status buckets (needs attention, completed, inactive), stat pills, and score deltas
-- Manage a client list from the patient pool
+- Manage a client list from the patient pool with server-side search and sort
 - Assign and remove modules for each client
-- Manage assignments with sort, filter, edit (due date, notes, recurrence), and collapsible patient groups
-- Review patient submissions and progress timelines
+- Review tab with filter drawer (module type, patient, date range) for patient submissions
 - View latest attempt submissions across all clients
 
 ### Admin
@@ -48,6 +48,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ## Recent Milestones
 
+- **Unified practice model** — merged assignments and attempts into a single practice concept, new journey/practice/review tabs, BarSparkline component, server-side client search/sort (2026-04-01)
 - **Reading module type** — replaced psychoeducation/exercise with unified reading presenter, markdown rendering, scroll progress bar, reader notes (2026-04-01)
 - **Destructive action confirmation** — ActionMenu built-in confirmation step for all destructive actions with customisable title, description, and label (2026-03-29)
 - **Therapist assignments redesign** — SectionList grouped by patient, sort/filter drawer, edit modal (due date, notes, recurrence), collapsible sections, shared chip styles (2026-03-27)
@@ -57,7 +58,6 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 - **Diary presenter refactor** — extracted 670-line presenter into composable hooks and components, FlatList performance tuning (2026-03-24)
 - **Diary UX polish** — compact header, floating save button, haptics, placeholder colours, character counts (2026-03-23)
 - **Therapist attempts redesign** — severity-tinted cards with score band colour mapping, timeAgo display (2026-03-21)
-- **ActionMenu refactor** — replaced FabGroup with bottom sheet ActionMenu, added tint colour tokens (2026-03-21)
 
 ## Tech Stack
 
@@ -81,9 +81,11 @@ app/
 ├── (auth)/              # Login, signup, email verification
 ├── (welcome)/           # Onboarding carousel
 └── (main)/(tabs)/       # Authenticated tab navigator
-    ├── home/            # Role-specific home screens
-    ├── assignments/     # View & create assignments
-    ├── attempts/        # View attempt history & details
+    ├── home/            # Role-specific home screens + nested client/patient views
+    ├── journey/         # Patient: score trends & progress history
+    ├── practice/        # Patient: active & completed practice items
+    ├── patients/        # Therapist: client list & assignment management
+    ├── review/          # Therapist: review patient submissions
     ├── programs/        # Browse programs & modules
     ├── all-users/       # Admin: search, filter & sort all users
     └── profile/         # User profile & logout
