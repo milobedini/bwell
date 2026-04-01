@@ -70,6 +70,7 @@ const PatientsIndexScreen = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerPatient, setPickerPatient] = useState<AuthUser | null>(null);
   const [searchText, setSearchText] = useState('');
   const debouncedSearch = useDebounce(searchText.trim(), 250);
 
@@ -102,6 +103,7 @@ const PatientsIndexScreen = () => {
 
   const handleCreateAssignment = useCallback(() => {
     if (selectedClient) {
+      setPickerPatient(selectedClient);
       setMenuOpen(false);
       setPickerOpen(true);
     }
@@ -217,14 +219,15 @@ const PatientsIndexScreen = () => {
         actions={actions}
       />
 
-      {pickerOpen && selectedClient && (
+      {pickerPatient && (
         <ModulePicker
           visible={pickerOpen}
           onDismiss={() => {
             setPickerOpen(false);
+            setPickerPatient(null);
             setSelectedClientId(null);
           }}
-          patient={selectedClient}
+          patient={pickerPatient}
         />
       )}
     </ContentContainer>
