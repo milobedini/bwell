@@ -78,10 +78,17 @@ const AddAssignment = () => {
   const handleSubmit = useCallback(() => {
     createAssignment.mutate(input, {
       onSuccess: () => {
-        router.back();
+        if (client) {
+          router.replace({
+            pathname: '/(main)/(tabs)/patients/[id]',
+            params: { id: client._id, name: client.name ?? client.username }
+          });
+        } else {
+          router.back();
+        }
       }
     });
-  }, [createAssignment, input, router]);
+  }, [createAssignment, input, router, client]);
 
   return (
     <ContentContainer>

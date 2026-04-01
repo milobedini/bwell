@@ -24,7 +24,7 @@ const ModulePicker = ({ visible, onDismiss, patient }: ModulePickerProps) => {
   const handleSelect = (item: Module & { subtitle?: string }) => {
     const chosen = modules?.find((m) => m._id === item._id);
     if (!chosen) return;
-    router.replace({
+    router.push({
       pathname: '/patients/add',
       params: {
         client: JSON.stringify(patient),
