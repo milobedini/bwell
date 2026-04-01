@@ -98,7 +98,7 @@ export const useGetMyAttemptDetail = (attemptId: string) => {
       const { data } = await api.get<AttemptDetailResponse>(`/attempts/${attemptId}`);
       return data;
     },
-    enabled: isLoggedIn
+    enabled: isLoggedIn && !!attemptId
   });
 };
 
@@ -111,7 +111,7 @@ export const useTherapistGetAttemptDetail = (attemptId: string) => {
       const { data } = await api.get<AttemptDetailResponse>(`/attempts/therapist/${attemptId}`);
       return data;
     },
-    enabled: isLoggedIn
+    enabled: isLoggedIn && !!attemptId
   });
 };
 
