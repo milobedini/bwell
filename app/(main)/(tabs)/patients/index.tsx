@@ -62,34 +62,22 @@ const ClientRow = ({
 
 const MemoClientRow = memo(ClientRow);
 
-const sortByName = (a: AuthUser, b: AuthUser): number => {
-  const nameA = (a.name || a.username || '').toLowerCase();
-  const nameB = (b.name || b.username || '').toLowerCase();
-  return nameA.localeCompare(nameB);
-};
-
 const PatientsIndexScreen = () => {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const { data: clients, isPending, isError } = useClients();
   const addRemoveTherapist = useAddRemoveTherapist();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const debouncedSearch = useDebounce(searchText.trim().toLowerCase(), 250);
+  const debouncedSearch = useDebounce(searchText.trim(), 250);
 
-  const filteredClients = useMemo(() => {
-    if (!clients) return [];
-    const sorted = [...clients].sort(sortByName);
-    if (!debouncedSearch) return sorted;
-    return sorted.filter((c) => {
-      const name = (c.name || c.username || '').toLowerCase();
-      const email = (c.email || '').toLowerCase();
-      return name.includes(debouncedSearch) || email.includes(debouncedSearch);
-    });
-  }, [clients, debouncedSearch]);
+  const clientsQuery = useMemo(
+    () => (debouncedSearch ? { q: debouncedSearch, sort: 'name' } : { sort: 'name' }),
+    [debouncedSearch]
+  );
+  const { data: clients, isPending, isError, isFetching } = useClients(clientsQuery);
 
   const selectedClient = useMemo(() => clients?.find((p) => p._id === selectedClientId), [clients, selectedClientId]);
 
@@ -180,16 +168,9 @@ const PatientsIndexScreen = () => {
   if (isPending) return <LoadingIndicator marginBottom={0} />;
   if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
   if (!clients) return <ErrorComponent errorType={ErrorTypes.NO_CONTENT} />;
-  if (!clients.length)
-    return (
-      <ContentContainer>
-        <EmptyState icon="account-group-outline" title="No clients yet" />
-      </ContentContainer>
-    );
 
   return (
     <ContentContainer>
-      {/* Search bar */}
       <View
         className="mx-1 mb-2 mt-2 flex-row items-center gap-2 rounded-xl px-3"
         style={{ backgroundColor: Colors.chip.darkCard }}
@@ -213,12 +194,18 @@ const PatientsIndexScreen = () => {
       </View>
 
       <FlatList
-        data={filteredClients}
+        data={clients}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         contentContainerClassName="gap-2 px-1 pt-2"
         ListEmptyComponent={
-          <EmptyState icon="account-search-outline" title="No matches" subtitle="Try a different search term" />
+          !isFetching ? (
+            debouncedSearch ? (
+              <EmptyState icon="account-search-outline" title="No matches" subtitle="Try a different search term" />
+            ) : (
+              <EmptyState icon="account-group-outline" title="No clients yet" />
+            )
+          ) : null
         }
       />
 

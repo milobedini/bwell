@@ -11,7 +11,7 @@ import {
 import { Chip, IconButton } from 'react-native-paper';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/Colors';
-import { useTherapistReview } from '@/hooks/usePractice';
+import { useTherapistReview, useTherapistReviewModules } from '@/hooks/usePractice';
 import { useClients } from '@/hooks/useUsers';
 import { filterChipStyle, filterChipTextStyle } from '@/utils/chipStyles';
 import { type DateSection, groupByDate, timeAgo } from '@/utils/dates';
@@ -210,16 +210,11 @@ const ReviewScreen = () => {
   const needsAttention = useMemo(() => data?.needsAttention ?? [], [data?.needsAttention]);
   const submissions = useMemo(() => data?.submissions ?? [], [data?.submissions]);
 
-  // Derive unique module choices from all submissions
-  const moduleChoices = useMemo(() => {
-    const seen = new Map<string, string>();
-    for (const item of submissions) {
-      if (!seen.has(item.moduleId)) {
-        seen.set(item.moduleId, item.moduleTitle);
-      }
-    }
-    return Array.from(seen, ([id, title]) => ({ id, title }));
-  }, [submissions]);
+  const { data: modulesData } = useTherapistReviewModules();
+  const moduleChoices = useMemo(
+    () => (modulesData ?? []).map((m) => ({ id: String(m._id), title: m.title })),
+    [modulesData]
+  );
 
   const selectedPatientName = useMemo(
     () => patientChoices.find((p) => p.id === filters.patientId)?.name,

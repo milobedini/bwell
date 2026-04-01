@@ -5,7 +5,8 @@ import type {
   PracticeHistoryResponse,
   PracticeResponse,
   ReviewFilters,
-  ReviewResponse
+  ReviewResponse,
+  TherapistAttemptModulesResponse
 } from '@milobedini/shared-types';
 import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
@@ -51,6 +52,16 @@ export const usePatientPractice = (patientId: string | undefined) =>
       return data;
     },
     enabled: !!patientId
+  });
+
+// Therapist: available module types for filter drawers
+export const useTherapistReviewModules = () =>
+  useQuery({
+    queryKey: ['review', 'modules'],
+    queryFn: async () => {
+      const { data } = await api.get<TherapistAttemptModulesResponse>('/user/therapist/attempts/modules');
+      return data.modules;
+    }
   });
 
 // Therapist: review feed
