@@ -19,7 +19,7 @@
 
 ## Overview
 
-BWell connects **patients**, **therapists**, and **admins** in a mental health platform. Therapists assign therapeutic modules (questionnaires, exercises, psychoeducation) to patients and track their progress. Admins oversee the system, verify therapists, and monitor platform-wide metrics.
+BWell connects **patients**, **therapists**, and **admins** in a mental health platform. Therapists assign therapeutic modules (questionnaires, reading content, activity diaries) to patients and track their progress. Admins oversee the system, verify therapists, and monitor platform-wide metrics.
 
 ## Features
 
@@ -27,7 +27,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 - Personalised dashboard with focus card, effort metrics, upcoming assignments, and score trends
 - Browse programs and modules
-- Complete assigned questionnaires, exercises, and psychoeducation content
+- Complete assigned questionnaires and reading content
 - Track active and completed assignments
 - View attempt history
 
@@ -48,6 +48,8 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ## Recent Milestones
 
+- **Reading module type** — replaced psychoeducation/exercise with unified reading presenter, markdown rendering, scroll progress bar, reader notes (2026-04-01)
+- **Destructive action confirmation** — ActionMenu built-in confirmation step for all destructive actions with customisable title, description, and label (2026-03-29)
 - **Therapist assignments redesign** — SectionList grouped by patient, sort/filter drawer, edit modal (due date, notes, recurrence), collapsible sections, shared chip styles (2026-03-27)
 - **Patient dashboard** — focus card, effort strip, coming up list, Skia sparkline score trends, pull-to-refresh (2026-03-26)
 - **Therapist dashboard** — triage buckets with client cards, stat pills, score deltas, assignment dots, progress bars (2026-03-25)
@@ -56,8 +58,6 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 - **Diary UX polish** — compact header, floating save button, haptics, placeholder colours, character counts (2026-03-23)
 - **Therapist attempts redesign** — severity-tinted cards with score band colour mapping, timeAgo display (2026-03-21)
 - **ActionMenu refactor** — replaced FabGroup with bottom sheet ActionMenu, added tint colour tokens (2026-03-21)
-- **Admin All Users** — search, filtering, sorting, and infinite scroll for user management (2026-03-20)
-- **Query refactor** — restored default refetchOnMount, dropped refetchType workaround (2026-03-19)
 
 ## Tech Stack
 
@@ -70,7 +70,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 | Client State | Zustand (persisted to AsyncStorage) |
 | Server State | TanStack React Query |
 | Forms | Formik + Yup |
-| UI Components | React Native Paper, Bottom Sheet, Moti, Reanimated, Skia |
+| UI Components | React Native Paper, Bottom Sheet, Moti, Reanimated, Skia, Markdown Display |
 | HTTP | Axios (cookie-based auth) |
 | Shared Types | `@milobedini/shared-types` |
 

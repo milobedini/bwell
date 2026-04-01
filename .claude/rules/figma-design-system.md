@@ -137,7 +137,7 @@ When translating Figma designs to code, apply these HIG principles:
 - **Gestures:** Support standard iOS gestures — swipe-back for navigation, pull-to-refresh on scrollable lists, swipe-to-delete for row actions. Implement via `react-native-gesture-handler` / Reanimated.
 - **Feedback:** Every interactive element needs visible press feedback. Use haptics (`expo-haptics`) for meaningful moments (submit success, error, toggle changes) — not for every tap.
 - **Modals:** Prefer half-sheet / bottom sheet presentation over full-screen modals for lightweight tasks (consistent with existing `@gorhom/bottom-sheet` usage).
-- **Destructive actions:** Always require confirmation. Use `ActionMenu` with `variant: 'destructive'` or an alert dialog. Red-tint the destructive option.
+- **Destructive actions:** Always require confirmation. Use `ActionMenu` with `variant: 'destructive'` — this triggers a built-in confirmation step. Customise with `confirmTitle`, `confirmDescription`, and `confirmLabel` props on the action item. Red-tint the destructive option.
 - **Accessibility:** Support Dynamic Type scaling where feasible. Respect `reduceMotion` (skip decorative animations) and `reduceTransparency` settings. Ensure sufficient colour contrast (4.5:1 minimum for text).
 - **Content focus:** Minimise chrome — let content breathe. Avoid heavy borders, excessive dividers, or cluttered toolbars. When in doubt, favour whitespace over decoration.
 - **Platform controls:** Use native-feeling controls (switches, segmented controls, date pickers) rather than custom equivalents unless the design explicitly requires a custom treatment.
@@ -150,7 +150,7 @@ When translating Figma designs to code, apply these HIG principles:
 - Hero/branded: `PrimaryButton` — wide button with optional logo, border, translucent bg (onboarding, welcome screens)
 - Profile/settings: `SecondaryButton` — full-width rounded button with translucent bg
 - Note: `ThemedButton`, `PrimaryButton`, and `SecondaryButton` are in `components/ThemedButton.tsx` (not `components/ui/`)
-- Contextual actions: use `ActionMenu` bottom sheet for list item actions (replaced FabGroup)
+- Contextual actions: use `ActionMenu` modal for list item actions — destructive actions get a built-in confirmation step with customisable title/description/label
 - IMPORTANT: Never use `style={({ pressed }) => ...}` callbacks on Pressable — NativeWind's `className` conflicts with style callbacks, causing neither to render. Use NativeWind modifiers: `active:bg-*`, `active:opacity-*`, `disabled:opacity-*`. For pressed state on children, use `group` on the Pressable and `group-active:opacity-*` on children.
 
 ## Spacing

@@ -24,7 +24,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - **Styling:** NativeWind (Tailwind CSS) — prefer className over StyleSheet where possible
 - **State:** Zustand (client/auth), TanStack React Query (server state)
 - **Forms:** Formik + Yup
-- **UI:** react-native-paper, @gorhom/bottom-sheet, moti, react-native-reanimated, @shopify/react-native-skia, expo-image
+- **UI:** react-native-paper, @gorhom/bottom-sheet, moti, react-native-reanimated, @shopify/react-native-skia, expo-image, react-native-markdown-display
 - **JS Engine:** Hermes (explicitly enabled in app.config.js)
 - **API:** Axios with cookie-based auth (`withCredentials: true`)
 - **Types:** Shared types via `@milobedini/shared-types` npm package — all API/model types must live here, never in FE code
@@ -42,7 +42,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - `constants/` — Colors, shared constants
 - `stores/` — Zustand stores
 - `types/` — local TypeScript types
-- `utils/` — helper functions (date formatting, severity colours, role checks, debounce, shared chip styles)
+- `utils/` — helper functions (date formatting, severity colours, role checks, debounce, shared chip styles, module icons)
 
 - Query defaults (1-hour staleTime, refetchOnWindowFocus/refetchOnReconnect disabled) are centralized in `QueryClient` in `app/_layout.tsx` — only override in hooks when a shorter staleTime is needed
 - Use `invalidateQueries` (not `refetchQueries`) in mutation `onSuccess` callbacks for consistency
@@ -60,6 +60,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - **Infinite scroll + search:** Use `keepPreviousData` with `useInfiniteQuery` to prevent full-screen flashes on param changes. Use `isLoading` (not `isPending`) for initial full-screen loaders. Guard empty states with `!isFetching && items.length === 0`. See `useAllUsers` + `AllUsersList` for reference.
 - **Value debounce:** Use `useDebounce(value, delay)` from `hooks/useDebounce.ts` for search inputs. Distinct from callback-based `useDebouncedCallback` in `utils/debounce.ts`.
 - **Filter drawers:** Slide-in from right using `Animated.View` + `useWindowDimensions()`. See `AttemptFilterDrawer` (timeline), `UserFilterDrawer` (admin users), and `AssignmentFilterDrawer` (therapist assignments). Shared chip styles extracted to `utils/chipStyles.ts`.
+- **Destructive action confirmation:** `ActionMenu` has a built-in confirmation step for destructive actions. Set `variant: 'destructive'` on an action item and optionally provide `confirmTitle`, `confirmDescription`, and `confirmLabel` props for custom confirmation UI.
 
 ## Git Workflow
 
