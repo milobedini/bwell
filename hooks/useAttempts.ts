@@ -3,100 +3,19 @@ import { api } from '@/api/api';
 import { AttemptStatusInput } from '@/types/types';
 import type {
   AttemptDetailResponse,
-  MyAttemptsResponse,
   PatientModuleTimelineResponse,
   SaveProgressInput,
   SaveProgressResponse,
   StartAttemptResponse,
   SubmitAttemptInput,
-  SubmitAttemptResponse,
-  TherapistAttemptModulesResponse,
-  TherapistLatestFilters,
-  TherapistLatestResponse,
-  TherapistLatestRow
+  SubmitAttemptResponse
 } from '@milobedini/shared-types';
-import { type InfiniteData, keepPreviousData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type InfiniteData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useMutationWithToast } from './useMutationWithToast';
 import { useIsLoggedIn } from './useUsers';
 
 // QUERIES
-export type MyAttemptOptions = {
-  moduleId?: string;
-  limit?: number;
-  status?: AttemptStatusInput;
-};
-export const useGetMyAttempts = ({ moduleId, limit, status }: MyAttemptOptions) => {
-  const isLoggedIn = useIsLoggedIn();
-
-  return useQuery<MyAttemptsResponse>({
-    queryKey: ['attempts', 'mine', { moduleId, limit, status }],
-    queryFn: async (): Promise<MyAttemptsResponse> => {
-      const { data } = await api.get<MyAttemptsResponse>('/user/attempts', {
-        params: {
-          moduleId,
-          limit,
-          status
-        }
-      });
-      return data;
-    },
-    enabled: isLoggedIn
-  });
-};
-type TherapistLatestSelected = {
-  pages: TherapistLatestResponse[];
-  rows: TherapistLatestRow[];
-  nextCursor: string | null;
-  totalCount: number;
-};
-
-export const useTherapistGetLatestAttempts = (filters: TherapistLatestFilters = {}) => {
-  const isLoggedIn = useIsLoggedIn();
-  const { patientId, moduleId, severity, status, sort = 'newest', limit = 20 } = filters;
-
-  const query = useInfiniteQuery<
-    TherapistLatestResponse,
-    AxiosError,
-    TherapistLatestSelected,
-    readonly ['attempts', 'therapist', 'latest', TherapistLatestFilters],
-    string | null
-  >({
-    queryKey: ['attempts', 'therapist', 'latest', { patientId, moduleId, severity, status, sort, limit }] as const,
-    initialPageParam: null,
-    queryFn: async ({ pageParam }): Promise<TherapistLatestResponse> => {
-      const { data } = await api.get<TherapistLatestResponse>('/user/therapist/attempts/latest', {
-        params: {
-          patientId,
-          moduleId,
-          severity,
-          status,
-          sort,
-          limit,
-          cursor: pageParam ?? undefined
-        }
-      });
-      return data;
-    },
-    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-    select: (infinite: InfiniteData<TherapistLatestResponse, string | null>): TherapistLatestSelected => ({
-      pages: infinite.pages,
-      rows: infinite.pages.flatMap((p) => p.rows),
-      nextCursor: infinite.pages.at(-1)?.nextCursor ?? null,
-      totalCount: infinite.pages[0]?.totalCount ?? 0
-    }),
-    placeholderData: keepPreviousData,
-    enabled: isLoggedIn
-  });
-
-  return {
-    ...query,
-    rows: query.data?.rows ?? [],
-    totalCount: query.data?.totalCount ?? 0,
-    nextCursor: query.data?.nextCursor ?? null
-  };
-};
-
 export type PatientTimelineOptions = {
   patientId: string;
   moduleId?: string;
@@ -168,20 +87,6 @@ export const useGetPatientTimeline = ({
     attempts,
     nextCursor
   };
-};
-
-export const useTherapistAttemptModules = () => {
-  const isLoggedIn = useIsLoggedIn();
-
-  return useQuery<TherapistAttemptModulesResponse>({
-    queryKey: ['attempts', 'therapist', 'modules'],
-    queryFn: async (): Promise<TherapistAttemptModulesResponse> => {
-      const { data } = await api.get<TherapistAttemptModulesResponse>('/user/therapist/attempts/modules');
-      return data;
-    },
-    enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 30 // 30 minutes — module list rarely changes
-  });
 };
 
 export const useGetMyAttemptDetail = (attemptId: string) => {

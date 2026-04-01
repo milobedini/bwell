@@ -115,20 +115,6 @@ export default function MainTabsLayout() {
         }}
       />
 
-      {/* Hidden tabs — routes still exist, not shown in tab bar */}
-      <Tabs.Screen
-        name="assignments"
-        options={{
-          href: null
-        }}
-      />
-      <Tabs.Screen
-        name="attempts"
-        options={{
-          href: null
-        }}
-      />
-
       <Tabs.Screen
         name="profile"
         options={{
