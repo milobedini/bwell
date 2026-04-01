@@ -100,6 +100,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - Use `Colors` constants from `constants/Colors.ts` — never hardcode hex values in components
 - Use `useWindowDimensions()` hook over static `Dimensions.get()` in components
 - Wrap dev-only logging in `if (__DEV__)`
+- Keep sorting, filtering, and pagination logic on the backend (`../cbt/`) — the FE should pass query parameters to the API and render results, not re-sort or filter client-side
 
 ## Design System
 
