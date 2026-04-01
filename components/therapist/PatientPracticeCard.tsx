@@ -13,6 +13,7 @@ type PatientPracticeCardProps = {
   item: PracticeItem;
   sparkline?: number[];
   patientId: string;
+  patientName: string;
 };
 
 const SPARKLINE_BAR_COUNT = 5;
@@ -43,7 +44,7 @@ const Sparkline = ({ values }: { values: number[] }) => {
   );
 };
 
-const PatientPracticeCardBase = ({ item, sparkline, patientId }: PatientPracticeCardProps) => {
+const PatientPracticeCardBase = ({ item, sparkline, patientName }: PatientPracticeCardProps) => {
   const router = useRouter();
   const isCompleted = item.status === 'completed';
   const isInProgress = item.status === 'in_progress';
@@ -54,8 +55,8 @@ const PatientPracticeCardBase = ({ item, sparkline, patientId }: PatientPractice
   const handlePress = () => {
     if (!canNavigate) return;
     router.push({
-      pathname: '/(main)/(tabs)/review/[id]',
-      params: { id: item.latestAttempt!.attemptId, patientId }
+      pathname: '/(main)/(tabs)/patients/attempt/[id]',
+      params: { id: item.latestAttempt!.attemptId, headerTitle: patientName }
     });
   };
 

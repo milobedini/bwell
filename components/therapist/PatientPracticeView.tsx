@@ -33,9 +33,14 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
 
   const renderItem = useCallback(
     ({ item }: SectionListRenderItemInfo<PracticeItem>) => (
-      <PatientPracticeCard item={item} sparkline={data?.sparklines?.[item.moduleId]} patientId={patientId} />
+      <PatientPracticeCard
+        item={item}
+        sparkline={data?.sparklines?.[item.moduleId]}
+        patientId={patientId}
+        patientName={patientName}
+      />
     ),
-    [data?.sparklines, patientId]
+    [data?.sparklines, patientId, patientName]
   );
 
   const renderSectionHeader = useCallback(
