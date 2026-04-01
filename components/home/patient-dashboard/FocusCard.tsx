@@ -54,8 +54,8 @@ const FocusCard = memo(({ assignment }: FocusCardProps) => {
     }
     if (assignment.latestAttempt && !assignment.latestAttempt.completedAt) {
       router.push({
-        pathname: '/(main)/(tabs)/journey/[id]',
-        params: { id: assignment.latestAttempt.attemptId, assignmentId: assignment.assignmentId }
+        pathname: '/(main)/(tabs)/practice/[id]',
+        params: { id: assignment.assignmentId }
       });
       return;
     }

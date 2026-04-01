@@ -19,8 +19,8 @@ const AssignmentRow = memo(({ assignment }: { assignment: PracticeItem }) => {
     // If there's an in-progress draft, navigate to that attempt
     if (assignment.latestAttempt && !assignment.latestAttempt.completedAt) {
       router.push({
-        pathname: '/(main)/(tabs)/journey/[id]',
-        params: { id: assignment.latestAttempt.attemptId, assignmentId: assignment.assignmentId }
+        pathname: '/(main)/(tabs)/practice/[id]',
+        params: { id: assignment.assignmentId }
       });
       return;
     }

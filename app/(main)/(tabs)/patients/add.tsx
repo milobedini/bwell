@@ -1,0 +1,171 @@
+import { useCallback, useMemo, useState } from 'react';
+import { TextInput, View } from 'react-native';
+import { Divider } from 'react-native-paper';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import ContentContainer from '@/components/ContentContainer';
+import ThemedButton from '@/components/ThemedButton';
+import DueDateField from '@/components/ui/DueDateField';
+import RecurrenceField from '@/components/ui/RecurrenceField';
+import SearchPickerDialog from '@/components/ui/SearchPickerDialog';
+import SelectField from '@/components/ui/SelectField';
+import { Fonts } from '@/constants/Typography';
+import { useCreateAssignment } from '@/hooks/useAssignments';
+import { useModules } from '@/hooks/useModules';
+import useToggle from '@/hooks/useToggle';
+import { useClients } from '@/hooks/useUsers';
+import type { AssignmentRecurrence, AuthUser, CreateAssignmentInput, Module } from '@milobedini/shared-types';
+
+const AddAssignment = () => {
+  const params = useLocalSearchParams<{
+    client?: string;
+    module?: string;
+  }>();
+
+  const initialClient = useMemo(
+    () => (params.client ? (JSON.parse(params.client) as AuthUser) : undefined),
+    [params.client]
+  );
+  const initialModule = useMemo(
+    () => (params.module ? (JSON.parse(params.module) as Module) : undefined),
+    [params.module]
+  );
+
+  const [clientPickerVisible, toggleClientPickerVisible] = useToggle(false);
+  const [client, setClient] = useState<AuthUser | undefined>(initialClient);
+  const [modulePickerVisible, toggleModulePickerVisible] = useToggle(false);
+  const [module, setModule] = useState<Module | undefined>(initialModule);
+  const [dueAt, setDueAt] = useState<string | undefined>();
+  const [recurrence, setRecurrence] = useState<AssignmentRecurrence | undefined>({ freq: 'none' });
+  const [notes, setNotes] = useState('');
+
+  const router = useRouter();
+  const createAssignment = useCreateAssignment();
+  const { isPending: createPending } = createAssignment;
+  const { data: clients, isPending: clientsPending, isError: clientsError } = useClients();
+  const { data: modules, isPaused: modulesPending, isError: modulesError } = useModules();
+
+  const clientItems = useMemo(
+    () =>
+      (clients || []).map((c) => ({
+        _id: c._id,
+        title: c.name || c.username,
+        subtitle: c.email,
+        raw: c
+      })),
+    [clients]
+  );
+  const moduleItems = useMemo(
+    () =>
+      (modules || []).map((c) => ({
+        _id: c._id,
+        title: c.title,
+        subtitle: `${c.program.title} (${c.type})`,
+        raw: c
+      })),
+    [modules]
+  );
+
+  const input: CreateAssignmentInput = useMemo(() => {
+    return {
+      userId: client?._id || '',
+      moduleId: module?._id || '',
+      dueAt,
+      recurrence,
+      notes
+    };
+  }, [client?._id, module?._id, dueAt, recurrence, notes]);
+
+  const handleSubmit = useCallback(() => {
+    createAssignment.mutate(input, {
+      onSuccess: () => {
+        router.navigate('/(main)/(tabs)/patients');
+      }
+    });
+  }, [createAssignment, input, router]);
+
+  return (
+    <ContentContainer>
+      {/* Inputs */}
+      <SelectField
+        label="Client"
+        value={client?.name || client?.username}
+        placeholder="Choose a client"
+        selected={!!client?._id}
+        leftIcon="account-circle-outline"
+        onPress={() => toggleClientPickerVisible()}
+        onClear={() => setClient(undefined)}
+        disabled={!!params.client}
+      />
+      <Divider />
+      <SelectField
+        label="Module"
+        value={module?.title}
+        placeholder="Choose a module"
+        selected={!!module?._id}
+        leftIcon="book-open-page-variant-outline"
+        onPress={() => toggleModulePickerVisible()}
+        onClear={() => setModule(undefined)}
+        disabled={!!params.module}
+      />
+      <Divider />
+      <DueDateField value={dueAt} onChange={setDueAt} label="Due date" />
+      <Divider />
+      {dueAt && (
+        <>
+          <RecurrenceField value={recurrence} onChange={setRecurrence} label="Recurrence" />
+          <Divider />
+        </>
+      )}
+      <TextInput
+        autoCapitalize="sentences"
+        autoCorrect={true}
+        clearButtonMode="while-editing"
+        placeholder="Notes for your client (optional)..."
+        returnKeyType="send"
+        onSubmitEditing={() => {}}
+        value={notes}
+        onChangeText={setNotes}
+        className="h-[64px] px-3 text-white"
+        placeholderTextColor={'white'}
+        style={{ fontFamily: Fonts.Regular }}
+      />
+      <Divider />
+      <View className="mt-4 gap-4">
+        <ThemedButton
+          title={createPending ? 'Creating...' : 'Create'}
+          onPress={handleSubmit}
+          compact
+          centered
+          disabled={!client?._id || !module?._id}
+        />
+        <Link asChild href={'/patients'}>
+          <ThemedButton title="Cancel" compact variant="error" centered />
+        </Link>
+      </View>
+
+      {/* Dialogs */}
+      <SearchPickerDialog
+        visible={clientPickerVisible}
+        onDismiss={() => toggleClientPickerVisible()}
+        items={clientItems}
+        isPending={clientsPending}
+        isError={clientsError}
+        title="Clients"
+        onSelect={(item) => setClient(item.raw)}
+        leftIcon={() => 'account'}
+      />
+      <SearchPickerDialog
+        visible={modulePickerVisible}
+        onDismiss={() => toggleModulePickerVisible()}
+        items={moduleItems}
+        isPending={modulesPending}
+        isError={modulesError}
+        title="Modules"
+        onSelect={(item) => setModule(item.raw)}
+        leftIcon={() => 'book-open-page-variant'}
+      />
+    </ContentContainer>
+  );
+};
+
+export default AddAssignment;
