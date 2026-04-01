@@ -1,25 +1,14 @@
-import { type ComponentProps, memo, useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { Pressable, View } from 'react-native';
 import { Link } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { dateString } from '@/utils/dates';
+import { getModuleIcon } from '@/utils/moduleIcons';
 import type { MyAssignmentView } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
 import { ThemedText } from '../ThemedText';
 import { DueChip, RecurrenceChip, TimeLeftChip } from '../ui/Chip';
-
-type MCIName = ComponentProps<typeof MaterialCommunityIcons>['name'];
-
-const MODULE_TYPE_ICONS: Record<string, MCIName> = {
-  questionnaire: 'clipboard-text-outline',
-  activity_diary: 'calendar-week',
-  psychoeducation: 'book-open-outline',
-  exercise: 'pencil-outline'
-};
-
-const getModuleIcon = (moduleType?: string): MCIName =>
-  (moduleType && MODULE_TYPE_ICONS[moduleType]) || 'file-document-outline';
 
 const getUrgencyColor = (dueAt?: string): string => {
   if (!dueAt) return Colors.sway.darkGrey;
