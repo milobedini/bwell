@@ -1,7 +1,15 @@
 import type { AxiosError } from 'axios';
 import { api } from '@/api/api';
 import { useAuthStore } from '@/stores/authStore';
-import type { AuthResponse, LoginInput, RegisterInput, UpdateNameInput, VerifyInput } from '@milobedini/shared-types';
+import type {
+  AuthResponse,
+  BasicMutationResponse,
+  ChangePasswordInput,
+  LoginInput,
+  RegisterInput,
+  UpdateNameInput,
+  VerifyInput
+} from '@milobedini/shared-types';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { useMutationWithToast } from './useMutationWithToast';
@@ -67,16 +75,29 @@ export const useVerify = () => {
 
 export const useUpdateName = () => {
   const queryClient = useQueryClient();
+
   return useMutationWithToast<AuthResponse, AxiosError, UpdateNameInput>({
     mutationFn: async (body) => {
       const { data } = await api.put<AuthResponse>('/update-name', body);
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      const current = useAuthStore.getState().user;
+      if (current) useAuthStore.getState().setUser({ ...current, name: variables.newName });
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['patients'] });
       queryClient.invalidateQueries({ queryKey: ['clients'] });
     },
     toast: { pending: 'Updating name...', success: 'Name updated', error: 'Update failed' }
+  });
+};
+
+export const useChangePassword = () => {
+  return useMutationWithToast<BasicMutationResponse, AxiosError, ChangePasswordInput>({
+    mutationFn: async (body) => {
+      const { data } = await api.put<BasicMutationResponse>('/change-password', body);
+      return data;
+    },
+    toast: { pending: 'Changing password...', success: 'Password changed', error: 'Password change failed' }
   });
 };
