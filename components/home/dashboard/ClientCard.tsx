@@ -132,19 +132,16 @@ const ClientCard = memo(({ item, bucket }: ClientCardProps) => {
 
   return (
     <Pressable
-      onPress={() => {
-        router.navigate('/(main)/(tabs)/patients');
-        setTimeout(() => {
-          router.push({
-            pathname: '/(main)/(tabs)/patients/[id]',
-            params: {
-              id: item.patient._id,
-              name: item.patient.name || item.patient.username,
-              headerTitle: item.patient.name || item.patient.username
-            }
-          });
-        }, 0);
-      }}
+      onPress={() =>
+        router.push({
+          pathname: '/(main)/(tabs)/patients/[id]',
+          params: {
+            id: item.patient._id,
+            name: item.patient.name || item.patient.username,
+            headerTitle: item.patient.name || item.patient.username
+          }
+        })
+      }
       className="mb-2.5 overflow-hidden rounded-[14] border-chip-dotInactive border-b-[1.5] bg-chip-pillPressed p-3.5 pb-3"
       style={{ borderLeftWidth: 4, borderLeftColor: borderColor }}
     >

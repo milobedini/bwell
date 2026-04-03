@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import {
   Pressable,
   RefreshControl,
@@ -8,7 +8,7 @@ import {
   View
 } from 'react-native';
 import { Badge } from 'react-native-paper';
-import { useNavigation, useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import type { AttemptFilterDrawerValues } from '@/constants/Filters';
 import { useRemoveAssignment } from '@/hooks/useAssignments';
@@ -94,7 +94,6 @@ ActiveFilterChips.displayName = 'ActiveFilterChips';
 const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeViewProps) => {
   const { data, isPending, isFetching, refetch } = usePatientPractice(patientId);
   const router = useRouter();
-  const navigation = useNavigation();
   const [menuItem, setMenuItem] = useState<PracticeItem | null>(null);
   const { mutate: removeAssignmentMutate } = useRemoveAssignment();
 
@@ -115,28 +114,25 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
     ].filter(Boolean).length;
   }, [filters]);
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Pressable
-          onPress={() => setDrawerOpen(true)}
-          accessibilityLabel="Open filters"
-          className="relative items-center justify-center"
-          style={{ width: 40, height: 40 }}
-          hitSlop={8}
-        >
-          <MaterialCommunityIcons
-            name="filter-variant"
-            size={22}
-            color={isFiltered ? Colors.sway.bright : Colors.sway.lightGrey}
-          />
-          {activeFilterCount > 0 && (
-            <Badge style={{ position: 'absolute', top: 0, right: 0 }}>{activeFilterCount}</Badge>
-          )}
-        </Pressable>
-      )
-    });
-  }, [navigation, isFiltered, activeFilterCount]);
+  const headerRight = useCallback(
+    () => (
+      <Pressable
+        onPress={() => setDrawerOpen(true)}
+        accessibilityLabel="Open filters"
+        className="items-center justify-center"
+        style={{ width: 40, height: 40 }}
+        hitSlop={8}
+      >
+        <MaterialCommunityIcons
+          name="filter-variant"
+          size={22}
+          color={isFiltered ? Colors.sway.bright : Colors.sway.lightGrey}
+        />
+        {activeFilterCount > 0 && <Badge style={{ position: 'absolute', top: 0, right: 0 }}>{activeFilterCount}</Badge>}
+      </Pressable>
+    ),
+    [isFiltered, activeFilterCount]
+  );
 
   const statusParam = useMemo(() => {
     if (!filters?.status?.length) return 'all';
@@ -275,6 +271,7 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
 
   return (
     <>
+      <Stack.Screen options={{ headerRight }} />
       <ContentContainer padded={false}>
         {isFiltered ? (
           <View className="flex-1">
