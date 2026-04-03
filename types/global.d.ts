@@ -1,4 +1,5 @@
 declare module 'eslint-config-expo/flat';
+declare module 'react-native-fit-image';
 
 declare module '*.jpg' {
   import { ImageSourcePropType } from 'react-native';

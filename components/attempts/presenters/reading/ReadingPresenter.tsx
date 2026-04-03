@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { Linking, StyleSheet, TextInput, View } from 'react-native';
+import FitImage from 'react-native-fit-image';
 import Markdown from 'react-native-markdown-display';
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
@@ -22,6 +23,38 @@ type ReadingPresenterProps = {
   attempt: AttemptDetailResponseItem;
   mode: 'view' | 'edit';
   patientName?: string;
+};
+
+// Fix React 19 key-in-spread warning from react-native-markdown-display's image rule
+const markdownRules = {
+  image: (
+    node: { key: string; attributes: { src?: string; alt?: string } },
+    children: ReactNode[],
+    parent: unknown[],
+    styles: Record<string, object>,
+    allowedImageHandlers: string[],
+    defaultImageHandler: string | null
+  ) => {
+    const { src, alt } = node.attributes;
+    if (!src) return null;
+
+    const show = allowedImageHandlers.some((h) => src.toLowerCase().startsWith(h.toLowerCase()));
+
+    if (!show && defaultImageHandler === null) return null;
+
+    const imageProps: Record<string, unknown> = {
+      indicator: true,
+      style: styles._VIEW_SAFE_image,
+      source: { uri: show ? src : `${defaultImageHandler}${src}` }
+    };
+
+    if (alt) {
+      imageProps.accessible = true;
+      imageProps.accessibilityLabel = alt;
+    }
+
+    return <FitImage key={node.key} {...imageProps} />;
+  }
 };
 
 const markdownStyles = StyleSheet.create({
@@ -138,7 +171,7 @@ const ReadingPresenter = ({ attempt, mode, patientName }: ReadingPresenterProps)
         )}
 
         {content ? (
-          <Markdown style={markdownStyles} onLinkPress={handleLinkPress}>
+          <Markdown style={markdownStyles} rules={markdownRules} onLinkPress={handleLinkPress}>
             {content}
           </Markdown>
         ) : (
