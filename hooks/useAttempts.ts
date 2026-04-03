@@ -10,7 +10,7 @@ import type {
   SubmitAttemptInput,
   SubmitAttemptResponse
 } from '@milobedini/shared-types';
-import { type InfiniteData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type InfiniteData, keepPreviousData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useMutationWithToast } from './useMutationWithToast';
 import { useIsLoggedIn } from './useUsers';
@@ -21,6 +21,7 @@ export type PatientTimelineOptions = {
   moduleId?: string;
   limit?: number;
   status?: AttemptStatusInput | 'all' | string;
+  severity?: string;
   enabled?: boolean;
 };
 
@@ -35,7 +36,8 @@ export const useGetPatientTimeline = ({
   patientId,
   moduleId,
   limit = 20,
-  status = 'submitted',
+  status = 'all',
+  severity,
   enabled = true
 }: PatientTimelineOptions) => {
   const isLoggedIn = useIsLoggedIn();
@@ -48,11 +50,11 @@ export const useGetPatientTimeline = ({
       'attempts',
       'therapist',
       'patient-timeline',
-      { patientId: string; moduleId?: string; limit: number; status: string }
+      { patientId: string; moduleId?: string; limit: number; status: string; severity?: string }
     ], // TQueryKey
     string | null // TPageParam
   >({
-    queryKey: ['attempts', 'therapist', 'patient-timeline', { patientId, moduleId, limit, status }],
+    queryKey: ['attempts', 'therapist', 'patient-timeline', { patientId, moduleId, limit, status, severity }],
     initialPageParam: null,
     queryFn: async ({ pageParam }): Promise<PatientModuleTimelineResponse> => {
       const { data } = await api.get<PatientModuleTimelineResponse>(`/user/therapist/patients/${patientId}/timeline`, {
@@ -60,6 +62,7 @@ export const useGetPatientTimeline = ({
           moduleId,
           limit,
           status,
+          severity,
           cursor: pageParam ?? undefined
         }
       });
@@ -75,6 +78,7 @@ export const useGetPatientTimeline = ({
       return { pages, attempts, nextCursor };
     },
 
+    placeholderData: keepPreviousData,
     enabled: isLoggedIn && !!patientId && enabled
   });
 

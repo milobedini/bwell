@@ -81,7 +81,11 @@ const AddAssignment = () => {
         if (client) {
           router.replace({
             pathname: '/(main)/(tabs)/patients/[id]',
-            params: { id: client._id, name: client.name ?? client.username }
+            params: {
+              id: client._id,
+              name: client.name ?? client.username,
+              headerTitle: client.name ?? client.username
+            }
           });
         } else {
           router.back();
