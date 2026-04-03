@@ -46,16 +46,9 @@ const AttemptCard = memo(({ item, onPress }: AttemptCardProps) => {
   })();
 
   return (
-    <Pressable
-      onPress={() => onPress(item)}
-      className="active:opacity-80"
-      style={{ backgroundColor: Colors.chip.darkCard, borderRadius: 12, padding: 12 }}
-    >
+    <Pressable onPress={() => onPress(item)} className="rounded-xl bg-chip-darkCard p-3 active:opacity-80">
       <View className="flex-row items-center gap-3">
-        <View
-          className="items-center justify-center rounded-lg"
-          style={{ width: 36, height: 36, backgroundColor: Colors.chip.darkCardAlt }}
-        >
+        <View className="h-9 w-9 items-center justify-center rounded-lg bg-chip-darkCardAlt">
           <MaterialCommunityIcons
             name={icon}
             size={18}

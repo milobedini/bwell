@@ -47,23 +47,23 @@ type ActiveFilterChipsProps = {
 };
 
 const ActiveFilterChips = memo(({ filters, moduleName, onClear, onClearAll }: ActiveFilterChipsProps) => {
-  const chips: { key: keyof AttemptFilterDrawerValues; label: string }[] = [];
+  type Chip = { key: keyof AttemptFilterDrawerValues; label: string };
 
-  if (filters.status && filters.status.length > 0 && !(filters.status.length === 1 && filters.status[0] === 'all')) {
-    chips.push({ key: 'status', label: `Status: ${filters.status.join(', ')}` });
-  }
-  if (filters.moduleId && moduleName) {
-    chips.push({ key: 'moduleId', label: `Module: ${moduleName}` });
-  }
-  if (filters.severity) {
-    chips.push({
-      key: 'severity',
-      label: `Severity: ${filters.severity.charAt(0).toUpperCase() + filters.severity.slice(1)}`
-    });
-  }
-  if (filters.limit && filters.limit !== 20) {
-    chips.push({ key: 'limit', label: `Limit: ${filters.limit}` });
-  }
+  const chips = (
+    [
+      filters.status &&
+        filters.status.length > 0 &&
+        !(filters.status.length === 1 && filters.status[0] === 'all') &&
+        ({ key: 'status', label: `Status: ${filters.status.join(', ')}` } satisfies Chip),
+      filters.moduleId && moduleName && ({ key: 'moduleId', label: `Module: ${moduleName}` } satisfies Chip),
+      filters.severity &&
+        ({
+          key: 'severity',
+          label: `Severity: ${filters.severity.charAt(0).toUpperCase() + filters.severity.slice(1)}`
+        } satisfies Chip),
+      filters.limit && filters.limit !== 20 && ({ key: 'limit', label: `Limit: ${filters.limit}` } satisfies Chip)
+    ] as (Chip | false | undefined | 0 | '')[]
+  ).filter((c): c is Chip => !!c);
 
   if (chips.length === 0) return null;
 
@@ -76,13 +76,19 @@ const ActiveFilterChips = memo(({ filters, moduleName, onClear, onClearAll }: Ac
           className="flex-row items-center gap-1 rounded-full px-2.5 py-1"
           style={{ backgroundColor: Colors.tint.teal }}
         >
-          <ThemedText style={{ fontSize: 12, color: Colors.sway.bright }}>{c.label}</ThemedText>
-          <ThemedText style={{ fontSize: 12, color: Colors.sway.bright, opacity: 0.6 }}>✕</ThemedText>
+          <ThemedText type="small" style={{ color: Colors.sway.bright }}>
+            {c.label}
+          </ThemedText>
+          <ThemedText type="small" style={{ color: Colors.sway.bright, opacity: 0.6 }}>
+            ✕
+          </ThemedText>
         </Pressable>
       ))}
       {chips.length >= 2 && (
         <Pressable onPress={onClearAll}>
-          <ThemedText style={{ fontSize: 12, color: Colors.sway.darkGrey, marginLeft: 4 }}>Clear all</ThemedText>
+          <ThemedText type="small" style={{ color: Colors.sway.darkGrey }} className="ml-1">
+            Clear all
+          </ThemedText>
         </Pressable>
       )}
     </View>
@@ -108,7 +114,7 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
     if (!filters) return 0;
     return [
       !!filters.moduleId,
-      (filters.status?.length ?? 0) > 0 && !(filters.status?.length === 1 && filters.status?.[0] === 'submitted'),
+      (filters.status?.length ?? 0) > 0 && !(filters.status?.length === 1 && filters.status?.[0] === 'all'),
       !!filters.severity,
       !!filters.limit && filters.limit !== 20
     ].filter(Boolean).length;
@@ -119,8 +125,7 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
       <Pressable
         onPress={() => setDrawerOpen(true)}
         accessibilityLabel="Open filters"
-        className="items-center justify-center"
-        style={{ width: 40, height: 40 }}
+        className="h-10 w-10 items-center justify-center"
         hitSlop={8}
       >
         <MaterialCommunityIcons

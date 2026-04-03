@@ -10,7 +10,7 @@ import type {
   SubmitAttemptInput,
   SubmitAttemptResponse
 } from '@milobedini/shared-types';
-import { type InfiniteData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type InfiniteData, keepPreviousData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useMutationWithToast } from './useMutationWithToast';
 import { useIsLoggedIn } from './useUsers';
@@ -36,7 +36,7 @@ export const useGetPatientTimeline = ({
   patientId,
   moduleId,
   limit = 20,
-  status = 'submitted',
+  status = 'all',
   severity,
   enabled = true
 }: PatientTimelineOptions) => {
@@ -78,6 +78,7 @@ export const useGetPatientTimeline = ({
       return { pages, attempts, nextCursor };
     },
 
+    placeholderData: keepPreviousData,
     enabled: isLoggedIn && !!patientId && enabled
   });
 

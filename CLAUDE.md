@@ -52,7 +52,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - Role-based tab visibility uses `href: null` in tab config
 - Module types each get their own presenter component in `components/attempts/presenters/` — the `AttemptPresenter` routes to the correct one based on module type
 - Each new CBT tool will likely need: a new `ModuleType` enum value, a Mongoose model (BE), a controller (BE), a FE presenter component, and a hook
-- **Shared types workflow:** All API response types, model interfaces, and enums must be defined in the BE shared-types package (`@milobedini/shared-types`), not in FE code. When making changes that affect types: (1) update the shared-types package in `../cbt/`, (2) publish to npm, (3) run `npm run update-types` in the FE. Never create local FE type definitions for data that comes from the API.
+- **Shared types workflow:** All API response types, model interfaces, and response shapes must be defined in the BE shared-types package (`@milobedini/shared-types`), not in FE code. When making changes that affect types: (1) update the shared-types package in `../cbt/`, (2) publish to npm, (3) run `npm run update-types` in the FE. Local FE enums (or `as const` objects) that mirror shared string-union types are permitted when they provide runtime constants for comparisons — these prevent magic strings and enable safe refactoring. Keep them in `types/types.ts` and ensure values stay in sync with the shared-types contract.
 
 ### Patterns
 
