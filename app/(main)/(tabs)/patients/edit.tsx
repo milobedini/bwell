@@ -57,7 +57,7 @@ const EditAssignment = () => {
     }
     if (notes !== (initialNotes ?? '')) updates.notes = notes;
     if (JSON.stringify(recurrence) !== JSON.stringify(initialRecurrence ?? { freq: 'none' })) {
-      updates.recurrence = recurrence;
+      updates.recurrence = recurrence ?? { freq: 'none' };
     }
 
     updateAssignment.mutate({ assignmentId: assignmentId!, updates }, { onSuccess: () => router.back() });
