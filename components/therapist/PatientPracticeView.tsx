@@ -10,7 +10,7 @@ import {
 import { Badge } from 'react-native-paper';
 import { Stack, useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
-import { type AttemptFilterDrawerValues, DEFAULT_FILTERS } from '@/constants/Filters';
+import type { AttemptFilterDrawerValues } from '@/constants/Filters';
 import { useRemoveAssignment } from '@/hooks/useAssignments';
 import { useGetPatientTimeline } from '@/hooks/useAttempts';
 import { usePatientModules, usePatientPractice } from '@/hooks/usePractice';
@@ -325,7 +325,7 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
       <AttemptFilterDrawer
         visible={drawerOpen}
         onDismiss={() => setDrawerOpen(false)}
-        values={filters ?? DEFAULT_FILTERS}
+        values={filters ?? { status: [], limit: 20 }}
         onChange={setFilters}
         onApply={setFilters}
         onReset={handleResetFilters}
