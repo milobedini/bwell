@@ -44,7 +44,6 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
 
   const handleEdit = useCallback(() => {
     if (!menuItem) return;
-    // Route registered in Task 3 — cast needed until edit.tsx exists
     router.push({
       pathname: '/(main)/(tabs)/patients/edit',
       params: {
@@ -58,8 +57,7 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
         ...(menuItem.notes ? { notes: menuItem.notes } : {}),
         headerTitle: 'Edit Assignment'
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any);
+    });
   }, [menuItem, patientName, router]);
 
   const handleRemove = useCallback(() => {
