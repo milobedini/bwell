@@ -152,7 +152,7 @@ const PatientsIndexScreen = () => {
     (client: AuthUser) => {
       router.push({
         pathname: '/(main)/(tabs)/patients/[id]',
-        params: { id: client._id, name: client.name || client.username }
+        params: { id: client._id, name: client.name || client.username, headerTitle: client.name || client.username }
       });
     },
     [router]

@@ -245,8 +245,7 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
   const keyExtractor = useCallback((item: PracticeItem) => item.assignmentId, []);
 
   const listHeader = (
-    <View className="flex-row items-center justify-between pb-2 pt-2">
-      <ThemedText type="subtitle">{patientName}</ThemedText>
+    <View className="flex-row items-center justify-end pb-2 pt-2">
       <View className="relative flex-row items-center">
         <IconButton
           icon="filter-variant"
