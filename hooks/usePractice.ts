@@ -62,6 +62,21 @@ export const usePatientPractice = (patientId: string | undefined) =>
     enabled: !!patientId
   });
 
+// Therapist: available modules for a specific patient (for filter drawers)
+export const usePatientModules = (patientId: string | undefined) => {
+  const isLoggedIn = useIsLoggedIn();
+  return useQuery({
+    queryKey: ['practice', 'patient', patientId, 'modules'],
+    queryFn: async () => {
+      const { data } = await api.get<{ modules: { _id: string; title: string }[] }>(
+        `/user/therapist/patients/${patientId}/modules`
+      );
+      return data.modules;
+    },
+    enabled: !!patientId && isLoggedIn
+  });
+};
+
 // Therapist: available module types for filter drawers
 export const useTherapistReviewModules = () => {
   const isLoggedIn = useIsLoggedIn();

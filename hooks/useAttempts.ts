@@ -21,6 +21,7 @@ export type PatientTimelineOptions = {
   moduleId?: string;
   limit?: number;
   status?: AttemptStatusInput | 'all' | string;
+  severity?: string;
   enabled?: boolean;
 };
 
@@ -36,6 +37,7 @@ export const useGetPatientTimeline = ({
   moduleId,
   limit = 20,
   status = 'submitted',
+  severity,
   enabled = true
 }: PatientTimelineOptions) => {
   const isLoggedIn = useIsLoggedIn();
@@ -48,11 +50,11 @@ export const useGetPatientTimeline = ({
       'attempts',
       'therapist',
       'patient-timeline',
-      { patientId: string; moduleId?: string; limit: number; status: string }
+      { patientId: string; moduleId?: string; limit: number; status: string; severity?: string }
     ], // TQueryKey
     string | null // TPageParam
   >({
-    queryKey: ['attempts', 'therapist', 'patient-timeline', { patientId, moduleId, limit, status }],
+    queryKey: ['attempts', 'therapist', 'patient-timeline', { patientId, moduleId, limit, status, severity }],
     initialPageParam: null,
     queryFn: async ({ pageParam }): Promise<PatientModuleTimelineResponse> => {
       const { data } = await api.get<PatientModuleTimelineResponse>(`/user/therapist/patients/${patientId}/timeline`, {
@@ -60,6 +62,7 @@ export const useGetPatientTimeline = ({
           moduleId,
           limit,
           status,
+          severity,
           cursor: pageParam ?? undefined
         }
       });
