@@ -24,6 +24,7 @@ import ContentContainer from '../ContentContainer';
 import ErrorComponent, { ErrorTypes } from '../ErrorComponent';
 import { LoadingIndicator } from '../LoadingScreen';
 import { ThemedText } from '../ThemedText';
+import ActiveFilterChips from '../ui/ActiveFilterChips';
 import EmptyState from '../ui/EmptyState';
 
 import NeedsAttentionSection from './NeedsAttentionSection';
@@ -126,58 +127,6 @@ const SectionHeader = memo(function SectionHeader({ title }: { title: string }) 
   );
 });
 
-const ActiveFilterChips = memo(function ActiveFilterChips({
-  filters,
-  patientName,
-  moduleName,
-  onClear,
-  onClearAll
-}: {
-  filters: ReviewFilterValues;
-  patientName?: string;
-  moduleName?: string;
-  onClear: (key: keyof ReviewFilterValues) => void;
-  onClearAll: () => void;
-}) {
-  const chips: { key: keyof ReviewFilterValues; label: string }[] = [];
-
-  if (filters.patientId && patientName) {
-    chips.push({ key: 'patientId', label: `Patient: ${patientName}` });
-  }
-  if (filters.moduleId && moduleName) {
-    chips.push({ key: 'moduleId', label: `Module: ${moduleName}` });
-  }
-  if (filters.severity) {
-    chips.push({
-      key: 'severity',
-      label: `Severity: ${filters.severity.charAt(0).toUpperCase() + filters.severity.slice(1)}`
-    });
-  }
-
-  if (chips.length === 0) return null;
-
-  return (
-    <View className="flex-row flex-wrap items-center gap-1.5 pb-2">
-      {chips.map((c) => (
-        <Pressable
-          key={c.key}
-          onPress={() => onClear(c.key)}
-          className="flex-row items-center gap-1 rounded-full px-2.5 py-1"
-          style={{ backgroundColor: Colors.tint.teal }}
-        >
-          <ThemedText style={{ fontSize: 12, color: Colors.sway.bright }}>{c.label}</ThemedText>
-          <ThemedText style={{ fontSize: 12, color: Colors.sway.bright, opacity: 0.6 }}>✕</ThemedText>
-        </Pressable>
-      ))}
-      {chips.length >= 2 && (
-        <Pressable onPress={onClearAll}>
-          <ThemedText style={{ fontSize: 12, color: Colors.sway.darkGrey, marginLeft: 4 }}>Clear all</ThemedText>
-        </Pressable>
-      )}
-    </View>
-  );
-});
-
 const ReviewScreen = () => {
   const [sort, setSort] = useState<SortOption>('newest');
   const [filters, setFilters] = useState<ReviewFilterValues>(DEFAULT_REVIEW_FILTERS);
@@ -226,6 +175,23 @@ const ReviewScreen = () => {
     [moduleChoices, filters.moduleId]
   );
 
+  const filterChips = useMemo(() => {
+    const chips: { key: string; label: string }[] = [];
+    if (filters.patientId && selectedPatientName) {
+      chips.push({ key: 'patientId', label: `Patient: ${selectedPatientName}` });
+    }
+    if (filters.moduleId && selectedModuleName) {
+      chips.push({ key: 'moduleId', label: `Module: ${selectedModuleName}` });
+    }
+    if (filters.severity) {
+      chips.push({
+        key: 'severity',
+        label: `Severity: ${filters.severity.charAt(0).toUpperCase() + filters.severity.slice(1)}`
+      });
+    }
+    return chips;
+  }, [filters, selectedPatientName, selectedModuleName]);
+
   const sections = useMemo(() => groupByDate(submissions, getReviewDate), [submissions]);
 
   const renderItem = useCallback(
@@ -244,8 +210,8 @@ const ReviewScreen = () => {
     if (hasNextPage && !isFetchingNextPage) fetchNextPage();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleClearFilter = useCallback((key: keyof ReviewFilterValues) => {
-    setFilters((prev) => ({ ...prev, [key]: undefined }));
+  const handleClearFilter = useCallback((key: string) => {
+    setFilters((prev) => ({ ...prev, [key as keyof ReviewFilterValues]: undefined }));
   }, []);
 
   const handleClearAll = useCallback(() => setFilters(DEFAULT_REVIEW_FILTERS), []);
@@ -295,13 +261,7 @@ const ReviewScreen = () => {
       </View>
 
       {/* Active filter chips */}
-      <ActiveFilterChips
-        filters={filters}
-        patientName={selectedPatientName}
-        moduleName={selectedModuleName}
-        onClear={handleClearFilter}
-        onClearAll={handleClearAll}
-      />
+      <ActiveFilterChips chips={filterChips} onClear={handleClearFilter} onClearAll={handleClearAll} />
 
       {/* All Submissions header */}
       <View className="border-b pb-2 pt-1" style={{ borderBottomColor: Colors.chip.darkCardAlt, marginBottom: 12 }}>
