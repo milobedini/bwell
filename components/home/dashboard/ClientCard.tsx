@@ -75,6 +75,7 @@ const ReasonTags = ({ reasons, bucket }: ReasonTagsProps) => {
       {reasons.map((reason) => {
         const config = REASON_TAG_CONFIG[reason];
         if (!config) {
+          // eslint-disable-next-line no-console
           if (__DEV__) console.warn(`Unknown reason tag: ${reason}`);
           return null;
         }
