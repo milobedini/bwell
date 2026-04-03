@@ -6,7 +6,6 @@ export default function HomeStack() {
     <Stack screenOptions={stackScreenOptions}>
       <Stack.Screen name="index" />
       <Stack.Screen name="practice/[id]" options={withHeaderFromParams()} />
-      <Stack.Screen name="clients/[id]/index" options={withHeaderFromParams()} />
     </Stack>
   );
 }
