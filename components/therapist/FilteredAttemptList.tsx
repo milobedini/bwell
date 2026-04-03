@@ -2,16 +2,17 @@ import { memo, useCallback } from 'react';
 import { FlatList, Pressable, RefreshControl, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
+import { AttemptStatus } from '@/types/types';
 import { dueLabel, formatShortDate } from '@/utils/dates';
 import { getModuleIcon } from '@/utils/moduleIcons';
-import type { AttemptListItem, ScoreBandSummary } from '@milobedini/shared-types';
+import type { AttemptListItem } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
 import { LoadingIndicator } from '../LoadingScreen';
 import { ThemedText } from '../ThemedText';
 import EmptyState from '../ui/EmptyState';
 
-type TimelineAttempt = AttemptListItem & { band?: ScoreBandSummary };
+type TimelineAttempt = AttemptListItem;
 
 type FilteredAttemptListProps = {
   attempts: TimelineAttempt[];
@@ -31,16 +32,16 @@ type AttemptCardProps = {
 
 const AttemptCard = memo(({ item, onPress }: AttemptCardProps) => {
   const icon = getModuleIcon(item.moduleType);
-  const isCompleted = item.status === 'submitted';
+  const isCompleted = item.status === AttemptStatus.SUBMITTED;
 
   const statusText = (() => {
     if (isCompleted && item.completedAt) {
       return `Submitted ${formatShortDate(item.completedAt)}`;
     }
-    if (item.status === 'started' && item.percentComplete) {
+    if (item.status === AttemptStatus.STARTED && item.percentComplete) {
       return `${Math.round(item.percentComplete)}% complete`;
     }
-    if (item.status === 'abandoned') return 'Abandoned';
+    if (item.status === AttemptStatus.ABANDONED) return 'Abandoned';
     return 'Not started';
   })();
 
