@@ -46,13 +46,12 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
 
   const activeFilterCount = useMemo(() => {
     if (!filters) return 0;
-    let n = 0;
-    if (filters.moduleId) n++;
-    if ((filters.status?.length ?? 0) > 0 && !(filters.status?.length === 1 && filters.status?.[0] === 'submitted'))
-      n++;
-    if (filters.severity) n++;
-    if (filters.limit && filters.limit !== 20) n++;
-    return n;
+    return [
+      !!filters.moduleId,
+      (filters.status?.length ?? 0) > 0 && !(filters.status?.length === 1 && filters.status?.[0] === 'submitted'),
+      !!filters.severity,
+      !!filters.limit && filters.limit !== 20
+    ].filter(Boolean).length;
   }, [filters]);
 
   const statusParam = useMemo(() => {

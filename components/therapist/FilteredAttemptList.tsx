@@ -26,7 +26,6 @@ type FilteredAttemptListProps = {
 
 type AttemptCardProps = {
   item: TimelineAttempt;
-  patientName: string;
   onPress: (item: TimelineAttempt) => void;
 };
 
@@ -121,10 +120,8 @@ const FilteredAttemptListBase = ({
   );
 
   const renderItem = useCallback(
-    ({ item }: { item: TimelineAttempt }) => (
-      <AttemptCard item={item} patientName={patientName} onPress={handlePress} />
-    ),
-    [patientName, handlePress]
+    ({ item }: { item: TimelineAttempt }) => <AttemptCard item={item} onPress={handlePress} />,
+    [handlePress]
   );
 
   const keyExtractor = useCallback((item: TimelineAttempt) => item._id, []);
