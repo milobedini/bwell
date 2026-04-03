@@ -13,6 +13,7 @@ export default function PatientsLayout() {
       <Stack.Screen name="[id]" options={nestedScreenOptions} />
       <Stack.Screen name="attempt/[id]" options={withHeaderFromParams()} />
       <Stack.Screen name="add" options={nestedScreenOptionsWithTitle('Create Assignment')} />
+      <Stack.Screen name="edit" options={withHeaderFromParams()} />
     </Stack>
   );
 }
