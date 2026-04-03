@@ -23,7 +23,6 @@ import { LoadingIndicator } from '../LoadingScreen';
 import { ThemedText } from '../ThemedText';
 import type { ActionMenuItem } from '../ui/ActionMenu';
 import ActionMenu from '../ui/ActionMenu';
-import ActiveFilterChips from '../ui/ActiveFilterChips';
 import { AttemptFilterDrawer } from '../ui/AttemptFilterDrawer';
 import EmptyState from '../ui/EmptyState';
 
@@ -40,6 +39,58 @@ type Section = {
   data: PracticeItem[];
 };
 
+type ActiveFilterChipsProps = {
+  filters: AttemptFilterDrawerValues;
+  moduleName?: string;
+  onClear: (key: keyof AttemptFilterDrawerValues) => void;
+  onClearAll: () => void;
+};
+
+const ActiveFilterChips = memo(({ filters, moduleName, onClear, onClearAll }: ActiveFilterChipsProps) => {
+  const chips: { key: keyof AttemptFilterDrawerValues; label: string }[] = [];
+
+  if (filters.status && filters.status.length > 0 && !(filters.status.length === 1 && filters.status[0] === 'all')) {
+    chips.push({ key: 'status', label: `Status: ${filters.status.join(', ')}` });
+  }
+  if (filters.moduleId && moduleName) {
+    chips.push({ key: 'moduleId', label: `Module: ${moduleName}` });
+  }
+  if (filters.severity) {
+    chips.push({
+      key: 'severity',
+      label: `Severity: ${filters.severity.charAt(0).toUpperCase() + filters.severity.slice(1)}`
+    });
+  }
+  if (filters.limit && filters.limit !== 20) {
+    chips.push({ key: 'limit', label: `Limit: ${filters.limit}` });
+  }
+
+  if (chips.length === 0) return null;
+
+  return (
+    <View className="flex-row flex-wrap items-center gap-1.5 px-4 pb-2">
+      {chips.map((c) => (
+        <Pressable
+          key={c.key}
+          onPress={() => onClear(c.key)}
+          className="flex-row items-center gap-1 rounded-full px-2.5 py-1"
+          style={{ backgroundColor: Colors.tint.teal }}
+        >
+          <ThemedText style={{ fontSize: 12, color: Colors.sway.bright }}>{c.label}</ThemedText>
+          <ThemedText style={{ fontSize: 12, color: Colors.sway.bright, opacity: 0.6 }}>✕</ThemedText>
+        </Pressable>
+      ))}
+      {chips.length >= 2 && (
+        <Pressable onPress={onClearAll}>
+          <ThemedText style={{ fontSize: 12, color: Colors.sway.darkGrey, marginLeft: 4 }}>Clear all</ThemedText>
+        </Pressable>
+      )}
+    </View>
+  );
+});
+
+ActiveFilterChips.displayName = 'ActiveFilterChips';
+
 const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeViewProps) => {
   const { data, isPending, isFetching, refetch } = usePatientPractice(patientId);
   const router = useRouter();
@@ -53,38 +104,15 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
 
   const isFiltered = filters !== null;
 
-  const moduleChoices = useMemo(
-    () => patientModules?.map((m) => ({ id: m._id, title: m.title })) ?? [],
-    [patientModules]
-  );
-
-  const selectedModuleName = useMemo(
-    () => moduleChoices.find((m) => m.id === filters?.moduleId)?.title,
-    [moduleChoices, filters?.moduleId]
-  );
-
-  const filterChips = useMemo(() => {
-    if (!filters) return [];
-    const chips: { key: string; label: string }[] = [];
-    if (filters.status && filters.status.length > 0 && !(filters.status.length === 1 && filters.status[0] === 'all')) {
-      chips.push({ key: 'status', label: `Status: ${filters.status.join(', ')}` });
-    }
-    if (filters.moduleId && selectedModuleName) {
-      chips.push({ key: 'moduleId', label: `Module: ${selectedModuleName}` });
-    }
-    if (filters.severity) {
-      chips.push({
-        key: 'severity',
-        label: `Severity: ${filters.severity.charAt(0).toUpperCase() + filters.severity.slice(1)}`
-      });
-    }
-    if (filters.limit && filters.limit !== 20) {
-      chips.push({ key: 'limit', label: `Limit: ${filters.limit}` });
-    }
-    return chips;
-  }, [filters, selectedModuleName]);
-
-  const activeFilterCount = filterChips.length;
+  const activeFilterCount = useMemo(() => {
+    if (!filters) return 0;
+    return [
+      !!filters.moduleId,
+      (filters.status?.length ?? 0) > 0 && !(filters.status?.length === 1 && filters.status?.[0] === 'submitted'),
+      !!filters.severity,
+      !!filters.limit && filters.limit !== 20
+    ].filter(Boolean).length;
+  }, [filters]);
 
   const headerRight = useCallback(
     () => (
@@ -159,10 +187,20 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
     setFilters(null);
   }, []);
 
-  const handleClearFilter = useCallback((key: string) => {
+  const moduleChoices = useMemo(
+    () => patientModules?.map((m) => ({ id: m._id, title: m.title })) ?? [],
+    [patientModules]
+  );
+
+  const selectedModuleName = useMemo(
+    () => moduleChoices.find((m) => m.id === filters?.moduleId)?.title,
+    [moduleChoices, filters?.moduleId]
+  );
+
+  const handleClearFilter = useCallback((key: keyof AttemptFilterDrawerValues) => {
     setFilters((prev) => {
       if (!prev) return null;
-      const next = { ...prev, [key as keyof AttemptFilterDrawerValues]: undefined };
+      const next = { ...prev, [key]: undefined };
       // if all filters are now empty, reset to null (unfiltered mode)
       const hasAny =
         next.moduleId ||
@@ -234,10 +272,10 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
         {isFiltered ? (
           <View className="flex-1">
             <ActiveFilterChips
-              chips={filterChips}
+              filters={filters}
+              moduleName={selectedModuleName}
               onClear={handleClearFilter}
               onClearAll={handleResetFilters}
-              style={{ paddingHorizontal: 16 }}
             />
             <FilteredAttemptList
               attempts={timeline.attempts}
