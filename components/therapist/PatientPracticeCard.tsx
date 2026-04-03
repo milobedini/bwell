@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { Pressable, View } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { dueLabel, formatShortDate } from '@/utils/dates';
@@ -15,12 +16,13 @@ type PatientPracticeCardProps = {
   sparkline?: number[];
   patientId: string;
   patientName: string;
+  onLongPress?: (item: PracticeItem) => void;
 };
 
 const SPARKLINE_BAR_COUNT = 5;
 const SPARKLINE_MAX_HEIGHT = 20;
 
-const PatientPracticeCardBase = ({ item, sparkline, patientName }: PatientPracticeCardProps) => {
+const PatientPracticeCardBase = ({ item, sparkline, patientName, onLongPress }: PatientPracticeCardProps) => {
   const router = useRouter();
   const isCompleted = item.status === 'completed';
   const isInProgress = item.status === 'in_progress';
@@ -29,11 +31,15 @@ const PatientPracticeCardBase = ({ item, sparkline, patientName }: PatientPracti
   const canNavigate = item.status !== 'not_started' && !!item.latestAttempt?.attemptId;
 
   const handlePress = () => {
-    if (!canNavigate) return;
     router.push({
       pathname: '/(main)/(tabs)/patients/attempt/[id]',
       params: { id: item.latestAttempt!.attemptId, headerTitle: patientName }
     });
+  };
+
+  const handleLongPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onLongPress?.(item);
   };
 
   const statusText = (() => {
@@ -57,8 +63,8 @@ const PatientPracticeCardBase = ({ item, sparkline, patientName }: PatientPracti
 
   return (
     <Pressable
-      onPress={handlePress}
-      disabled={!canNavigate}
+      onPress={canNavigate ? handlePress : undefined}
+      onLongPress={handleLongPress}
       className="active:opacity-80"
       style={{ backgroundColor: Colors.chip.darkCard, borderRadius: 12, padding: 12 }}
     >
