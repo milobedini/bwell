@@ -7,7 +7,7 @@ import {
   type SectionListRenderItemInfo,
   View
 } from 'react-native';
-import { Badge, IconButton } from 'react-native-paper';
+import { Badge } from 'react-native-paper';
 import { useNavigation, useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import type { AttemptFilterDrawerValues } from '@/constants/Filters';
@@ -16,6 +16,7 @@ import { useGetPatientTimeline } from '@/hooks/useAttempts';
 import { usePatientModules, usePatientPractice } from '@/hooks/usePractice';
 import { dueLabel } from '@/utils/dates';
 import type { PracticeItem } from '@milobedini/shared-types';
+import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
 import ContentContainer from '../ContentContainer';
 import { LoadingIndicator } from '../LoadingScreen';
@@ -117,18 +118,22 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <View className="relative">
-          <IconButton
-            icon="filter-variant"
-            onPress={() => setDrawerOpen(true)}
-            accessibilityLabel="Open filters"
-            iconColor={isFiltered ? Colors.sway.bright : Colors.sway.lightGrey}
+        <Pressable
+          onPress={() => setDrawerOpen(true)}
+          accessibilityLabel="Open filters"
+          className="relative items-center justify-center"
+          style={{ width: 40, height: 40 }}
+          hitSlop={8}
+        >
+          <MaterialCommunityIcons
+            name="filter-variant"
             size={22}
+            color={isFiltered ? Colors.sway.bright : Colors.sway.lightGrey}
           />
           {activeFilterCount > 0 && (
-            <Badge style={{ position: 'absolute', top: 2, right: 2 }}>{activeFilterCount}</Badge>
+            <Badge style={{ position: 'absolute', top: 0, right: 0 }}>{activeFilterCount}</Badge>
           )}
-        </View>
+        </Pressable>
       )
     });
   }, [navigation, isFiltered, activeFilterCount]);
