@@ -29,7 +29,7 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
   const { data, isPending, isFetching, refetch } = usePatientPractice(patientId);
   const router = useRouter();
   const [menuItem, setMenuItem] = useState<PracticeItem | null>(null);
-  const removeAssignment = useRemoveAssignment();
+  const { mutate: removeAssignmentMutate } = useRemoveAssignment();
 
   const sections: Section[] = [
     { title: 'Today', data: data?.today ?? [] },
@@ -62,8 +62,8 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
 
   const handleRemove = useCallback(() => {
     if (!menuItem) return;
-    removeAssignment.mutate({ assignmentId: menuItem.assignmentId });
-  }, [menuItem, removeAssignment]);
+    removeAssignmentMutate({ assignmentId: menuItem.assignmentId });
+  }, [menuItem, removeAssignmentMutate]);
 
   const menuActions: ActionMenuItem[] = menuItem
     ? [

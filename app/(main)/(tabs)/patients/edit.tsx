@@ -31,28 +31,37 @@ const EditAssignment = () => {
 
   const [dueAt, setDueAt] = useState<string | undefined>(params.dueAt);
   const [recurrence, setRecurrence] = useState<AssignmentRecurrence | undefined>(initialRecurrence ?? { freq: 'none' });
+
+  const handleDueAtChange = useCallback((val?: string) => {
+    setDueAt(val);
+    if (!val) setRecurrence({ freq: 'none' });
+  }, []);
   const [notes, setNotes] = useState(params.notes ?? '');
 
   const router = useRouter();
   const updateAssignment = useUpdateAssignment();
+  const { assignmentId, dueAt: initialDueAt, notes: initialNotes } = params;
 
   const hasChanges = useMemo(() => {
-    const dueAtChanged = (dueAt ?? '') !== (params.dueAt ?? '');
-    const notesChanged = notes !== (params.notes ?? '');
+    const dueAtChanged = (dueAt ?? '') !== (initialDueAt ?? '');
+    const notesChanged = notes !== (initialNotes ?? '');
     const recurrenceChanged = JSON.stringify(recurrence) !== JSON.stringify(initialRecurrence ?? { freq: 'none' });
     return dueAtChanged || notesChanged || recurrenceChanged;
-  }, [dueAt, params.dueAt, notes, params.notes, recurrence, initialRecurrence]);
+  }, [dueAt, initialDueAt, notes, initialNotes, recurrence, initialRecurrence]);
 
   const handleSubmit = useCallback(() => {
     const updates: UpdateAssignmentInput = {};
-    if ((dueAt ?? '') !== (params.dueAt ?? '')) updates.dueAt = dueAt;
-    if (notes !== (params.notes ?? '')) updates.notes = notes;
+    if ((dueAt ?? '') !== (initialDueAt ?? '')) {
+      // Send null explicitly to unset dueAt on the BE
+      updates.dueAt = dueAt ?? (null as unknown as string);
+    }
+    if (notes !== (initialNotes ?? '')) updates.notes = notes;
     if (JSON.stringify(recurrence) !== JSON.stringify(initialRecurrence ?? { freq: 'none' })) {
       updates.recurrence = recurrence;
     }
 
-    updateAssignment.mutate({ assignmentId: params.assignmentId!, updates }, { onSuccess: () => router.back() });
-  }, [dueAt, recurrence, notes, params, initialRecurrence, updateAssignment, router]);
+    updateAssignment.mutate({ assignmentId: assignmentId!, updates }, { onSuccess: () => router.back() });
+  }, [dueAt, recurrence, notes, initialDueAt, initialNotes, assignmentId, initialRecurrence, updateAssignment, router]);
 
   return (
     <ContentContainer>
@@ -80,7 +89,7 @@ const EditAssignment = () => {
       <Divider />
 
       {/* Due date (editable) */}
-      <DueDateField value={dueAt} onChange={setDueAt} label="Due date" />
+      <DueDateField value={dueAt} onChange={handleDueAtChange} label="Due date" />
       <Divider />
 
       {/* Recurrence (editable, shown when due date set) */}
