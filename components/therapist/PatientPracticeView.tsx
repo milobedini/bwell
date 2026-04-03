@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { useRemoveAssignment } from '@/hooks/useAssignments';
 import { usePatientPractice } from '@/hooks/usePractice';
+import { dueLabel } from '@/utils/dates';
 import type { PracticeItem } from '@milobedini/shared-types';
 
 import ContentContainer from '../ContentContainer';
@@ -161,9 +162,7 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
         visible={!!menuItem}
         onDismiss={() => setMenuItem(null)}
         title={menuItem?.moduleTitle}
-        subtitle={[menuItem?.dueAt ? `Due ${new Date(menuItem.dueAt).toLocaleDateString()}` : 'No due date']
-          .filter(Boolean)
-          .join(' · ')}
+        subtitle={menuItem?.dueAt ? dueLabel(menuItem.dueAt) : 'No due date'}
         actions={menuActions}
       />
     </>

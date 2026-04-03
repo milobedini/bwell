@@ -9,7 +9,7 @@ type SelectFieldProps = {
   placeholder?: string;
   selected?: boolean;
   leftIcon?: string;
-  onPress: () => void;
+  onPress?: () => void;
   onClear?: () => void;
   dense?: boolean;
   disabled?: boolean;

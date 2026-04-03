@@ -7,9 +7,12 @@ import ThemedButton from '@/components/ThemedButton';
 import DueDateField from '@/components/ui/DueDateField';
 import RecurrenceField from '@/components/ui/RecurrenceField';
 import SelectField from '@/components/ui/SelectField';
+import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { useUpdateAssignment } from '@/hooks/useAssignments';
 import type { AssignmentRecurrence, UpdateAssignmentInput } from '@milobedini/shared-types';
+
+const NO_RECURRENCE: AssignmentRecurrence = { freq: 'none' };
 
 const EditAssignment = () => {
   const params = useLocalSearchParams<{
@@ -30,11 +33,11 @@ const EditAssignment = () => {
   );
 
   const [dueAt, setDueAt] = useState<string | undefined>(params.dueAt);
-  const [recurrence, setRecurrence] = useState<AssignmentRecurrence | undefined>(initialRecurrence ?? { freq: 'none' });
+  const [recurrence, setRecurrence] = useState<AssignmentRecurrence | undefined>(initialRecurrence ?? NO_RECURRENCE);
 
   const handleDueAtChange = useCallback((val?: string) => {
     setDueAt(val);
-    if (!val) setRecurrence({ freq: 'none' });
+    if (!val) setRecurrence(NO_RECURRENCE);
   }, []);
   const [notes, setNotes] = useState(params.notes ?? '');
 
@@ -42,57 +45,49 @@ const EditAssignment = () => {
   const updateAssignment = useUpdateAssignment();
   const { assignmentId, dueAt: initialDueAt, notes: initialNotes } = params;
 
-  const hasChanges = useMemo(() => {
-    const dueAtChanged = (dueAt ?? '') !== (initialDueAt ?? '');
-    const notesChanged = notes !== (initialNotes ?? '');
-    const recurrenceChanged = JSON.stringify(recurrence) !== JSON.stringify(initialRecurrence ?? { freq: 'none' });
-    return dueAtChanged || notesChanged || recurrenceChanged;
-  }, [dueAt, initialDueAt, notes, initialNotes, recurrence, initialRecurrence]);
-
-  const handleSubmit = useCallback(() => {
+  const buildUpdates = useCallback((): UpdateAssignmentInput => {
     const updates: UpdateAssignmentInput = {};
     if ((dueAt ?? '') !== (initialDueAt ?? '')) {
-      // Send null explicitly to unset dueAt on the BE
-      updates.dueAt = dueAt ?? (null as unknown as string);
+      updates.dueAt = dueAt ?? null;
     }
     if (notes !== (initialNotes ?? '')) updates.notes = notes;
-    if (JSON.stringify(recurrence) !== JSON.stringify(initialRecurrence ?? { freq: 'none' })) {
-      updates.recurrence = recurrence ?? { freq: 'none' };
+    if (JSON.stringify(recurrence) !== JSON.stringify(initialRecurrence ?? NO_RECURRENCE)) {
+      updates.recurrence = recurrence ?? NO_RECURRENCE;
     }
+    return updates;
+  }, [dueAt, initialDueAt, notes, initialNotes, recurrence, initialRecurrence]);
 
+  const hasChanges = useMemo(() => Object.keys(buildUpdates()).length > 0, [buildUpdates]);
+
+  const handleSubmit = useCallback(() => {
+    const updates = buildUpdates();
     updateAssignment.mutate({ assignmentId: assignmentId!, updates }, { onSuccess: () => router.back() });
-  }, [dueAt, recurrence, notes, initialDueAt, initialNotes, assignmentId, initialRecurrence, updateAssignment, router]);
+  }, [buildUpdates, assignmentId, updateAssignment, router]);
 
   return (
     <ContentContainer>
-      {/* Client (read-only) */}
       <SelectField
         label={params.patientName ?? 'Patient'}
         value={params.patientName}
         selected
         leftIcon="check-circle"
-        onPress={() => {}}
         disabled
       />
       <Divider />
 
-      {/* Module (read-only) */}
       <SelectField
         label={params.moduleTitle ?? 'Module'}
         value={params.moduleTitle}
         placeholder={`${params.programTitle ?? ''} (${params.moduleType ?? ''})`}
         selected
         leftIcon="check-circle"
-        onPress={() => {}}
         disabled
       />
       <Divider />
 
-      {/* Due date (editable) */}
       <DueDateField value={dueAt} onChange={handleDueAtChange} label="Due date" />
       <Divider />
 
-      {/* Recurrence (editable, shown when due date set) */}
       {dueAt && (
         <>
           <RecurrenceField value={recurrence} onChange={setRecurrence} label="Recurrence" />
@@ -100,7 +95,6 @@ const EditAssignment = () => {
         </>
       )}
 
-      {/* Notes (editable) */}
       <TextInput
         autoCapitalize="sentences"
         autoCorrect={true}
@@ -110,12 +104,11 @@ const EditAssignment = () => {
         value={notes}
         onChangeText={setNotes}
         className="h-[64px] px-3 text-white"
-        placeholderTextColor={'white'}
+        placeholderTextColor={Colors.sway.darkGrey}
         style={{ fontFamily: Fonts.Regular }}
       />
       <Divider />
 
-      {/* Buttons */}
       <View className="mt-4 gap-4">
         <ThemedButton
           title={updateAssignment.isPending ? 'Saving...' : 'Save Changes'}
