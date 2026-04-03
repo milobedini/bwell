@@ -1,9 +1,12 @@
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { RefreshControl, SectionList, type SectionListData, type SectionListRenderItemInfo, View } from 'react-native';
+import { Badge, IconButton } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
+import type { AttemptFilterDrawerValues } from '@/constants/Filters';
 import { useRemoveAssignment } from '@/hooks/useAssignments';
-import { usePatientPractice } from '@/hooks/usePractice';
+import { useGetPatientTimeline } from '@/hooks/useAttempts';
+import { usePatientModules, usePatientPractice } from '@/hooks/usePractice';
 import { dueLabel } from '@/utils/dates';
 import type { PracticeItem } from '@milobedini/shared-types';
 
@@ -12,8 +15,10 @@ import { LoadingIndicator } from '../LoadingScreen';
 import { ThemedText } from '../ThemedText';
 import type { ActionMenuItem } from '../ui/ActionMenu';
 import ActionMenu from '../ui/ActionMenu';
+import { AttemptFilterDrawer } from '../ui/AttemptFilterDrawer';
 import EmptyState from '../ui/EmptyState';
 
+import FilteredAttemptList from './FilteredAttemptList';
 import PatientPracticeCard from './PatientPracticeCard';
 
 type PatientPracticeViewProps = {
@@ -31,6 +36,39 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
   const router = useRouter();
   const [menuItem, setMenuItem] = useState<PracticeItem | null>(null);
   const { mutate: removeAssignmentMutate } = useRemoveAssignment();
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [filters, setFilters] = useState<AttemptFilterDrawerValues | null>(null);
+
+  const { data: patientModules } = usePatientModules(patientId);
+
+  const isFiltered = filters !== null;
+
+  const activeFilterCount = useMemo(() => {
+    if (!filters) return 0;
+    let n = 0;
+    if (filters.moduleId) n++;
+    if ((filters.status?.length ?? 0) > 0 && !(filters.status?.length === 1 && filters.status?.[0] === 'submitted'))
+      n++;
+    if (filters.severity) n++;
+    if (filters.limit && filters.limit !== 20) n++;
+    return n;
+  }, [filters]);
+
+  const statusParam = useMemo(() => {
+    if (!filters?.status?.length) return 'submitted';
+    if (filters.status.includes('all')) return 'all';
+    return filters.status.join(',');
+  }, [filters?.status]);
+
+  const timeline = useGetPatientTimeline({
+    patientId,
+    moduleId: filters?.moduleId,
+    limit: filters?.limit ?? 20,
+    status: statusParam,
+    severity: filters?.severity,
+    enabled: isFiltered
+  });
 
   const sections: Section[] = [
     { title: 'Today', data: data?.today ?? [] },
@@ -65,6 +103,19 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
     if (!menuItem) return;
     removeAssignmentMutate({ assignmentId: menuItem.assignmentId });
   }, [menuItem, removeAssignmentMutate]);
+
+  const handleApplyFilters = useCallback((v: AttemptFilterDrawerValues) => {
+    setFilters(v);
+  }, []);
+
+  const handleResetFilters = useCallback(() => {
+    setFilters(null);
+  }, []);
+
+  const moduleChoices = useMemo(
+    () => patientModules?.map((m) => ({ id: m._id, title: m.title })) ?? [],
+    [patientModules]
+  );
 
   const menuActions: ActionMenuItem[] = menuItem
     ? [
@@ -117,8 +168,18 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
   const keyExtractor = useCallback((item: PracticeItem) => item.assignmentId, []);
 
   const listHeader = (
-    <View className="pb-2 pt-2">
+    <View className="flex-row items-center justify-between pb-2 pt-2">
       <ThemedText type="subtitle">{patientName}</ThemedText>
+      <View className="relative flex-row items-center">
+        <IconButton
+          icon="filter-variant"
+          onPress={() => setDrawerOpen(true)}
+          accessibilityLabel="Open filters"
+          iconColor={isFiltered ? Colors.sway.bright : Colors.sway.lightGrey}
+          size={22}
+        />
+        {activeFilterCount > 0 && <Badge style={{ position: 'absolute', top: 2, right: 2 }}>{activeFilterCount}</Badge>}
+      </View>
     </View>
   );
 
@@ -129,7 +190,21 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
   return (
     <>
       <ContentContainer padded={false}>
-        {isEmpty ? (
+        {isFiltered ? (
+          <View className="flex-1">
+            <View className="px-4">{listHeader}</View>
+            <FilteredAttemptList
+              attempts={timeline.attempts}
+              patientName={patientName}
+              isFetching={timeline.isFetching}
+              isPending={timeline.isPending}
+              hasNextPage={!!timeline.hasNextPage}
+              isFetchingNextPage={timeline.isFetchingNextPage}
+              fetchNextPage={timeline.fetchNextPage}
+              refetch={timeline.refetch}
+            />
+          </View>
+        ) : isEmpty ? (
           <View className="flex-1 px-4">
             {listHeader}
             <EmptyState
@@ -164,6 +239,17 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
         title={menuItem?.moduleTitle}
         subtitle={menuItem?.dueAt ? dueLabel(menuItem.dueAt) : 'No due date'}
         actions={menuActions}
+      />
+      <AttemptFilterDrawer
+        visible={drawerOpen}
+        onDismiss={() => setDrawerOpen(false)}
+        values={filters ?? { status: ['submitted'], limit: 20 }}
+        onChange={handleApplyFilters}
+        onApply={handleApplyFilters}
+        onReset={handleResetFilters}
+        title="Client filters"
+        moduleChoices={moduleChoices}
+        showSeverity
       />
     </>
   );
