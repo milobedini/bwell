@@ -81,7 +81,7 @@ export default function MainTabsLayout() {
       <Tabs.Screen
         name="patients"
         options={{
-          title: 'Patients',
+          title: 'Clients',
           tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="account-group" color={color} size={size} />,
           href: therapist ? undefined : null
         }}

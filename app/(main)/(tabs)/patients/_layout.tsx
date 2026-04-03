@@ -8,7 +8,7 @@ import {
 
 export default function PatientsLayout() {
   return (
-    <Stack screenOptions={stackScreenOptionsWithTitle('Patients')}>
+    <Stack screenOptions={stackScreenOptionsWithTitle('Clients')}>
       <Stack.Screen name="index" />
       <Stack.Screen name="[id]" options={nestedScreenOptions} />
       <Stack.Screen name="attempt/[id]" options={withHeaderFromParams()} />

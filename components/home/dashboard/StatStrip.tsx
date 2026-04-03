@@ -1,5 +1,6 @@
 import { memo, useCallback } from 'react';
 import { Pressable, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { DashboardStats } from '@milobedini/shared-types';
@@ -41,13 +42,14 @@ type StatStripProps = {
 };
 
 const StatStrip = memo(({ stats, onScrollToBucket }: StatStripProps) => {
-  const scrollToTop = useCallback(() => onScrollToBucket('top'), [onScrollToBucket]);
+  const router = useRouter();
+  const goToClients = useCallback(() => router.push('/(main)/(tabs)/patients'), [router]);
   const scrollToAttention = useCallback(() => onScrollToBucket('attention'), [onScrollToBucket]);
   const scrollToCompleted = useCallback(() => onScrollToBucket('completed'), [onScrollToBucket]);
 
   return (
     <View className="my-4 flex-row gap-2">
-      <StatPill value={stats.totalClients} label="Clients" color={Colors.sway.darkGrey} onPress={scrollToTop} />
+      <StatPill value={stats.totalClients} label="Clients" color={Colors.sway.darkGrey} onPress={goToClients} />
       <StatPill
         value={stats.needsAttention}
         label="Attention"

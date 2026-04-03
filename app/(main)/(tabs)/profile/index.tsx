@@ -70,10 +70,8 @@ export default function Profile() {
           <SecondaryButton title="Change Password" onPress={() => setChangePasswordVisible(true)} />
           {therapist && (
             <>
-              <Link href={'/home/clients'} asChild>
-                <SecondaryButton title="Your Clients" />
-              </Link>
-              <Link href={'/home/patients'} asChild>
+              <SecondaryButton title="Your Clients" onPress={() => router.push('/(main)/(tabs)/patients')} />
+              <Link href={'/profile/patients'} asChild>
                 <SecondaryButton title="All Patients" />
               </Link>
             </>

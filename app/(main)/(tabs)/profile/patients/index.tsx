@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { FlatList, TouchableOpacity, View } from 'react-native';
 import ContentContainer from '@/components/ContentContainer';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
@@ -60,7 +60,7 @@ const PatientRow = ({
   );
 };
 
-const MemoPatientRow = React.memo(PatientRow);
+const MemoPatientRow = memo(PatientRow);
 
 const AllPatients = () => {
   const user = useAuthStore((s) => s.user);
@@ -115,7 +115,7 @@ const AllPatients = () => {
         icon: isClient ? 'star-off' : 'star',
         label: isClient ? 'Remove as client' : 'Add as client',
         onPress: handleAddRemoveClient,
-        variant: isClient ? ('destructive' as const) : ('default' as const),
+        variant: isClient ? 'destructive' : 'default',
         ...(isClient && {
           confirmTitle: 'Remove client?',
           confirmDescription: 'This will remove the therapist-client relationship. The patient record will remain.',

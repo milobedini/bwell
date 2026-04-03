@@ -181,7 +181,7 @@ const PatientsIndexScreen = () => {
         <TextInput
           value={searchText}
           onChangeText={setSearchText}
-          placeholder="Search patients..."
+          placeholder="Search clients..."
           placeholderTextColor={Colors.sway.darkGrey}
           style={{ flex: 1, color: Colors.sway.lightGrey, paddingVertical: 12, fontSize: 16 }}
           autoCapitalize="none"

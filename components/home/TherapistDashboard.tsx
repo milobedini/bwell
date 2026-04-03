@@ -64,10 +64,10 @@ const TherapistDashboard = ({ firstName }: Props) => {
         <EmptyState
           icon="account-group-outline"
           title="No clients yet"
-          subtitle="Browse patients to add your first client"
+          subtitle="Browse all patients to add your first client"
           action={{
-            label: 'Browse patients',
-            onPress: () => router.push('/home/patients')
+            label: 'Browse all patients',
+            onPress: () => router.push('/profile/patients')
           }}
         />
       </View>
@@ -100,7 +100,7 @@ const TherapistDashboard = ({ firstName }: Props) => {
         data.completedThisWeek.length === 0 &&
         data.noActivity.every((c) => c.assignments.total === 0) && (
           <Pressable
-            onPress={() => router.push('/home/clients')}
+            onPress={() => router.push('/(main)/(tabs)/patients')}
             className="mb-2 rounded-xl p-3.5"
             style={{ backgroundColor: Colors.tint.teal }}
           >
