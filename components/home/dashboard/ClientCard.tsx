@@ -6,7 +6,6 @@ import { Colors } from '@/constants/Colors';
 import { formatRelativeTime } from '@/utils/dates';
 import { getSeverityColors } from '@/utils/severity';
 import type { DashboardAssignmentSummary, DashboardClientItem } from '@milobedini/shared-types';
-import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
 import { BucketType } from './TriageBucket';
 
@@ -244,7 +243,7 @@ const ClientCard = memo(({ item, bucket }: ClientCardProps) => {
         style={{ borderLeftWidth: 4, borderLeftColor: borderColor }}
       >
         {/* Top row: name + last active */}
-        <View className="flex-row items-start justify-between pr-5">
+        <View className="flex-row items-start justify-between">
           <ThemedText type="default" style={{ fontWeight: '700', fontSize: 16 }}>
             {displayName}
           </ThemedText>
@@ -289,18 +288,6 @@ const ClientCard = memo(({ item, bucket }: ClientCardProps) => {
             completedThisWeek={assignments.completedThisWeek}
             total={assignments.completedThisWeek + assignments.overdueTotal + assignments.pendingThisWeek}
           />
-        </View>
-
-        {/* Chevron disclosure indicator */}
-        <View
-          style={{
-            position: 'absolute',
-            right: 10,
-            top: '50%',
-            transform: [{ translateY: -9 }]
-          }}
-        >
-          <MaterialCommunityIcons name="chevron-right" size={18} color={Colors.chip.dotInactive} />
         </View>
       </Pressable>
     </Link>
