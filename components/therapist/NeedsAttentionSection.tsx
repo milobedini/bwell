@@ -80,7 +80,7 @@ const NeedsAttentionSectionBase = ({ items }: Props) => {
       </View>
 
       {items.map((item) => (
-        <AttentionItem key={item.assignmentId} item={item} />
+        <AttentionItem key={item.assignmentId || item.latestAttempt?.attemptId || item.moduleId} item={item} />
       ))}
     </View>
   );
