@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Pressable, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { formatRelativeTime } from '@/utils/dates';
@@ -123,7 +123,6 @@ type ClientCardProps = {
 };
 
 const ClientCard = memo(({ item, bucket }: ClientCardProps) => {
-  const router = useRouter();
   const borderColor = getLeftBorderColor(item, bucket);
   const { latestScore, previousScore, assignments } = item;
   const severity = getSeverityColors(latestScore?.scoreBandLabel);
@@ -131,72 +130,76 @@ const ClientCard = memo(({ item, bucket }: ClientCardProps) => {
   const displayName = item.patient.name || item.patient.username;
 
   return (
-    <Pressable
-      onPress={() =>
-        router.push({
-          pathname: '/(main)/(tabs)/patients/[id]',
-          params: {
-            id: item.patient._id,
-            name: item.patient.name || item.patient.username,
-            headerTitle: item.patient.name || item.patient.username
-          }
-        })
-      }
-      className="mb-2.5 overflow-hidden rounded-[14] border-chip-dotInactive border-b-[1.5] bg-chip-pillPressed p-3.5 pb-3"
-      style={{ borderLeftWidth: 4, borderLeftColor: borderColor }}
+    <Link
+      href={{
+        pathname: '/(main)/(tabs)/patients/[id]',
+        params: {
+          id: item.patient._id,
+          name: displayName,
+          headerTitle: displayName
+        }
+      }}
+      push
+      withAnchor
+      asChild
     >
-      {/* Top row: name + last active */}
-      <View className="flex-row items-start justify-between">
-        <ThemedText type="default" style={{ fontWeight: '700', fontSize: 16 }}>
-          {displayName}
-        </ThemedText>
-        <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
-          {item.lastActive ? formatRelativeTime(item.lastActive) : 'Never'}
-        </ThemedText>
-      </View>
-
-      {/* Middle row: score badge + delta + assignment dots */}
-      <View className="mt-2 flex-row items-center gap-3">
-        {latestScore ? (
-          <View
-            className="flex-row items-center gap-1 rounded-lg px-2.5 py-1"
-            style={{ backgroundColor: severity.pillBg }}
-          >
-            <ThemedText type="smallBold" style={{ color: severity.text }}>
-              {latestScore.moduleTitle}: {latestScore.score}
-            </ThemedText>
-          </View>
-        ) : (
-          <View className="rounded-lg px-2.5 py-1" style={{ backgroundColor: Colors.tint.neutral }}>
-            <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
-              No scores
-            </ThemedText>
-          </View>
-        )}
-        {latestScore && <ScoreDelta current={latestScore.score} previous={previousScore?.score ?? null} />}
-        <View className="ml-auto">
-          <AssignmentDots total={assignments.total} completed={assignments.completed} overdue={assignments.overdue} />
-        </View>
-      </View>
-
-      {/* Bottom row: completion text + progress bar */}
-      <View className="mt-1.5 flex-row items-center justify-between">
-        <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
-          <ThemedText type="small" style={{ color: Colors.sway.lightGrey }}>
-            {assignments.completed}
+      <Pressable
+        className="mb-2.5 overflow-hidden rounded-[14] border-chip-dotInactive border-b-[1.5] bg-chip-pillPressed p-3.5 pb-3"
+        style={{ borderLeftWidth: 4, borderLeftColor: borderColor }}
+      >
+        {/* Top row: name + last active */}
+        <View className="flex-row items-start justify-between">
+          <ThemedText type="default" style={{ fontWeight: '700', fontSize: 16 }}>
+            {displayName}
           </ThemedText>
-          /{assignments.total} completed
-          {assignments.overdue > 0 && (
-            <ThemedText type="small" style={{ color: Colors.sway.lightGrey }}>
-              {' '}
-              · {assignments.overdue} overdue
-            </ThemedText>
+          <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
+            {item.lastActive ? formatRelativeTime(item.lastActive) : 'Never'}
+          </ThemedText>
+        </View>
+
+        {/* Middle row: score badge + delta + assignment dots */}
+        <View className="mt-2 flex-row items-center gap-3">
+          {latestScore ? (
+            <View
+              className="flex-row items-center gap-1 rounded-lg px-2.5 py-1"
+              style={{ backgroundColor: severity.pillBg }}
+            >
+              <ThemedText type="smallBold" style={{ color: severity.text }}>
+                {latestScore.moduleTitle}: {latestScore.score}
+              </ThemedText>
+            </View>
+          ) : (
+            <View className="rounded-lg px-2.5 py-1" style={{ backgroundColor: Colors.tint.neutral }}>
+              <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
+                No scores
+              </ThemedText>
+            </View>
           )}
-          {assignments.total > 0 && assignments.completed === assignments.total && ' ✓'}
-        </ThemedText>
-        <ProgressBar completed={assignments.completed} total={assignments.total} />
-      </View>
-    </Pressable>
+          {latestScore && <ScoreDelta current={latestScore.score} previous={previousScore?.score ?? null} />}
+          <View className="ml-auto">
+            <AssignmentDots total={assignments.total} completed={assignments.completed} overdue={assignments.overdue} />
+          </View>
+        </View>
+
+        {/* Bottom row: completion text + progress bar */}
+        <View className="mt-1.5 flex-row items-center justify-between">
+          <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
+            <ThemedText type="small" style={{ color: Colors.sway.lightGrey }}>
+              {assignments.completed}
+            </ThemedText>
+            /{assignments.total} completed
+            {assignments.overdue > 0 && (
+              <ThemedText type="small" style={{ color: Colors.sway.lightGrey }}>
+                {' '}
+                · {assignments.overdue} overdue
+              </ThemedText>
+            )}
+            {assignments.total > 0 && assignments.completed === assignments.total && ' ✓'}
+          </ThemedText>
+          <ProgressBar completed={assignments.completed} total={assignments.total} />
+        </View>
+      </Pressable>
+    </Link>
   );
 });
 

@@ -62,6 +62,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - **Value debounce:** Use `useDebounce(value, delay)` from `hooks/useDebounce.ts` for search inputs. Distinct from callback-based `useDebouncedCallback` in `utils/debounce.ts`.
 - **Filter drawers:** Slide-in from right using `Animated.View` + `useWindowDimensions()`. See `AttemptFilterDrawer` (timeline), `UserFilterDrawer` (admin users), and `ReviewFilterDrawer` (therapist review). Shared chip styles extracted to `utils/chipStyles.ts`.
 - **Destructive action confirmation:** `ActionMenu` has a built-in confirmation step for destructive actions. Set `variant: 'destructive'` on an action item and optionally provide `confirmTitle`, `confirmDescription`, and `confirmLabel` props for custom confirmation UI.
+- **Cross-tab navigation with back button:** When navigating from one tab to a nested screen in another tab's stack (e.g. dashboard → client detail), use `<Link push withAnchor asChild>` instead of `router.push`. The `withAnchor` prop forces the target stack's `initialRouteName` to load first, ensuring a proper back button. Requires `export const unstable_settings = { initialRouteName: 'index' }` in the target stack's layout file. See `ClientCard.tsx` → `patients/[id]` for reference. Docs: https://docs.expo.dev/router/basics/navigation/
 
 ## Git Workflow
 
