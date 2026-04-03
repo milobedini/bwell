@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Pressable,
   RefreshControl,
@@ -8,7 +8,7 @@ import {
   View
 } from 'react-native';
 import { Badge, IconButton } from 'react-native-paper';
-import { useRouter } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import type { AttemptFilterDrawerValues } from '@/constants/Filters';
 import { useRemoveAssignment } from '@/hooks/useAssignments';
@@ -93,6 +93,7 @@ ActiveFilterChips.displayName = 'ActiveFilterChips';
 const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeViewProps) => {
   const { data, isPending, isFetching, refetch } = usePatientPractice(patientId);
   const router = useRouter();
+  const navigation = useNavigation();
   const [menuItem, setMenuItem] = useState<PracticeItem | null>(null);
   const { mutate: removeAssignmentMutate } = useRemoveAssignment();
 
@@ -112,6 +113,25 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
       !!filters.limit && filters.limit !== 20
     ].filter(Boolean).length;
   }, [filters]);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <View className="relative">
+          <IconButton
+            icon="filter-variant"
+            onPress={() => setDrawerOpen(true)}
+            accessibilityLabel="Open filters"
+            iconColor={isFiltered ? Colors.sway.bright : Colors.sway.lightGrey}
+            size={22}
+          />
+          {activeFilterCount > 0 && (
+            <Badge style={{ position: 'absolute', top: 2, right: 2 }}>{activeFilterCount}</Badge>
+          )}
+        </View>
+      )
+    });
+  }, [navigation, isFiltered, activeFilterCount]);
 
   const statusParam = useMemo(() => {
     if (!filters?.status?.length) return 'all';
@@ -244,21 +264,6 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
 
   const keyExtractor = useCallback((item: PracticeItem) => item.assignmentId, []);
 
-  const listHeader = (
-    <View className="flex-row items-center justify-end pb-2 pt-2">
-      <View className="relative flex-row items-center">
-        <IconButton
-          icon="filter-variant"
-          onPress={() => setDrawerOpen(true)}
-          accessibilityLabel="Open filters"
-          iconColor={isFiltered ? Colors.sway.bright : Colors.sway.lightGrey}
-          size={22}
-        />
-        {activeFilterCount > 0 && <Badge style={{ position: 'absolute', top: 2, right: 2 }}>{activeFilterCount}</Badge>}
-      </View>
-    </View>
-  );
-
   if (isPending) return <LoadingIndicator marginBottom={0} />;
 
   const isEmpty = !isFetching && sections.length === 0;
@@ -268,7 +273,6 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
       <ContentContainer padded={false}>
         {isFiltered ? (
           <View className="flex-1">
-            <View className="px-4">{listHeader}</View>
             <ActiveFilterChips
               filters={filters}
               moduleName={selectedModuleName}
@@ -288,7 +292,6 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
           </View>
         ) : isEmpty ? (
           <View className="flex-1 px-4">
-            {listHeader}
             <EmptyState
               icon="clipboard-text-outline"
               title="No practice items"
@@ -302,9 +305,8 @@ const PatientPracticeViewBase = ({ patientId, patientName }: PatientPracticeView
             renderItem={renderItem}
             renderSectionHeader={renderSectionHeader}
             ItemSeparatorComponent={renderItemSeparator}
-            ListHeaderComponent={listHeader}
             stickySectionHeadersEnabled={false}
-            contentContainerStyle={{ paddingBottom: 80, paddingHorizontal: 16 }}
+            contentContainerStyle={{ paddingBottom: 80, paddingHorizontal: 16, paddingTop: 8 }}
             refreshControl={
               <RefreshControl
                 refreshing={isFetching && !isPending}
