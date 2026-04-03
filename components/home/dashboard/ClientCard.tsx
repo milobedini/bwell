@@ -132,7 +132,12 @@ const ClientCard = memo(({ item, bucket }: ClientCardProps) => {
 
   return (
     <Pressable
-      onPress={() => router.push(`/home/clients/${item.patient._id}`)}
+      onPress={() =>
+        router.push({
+          pathname: '/(main)/(tabs)/patients/[id]',
+          params: { id: item.patient._id, name: item.patient.name || item.patient.username }
+        })
+      }
       className="mb-2.5 overflow-hidden rounded-[14] border-chip-dotInactive border-b-[1.5] bg-chip-pillPressed p-3.5 pb-3"
       style={{ borderLeftWidth: 4, borderLeftColor: borderColor }}
     >
