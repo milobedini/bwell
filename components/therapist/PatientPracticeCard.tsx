@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
-import { dueLabel, formatShortDate } from '@/utils/dates';
+import { dueLabel, submittedLabel } from '@/utils/dates';
 import { getModuleIcon } from '@/utils/moduleIcons';
 import type { PracticeItem } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
@@ -28,7 +28,8 @@ const PatientPracticeCardBase = ({ item, sparkline, patientName, onLongPress }: 
   const isInProgress = item.status === 'in_progress';
   const icon = getModuleIcon(item.moduleType);
 
-  const canNavigate = item.status !== 'not_started' && !!item.latestAttempt?.attemptId;
+  const canNavigate =
+    item.status !== 'not_started' && !!item.latestAttempt?.attemptId && !(isInProgress && item.percentComplete === 0);
 
   const handlePress = () => {
     router.push({
@@ -42,9 +43,11 @@ const PatientPracticeCardBase = ({ item, sparkline, patientName, onLongPress }: 
     onLongPress?.(item);
   };
 
+  const isOverdue = !isCompleted && !!item.dueAt && new Date(item.dueAt) < new Date();
+
   const statusText = (() => {
     if (isCompleted && item.latestAttempt?.completedAt) {
-      return `Submitted ${formatShortDate(item.latestAttempt.completedAt)}`;
+      return `Submitted ${submittedLabel(item.latestAttempt.completedAt)}`;
     }
     if (isInProgress && item.percentComplete > 0) {
       return `${Math.round(item.percentComplete)}% complete`;
@@ -103,18 +106,45 @@ const PatientPracticeCardBase = ({ item, sparkline, patientName, onLongPress }: 
             {statusText}
           </ThemedText>
 
-          <View className="flex-row flex-wrap gap-2">
-            {item.dueAt ? (
-              <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
-                {dueLabel(item.dueAt)}
-              </ThemedText>
-            ) : null}
-            {recurrenceLabel ? (
-              <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
-                {recurrenceLabel}
-              </ThemedText>
-            ) : null}
-          </View>
+          {isInProgress && item.percentComplete > 0 ? (
+            <View
+              className="mt-0.5 h-1 overflow-hidden rounded-full"
+              style={{ backgroundColor: Colors.chip.darkCardAlt }}
+            >
+              <View
+                className="h-1 rounded-full"
+                style={{
+                  width: `${Math.round(item.percentComplete)}%`,
+                  backgroundColor: Colors.sway.bright
+                }}
+              />
+            </View>
+          ) : null}
+
+          {!isCompleted ? (
+            <View className="flex-row flex-wrap items-center gap-2">
+              {isOverdue ? (
+                <View
+                  className="rounded-full px-2 py-0.5"
+                  style={{ backgroundColor: Colors.tint.error, borderWidth: 1, borderColor: Colors.tint.errorBorder }}
+                >
+                  <ThemedText type="small" style={{ color: Colors.primary.error }}>
+                    Overdue
+                  </ThemedText>
+                </View>
+              ) : null}
+              {item.dueAt ? (
+                <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
+                  {dueLabel(item.dueAt)}
+                </ThemedText>
+              ) : null}
+              {recurrenceLabel ? (
+                <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
+                  {recurrenceLabel}
+                </ThemedText>
+              ) : null}
+            </View>
+          ) : null}
         </View>
 
         {/* Right: score + sparkline or chevron */}

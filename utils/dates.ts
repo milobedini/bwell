@@ -191,6 +191,25 @@ export const getWeekStart = (): string => {
   return monday.toISOString();
 };
 
+/** Relative submitted-date label matching the Review tab grouping style. */
+export const submittedLabel = (isoDate: string): string => {
+  const date = new Date(isoDate);
+  if (isNaN(date.getTime())) return '';
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today.getTime() - 86_400_000);
+  const dow = today.getDay() || 7;
+  const thisWeekStart = new Date(today.getTime() - (dow - 1) * 86_400_000);
+  const lastWeekStart = new Date(thisWeekStart.getTime() - 7 * 86_400_000);
+
+  if (date >= today) return 'Today';
+  if (date >= yesterday) return 'Yesterday';
+  if (date >= thisWeekStart) return 'This week';
+  if (date >= lastWeekStart) return 'Last week';
+  return formatShortDate(isoDate);
+};
+
 /** Human-friendly due date label relative to today. */
 export const dueLabel = (dueAt: string): string => {
   const due = new Date(dueAt);

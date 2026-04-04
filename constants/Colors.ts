@@ -53,6 +53,7 @@ export const Colors = {
     error: 'rgba(255,109,94,0.15)',
     errorBorder: 'rgba(255,109,94,0.3)',
     info: 'rgba(255,209,93,0.15)',
+    infoBorder: 'rgba(255,209,93,0.3)',
     neutral: 'rgba(166,173,187,0.12)'
   },
   overlay: {

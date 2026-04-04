@@ -5,7 +5,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { formatRelativeTime } from '@/utils/dates';
 import { getSeverityColors } from '@/utils/severity';
-import { DashboardClientItem } from '@milobedini/shared-types';
+import type { DashboardAssignmentSummary, DashboardClientItem } from '@milobedini/shared-types';
 
 import { BucketType } from './TriageBucket';
 
@@ -41,10 +41,63 @@ const ScoreDelta = ({ current, previous }: ScoreDeltaProps) => {
   );
 };
 
+const REASON_TAG_CONFIG: Record<string, { label: string; bg: string; border: string; text: string }> = {
+  severe_score: {
+    label: 'Severe',
+    bg: Colors.tint.error,
+    border: Colors.tint.errorBorder,
+    text: Colors.primary.error
+  },
+  worsening: {
+    label: 'Worsening',
+    bg: Colors.tint.info,
+    border: Colors.tint.infoBorder,
+    text: Colors.primary.warning
+  },
+  overdue: {
+    label: 'Overdue',
+    bg: Colors.tint.info,
+    border: Colors.tint.infoBorder,
+    text: Colors.primary.warning
+  }
+};
+
+type ReasonTagsProps = {
+  reasons: DashboardClientItem['reasons'];
+  bucket: BucketType;
+};
+
+const ReasonTags = ({ reasons, bucket }: ReasonTagsProps) => {
+  if (bucket !== 'attention' || reasons.length === 0) return null;
+
+  return (
+    <>
+      {reasons.map((reason) => {
+        const config = REASON_TAG_CONFIG[reason];
+        if (!config) return null;
+        return (
+          <View
+            key={reason}
+            className="rounded-[10] border px-2 py-0.5"
+            style={{
+              backgroundColor: config.bg,
+              borderColor: config.border
+            }}
+          >
+            <ThemedText type="small" style={{ color: config.text, fontSize: 11, fontWeight: '600' }}>
+              {config.label}
+            </ThemedText>
+          </View>
+        );
+      })}
+    </>
+  );
+};
+
 type AssignmentDotsProps = {
-  total: number;
-  completed: number;
-  overdue: number;
+  completedThisWeek: number;
+  overdueTotal: number;
+  pendingThisWeek: number;
 };
 
 const MAX_DOTS = 6;
@@ -64,20 +117,21 @@ const DOT_STYLES = {
   pending: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.chip.dotInactive }
 } as const;
 
-const getStatus = (i: number, completed: number, overdue: number): 'done' | 'overdue' | 'pending' => {
-  if (i < completed) return 'done';
-  if (i < completed + overdue) return 'overdue';
+const getStatus = (i: number, completedThisWeek: number, overdueTotal: number): 'done' | 'overdue' | 'pending' => {
+  if (i < completedThisWeek) return 'done';
+  if (i < completedThisWeek + overdueTotal) return 'overdue';
   return 'pending';
 };
 
-const AssignmentDots = ({ total, completed, overdue }: AssignmentDotsProps) => {
+const AssignmentDots = ({ completedThisWeek, overdueTotal, pendingThisWeek }: AssignmentDotsProps) => {
+  const total = completedThisWeek + overdueTotal + pendingThisWeek;
   const visible = Math.min(total, MAX_DOTS);
   const overflow = total - MAX_DOTS;
 
   return (
     <View className="flex-row items-center gap-1.5">
       {Array.from({ length: visible }, (_, i) => (
-        <View key={i} style={DOT_STYLES[getStatus(i, completed, overdue)]} />
+        <View key={i} style={DOT_STYLES[getStatus(i, completedThisWeek, overdueTotal)]} />
       ))}
       {overflow > 0 && (
         <ThemedText type="small" style={{ color: Colors.sway.darkGrey, fontSize: 11 }}>
@@ -89,31 +143,58 @@ const AssignmentDots = ({ total, completed, overdue }: AssignmentDotsProps) => {
 };
 
 type ProgressBarProps = {
-  completed: number;
+  completedThisWeek: number;
   total: number;
 };
 
-const ProgressBar = ({ completed, total }: ProgressBarProps) => {
-  const pct = total > 0 ? (completed / total) * 100 : 0;
+const ProgressBar = ({ completedThisWeek, total }: ProgressBarProps) => {
+  const pct = total > 0 ? (completedThisWeek / total) * 100 : 0;
 
   return (
-    <View
-      style={{
-        width: 80,
-        height: 4,
-        borderRadius: 2,
-        backgroundColor: Colors.chip.darkCardDeep
-      }}
-    >
+    <View className="h-1 w-20 overflow-hidden rounded-sm" style={{ backgroundColor: Colors.chip.darkCardDeep }}>
       <View
+        className="h-full rounded-sm"
         style={{
           width: `${pct}%`,
-          height: '100%',
-          borderRadius: 2,
           backgroundColor: pct > 0 ? Colors.sway.bright : 'transparent'
         }}
       />
     </View>
+  );
+};
+
+const CompletionText = ({ assignments }: { assignments: DashboardAssignmentSummary }) => {
+  const { completedThisWeek, overdueTotal, pendingThisWeek } = assignments;
+  const total = completedThisWeek + overdueTotal + pendingThisWeek;
+
+  if (total === 0) {
+    return (
+      <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
+        No assignments this week
+      </ThemedText>
+    );
+  }
+
+  const allDone = completedThisWeek > 0 && overdueTotal === 0 && pendingThisWeek === 0;
+
+  const segments: { count: number; label: string }[] = [];
+  if (completedThisWeek > 0) segments.push({ count: completedThisWeek, label: 'done' });
+  if (overdueTotal > 0) segments.push({ count: overdueTotal, label: 'overdue' });
+  if (pendingThisWeek > 0) segments.push({ count: pendingThisWeek, label: 'pending' });
+
+  return (
+    <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
+      {segments.map((seg, i) => (
+        <ThemedText key={seg.label} type="small" style={{ color: Colors.sway.darkGrey }}>
+          {i > 0 && ' · '}
+          <ThemedText type="small" style={{ color: Colors.sway.lightGrey }}>
+            {seg.count}
+          </ThemedText>{' '}
+          {seg.label}
+        </ThemedText>
+      ))}
+      {allDone && ' ✓'}
+    </ThemedText>
   );
 };
 
@@ -122,10 +203,13 @@ type ClientCardProps = {
   bucket: BucketType;
 };
 
+const getAssignmentTotal = (a: DashboardAssignmentSummary) => a.completedThisWeek + a.overdueTotal + a.pendingThisWeek;
+
 const ClientCard = memo(({ item, bucket }: ClientCardProps) => {
   const borderColor = getLeftBorderColor(item, bucket);
   const { latestScore, previousScore, assignments } = item;
   const severity = getSeverityColors(latestScore?.scoreBandLabel);
+  const assignmentTotal = getAssignmentTotal(assignments);
 
   const displayName = item.patient.name || item.patient.username;
 
@@ -157,8 +241,8 @@ const ClientCard = memo(({ item, bucket }: ClientCardProps) => {
           </ThemedText>
         </View>
 
-        {/* Middle row: score badge + delta + assignment dots */}
-        <View className="mt-2 flex-row items-center gap-3">
+        {/* Middle row: score badge + delta + reason tags + assignment dots */}
+        <View className="mt-2 flex-row flex-wrap items-center gap-2">
           {latestScore ? (
             <View
               className="flex-row items-center gap-1 rounded-lg px-2.5 py-1"
@@ -176,27 +260,20 @@ const ClientCard = memo(({ item, bucket }: ClientCardProps) => {
             </View>
           )}
           {latestScore && <ScoreDelta current={latestScore.score} previous={previousScore?.score ?? null} />}
+          <ReasonTags reasons={item.reasons} bucket={bucket} />
           <View className="ml-auto">
-            <AssignmentDots total={assignments.total} completed={assignments.completed} overdue={assignments.overdue} />
+            <AssignmentDots
+              completedThisWeek={assignments.completedThisWeek}
+              overdueTotal={assignments.overdueTotal}
+              pendingThisWeek={assignments.pendingThisWeek}
+            />
           </View>
         </View>
 
-        {/* Bottom row: completion text + progress bar */}
+        {/* Bottom row: week-scoped completion text + progress bar */}
         <View className="mt-1.5 flex-row items-center justify-between">
-          <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
-            <ThemedText type="small" style={{ color: Colors.sway.lightGrey }}>
-              {assignments.completed}
-            </ThemedText>
-            /{assignments.total} completed
-            {assignments.overdue > 0 && (
-              <ThemedText type="small" style={{ color: Colors.sway.lightGrey }}>
-                {' '}
-                · {assignments.overdue} overdue
-              </ThemedText>
-            )}
-            {assignments.total > 0 && assignments.completed === assignments.total && ' ✓'}
-          </ThemedText>
-          <ProgressBar completed={assignments.completed} total={assignments.total} />
+          <CompletionText assignments={assignments} />
+          <ProgressBar completedThisWeek={assignments.completedThisWeek} total={assignmentTotal} />
         </View>
       </Pressable>
     </Link>

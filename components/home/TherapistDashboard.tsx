@@ -98,7 +98,9 @@ const TherapistDashboard = ({ firstName }: Props) => {
       {data.stats.totalClients > 0 &&
         data.needsAttention.length === 0 &&
         data.completedThisWeek.length === 0 &&
-        data.noActivity.every((c) => c.assignments.total === 0) && (
+        data.noActivity.every(
+          (c) => c.assignments.completedThisWeek + c.assignments.overdueTotal + c.assignments.pendingThisWeek === 0
+        ) && (
           <Pressable
             onPress={() => router.push('/(main)/(tabs)/patients')}
             className="mb-2 rounded-xl p-3.5"
