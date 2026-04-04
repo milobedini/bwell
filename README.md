@@ -48,6 +48,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ## Recent Milestones
 
+- **Maestro E2E testing** — login flow with reusable subflows, full pipeline script with BE healthcheck, iOS simulator build with LogBox suppression, testID conventions (2026-04-04)
 - **Therapist dashboard UX improvements** — overdue chips, relative dates, progress bars on client detail cards, reason tags on attention cards, week-scoped assignment framing (2026-04-04)
 - **Unified practice model** — merged assignments and attempts into a single practice concept, new journey/practice/review tabs, BarSparkline component, server-side client search/sort (2026-04-01)
 - **Reading module type** — replaced psychoeducation/exercise with unified reading presenter, markdown rendering, scroll progress bar, reader notes (2026-04-01)
@@ -57,7 +58,6 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 - **Therapist dashboard** — triage buckets with client cards, stat pills, score deltas, assignment dots, progress bars (2026-03-25)
 - **Diary keyboard toolbar** — native-style prev/next chevron navigation for numeric fields, keyboard-aware positioning (2026-03-24)
 - **Diary presenter refactor** — extracted 670-line presenter into composable hooks and components, FlatList performance tuning (2026-03-24)
-- **Diary UX polish** — compact header, floating save button, haptics, placeholder colours, character counts (2026-03-23)
 
 ## Tech Stack
 
@@ -127,11 +127,15 @@ From the dev server, press **i** for iOS simulator, **a** for Android emulator, 
 | Command | Description |
 | --- | --- |
 | `npx expo start` | Start the dev server |
-| `npx expo start -c` | Start with cache cleared |
-| `npx tsc --noEmit` | Type check |
-| `npx eslint .` | Lint |
+| `npm run restart` | Start with cache cleared |
+| `npm run lint` | Run all validation (eslint, prettier, type check) |
 | `npx prettier --write .` | Format all files |
 | `npm run publish` | Publish OTA update via EAS |
+| `npm run publish-web` | Export and deploy web build |
+| `npm run update-types` | Reinstall `@milobedini/shared-types` to latest |
+| `npm run build:ios-sim` | Build dev app for iOS simulator (E2E) |
+| `npm run test:e2e` | Run all Maestro E2E flows |
+| `npm run test:e2e:full` | Full E2E pipeline (BE + build + Maestro) |
 
 ## Architecture
 
