@@ -127,6 +127,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - `expo run:ios` (used by `build:ios-sim`) rewrites `ios`/`android` scripts in `package.json` from `expo start` to `expo run` during prebuild — restore them after building
 - `maestro test` does not recurse subdirectories by default — use glob (`flows/**`) or configure `flows:` in `config.yaml`
 - No CI integration yet — Maestro Cloud has no free tier ($250/device/month). E2E runs locally only via `npm run test:e2e`
+- **Always create or update Maestro E2E flows** when implementing new features or changing existing features that affect user-facing behavior — E2E coverage should grow with the app
 
 ## Code Review
 
