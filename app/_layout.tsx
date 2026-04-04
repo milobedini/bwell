@@ -1,9 +1,5 @@
 import { LogBox } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
-if (process.env.EXPO_PUBLIC_E2E === 'true') {
-  LogBox.ignoreAllLogs();
-}
 import { MD3DarkTheme, PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Slot } from 'expo-router';
@@ -17,6 +13,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import 'react-native-reanimated';
 
 import '../global.css';
+
+if (process.env.EXPO_PUBLIC_E2E === 'true') {
+  LogBox.ignoreAllLogs();
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
