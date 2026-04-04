@@ -5,22 +5,28 @@ env:
 ---
 - launchApp:
     clearState: true
-- assertVisible:
-    id: 'login-unlock-button'
-    timeout: 60000
+- tapOn:
+    id: 'ready-get-started-button'
+- tapOn:
+    id: 'carousel-create-account-button'
+- tapOn:
+    id: 'signup-unlock-button'
+- tapOn:
+    id: 'signup-login-link'
 - tapOn:
     id: 'login-unlock-button'
-- waitForAnimationToEnd
 - tapOn:
     id: 'login-identifier-input'
 - inputText: ${EMAIL}
-- hideKeyboard
 - tapOn:
     id: 'login-password-input'
 - inputText: ${PASSWORD}
-- hideKeyboard
 - tapOn:
     id: 'login-submit-button'
+- runFlow:
+    when:
+      visible: 'Not Now'
+    commands:
+      - tapOn: 'Not Now'
 - assertVisible:
     id: 'home-screen'
-    timeout: 60000

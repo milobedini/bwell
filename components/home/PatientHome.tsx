@@ -62,7 +62,7 @@ const PatientHome = () => {
 
   // Populated state: functional dashboard
   return (
-    <View className="flex-1 bg-sway-dark" style={{ paddingTop: insets.top }}>
+    <View className="flex-1 bg-sway-dark" testID="home-screen" style={{ paddingTop: insets.top }}>
       <PatientDashboard firstName={firstName} data={data} isRefetching={isRefetching} refetch={refetch} />
     </View>
   );

@@ -6,33 +6,40 @@ env:
   EMAIL: ${EMAIL}
   PASSWORD: ${PASSWORD}
 ---
-# Launch fresh — clears persisted auth state
 - launchApp:
     clearState: true
 
-# Wait for welcome screen (generous timeout for Render cold start)
-- assertVisible:
-    id: 'login-unlock-button'
-    timeout: 60000
+# Onboarding
+- tapOn:
+    id: 'ready-get-started-button'
+- tapOn:
+    id: 'carousel-create-account-button'
 
-# Open login bottom sheet
+# Signup → Login
+- tapOn:
+    id: 'signup-unlock-button'
+- tapOn:
+    id: 'signup-login-link'
+
+# Login
 - tapOn:
     id: 'login-unlock-button'
-- waitForAnimationToEnd
-
-# Fill credentials
 - tapOn:
     id: 'login-identifier-input'
 - inputText: ${EMAIL}
-- hideKeyboard
 - tapOn:
     id: 'login-password-input'
 - inputText: ${PASSWORD}
-- hideKeyboard
-
-# Submit and verify login succeeded
 - tapOn:
     id: 'login-submit-button'
+
+# Dismiss iOS "Save Password?" dialog if present
+- runFlow:
+    when:
+      visible: 'Not Now'
+    commands:
+      - tapOn: 'Not Now'
+
+# Verify
 - assertVisible:
     id: 'home-screen'
-    timeout: 60000

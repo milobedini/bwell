@@ -78,7 +78,12 @@ export default function Signup() {
 
   return (
     <BottomSheetModalProvider>
-      <AuthVideoBackground videoSource={videoSource} heading={`Take back \ncontrol`} onUnlock={showModal}>
+      <AuthVideoBackground
+        videoSource={videoSource}
+        heading={`Take back \ncontrol`}
+        onUnlock={showModal}
+        testID="signup-unlock-button"
+      >
         <BottomSheetModal
           ref={bottomSheetModalRef}
           accessible={Platform.select({ ios: false })}
@@ -223,7 +228,7 @@ export default function Signup() {
                             disabled={buttonDisabled}
                             onPress={() => handleSubmit()}
                           />
-                          <AuthLink href="/(auth)/login" label="Have an account?" />
+                          <AuthLink href="/(auth)/login" label="Have an account?" testID="signup-login-link" />
                         </MotiView>
                       </>
                     );

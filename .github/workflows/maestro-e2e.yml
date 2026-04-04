@@ -25,6 +25,7 @@ jobs:
       - name: Build iOS simulator app
         env:
           EXPO_PUBLIC_BACKEND_BASE_URL: ${{ secrets.EXPO_PUBLIC_BACKEND_BASE_URL }}
+          EXPO_PUBLIC_E2E: 'true'
         run: npx expo run:ios --no-install
 
       - name: Wake backend (Render free tier cold start)
