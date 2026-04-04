@@ -108,13 +108,12 @@ const PatientPracticeCardBase = ({ item, sparkline, patientName, onLongPress }: 
 
           {isInProgress && item.percentComplete > 0 ? (
             <View
-              className="overflow-hidden rounded-full"
-              style={{ height: 4, backgroundColor: Colors.chip.darkCardAlt, marginTop: 2 }}
+              className="mt-0.5 h-1 overflow-hidden rounded-full"
+              style={{ backgroundColor: Colors.chip.darkCardAlt }}
             >
               <View
-                className="rounded-full"
+                className="h-1 rounded-full"
                 style={{
-                  height: 4,
                   width: `${Math.round(item.percentComplete)}%`,
                   backgroundColor: Colors.sway.bright
                 }}

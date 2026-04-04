@@ -78,13 +78,10 @@ const ReasonTags = ({ reasons, bucket }: ReasonTagsProps) => {
         return (
           <View
             key={reason}
+            className="rounded-[10] border px-2 py-0.5"
             style={{
               backgroundColor: config.bg,
-              borderColor: config.border,
-              borderWidth: 1,
-              borderRadius: 10,
-              paddingHorizontal: 8,
-              paddingVertical: 2
+              borderColor: config.border
             }}
           >
             <ThemedText type="small" style={{ color: config.text, fontSize: 11, fontWeight: '600' }}>
@@ -154,19 +151,11 @@ const ProgressBar = ({ completedThisWeek, total }: ProgressBarProps) => {
   const pct = total > 0 ? (completedThisWeek / total) * 100 : 0;
 
   return (
-    <View
-      style={{
-        width: 80,
-        height: 4,
-        borderRadius: 2,
-        backgroundColor: Colors.chip.darkCardDeep
-      }}
-    >
+    <View className="h-1 w-20 overflow-hidden rounded-sm" style={{ backgroundColor: Colors.chip.darkCardDeep }}>
       <View
+        className="h-full rounded-sm"
         style={{
           width: `${pct}%`,
-          height: '100%',
-          borderRadius: 2,
           backgroundColor: pct > 0 ? Colors.sway.bright : 'transparent'
         }}
       />
