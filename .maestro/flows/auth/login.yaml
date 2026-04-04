@@ -6,40 +6,8 @@ env:
   EMAIL: ${EMAIL}
   PASSWORD: ${PASSWORD}
 ---
-- launchApp:
-    clearState: true
-
-# Onboarding
-- tapOn:
-    id: 'ready-get-started-button'
-- tapOn:
-    id: 'carousel-create-account-button'
-
-# Signup → Login
-- tapOn:
-    id: 'signup-unlock-button'
-- tapOn:
-    id: 'signup-login-link'
-
-# Login
-- tapOn:
-    id: 'login-unlock-button'
-- tapOn:
-    id: 'login-identifier-input'
-- inputText: ${EMAIL}
-- tapOn:
-    id: 'login-password-input'
-- inputText: ${PASSWORD}
-- tapOn:
-    id: 'login-submit-button'
-
-# Dismiss iOS "Save Password?" dialog if present
 - runFlow:
-    when:
-      visible: 'Not Now'
-    commands:
-      - tapOn: 'Not Now'
-
-# Verify
-- assertVisible:
-    id: 'home-screen'
+    file: ../../subflows/login.yaml
+    env:
+      EMAIL: ${EMAIL}
+      PASSWORD: ${PASSWORD}

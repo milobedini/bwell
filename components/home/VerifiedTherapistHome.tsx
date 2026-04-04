@@ -10,7 +10,7 @@ const VerifiedTherapistHome = () => {
   const firstName = profile?.name?.split(' ')[0] || profile?.username || '';
 
   return (
-    <View className="flex-1 bg-sway-dark" style={{ paddingTop: insets.top }}>
+    <View className="flex-1 bg-sway-dark" testID="home-screen" style={{ paddingTop: insets.top }}>
       <TherapistDashboard firstName={firstName} />
     </View>
   );

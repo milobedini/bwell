@@ -31,6 +31,8 @@ const LoginSchema = Yup.object().shape({
 });
 
 const AnimatedText = motify(Text)();
+// Maestro can't see child elements inside BottomSheetModal on iOS unless accessibility grouping is disabled
+const sheetAccessible = Platform.select({ ios: false, default: undefined });
 
 export default function Login() {
   const login = useLogin();
@@ -79,7 +81,7 @@ export default function Login() {
       >
         <BottomSheetModal
           ref={bottomSheetModalRef}
-          accessible={Platform.select({ ios: false })}
+          accessible={sheetAccessible}
           keyboardBehavior="interactive"
           keyboardBlurBehavior="restore"
           handleComponent={() => <AuthSheetHandle onPress={hideModal} />}
