@@ -24,8 +24,9 @@
     "publish-web": "npx expo export --platform web && eas deploy --environment production",
     "update-types": "npm uninstall @milobedini/shared-types && npm i @milobedini/shared-types -D",
     "build:ios-sim": "EXPO_PUBLIC_E2E=true npx expo run:ios",
-    "test:e2e": "maestro test .maestro/flows/",
-    "test:e2e:studio": "maestro studio"
+    "test:e2e": "maestro test @.maestro/.env .maestro/flows/**",
+    "test:e2e:studio": "maestro studio",
+    "test:e2e:full": "bash scripts/run-e2e.sh"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",

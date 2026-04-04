@@ -85,6 +85,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - `npm run build:ios-sim` — build dev app for iOS simulator (required for Maestro, sets `EXPO_PUBLIC_E2E=true`)
 - `npm run test:e2e` — run all Maestro E2E flows
 - `npm run test:e2e:studio` — launch Maestro Studio for interactive flow authoring
+- `npm run test:e2e:full` — full pipeline: starts BE if needed, builds iOS sim app, runs all Maestro flows
 
 ## Validation Workflow
 
@@ -122,6 +123,9 @@ The app has three tiers (from `docs/proposal.pdf`):
 - Prefer tapping the next input to dismiss the keyboard — `hideKeyboard` is unreliable with `BottomSheetTextInput`
 - iOS "Save Password?" dialog appears after login — flows dismiss it with a conditional `runFlow` checking for "Not Now"
 - `clearState: true` on `launchApp` wipes AsyncStorage, so onboarding runs every time — flows navigate through ready → carousel → signup → login
+- Maestro env vars (EMAIL, PASSWORD) live in `.maestro/.env` with `-e KEY=VALUE` format — Maestro reads this via `@.maestro/.env` syntax, NOT from shell env or project `.env`
+- `expo run:ios` (used by `build:ios-sim`) rewrites `ios`/`android` scripts in `package.json` from `expo start` to `expo run` during prebuild — restore them after building
+- `maestro test` does not recurse subdirectories by default — use glob (`flows/**`) or configure `flows:` in `config.yaml`
 - No CI integration yet — Maestro Cloud has no free tier ($250/device/month). E2E runs locally only via `npm run test:e2e`
 
 ## Code Review
