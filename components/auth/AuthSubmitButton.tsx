@@ -7,10 +7,11 @@ type AuthSubmitButtonProps = {
   isPending: boolean;
   disabled: boolean;
   onPress: () => void;
+  testID?: string;
 };
 
-const AuthSubmitButton = ({ label, loadingLabel, isPending, disabled, onPress }: AuthSubmitButtonProps) => (
-  <Pressable style={{ marginBottom: 16 }} onPress={onPress} disabled={disabled}>
+const AuthSubmitButton = ({ label, loadingLabel, isPending, disabled, onPress, testID }: AuthSubmitButtonProps) => (
+  <Pressable style={{ marginBottom: 16 }} onPress={onPress} disabled={disabled} testID={testID}>
     <View
       style={{
         backgroundColor: disabled ? Colors.sway.darkGrey : Colors.sway.dark,

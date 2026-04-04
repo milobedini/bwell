@@ -71,7 +71,12 @@ export default function Login() {
 
   return (
     <BottomSheetModalProvider>
-      <AuthVideoBackground videoSource={videoSource} heading={`Keep building \nyour momentum`} onUnlock={showModal}>
+      <AuthVideoBackground
+        videoSource={videoSource}
+        heading={`Keep building \nyour momentum`}
+        onUnlock={showModal}
+        testID="login-unlock-button"
+      >
         <BottomSheetModal
           ref={bottomSheetModalRef}
           accessible={Platform.select({ ios: false })}
@@ -116,6 +121,7 @@ export default function Login() {
                   return (
                     <>
                       <BottomSheetTextInput
+                        testID="login-identifier-input"
                         autoCapitalize="none"
                         autoCorrect={false}
                         autoFocus
@@ -132,6 +138,7 @@ export default function Login() {
                       />
                       {submitted && errors.identifier && <ThemedText type="error">{errors.identifier}</ThemedText>}
                       <BottomSheetTextInput
+                        testID="login-password-input"
                         autoCapitalize="none"
                         autoCorrect={false}
                         clearButtonMode="while-editing"
@@ -155,13 +162,14 @@ export default function Login() {
                         style={{ justifyContent: 'center', marginTop: 16 }}
                       >
                         <AuthSubmitButton
+                          testID="login-submit-button"
                           label="Login"
                           loadingLabel="Logging in..."
                           isPending={isPending}
                           disabled={buttonDisabled}
                           onPress={() => handleSubmit()}
                         />
-                        <AuthLink href="/(auth)/signup" label="Need an account?" />
+                        <AuthLink href="/(auth)/signup" label="Need an account?" testID="login-signup-link" />
                       </MotiView>
                     </>
                   );

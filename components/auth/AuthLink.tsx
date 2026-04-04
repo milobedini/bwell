@@ -5,9 +5,10 @@ import { Colors } from '@/constants/Colors';
 type AuthLinkProps = {
   href: string;
   label: string;
+  testID?: string;
 };
 
-const AuthLink = ({ href, label }: AuthLinkProps) => (
+const AuthLink = ({ href, label, testID }: AuthLinkProps) => (
   <View
     style={{
       alignItems: 'center',
@@ -16,7 +17,7 @@ const AuthLink = ({ href, label }: AuthLinkProps) => (
     }}
   >
     <Link href={href as '/(auth)/login'} asChild>
-      <Pressable>
+      <Pressable testID={testID}>
         <Text
           style={{
             fontWeight: '700',

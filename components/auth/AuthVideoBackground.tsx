@@ -11,9 +11,10 @@ type AuthVideoBackgroundProps = {
   heading: string;
   onUnlock: () => void;
   children: ReactNode;
+  testID?: string;
 };
 
-const AuthVideoBackground = ({ videoSource, heading, onUnlock, children }: AuthVideoBackgroundProps) => {
+const AuthVideoBackground = ({ videoSource, heading, onUnlock, children, testID }: AuthVideoBackgroundProps) => {
   const { width, height } = useWindowDimensions();
 
   const player = useVideoPlayer(videoSource, (p) => {
@@ -48,7 +49,7 @@ const AuthVideoBackground = ({ videoSource, heading, onUnlock, children }: AuthV
             }}
           />
         </View>
-        <Pressable onPress={onUnlock}>
+        <Pressable onPress={onUnlock} testID={testID}>
           <View style={styles.unlockButton}>
             <AntDesign name="unlock" size={32} color={Colors.sway.bright} />
           </View>
