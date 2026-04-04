@@ -74,11 +74,7 @@ const ReasonTags = ({ reasons, bucket }: ReasonTagsProps) => {
     <>
       {reasons.map((reason) => {
         const config = REASON_TAG_CONFIG[reason];
-        if (!config) {
-          // eslint-disable-next-line no-console
-          if (__DEV__) console.warn(`Unknown reason tag: ${reason}`);
-          return null;
-        }
+        if (!config) return null;
         return (
           <View
             key={reason}
@@ -218,10 +214,13 @@ type ClientCardProps = {
   bucket: BucketType;
 };
 
+const getAssignmentTotal = (a: DashboardAssignmentSummary) => a.completedThisWeek + a.overdueTotal + a.pendingThisWeek;
+
 const ClientCard = memo(({ item, bucket }: ClientCardProps) => {
   const borderColor = getLeftBorderColor(item, bucket);
   const { latestScore, previousScore, assignments } = item;
   const severity = getSeverityColors(latestScore?.scoreBandLabel);
+  const assignmentTotal = getAssignmentTotal(assignments);
 
   const displayName = item.patient.name || item.patient.username;
 
@@ -285,10 +284,7 @@ const ClientCard = memo(({ item, bucket }: ClientCardProps) => {
         {/* Bottom row: week-scoped completion text + progress bar */}
         <View className="mt-1.5 flex-row items-center justify-between">
           <CompletionText assignments={assignments} />
-          <ProgressBar
-            completedThisWeek={assignments.completedThisWeek}
-            total={assignments.completedThisWeek + assignments.overdueTotal + assignments.pendingThisWeek}
-          />
+          <ProgressBar completedThisWeek={assignments.completedThisWeek} total={assignmentTotal} />
         </View>
       </Pressable>
     </Link>
