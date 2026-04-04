@@ -82,6 +82,9 @@ The app has three tiers (from `docs/proposal.pdf`):
 - `npm run update-types` — reinstall `@milobedini/shared-types` to pick up latest version
 - `npm run publish` — OTA update via EAS
 - `npm run publish-web` — export and deploy web build
+- `npm run build:ios-sim` — build dev app for iOS simulator (required for Maestro, sets `EXPO_PUBLIC_E2E=true`)
+- `npm run test:e2e` — run all Maestro E2E flows
+- `npm run test:e2e:studio` — launch Maestro Studio for interactive flow authoring
 
 ## Validation Workflow
 
@@ -107,6 +110,19 @@ The app has three tiers (from `docs/proposal.pdf`):
 ## Design System
 
 - Figma-to-code rules, colour tokens, typography, component inventory, and layout patterns are documented in `.claude/rules/figma-design-system.md` — this file is auto-loaded as context for every conversation and should be kept in sync with the codebase via the `update-status` skill.
+
+## E2E Testing (Maestro)
+
+- Maestro flows live in `.maestro/flows/`, reusable subflows in `.maestro/subflows/`
+- testID convention: `<screen>-<element>-<type>` (e.g., `login-identifier-input`, `signup-unlock-button`)
+- `npm run build:ios-sim` builds a dev app with `EXPO_PUBLIC_E2E=true` — this suppresses `LogBox` to prevent the debugger banner from blocking Maestro interactions
+- **Do NOT change `npm run ios`/`npm run android`** — these are Expo Go commands (`expo start --ios`), not native builds. Maestro uses `build:ios-sim` (`expo run:ios`) which is a completely different command
+- `@gorhom/bottom-sheet` requires `accessible={Platform.select({ ios: false })}` on `BottomSheetModal` for Maestro to see child elements on iOS — without this, iOS collapses the entire sheet into one accessibility node
+- Maestro `assertVisible` has no `timeout` param — use `extendedWaitUntil` for waits longer than the default 7s
+- Prefer tapping the next input to dismiss the keyboard — `hideKeyboard` is unreliable with `BottomSheetTextInput`
+- iOS "Save Password?" dialog appears after login — flows dismiss it with a conditional `runFlow` checking for "Not Now"
+- `clearState: true` on `launchApp` wipes AsyncStorage, so onboarding runs every time — flows navigate through ready → carousel → signup → login
+- No CI integration yet — Maestro Cloud has no free tier ($250/device/month). E2E runs locally only via `npm run test:e2e`
 
 ## Code Review
 
