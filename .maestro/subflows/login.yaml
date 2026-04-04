@@ -3,18 +3,20 @@ env:
   EMAIL: ${EMAIL}
   PASSWORD: ${PASSWORD}
 ---
-- launchApp:
-    clearState: true
-- tapOn:
-    id: 'ready-get-started-button'
-- tapOn:
-    id: 'carousel-create-account-button'
+# Log in with existing credentials
+# Expects: onboarding already completed, on signup screen
+
+# Navigate to login from signup screen
 - tapOn:
     id: 'signup-unlock-button'
 - tapOn:
     id: 'signup-login-link'
+
+# Open login sheet
 - tapOn:
     id: 'login-unlock-button'
+
+# Fill login form
 - tapOn:
     id: 'login-identifier-input'
 - inputText: ${EMAIL}
@@ -23,10 +25,14 @@ env:
 - inputText: ${PASSWORD}
 - tapOn:
     id: 'login-submit-button'
+
+# Dismiss iOS "Save Password?" dialog if present
 - runFlow:
     when:
       visible: 'Not Now'
     commands:
       - tapOn: 'Not Now'
+
+# Assert we reached the home screen
 - assertVisible:
     id: 'home-screen'

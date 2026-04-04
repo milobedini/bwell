@@ -151,6 +151,7 @@ export default function Signup() {
                           keyboardType="email-address"
                           onChangeText={handleChange('email')}
                           onBlur={handleBlur('email')}
+                          testID="signup-email-input"
                           className="h-[64px] rounded border-b-[1px] border-b-black"
                         />
                         {submitted && errors.email && <ThemedText type="error">{errors.email}</ThemedText>}
@@ -168,6 +169,7 @@ export default function Signup() {
                           value={values.username}
                           onChangeText={handleChange('username')}
                           onBlur={handleBlur('username')}
+                          testID="signup-username-input"
                           className="h-[64px] rounded border-b-[1px] border-b-black"
                         />
                         {submitted && errors.username && <ThemedText type="error">{errors.username}</ThemedText>}
@@ -187,6 +189,7 @@ export default function Signup() {
                           value={values.password}
                           onChangeText={handleChange('password')}
                           onBlur={handleBlur('password')}
+                          testID="signup-password-input"
                           className="h-[64px] rounded border-b-[1px] border-b-black"
                         />
                         {submitted && errors.password && <ThemedText type="error">{errors.password}</ThemedText>}
@@ -229,6 +232,7 @@ export default function Signup() {
                             isPending={isPending}
                             disabled={buttonDisabled}
                             onPress={() => handleSubmit()}
+                            testID="signup-submit-button"
                           />
                           <AuthLink href="/(auth)/login" label="Have an account?" testID="signup-login-link" />
                         </MotiView>

@@ -1,0 +1,9 @@
+appId: com.milobedini.bwell
+---
+# Launch app with clear state and navigate through onboarding
+- launchApp:
+    clearState: true
+- tapOn:
+    id: 'ready-get-started-button'
+- tapOn:
+    id: 'carousel-create-account-button'

@@ -1,0 +1,57 @@
+appId: com.milobedini.bwell
+env:
+  E2E_EMAIL: ${E2E_EMAIL}
+  E2E_USERNAME: ${E2E_USERNAME}
+  E2E_PASSWORD: ${E2E_PASSWORD}
+  E2E_NAME: ${E2E_NAME}
+---
+# Register a new user with E2E bypass code (000000)
+# Expects: onboarding already completed, on signup screen
+
+# Open signup sheet
+- tapOn:
+    id: 'signup-unlock-button'
+
+# Fill signup form
+- tapOn:
+    id: 'signup-email-input'
+- inputText: ${E2E_EMAIL}
+- tapOn:
+    id: 'signup-username-input'
+- inputText: ${E2E_USERNAME}
+- tapOn:
+    id: 'signup-password-input'
+- inputText: ${E2E_PASSWORD}
+
+# Submit signup (Patient role is default)
+- tapOn:
+    id: 'signup-submit-button'
+
+# Verify screen — enter E2E bypass code
+- extendedWaitUntil:
+    visible:
+      id: 'my-code-input'
+    timeout: 15000
+- tapOn:
+    id: 'my-code-input'
+- inputText: '000000'
+
+# Enter full name
+- tapOn:
+    id: 'verify-name-input'
+- inputText: ${E2E_NAME}
+
+# Submit verification
+- tapOn:
+    id: 'verify-submit-button'
+
+# Dismiss iOS "Save Password?" dialog if present
+- runFlow:
+    when:
+      visible: 'Not Now'
+    commands:
+      - tapOn: 'Not Now'
+
+# Assert we reached the home screen
+- assertVisible:
+    id: 'home-screen'

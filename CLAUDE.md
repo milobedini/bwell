@@ -115,6 +115,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 ## E2E Testing (Maestro)
 
 - Maestro flows live in `.maestro/flows/`, reusable subflows in `.maestro/subflows/`
+- **Flows vs subflows:** Top-level flows in `flows/` should be thin orchestrators that compose subflows via `runFlow`. Reusable sequences (onboarding, login, register) belong in `subflows/`. This keeps flows DRY and lets future flows reuse common steps (e.g., any flow needing an authenticated user can `runFlow` onboarding + login subflows)
 - testID convention: `<screen>-<element>-<type>` (e.g., `login-identifier-input`, `signup-unlock-button`)
 - `npm run build:ios-sim` builds a dev app with `EXPO_PUBLIC_E2E=true` — this suppresses `LogBox` to prevent the debugger banner from blocking Maestro interactions
 - **Do NOT change `npm run ios`/`npm run android`** — these are Expo Go commands (`expo start --ios`), not native builds. Maestro uses `build:ios-sim` (`expo run:ios`) which is a completely different command

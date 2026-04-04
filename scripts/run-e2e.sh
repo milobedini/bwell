@@ -51,6 +51,30 @@ fi
 echo "Building iOS simulator app..."
 EXPO_PUBLIC_E2E=true npx expo run:ios
 
-# 4. Run Maestro E2E tests (env vars from .maestro/.env)
+# 4. Disable iOS password autofill on the simulator to prevent Strong Password dialogs
+BOOTED_DEVICE=$(xcrun simctl list devices booted -j | python3 -c "
+import json,sys
+data=json.load(sys.stdin)
+for runtime,devices in data['devices'].items():
+    for d in devices:
+        if d['state']=='Booted':
+            print(d['udid'])
+            sys.exit()
+" 2>/dev/null)
+if [ -n "$BOOTED_DEVICE" ]; then
+  PLIST="$HOME/Library/Developer/CoreSimulator/Devices/$BOOTED_DEVICE/data/Library/UserConfigurationProfiles/EffectiveUserSettings.plist"
+  if [ -f "$PLIST" ]; then
+    plutil -replace restrictedBool.allowPasswordAutoFill.value -bool NO "$PLIST"
+    echo "✓ Disabled password autofill on simulator $BOOTED_DEVICE"
+  fi
+fi
+
+# 5. Clean up E2E test users from previous runs
+echo "Cleaning up E2E test users..."
+curl -s -X DELETE "http://localhost:$BE_PORT/api/test/cleanup" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"e2e-register@test.com"}' || true
+
+# 6. Run Maestro E2E tests (env vars from .maestro/.env)
 echo "Running Maestro E2E tests..."
 maestro test @"$SCRIPT_DIR/.maestro/.env" "$SCRIPT_DIR/.maestro/flows/**"

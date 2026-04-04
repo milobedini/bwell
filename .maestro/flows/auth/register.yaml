@@ -1,0 +1,19 @@
+appId: com.milobedini.bwell
+tags:
+  - smoke
+  - auth
+env:
+  E2E_EMAIL: ${E2E_EMAIL}
+  E2E_USERNAME: ${E2E_USERNAME}
+  E2E_PASSWORD: ${E2E_PASSWORD}
+  E2E_NAME: ${E2E_NAME}
+---
+- runFlow:
+    file: ../../subflows/onboarding.yaml
+- runFlow:
+    file: ../../subflows/register.yaml
+    env:
+      E2E_EMAIL: ${E2E_EMAIL}
+      E2E_USERNAME: ${E2E_USERNAME}
+      E2E_PASSWORD: ${E2E_PASSWORD}
+      E2E_NAME: ${E2E_NAME}

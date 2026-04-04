@@ -145,6 +145,7 @@ const Verify = () => {
                   value={values.newName}
                   onChangeText={(text) => setFieldValue('newName', text)}
                   onSubmitEditing={() => handleSubmit()}
+                  testID="verify-name-input"
                   className="mt-4 h-[64px] rounded border-b-[1px] border-b-white text-lg text-white"
                   placeholderTextColor="white"
                 />
@@ -158,6 +159,7 @@ const Verify = () => {
                   onPress={() => handleSubmit()}
                   className="mt-8"
                   disabled={isSubmittingCombined || values.verificationCode.length !== 6 || !values.newName.trim()}
+                  testID="verify-submit-button"
                 >
                   {isSubmittingCombined ? 'Submitting...' : 'Verify & Continue'}
                 </ThemedButton>
