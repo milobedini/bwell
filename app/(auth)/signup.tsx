@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { Text } from 'react-native';
+import { Platform, Text } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import type { VideoSource } from 'expo-video';
@@ -38,6 +38,8 @@ const SignupSchema = Yup.object().shape({
 });
 
 const AnimatedText = motify(Text)();
+// Maestro can't see child elements inside BottomSheetModal on iOS unless accessibility grouping is disabled
+const sheetAccessible = Platform.select({ ios: false, default: undefined });
 
 export default function Signup() {
   const register = useRegister();
@@ -78,9 +80,15 @@ export default function Signup() {
 
   return (
     <BottomSheetModalProvider>
-      <AuthVideoBackground videoSource={videoSource} heading={`Take back \ncontrol`} onUnlock={showModal}>
+      <AuthVideoBackground
+        videoSource={videoSource}
+        heading={`Take back \ncontrol`}
+        onUnlock={showModal}
+        testID="signup-unlock-button"
+      >
         <BottomSheetModal
           ref={bottomSheetModalRef}
+          accessible={sheetAccessible}
           keyboardBehavior="interactive"
           keyboardBlurBehavior="restore"
           handleComponent={() => <AuthSheetHandle onPress={hideModal} />}
@@ -222,7 +230,7 @@ export default function Signup() {
                             disabled={buttonDisabled}
                             onPress={() => handleSubmit()}
                           />
-                          <AuthLink href="/(auth)/login" label="Have an account?" />
+                          <AuthLink href="/(auth)/login" label="Have an account?" testID="signup-login-link" />
                         </MotiView>
                       </>
                     );

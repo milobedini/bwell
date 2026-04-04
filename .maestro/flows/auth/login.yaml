@@ -1,0 +1,13 @@
+appId: com.milobedini.bwell
+tags:
+  - smoke
+  - auth
+env:
+  EMAIL: ${EMAIL}
+  PASSWORD: ${PASSWORD}
+---
+- runFlow:
+    file: ../../subflows/login.yaml
+    env:
+      EMAIL: ${EMAIL}
+      PASSWORD: ${PASSWORD}

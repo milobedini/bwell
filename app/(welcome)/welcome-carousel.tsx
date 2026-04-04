@@ -65,6 +65,7 @@ const WelcomeCarousel = () => {
         }}
       >
         <TouchableOpacity
+          testID="carousel-create-account-button"
           onPress={skipToRegister}
           style={{
             width: welcomeConstants.buttonSize * 3,

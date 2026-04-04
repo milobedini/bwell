@@ -31,7 +31,9 @@ const ReadyScreen = () => {
           onLoad={() => SplashScreen.hideAsync()}
         />
         <ThemedText type="title">Welcome to BWell</ThemedText>
-        <ThemedButton onPress={onGetStarted}>Get started!</ThemedButton>
+        <ThemedButton onPress={onGetStarted} testID="ready-get-started-button">
+          Get started!
+        </ThemedButton>
       </Container>
     );
   }

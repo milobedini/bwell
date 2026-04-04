@@ -40,7 +40,7 @@ export const HomeScreen = ({ content }: HomeScreenProps) => {
   }, []);
 
   return (
-    <View className="flex-1 bg-sway-dark">
+    <View className="flex-1 bg-sway-dark" testID="home-screen">
       <View
         className="flex-row justify-center pb-[22]"
         style={{

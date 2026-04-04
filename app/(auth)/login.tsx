@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { Text } from 'react-native';
+import { Platform, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import type { VideoSource } from 'expo-video';
 import { Formik } from 'formik';
@@ -31,6 +31,8 @@ const LoginSchema = Yup.object().shape({
 });
 
 const AnimatedText = motify(Text)();
+// Maestro can't see child elements inside BottomSheetModal on iOS unless accessibility grouping is disabled
+const sheetAccessible = Platform.select({ ios: false, default: undefined });
 
 export default function Login() {
   const login = useLogin();
@@ -71,9 +73,15 @@ export default function Login() {
 
   return (
     <BottomSheetModalProvider>
-      <AuthVideoBackground videoSource={videoSource} heading={`Keep building \nyour momentum`} onUnlock={showModal}>
+      <AuthVideoBackground
+        videoSource={videoSource}
+        heading={`Keep building \nyour momentum`}
+        onUnlock={showModal}
+        testID="login-unlock-button"
+      >
         <BottomSheetModal
           ref={bottomSheetModalRef}
+          accessible={sheetAccessible}
           keyboardBehavior="interactive"
           keyboardBlurBehavior="restore"
           handleComponent={() => <AuthSheetHandle onPress={hideModal} />}
@@ -115,6 +123,7 @@ export default function Login() {
                   return (
                     <>
                       <BottomSheetTextInput
+                        testID="login-identifier-input"
                         autoCapitalize="none"
                         autoCorrect={false}
                         autoFocus
@@ -131,6 +140,7 @@ export default function Login() {
                       />
                       {submitted && errors.identifier && <ThemedText type="error">{errors.identifier}</ThemedText>}
                       <BottomSheetTextInput
+                        testID="login-password-input"
                         autoCapitalize="none"
                         autoCorrect={false}
                         clearButtonMode="while-editing"
@@ -154,13 +164,14 @@ export default function Login() {
                         style={{ justifyContent: 'center', marginTop: 16 }}
                       >
                         <AuthSubmitButton
+                          testID="login-submit-button"
                           label="Login"
                           loadingLabel="Logging in..."
                           isPending={isPending}
                           disabled={buttonDisabled}
                           onPress={() => handleSubmit()}
                         />
-                        <AuthLink href="/(auth)/signup" label="Need an account?" />
+                        <AuthLink href="/(auth)/signup" label="Need an account?" testID="login-signup-link" />
                       </MotiView>
                     </>
                   );
