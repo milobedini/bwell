@@ -14,7 +14,8 @@ export default {
       policy: 'appVersion'
     },
     ios: {
-      supportsTablet: true
+      supportsTablet: true,
+      bundleIdentifier: 'com.milobedini.bwell'
     },
     android: {
       adaptiveIcon: {
