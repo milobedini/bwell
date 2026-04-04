@@ -1,0 +1,44 @@
+name: Maestro E2E
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  e2e:
+    runs-on: macos-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build iOS simulator app
+        env:
+          EXPO_PUBLIC_BACKEND_BASE_URL: ${{ secrets.EXPO_PUBLIC_BACKEND_BASE_URL }}
+        run: npx expo run:ios --no-install
+
+      - name: Wake backend (Render free tier cold start)
+        run: |
+          curl -sf --retry 5 --retry-delay 10 --retry-all-errors \
+            "${{ secrets.EXPO_PUBLIC_BACKEND_BASE_URL }}/health" \
+            || echo "Backend warm-up attempted"
+
+      - name: Run Maestro Cloud tests
+        uses: mobile-dev-inc/action-maestro-cloud@v2
+        with:
+          api-key: ${{ secrets.MAESTRO_API_KEY }}
+          project-id: ${{ secrets.MAESTRO_PROJECT_ID }}
+          app-file: ios/build/Build/Products/Debug-iphonesimulator/bwell.app
+          env: |
+            EMAIL=${{ secrets.MAESTRO_TEST_EMAIL }}
+            PASSWORD=${{ secrets.MAESTRO_TEST_PASSWORD }}
