@@ -1,0 +1,38 @@
+appId: com.milobedini.bwell
+tags:
+  - smoke
+  - auth
+env:
+  EMAIL: ${EMAIL}
+  PASSWORD: ${PASSWORD}
+---
+# Launch fresh — clears persisted auth state
+- launchApp:
+    clearState: true
+
+# Wait for welcome screen (generous timeout for Render cold start)
+- assertVisible:
+    id: "login-unlock-button"
+    timeout: 60000
+
+# Open login bottom sheet
+- tapOn:
+    id: "login-unlock-button"
+- waitForAnimationToEnd
+
+# Fill credentials
+- tapOn:
+    id: "login-identifier-input"
+- inputText: ${EMAIL}
+- hideKeyboard
+- tapOn:
+    id: "login-password-input"
+- inputText: ${PASSWORD}
+- hideKeyboard
+
+# Submit and verify login succeeded
+- tapOn:
+    id: "login-submit-button"
+- assertVisible:
+    id: "home-screen"
+    timeout: 60000

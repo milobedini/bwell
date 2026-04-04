@@ -1,0 +1,7 @@
+flows:
+  - "flows/**"
+executionOrder:
+  continueOnFailure: false
+platform:
+  ios:
+    disableAnimations: true

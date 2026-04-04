@@ -22,7 +22,10 @@
     "upgrade": "expo install --fix && expo install --check && npx expo-doctor",
     "publish": "eas update --branch main --environment production --message \"Update $(date)\"",
     "publish-web": "npx expo export --platform web && eas deploy --environment production",
-    "update-types": "npm uninstall @milobedini/shared-types && npm i @milobedini/shared-types -D"
+    "update-types": "npm uninstall @milobedini/shared-types && npm i @milobedini/shared-types -D",
+    "build:ios-sim": "npx expo run:ios",
+    "test:e2e": "maestro test .maestro/flows/",
+    "test:e2e:studio": "maestro studio"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",

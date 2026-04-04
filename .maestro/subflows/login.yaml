@@ -1,0 +1,26 @@
+appId: com.milobedini.bwell
+env:
+  EMAIL: ${EMAIL}
+  PASSWORD: ${PASSWORD}
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: "login-unlock-button"
+    timeout: 60000
+- tapOn:
+    id: "login-unlock-button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "login-identifier-input"
+- inputText: ${EMAIL}
+- hideKeyboard
+- tapOn:
+    id: "login-password-input"
+- inputText: ${PASSWORD}
+- hideKeyboard
+- tapOn:
+    id: "login-submit-button"
+- assertVisible:
+    id: "home-screen"
+    timeout: 60000
