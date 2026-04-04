@@ -49,6 +49,7 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 | Tint error | `Colors.tint.error` | `rgba(255,109,94,0.15)` |
 | Tint error border | `Colors.tint.errorBorder` | `rgba(255,109,94,0.3)` |
 | Tint info | `Colors.tint.info` | `rgba(255,209,93,0.15)` |
+| Tint info border | `Colors.tint.infoBorder` | `rgba(255,209,93,0.3)` |
 | Tint neutral | `Colors.tint.neutral` | `rgba(166,173,187,0.12)` |
 | Chip pill | `Colors.chip.pill` / `bg-chip-pill` | `#1E2A45` |
 | Chip pill pressed | `Colors.chip.pillPressed` / `bg-chip-pillPressed` | `#253352` |

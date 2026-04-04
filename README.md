@@ -48,6 +48,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ## Recent Milestones
 
+- **Therapist dashboard UX improvements** — overdue chips, relative dates, progress bars on client detail cards, reason tags on attention cards, week-scoped assignment framing (2026-04-04)
 - **Unified practice model** — merged assignments and attempts into a single practice concept, new journey/practice/review tabs, BarSparkline component, server-side client search/sort (2026-04-01)
 - **Reading module type** — replaced psychoeducation/exercise with unified reading presenter, markdown rendering, scroll progress bar, reader notes (2026-04-01)
 - **Destructive action confirmation** — ActionMenu built-in confirmation step for all destructive actions with customisable title, description, and label (2026-03-29)
@@ -57,7 +58,6 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 - **Diary keyboard toolbar** — native-style prev/next chevron navigation for numeric fields, keyboard-aware positioning (2026-03-24)
 - **Diary presenter refactor** — extracted 670-line presenter into composable hooks and components, FlatList performance tuning (2026-03-24)
 - **Diary UX polish** — compact header, floating save button, haptics, placeholder colours, character counts (2026-03-23)
-- **Therapist attempts redesign** — severity-tinted cards with score band colour mapping, timeAgo display (2026-03-21)
 
 ## Tech Stack
 
@@ -81,10 +81,10 @@ app/
 ├── (auth)/              # Login, signup, email verification
 ├── (welcome)/           # Onboarding carousel
 └── (main)/(tabs)/       # Authenticated tab navigator
-    ├── home/            # Role-specific home screens + nested client/patient views
+    ├── home/            # "Dashboard" (therapist/admin) / "Home" (patient) + nested views
     ├── journey/         # Patient: score trends & progress history
     ├── practice/        # Patient: active & completed practice items
-    ├── patients/        # Therapist: client list & assignment management
+    ├── patients/        # Therapist: "Clients" tab — client list & assignment management
     ├── review/          # Therapist: review patient submissions
     ├── programs/        # Browse programs & modules
     ├── all-users/       # Admin: search, filter & sort all users
