@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { Text } from 'react-native';
+import { Platform, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import type { VideoSource } from 'expo-video';
 import { Formik } from 'formik';
@@ -74,6 +74,7 @@ export default function Login() {
       <AuthVideoBackground videoSource={videoSource} heading={`Keep building \nyour momentum`} onUnlock={showModal}>
         <BottomSheetModal
           ref={bottomSheetModalRef}
+          accessible={Platform.select({ ios: false })}
           keyboardBehavior="interactive"
           keyboardBlurBehavior="restore"
           handleComponent={() => <AuthSheetHandle onPress={hideModal} />}

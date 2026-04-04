@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { Text } from 'react-native';
+import { Platform, Text } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import type { VideoSource } from 'expo-video';
@@ -81,6 +81,7 @@ export default function Signup() {
       <AuthVideoBackground videoSource={videoSource} heading={`Take back \ncontrol`} onUnlock={showModal}>
         <BottomSheetModal
           ref={bottomSheetModalRef}
+          accessible={Platform.select({ ios: false })}
           keyboardBehavior="interactive"
           keyboardBlurBehavior="restore"
           handleComponent={() => <AuthSheetHandle onPress={hideModal} />}
