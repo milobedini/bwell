@@ -115,20 +115,8 @@ The app has three tiers (from `docs/proposal.pdf`):
 ## E2E Testing (Maestro)
 
 - Maestro flows live in `.maestro/flows/`, reusable subflows in `.maestro/subflows/`
-- **Flows vs subflows:** Top-level flows in `flows/` should be thin orchestrators that compose subflows via `runFlow`. Reusable sequences (onboarding, login, register) belong in `subflows/`. This keeps flows DRY and lets future flows reuse common steps (e.g., any flow needing an authenticated user can `runFlow` onboarding + login subflows)
-- testID convention: `<screen>-<element>-<type>` (e.g., `login-identifier-input`, `signup-unlock-button`)
-- `npm run build:ios-sim` builds a dev app with `EXPO_PUBLIC_E2E=true` — this suppresses `LogBox` to prevent the debugger banner from blocking Maestro interactions
-- **Do NOT change `npm run ios`/`npm run android`** — these are Expo Go commands (`expo start --ios`), not native builds. Maestro uses `build:ios-sim` (`expo run:ios`) which is a completely different command
-- `@gorhom/bottom-sheet` requires `accessible={Platform.select({ ios: false })}` on `BottomSheetModal` for Maestro to see child elements on iOS — without this, iOS collapses the entire sheet into one accessibility node
-- Maestro `assertVisible` has no `timeout` param — use `extendedWaitUntil` for waits longer than the default 7s
-- Prefer tapping the next input to dismiss the keyboard — `hideKeyboard` is unreliable with `BottomSheetTextInput`
-- iOS "Save Password?" dialog appears after login — flows dismiss it with a conditional `runFlow` checking for "Not Now"
-- `clearState: true` on `launchApp` wipes AsyncStorage, so onboarding runs every time — flows navigate through ready → carousel → signup → login
-- Maestro env vars (EMAIL, PASSWORD) live in `.maestro/.env` with `-e KEY=VALUE` format — Maestro reads this via `@.maestro/.env` syntax, NOT from shell env or project `.env`
-- `expo run:ios` (used by `build:ios-sim`) rewrites `ios`/`android` scripts in `package.json` from `expo start` to `expo run` during prebuild — restore them after building
-- `maestro test` does not recurse subdirectories by default — use glob (`flows/**`) or configure `flows:` in `config.yaml`
-- No CI integration yet — Maestro Cloud has no free tier ($250/device/month). E2E runs locally only via `npm run test:e2e`
 - **Always create or update Maestro E2E flows** when implementing new features or changing existing features that affect user-facing behavior — E2E coverage should grow with the app
+- Detailed authoring guidance (testID conventions, platform quirks, CLI quirks, env vars) lives in `.maestro/CLAUDE.md`
 
 ## Code Review
 
