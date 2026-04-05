@@ -152,23 +152,27 @@ const FiveAreasPresenter = ({ attempt, mode, patientName: _patientName }: FiveAr
         <View className="flex-row gap-3 px-4 pb-6 pt-4">
           {state.currentStep > 0 && (
             <Pressable
-              className="flex-1 rounded-md p-4 active:opacity-70"
-              style={{ backgroundColor: Colors.sway.buttonBackgroundSolid }}
+              className="flex-1 items-center rounded-md p-4 active:opacity-70"
+              style={{ backgroundColor: Colors.chip.darkCardAlt }}
               onPress={state.goBack}
               disabled={state.isSaving}
             >
-              <ThemedText type="button" className="text-center">
-                Back
-              </ThemedText>
+              <ThemedText type="button">Back</ThemedText>
             </Pressable>
           )}
-          <View className="flex-1">
-            <ThemedButton
-              title={state.currentStep === AREA_KEYS.length - 1 ? 'Review & Submit' : 'Next'}
-              onPress={state.goForward}
-              disabled={state.isSaving || !state.fields[state.currentKey]?.trim()}
-            />
-          </View>
+          <Pressable
+            className="flex-1 items-center rounded-md p-4 active:opacity-70 disabled:opacity-40"
+            style={{
+              backgroundColor:
+                state.isSaving || !state.fields[state.currentKey]?.trim() ? Colors.sway.darkGrey : Colors.sway.bright
+            }}
+            onPress={state.goForward}
+            disabled={state.isSaving || !state.fields[state.currentKey]?.trim()}
+          >
+            <ThemedText type="button">
+              {state.currentStep === AREA_KEYS.length - 1 ? 'Review & Submit' : 'Next'}
+            </ThemedText>
+          </Pressable>
         </View>
       </View>
     </ContentContainer>
