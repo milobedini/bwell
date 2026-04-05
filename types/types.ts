@@ -7,7 +7,8 @@ enum UserRole {
 enum ModuleType {
   QUESTIONNAIRE = 'questionnaire',
   READING = 'reading',
-  ACTIVITY_DIARY = 'activity_diary'
+  ACTIVITY_DIARY = 'activity_diary',
+  FIVE_AREAS_MODEL = 'five_areas_model'
 }
 
 enum AccessPolicy {

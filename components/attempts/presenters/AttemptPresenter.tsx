@@ -5,6 +5,7 @@ import { isDiaryAttempt, isQuestionnaireAttempt, isReadingAttempt } from '@/util
 import type { AttemptDetailResponseItem } from '@milobedini/shared-types';
 
 import ActivityDiaryPresenter from './diary/ActivityDiaryPresenter';
+import FiveAreasPresenter from './five-areas/FiveAreasPresenter';
 import QuestionnairePresenter from './questionnaires/QuestionnairePresenter';
 import ReadingPresenter from './reading/ReadingPresenter';
 
@@ -27,6 +28,10 @@ const AttemptPresenter = ({ attempt, mode, patientName }: AttemptPresenterProps)
 
   if (isReadingAttempt(attempt)) {
     return <ReadingPresenter attempt={attempt} mode={mode} patientName={patientName} />;
+  }
+
+  if (attempt.moduleType === 'five_areas_model') {
+    return <FiveAreasPresenter attempt={attempt} mode={mode} patientName={patientName} />;
   }
 
   return (

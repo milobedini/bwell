@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Pressable, PressableProps } from 'react-native';
 import { clsx } from 'clsx';
 import { Image } from 'expo-image';
+import { Colors } from '@/constants/Colors';
 
 import { ThemedText } from './ThemedText';
 
@@ -13,13 +14,13 @@ type ThemedButtonProps = PressableProps & {
   logo?: boolean;
   textClasses?: string;
   logoClasses?: string;
-  variant?: 'default' | 'error';
+  variant?: 'default' | 'error' | 'outline';
   centered?: boolean;
   children?: ReactNode;
 };
 
 const ThemedButton = (props: ThemedButtonProps) => {
-  const { className, children, disabled, compact, title, variant = 'default', centered, ...rest } = props;
+  const { className, children, disabled, compact, title, variant = 'default', centered, textClasses, ...rest } = props;
   return (
     <Pressable
       disabled={disabled}
@@ -28,6 +29,7 @@ const ThemedButton = (props: ThemedButtonProps) => {
         disabled && 'bg-sway-darkGrey',
         compact && 'w-[200] px-3 py-2',
         variant === 'error' && 'bg-error',
+        variant === 'outline' && 'bg-transparent border-[1.5px] border-sway-bright',
         variant === 'default' && !disabled && 'bg-sway-bright',
         centered && 'self-center',
         className
@@ -36,7 +38,11 @@ const ThemedButton = (props: ThemedButtonProps) => {
       accessibilityState={{ disabled: !!disabled }}
       {...rest}
     >
-      <ThemedText type="button" className="text-center group-active:opacity-70">
+      <ThemedText
+        type="button"
+        className={clsx('text-center group-active:opacity-70', textClasses)}
+        style={variant === 'outline' ? { color: Colors.sway.bright } : undefined}
+      >
         {title ?? children}
       </ThemedText>
     </Pressable>
