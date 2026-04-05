@@ -1,10 +1,11 @@
 import { useRouter } from 'expo-router';
 import Container from '@/components/Container';
 import EmptyState from '@/components/ui/EmptyState';
-import { isDiaryAttempt, isQuestionnaireAttempt, isReadingAttempt } from '@/utils/types';
+import { isDiaryAttempt, isFiveAreasAttempt, isQuestionnaireAttempt, isReadingAttempt } from '@/utils/types';
 import type { AttemptDetailResponseItem } from '@milobedini/shared-types';
 
 import ActivityDiaryPresenter from './diary/ActivityDiaryPresenter';
+import FiveAreasPresenter from './five-areas/FiveAreasPresenter';
 import QuestionnairePresenter from './questionnaires/QuestionnairePresenter';
 import ReadingPresenter from './reading/ReadingPresenter';
 
@@ -27,6 +28,10 @@ const AttemptPresenter = ({ attempt, mode, patientName }: AttemptPresenterProps)
 
   if (isReadingAttempt(attempt)) {
     return <ReadingPresenter attempt={attempt} mode={mode} patientName={patientName} />;
+  }
+
+  if (isFiveAreasAttempt(attempt)) {
+    return <FiveAreasPresenter attempt={attempt} mode={mode} patientName={patientName} />;
   }
 
   return (
