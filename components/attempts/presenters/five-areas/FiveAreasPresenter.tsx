@@ -67,11 +67,7 @@ const FiveAreasPresenter = ({ attempt, mode, patientName: _patientName }: FiveAr
 
           {/* Tooltip overlay */}
           {tooltipKey && (
-            <Pressable
-              onPress={dismissTooltip}
-              className="absolute inset-0 items-center justify-center"
-              style={{ backgroundColor: Colors.overlay.light }}
-            >
+            <Pressable onPress={dismissTooltip} className="absolute inset-0 items-center justify-center">
               <View
                 className="mx-6 rounded-xl p-4"
                 style={{
