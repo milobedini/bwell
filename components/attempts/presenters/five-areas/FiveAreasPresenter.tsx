@@ -17,7 +17,7 @@ type FiveAreasPresenterProps = {
   patientName?: string;
 };
 
-const FiveAreasPresenter = ({ attempt, mode }: FiveAreasPresenterProps) => {
+const FiveAreasPresenter = ({ attempt, mode, patientName }: FiveAreasPresenterProps) => {
   const state = useFiveAreasState({ attempt, mode });
   const [tooltipKey, setTooltipKey] = useState<AreaKey | null>(null);
 
@@ -55,36 +55,34 @@ const FiveAreasPresenter = ({ attempt, mode }: FiveAreasPresenterProps) => {
           </View>
         )}
 
-        {/* Diagram with snippets + tooltip */}
-        <View>
-          <FiveAreasDiagram
-            currentStep={state.currentStep}
-            completedSteps={state.completedSteps}
-            snippets={state.fields}
-            mode="view"
-            onNodePress={handleNodePress}
-          />
+        {/* Diagram with snippets */}
+        <FiveAreasDiagram
+          currentStep={state.currentStep}
+          completedSteps={state.completedSteps}
+          snippets={state.fields}
+          mode="view"
+          onNodePress={handleNodePress}
+        />
 
-          {/* Tooltip overlay */}
-          {tooltipKey && (
-            <Pressable onPress={dismissTooltip} className="absolute inset-0 items-center justify-center">
-              <View
-                className="mx-6 rounded-xl p-4"
-                style={{
-                  backgroundColor: Colors.chip.darkCard,
-                  borderWidth: 1,
-                  borderColor: Colors.sway.bright,
-                  maxWidth: 300
-                }}
-              >
-                <ThemedText type="smallBold" style={{ color: Colors.sway.bright, marginBottom: 6 }}>
-                  {AREA_LABELS[tooltipKey]}
-                </ThemedText>
-                <ThemedText>{state.fields[tooltipKey] || '—'}</ThemedText>
-              </View>
-            </Pressable>
-          )}
-        </View>
+        {/* Tooltip overlay — covers entire screen so taps outside dismiss */}
+        {tooltipKey && (
+          <Pressable onPress={dismissTooltip} className="absolute inset-0 z-10 items-center justify-center">
+            <View
+              className="mx-6 rounded-xl p-4"
+              style={{
+                backgroundColor: Colors.chip.darkCard,
+                borderWidth: 1,
+                borderColor: Colors.sway.bright,
+                maxWidth: 300
+              }}
+            >
+              <ThemedText type="smallBold" style={{ color: Colors.sway.bright, marginBottom: 6 }}>
+                {AREA_LABELS[tooltipKey]}
+              </ThemedText>
+              <ThemedText>{state.fields[tooltipKey] || '—'}</ThemedText>
+            </View>
+          </Pressable>
+        )}
 
         {/* Full text cards */}
         <ScrollView className="mt-4" contentContainerStyle={{ paddingBottom: 40 }}>
@@ -96,7 +94,7 @@ const FiveAreasPresenter = ({ attempt, mode }: FiveAreasPresenterProps) => {
           {attempt.userNote && (
             <View className="mt-2">
               <ThemedText type="smallBold" style={{ marginBottom: 6 }}>
-                Personal Note
+                {patientName ? `${patientName}'s Note` : 'Personal Note'}
               </ThemedText>
               <View className="rounded-xl p-4" style={{ backgroundColor: Colors.chip.darkCard }}>
                 <ThemedText>{attempt.userNote}</ThemedText>
@@ -151,32 +149,20 @@ const FiveAreasPresenter = ({ attempt, mode }: FiveAreasPresenterProps) => {
         {/* Navigation buttons */}
         <View className="flex-row gap-3 px-4 pb-6 pt-4">
           {state.currentStep > 0 && (
-            <Pressable
-              className="flex-1 items-center rounded-md p-4 active:opacity-70"
-              style={{
-                backgroundColor: 'transparent',
-                borderWidth: 1.5,
-                borderColor: Colors.sway.bright
-              }}
+            <ThemedButton
+              className="flex-1"
+              variant="outline"
+              title="Back"
               onPress={state.goBack}
               disabled={state.isSaving}
-            >
-              <ThemedText type="button" style={{ color: Colors.sway.bright }}>
-                Back
-              </ThemedText>
-            </Pressable>
+            />
           )}
-          <Pressable
-            className="flex-1 items-center rounded-md p-4 active:opacity-70 disabled:opacity-40"
-            style={{
-              backgroundColor:
-                state.isSaving || !state.fields[state.currentKey]?.trim() ? Colors.sway.darkGrey : Colors.sway.bright
-            }}
+          <ThemedButton
+            className="flex-1"
+            title={state.currentStep === AREA_KEYS.length - 1 ? 'Review' : 'Next'}
             onPress={state.goForward}
             disabled={state.isSaving || !state.fields[state.currentKey]?.trim()}
-          >
-            <ThemedText type="button">{state.currentStep === AREA_KEYS.length - 1 ? 'Review' : 'Next'}</ThemedText>
-          </Pressable>
+          />
         </View>
       </View>
     </ContentContainer>

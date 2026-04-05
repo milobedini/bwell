@@ -1,6 +1,7 @@
 import { Pressable, TextInput, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
+import { Fonts } from '@/constants/Typography';
 import useToggle from '@/hooks/useToggle';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
@@ -50,8 +51,8 @@ const AreaStep = ({ areaKey, value, onChangeText, editable }: AreaStepProps) => 
         style={{
           backgroundColor: Colors.chip.darkCard,
           color: Colors.sway.lightGrey,
-          fontFamily: 'Lato-Regular',
-          fontSize: 16,
+          fontFamily: Fonts.Regular,
+          fontSize: 18,
           textAlignVertical: 'top',
           minHeight: 120,
           borderWidth: 1,

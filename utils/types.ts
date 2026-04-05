@@ -1,4 +1,4 @@
-import type { AttemptDetail, AttemptDetailResponseItem, DiaryDetail, FiveAreasData } from '@milobedini/shared-types';
+import type { AttemptDetail, AttemptDetailResponseItem, DiaryDetail } from '@milobedini/shared-types';
 
 export function isQuestionnaireAttempt(
   a: AttemptDetailResponseItem
@@ -15,10 +15,4 @@ export function isReadingAttempt(a: AttemptDetailResponseItem): a is AttemptDeta
   moduleSnapshot: NonNullable<AttemptDetailResponseItem['moduleSnapshot']>;
 } {
   return a.moduleType === 'reading' && !!a.moduleSnapshot;
-}
-
-export function isFiveAreasAttempt(
-  a: AttemptDetailResponseItem
-): a is AttemptDetailResponseItem & { fiveAreas?: FiveAreasData } {
-  return a.moduleType === 'five_areas_model';
 }

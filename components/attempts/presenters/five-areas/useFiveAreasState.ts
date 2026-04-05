@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { toast } from 'sonner-native';
+import { TOAST_DURATIONS, TOAST_STYLES } from '@/components/toast/toastOptions';
 import { useSaveModuleAttempt, useSubmitAttempt } from '@/hooks/useAttempts';
 import type { AttemptDetailResponseItem, FiveAreasData } from '@milobedini/shared-types';
 
@@ -63,7 +65,7 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
 
   // A step is "completed" (tappable) if it has content OR the user has progressed past it
   const completedSteps = useMemo(
-    () => new Set(AREA_KEYS.filter((key, i) => !!fields[key]?.trim() || i <= highestStep)),
+    () => new Set(AREA_KEYS.filter((key, i) => !!fields[key]?.trim() || i < highestStep)),
     [fields, highestStep]
   );
 
@@ -93,6 +95,12 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
           onSuccess: () => {
             setDirtyKeys(new Set());
             onDone();
+          },
+          onError: () => {
+            toast.error('Failed to save progress', {
+              duration: TOAST_DURATIONS.error,
+              styles: TOAST_STYLES.error
+            });
           }
         }
       );

@@ -232,7 +232,7 @@ const FiveAreasDiagram = memo(({ currentStep, completedSteps, onNodePress, snipp
           );
         })}
 
-        {/* ── text labels, checkmarks, and snippets ── */}
+        {/* ── text labels and snippets ── */}
         {NODES.map((_, i) => {
           const state = nodeState(i);
           const { x, y } = scaled[i];
