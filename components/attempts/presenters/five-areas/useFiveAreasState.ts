@@ -42,6 +42,7 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
   const [fields, setFields] = useState<Partial<FiveAreasData>>({});
   const [dirtyKeys, setDirtyKeys] = useState<Set<AreaKey>>(new Set());
   const [currentStep, setCurrentStep] = useState(0);
+  const [highestStep, setHighestStep] = useState(0); // track furthest step reached
   const [showReview, setShowReview] = useState(false);
 
   useEffect(() => {
@@ -50,7 +51,9 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
       setFields({ ...serverData });
       if (canEdit) {
         const firstEmpty = AREA_KEYS.findIndex((key) => !serverData[key]?.trim());
-        setCurrentStep(firstEmpty === -1 ? AREA_KEYS.length - 1 : firstEmpty);
+        const resumeStep = firstEmpty === -1 ? AREA_KEYS.length - 1 : firstEmpty;
+        setCurrentStep(resumeStep);
+        setHighestStep(resumeStep);
       }
     }
   }, [attempt._id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -58,7 +61,11 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
   const hasDirtyChanges = dirtyKeys.size > 0;
   const currentKey = AREA_KEYS[currentStep];
 
-  const completedSteps = useMemo(() => new Set(AREA_KEYS.filter((key) => !!fields[key]?.trim())), [fields]);
+  // A step is "completed" (tappable) if it has content OR the user has progressed past it
+  const completedSteps = useMemo(
+    () => new Set(AREA_KEYS.filter((key, i) => !!fields[key]?.trim() || i <= highestStep)),
+    [fields, highestStep]
+  );
 
   const updateField = useCallback((key: AreaKey, value: string) => {
     setFields((prev) => ({ ...prev, [key]: value }));
@@ -93,7 +100,11 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
       saveDirtyAndThen(() => setShowReview(true));
       return;
     }
-    saveDirtyAndThen(() => setCurrentStep((s) => s + 1));
+    saveDirtyAndThen(() => {
+      const next = currentStep + 1;
+      setCurrentStep(next);
+      setHighestStep((h) => Math.max(h, next));
+    });
   }, [currentStep, saveDirtyAndThen]);
 
   const goBack = useCallback(() => {
@@ -104,8 +115,8 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
   const goToStep = useCallback(
     (step: number) => {
       if (step < 0 || step >= AREA_KEYS.length) return;
-      const targetKey = AREA_KEYS[step];
-      if (!completedSteps.has(targetKey) && step !== currentStep) return;
+      // Allow navigating to any step the user has previously reached
+      if (step > highestStep && step !== currentStep) return;
 
       Haptics.selectionAsync().catch(() => {});
       saveDirtyAndThen(() => {
@@ -113,7 +124,7 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
         setShowReview(false);
       });
     },
-    [completedSteps, currentStep, saveDirtyAndThen]
+    [highestStep, currentStep, saveDirtyAndThen]
   );
 
   const handleSubmit = useCallback(() => {
