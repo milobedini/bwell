@@ -3,7 +3,17 @@ import { Pressable, useWindowDimensions } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { Canvas, Circle, Line, Text, useFont, vec } from '@shopify/react-native-skia';
 
-import { AREA_KEYS, AREA_LABELS, type AreaKey } from './useFiveAreasState';
+import { AREA_KEYS, type AreaKey } from './useFiveAreasState';
+
+// Short labels for the diagram nodes (full labels overflow the circles)
+const DIAGRAM_LABELS: Record<AreaKey, string> = {
+  situation: 'Situation',
+  thoughts: 'Thoughts',
+  emotions: 'Emotions',
+  physical: 'Physical',
+  behaviours: 'Behaviours',
+  reflection: 'Reflection'
+};
 
 type FiveAreasDiagramProps = {
   currentStep: number;
@@ -169,7 +179,7 @@ const FiveAreasDiagram = memo(({ currentStep, completedSteps, onNodePress, snipp
           const state = nodeState(i);
           const { x, y } = scaled[i];
           const key = AREA_KEYS[i];
-          const label = AREA_LABELS[key];
+          const label = DIAGRAM_LABELS[key];
           const color = getTextColor(state);
 
           const labelWidth = boldFont.measureText(label).width;
@@ -180,7 +190,7 @@ const FiveAreasDiagram = memo(({ currentStep, completedSteps, onNodePress, snipp
           const snippet = snippets?.[key];
           const showSnippet = snippet && regularFont;
           const showCheck = isCompleted && !snippet;
-          const truncated = snippet && snippet.length > 12 ? `${snippet.slice(0, 12)}…` : snippet;
+          const truncated = snippet && snippet.length > 8 ? `${snippet.slice(0, 8)}…` : snippet;
 
           return (
             <Fragment key={`text-${i}`}>

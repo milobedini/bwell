@@ -25,13 +25,10 @@ const FiveAreasPresenter = ({ attempt, mode, patientName }: FiveAreasPresenterPr
       <ContentContainer>
         {/* Header */}
         {patientName && (
-          <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginBottom: 4 }}>
+          <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginBottom: 12 }}>
             {patientName}&apos;s entry
           </ThemedText>
         )}
-        <ThemedText type="subtitle" style={{ marginBottom: 12 }}>
-          5 Areas Model
-        </ThemedText>
 
         {/* In-progress indicator for therapist */}
         {mode === 'view' && attempt.status !== 'submitted' && (
@@ -127,7 +124,7 @@ const FiveAreasPresenter = ({ attempt, mode, patientName }: FiveAreasPresenterPr
               <ThemedButton
                 title="Back"
                 onPress={state.goBack}
-                className="bg-sway-buttonBackgroundSolid"
+                style={{ backgroundColor: Colors.sway.buttonBackgroundSolid }}
                 disabled={state.isSaving}
               />
             </View>
