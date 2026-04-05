@@ -147,6 +147,7 @@ When translating Figma designs to code, apply these HIG principles:
 
 - Primary action: `ThemedButton` with `variant="default"` (teal bg)
 - Destructive: `ThemedButton` with `variant="error"` (red bg)
+- Outline: `ThemedButton` with `variant="outline"` (transparent bg, teal border + text)
 - Disabled: automatically uses `bg-sway-darkGrey`
 - Hero/branded: `PrimaryButton` — wide button with optional logo, border, translucent bg (onboarding, welcome screens)
 - Profile/settings: `SecondaryButton` — full-width rounded button with translucent bg
