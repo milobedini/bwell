@@ -4,6 +4,7 @@ import { MotiView } from 'moti';
 import { Colors } from '@/constants/Colors';
 import { Canvas, Circle, Line, Text, useFont, vec } from '@shopify/react-native-skia';
 
+import { CANVAS_H_PAD, MAX_CANVAS_W, NODE_POSITIONS, VB_H, VB_W } from './fiveAreasLayout';
 import { AREA_KEYS, type AreaKey } from './useFiveAreasState';
 
 // Short labels for the diagram nodes (full labels overflow the circles)
@@ -25,26 +26,15 @@ type FiveAreasDiagramProps = {
   dimmed?: boolean;
 };
 
-/* ── viewbox & sizing ── */
-
-const VB_W = 320;
-const VB_H = 290;
-const MAX_CANVAS_W = 420;
-const CANVAS_H_PAD = 32; // horizontal padding subtracted from screen width
-
-/* ── node layout (viewbox coordinates) ── */
+/* ── node layout ── */
 
 const CORE_RADIUS = 32;
 const REFLECT_RADIUS = 28;
 
-const NODES: { x: number; y: number; r: number }[] = [
-  { x: 160, y: 36, r: CORE_RADIUS }, // 0 — situation
-  { x: 75, y: 115, r: CORE_RADIUS }, // 1 — thoughts
-  { x: 245, y: 115, r: CORE_RADIUS }, // 2 — emotions
-  { x: 75, y: 205, r: CORE_RADIUS }, // 3 — physical
-  { x: 245, y: 205, r: CORE_RADIUS }, // 4 — behaviours
-  { x: 160, y: 260, r: REFLECT_RADIUS } // 5 — reflection
-];
+const NODES = NODE_POSITIONS.map((pos, i) => ({
+  ...pos,
+  r: i === 5 ? REFLECT_RADIUS : CORE_RADIUS
+}));
 
 // Centre of the four core nodes (used for vertical arrow lines)
 const BUN_CENTRE_X = 160;

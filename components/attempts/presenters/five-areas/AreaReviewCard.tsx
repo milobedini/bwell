@@ -1,4 +1,5 @@
 import { Pressable, View } from 'react-native';
+import clsx from 'clsx';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 
@@ -16,8 +17,8 @@ const AreaReviewCard = ({ areaKey, value, onPress }: AreaReviewCardProps) => {
 
   return (
     <Wrapper
-      {...(onPress ? { onPress } : {})}
-      className="mb-3 rounded-xl p-4 active:opacity-70"
+      onPress={onPress}
+      className={clsx('mb-3 rounded-xl p-4', onPress && 'active:opacity-70')}
       style={{
         backgroundColor: Colors.chip.darkCard,
         borderLeftWidth: 3,

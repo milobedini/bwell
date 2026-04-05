@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { Keyboard, Pressable, TextInput, useWindowDimensions, View } from 'react-native';
 import { AnimatePresence, MotiView } from 'moti';
 import ThemedButton from '@/components/ThemedButton';
@@ -8,23 +8,14 @@ import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
+import { CANVAS_H_PAD, MAX_CANVAS_W, NODE_POSITIONS, VB_W } from './fiveAreasLayout';
 import { AREA_HINTS, AREA_KEYS, AREA_LABELS, type AreaKey } from './useFiveAreasState';
 
-// Mirror of node positions from FiveAreasDiagram (viewbox coordinates)
-const NODE_POSITIONS = [
-  { x: 160, y: 36 }, // situation
-  { x: 75, y: 115 }, // thoughts
-  { x: 245, y: 115 }, // emotions
-  { x: 75, y: 205 }, // physical
-  { x: 245, y: 205 }, // behaviours
-  { x: 160, y: 260 } // reflection
-];
-const VB_W = 320;
-const CANVAS_H_PAD = 32;
-const MAX_CANVAS_W = 420;
 const DIAGRAM_PX_PAD = 16; // px-4 on diagram container
 const DIAGRAM_PT_PAD = 8; // pt-2 on diagram container
 const TITLE_FINAL_Y = 24; // approximate Y center of the title in its final position
+
+const dismissKeyboard = () => Keyboard.dismiss();
 
 type AreaInputModalProps = {
   areaKey: AreaKey;
@@ -67,16 +58,6 @@ const AreaInputModal = ({
     };
   }, [currentStep, screenWidth]);
 
-  // Auto-focus input after fly-in animation
-  useEffect(() => {
-    const timer = setTimeout(() => inputRef.current?.focus(), 400);
-    return () => clearTimeout(timer);
-  }, [areaKey]);
-
-  const handleSubmitEditing = useCallback(() => {
-    Keyboard.dismiss();
-  }, []);
-
   return (
     <KeyboardAvoidingWrapper>
       <View className="px-4">
@@ -88,6 +69,9 @@ const AreaInputModal = ({
             animate={{ opacity: 1, translateX: 0, translateY: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ type: 'timing', duration: 350 }}
+            onDidAnimate={(key, finished) => {
+              if (key === 'opacity' && finished) inputRef.current?.focus();
+            }}
           >
             <View className="pb-1 pt-3">
               {/* Back to diagram button */}
@@ -146,7 +130,7 @@ const AreaInputModal = ({
               scrollEnabled
               returnKeyType="done"
               submitBehavior="blurAndSubmit"
-              onSubmitEditing={handleSubmitEditing}
+              onSubmitEditing={dismissKeyboard}
             />
           </MotiView>
         </AnimatePresence>

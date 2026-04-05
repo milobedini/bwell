@@ -129,21 +129,6 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
     saveDirtyAndThen(() => setCurrentStep((s) => s - 1));
   }, [currentStep, saveDirtyAndThen]);
 
-  const goToStep = useCallback(
-    (step: number) => {
-      if (step < 0 || step >= AREA_KEYS.length) return;
-      // Allow navigating to any step the user has previously reached
-      if (step > highestStep && step !== currentStep) return;
-
-      Haptics.selectionAsync().catch(() => {});
-      saveDirtyAndThen(() => {
-        setCurrentStep(step);
-        setShowReview(false);
-      });
-    },
-    [highestStep, currentStep, saveDirtyAndThen]
-  );
-
   const openModal = useCallback(
     (step: number) => {
       if (step < 0 || step >= AREA_KEYS.length) return;
@@ -192,7 +177,6 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
     updateField,
     goForward,
     goBack,
-    goToStep,
     openModal,
     closeModal,
     goToReview,
