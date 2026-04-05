@@ -153,11 +153,17 @@ const FiveAreasPresenter = ({ attempt, mode, patientName: _patientName }: FiveAr
           {state.currentStep > 0 && (
             <Pressable
               className="flex-1 items-center rounded-md p-4 active:opacity-70"
-              style={{ backgroundColor: Colors.chip.darkCardAlt }}
+              style={{
+                backgroundColor: 'transparent',
+                borderWidth: 1.5,
+                borderColor: Colors.sway.bright
+              }}
               onPress={state.goBack}
               disabled={state.isSaving}
             >
-              <ThemedText type="button">Back</ThemedText>
+              <ThemedText type="button" style={{ color: Colors.sway.bright }}>
+                Back
+              </ThemedText>
             </Pressable>
           )}
           <Pressable
