@@ -1,4 +1,5 @@
-import { ScrollView, View } from 'react-native';
+import { useCallback, useState } from 'react';
+import { Pressable, ScrollView, View } from 'react-native';
 import ContentContainer from '@/components/ContentContainer';
 import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
@@ -8,7 +9,7 @@ import type { AttemptDetailResponseItem } from '@milobedini/shared-types';
 import AreaReviewCard from './AreaReviewCard';
 import AreaStep from './AreaStep';
 import FiveAreasDiagram from './FiveAreasDiagram';
-import { AREA_KEYS, useFiveAreasState } from './useFiveAreasState';
+import { AREA_KEYS, AREA_LABELS, type AreaKey, useFiveAreasState } from './useFiveAreasState';
 
 type FiveAreasPresenterProps = {
   attempt: AttemptDetailResponseItem;
@@ -18,14 +19,26 @@ type FiveAreasPresenterProps = {
 
 const FiveAreasPresenter = ({ attempt, mode, patientName: _patientName }: FiveAreasPresenterProps) => {
   const state = useFiveAreasState({ attempt, mode });
+  const [tooltipKey, setTooltipKey] = useState<AreaKey | null>(null);
+
+  const handleNodePress = useCallback(
+    (step: number) => {
+      if (state.canEdit) {
+        state.goToStep(step);
+        return;
+      }
+      const key = AREA_KEYS[step];
+      setTooltipKey((prev) => (prev === key ? null : key));
+    },
+    [state]
+  );
+
+  const dismissTooltip = useCallback(() => setTooltipKey(null), []);
 
   // ── Review mode (patient post-submit or therapist reviewing) ──
   if (!state.canEdit || state.showReview) {
     return (
       <ContentContainer>
-        {/* Header */}
-        {/* Header removed — screen title already shows patient name */}
-
         {/* In-progress indicator for therapist */}
         {mode === 'view' && attempt.status !== 'submitted' && (
           <View
@@ -42,14 +55,40 @@ const FiveAreasPresenter = ({ attempt, mode, patientName: _patientName }: FiveAr
           </View>
         )}
 
-        {/* Diagram with snippets */}
-        <FiveAreasDiagram
-          currentStep={state.currentStep}
-          completedSteps={state.completedSteps}
-          snippets={state.fields}
-          mode="view"
-          onNodePress={state.canEdit ? state.goToStep : undefined}
-        />
+        {/* Diagram with snippets + tooltip */}
+        <View>
+          <FiveAreasDiagram
+            currentStep={state.currentStep}
+            completedSteps={state.completedSteps}
+            snippets={state.fields}
+            mode="view"
+            onNodePress={handleNodePress}
+          />
+
+          {/* Tooltip overlay */}
+          {tooltipKey && (
+            <Pressable
+              onPress={dismissTooltip}
+              className="absolute inset-0 items-center justify-center"
+              style={{ backgroundColor: Colors.overlay.light }}
+            >
+              <View
+                className="mx-6 rounded-xl p-4"
+                style={{
+                  backgroundColor: Colors.chip.darkCard,
+                  borderWidth: 1,
+                  borderColor: Colors.sway.bright,
+                  maxWidth: 300
+                }}
+              >
+                <ThemedText type="smallBold" style={{ color: Colors.sway.bright, marginBottom: 6 }}>
+                  {AREA_LABELS[tooltipKey]}
+                </ThemedText>
+                <ThemedText>{state.fields[tooltipKey] || '—'}</ThemedText>
+              </View>
+            </Pressable>
+          )}
+        </View>
 
         {/* Full text cards */}
         <ScrollView className="mt-4" contentContainerStyle={{ paddingBottom: 40 }}>
