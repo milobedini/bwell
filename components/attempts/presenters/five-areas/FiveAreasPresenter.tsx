@@ -175,9 +175,7 @@ const FiveAreasPresenter = ({ attempt, mode, patientName: _patientName }: FiveAr
             onPress={state.goForward}
             disabled={state.isSaving || !state.fields[state.currentKey]?.trim()}
           >
-            <ThemedText type="button">
-              {state.currentStep === AREA_KEYS.length - 1 ? 'Review & Submit' : 'Next'}
-            </ThemedText>
+            <ThemedText type="button">{state.currentStep === AREA_KEYS.length - 1 ? 'Review' : 'Next'}</ThemedText>
           </Pressable>
         </View>
       </View>
