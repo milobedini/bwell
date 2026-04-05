@@ -132,8 +132,8 @@ const FiveAreasDiagram = memo(({ currentStep, completedSteps, onNodePress, snipp
   if (!boldFont) return null;
 
   return (
-    <Pressable onPress={handlePress}>
-      <Canvas style={{ width: canvasWidth, height: canvasHeight }}>
+    <Pressable onPressIn={handlePress}>
+      <Canvas style={{ width: canvasWidth, height: canvasHeight }} pointerEvents="none">
         {/* ── arrow: situation → bun centre ── */}
         <Line
           p1={vec(scaled[0].x, scaled[0].y + scaled[0].r)}
