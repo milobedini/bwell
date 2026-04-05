@@ -151,14 +151,16 @@ const FiveAreasPresenter = ({ attempt, mode, patientName: _patientName }: FiveAr
         {/* Navigation buttons */}
         <View className="flex-row gap-3 px-4 pb-6 pt-4">
           {state.currentStep > 0 && (
-            <View className="flex-1">
-              <ThemedButton
-                title="Back"
-                onPress={state.goBack}
-                style={{ backgroundColor: Colors.sway.buttonBackgroundSolid }}
-                disabled={state.isSaving}
-              />
-            </View>
+            <Pressable
+              className="flex-1 rounded-md p-4 active:opacity-70"
+              style={{ backgroundColor: Colors.sway.buttonBackgroundSolid }}
+              onPress={state.goBack}
+              disabled={state.isSaving}
+            >
+              <ThemedText type="button" className="text-center">
+                Back
+              </ThemedText>
+            </Pressable>
           )}
           <View className="flex-1">
             <ThemedButton

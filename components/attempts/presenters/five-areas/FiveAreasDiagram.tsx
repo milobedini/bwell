@@ -243,25 +243,14 @@ const FiveAreasDiagram = memo(({ currentStep, completedSteps, onNodePress, snipp
           const hasSnippet = !!snippets?.[key];
           const labelY = hasSnippet ? y + LABEL_Y_SNIPPET_NUDGE * scale : y + LABEL_Y_OFFSET * scale;
 
-          const isCompleted = state === 'completed';
           const snippet = snippets?.[key];
           const showSnippet = snippet && regularFont;
-          const showCheck = isCompleted && !snippet;
           const truncated =
             snippet && snippet.length > SNIPPET_MAX_CHARS ? `${snippet.slice(0, SNIPPET_MAX_CHARS)}…` : snippet;
 
           return (
             <Fragment key={`text-${i}`}>
               <Text x={labelX} y={labelY} text={label} font={boldFont} color={color} />
-              {showCheck && (
-                <Text
-                  x={x - boldFont.measureText('✓').width / 2}
-                  y={labelY + SECONDARY_TEXT_GAP * scale}
-                  text="✓"
-                  font={boldFont}
-                  color={COL_TEAL}
-                />
-              )}
               {showSnippet && truncated && (
                 <Text
                   x={x - regularFont.measureText(truncated).width / 2}
