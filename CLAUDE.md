@@ -29,6 +29,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - **API:** Axios with cookie-based auth (`withCredentials: true`)
 - **Types:** Shared types via `@milobedini/shared-types` npm package — all API/model types must live here, never in FE code
 - **Backend:** Node/Express + MongoDB (separate repo at `../cbt/`)
+- **Installing packages:** Use `npx expo install <pkg> --dev` for Expo-managed packages (`expo-*`, `jest-expo`, `react-native`, etc.) — it pins SDK-compatible versions. Use `npm install` for third-party packages with no Expo coupling (`axios`, `zustand`, `clsx`, etc.)
 
 ## Architecture
 
@@ -68,7 +69,8 @@ The app has three tiers (from `docs/proposal.pdf`):
 
 - Use conventional commits, keep messages concise
 - Never include AI co-author references in commit messages
-- Before staging, run `npx prettier --write .` to format all files — husky pre-commit hooks check this
+- Before staging, run `npx prettier --write .` to format all files
+- Pre-commit hook runs `lint-staged` (ESLint fix + Prettier on staged files only)
 - After a successful commit and push, run `npm run publish` to publish an OTA update
 
 ## Commands
@@ -83,9 +85,13 @@ The app has three tiers (from `docs/proposal.pdf`):
 - `npm run publish` — OTA update via EAS
 - `npm run publish-web` — export and deploy web build
 - `npm run build:ios-sim` — build dev app for iOS simulator (required for Maestro, sets `EXPO_PUBLIC_E2E=true`)
+- `npm test` — run all unit/component tests (Jest)
+- `npm run test:watch` — run tests in watch mode
+- `npm run test:coverage` — run tests with coverage report
 - `npm run test:e2e` — run all Maestro E2E flows
 - `npm run test:e2e:studio` — launch Maestro Studio for interactive flow authoring
 - `npm run test:e2e:full` — full pipeline: starts BE if needed, builds iOS sim app, runs all Maestro flows
+- `npm run upgrade` — upgrade to latest stable Expo SDK and fix all dependencies
 
 ## Validation Workflow
 
@@ -112,6 +118,19 @@ The app has three tiers (from `docs/proposal.pdf`):
 ## Design System
 
 - Figma-to-code rules, colour tokens, typography, component inventory, and layout patterns are documented in `.claude/rules/figma-design-system.md` — this file is auto-loaded as context for every conversation and should be kept in sync with the codebase via the `update-status` skill.
+
+## Unit & Component Testing (Jest)
+
+- **Runner:** Jest with `jest-expo` preset, `@testing-library/react-native` for component tests
+- Colocate test files next to the code they test: `Component.test.tsx`, `util.test.ts`
+- Test behaviour, not implementation — query by text/testID, not internal state
+- Use `jest.useFakeTimers()` + `jest.setSystemTime()` for time-dependent logic
+- RN style props are arrays — use `expect.arrayContaining([expect.objectContaining(...)])` for style assertions
+
+## CI (GitHub Actions)
+
+- PR validation workflow (`.github/workflows/pr-validation.yml`) runs on every push to main and every PR: ESLint, Prettier, TypeScript, and Jest tests
+- This is the merge gatekeeper — pre-commit hooks are a convenience, CI is the enforcement layer
 
 ## E2E Testing (Maestro)
 

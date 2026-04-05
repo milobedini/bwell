@@ -1,5 +1,5 @@
 import { Pressable, View } from 'react-native';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 

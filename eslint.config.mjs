@@ -15,6 +15,23 @@ export default defineConfig([
   // Ignore build output and files with config.cjs
   { ignores: ['dist/**', '.expo/**', '.worktrees/**', '**.cjs', '**.config.js'] },
 
+  // Jest test files — expose globals (describe, it, expect, jest, etc.)
+  {
+    files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}'],
+    languageOptions: {
+      globals: {
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        jest: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly'
+      }
+    }
+  },
+
   // Your project rules (register plugins here and keep the plugin rules in the same object)
   {
     files: ['**/*.{ts,tsx,js,jsx}'],
