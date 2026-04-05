@@ -16,7 +16,7 @@ type FiveAreasPresenterProps = {
   patientName?: string;
 };
 
-const FiveAreasPresenter = ({ attempt, mode, patientName }: FiveAreasPresenterProps) => {
+const FiveAreasPresenter = ({ attempt, mode, patientName: _patientName }: FiveAreasPresenterProps) => {
   const state = useFiveAreasState({ attempt, mode });
 
   // ── Review mode (patient post-submit or therapist reviewing) ──
@@ -24,11 +24,7 @@ const FiveAreasPresenter = ({ attempt, mode, patientName }: FiveAreasPresenterPr
     return (
       <ContentContainer>
         {/* Header */}
-        {patientName && (
-          <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginBottom: 12 }}>
-            {patientName}&apos;s entry
-          </ThemedText>
-        )}
+        {/* Header removed — screen title already shows patient name */}
 
         {/* In-progress indicator for therapist */}
         {mode === 'view' && attempt.status !== 'submitted' && (

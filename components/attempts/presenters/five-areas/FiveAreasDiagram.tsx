@@ -23,15 +23,18 @@ type FiveAreasDiagramProps = {
   mode: 'edit' | 'view';
 };
 
-/* ── layout constants (300×240 viewbox) ── */
+/* ── layout constants (320×280 viewbox) ── */
+
+const VB_W = 320;
+const VB_H = 280;
 
 const NODES: { x: number; y: number; r: number }[] = [
-  { x: 150, y: 28, r: 24 }, // 0 — situation
-  { x: 80, y: 90, r: 24 }, // 1 — thoughts
-  { x: 220, y: 90, r: 24 }, // 2 — emotions
-  { x: 80, y: 170, r: 24 }, // 3 — physical
-  { x: 220, y: 170, r: 24 }, // 4 — behaviours
-  { x: 150, y: 215, r: 18 } // 5 — reflection
+  { x: 160, y: 34, r: 32 }, // 0 — situation
+  { x: 75, y: 110, r: 32 }, // 1 — thoughts
+  { x: 245, y: 110, r: 32 }, // 2 — emotions
+  { x: 75, y: 200, r: 32 }, // 3 — physical
+  { x: 245, y: 200, r: 32 }, // 4 — behaviours
+  { x: 160, y: 255, r: 24 } // 5 — reflection
 ];
 
 // Edges between core bun nodes (indices 1-4)
@@ -64,14 +67,30 @@ const getTextColor = (state: 'locked' | 'current' | 'completed') => {
   return COL_GREY;
 };
 
+// Clip a line so it starts/ends at circle edges instead of centers
+const clipLine = (ax: number, ay: number, ar: number, bx: number, by: number, br: number) => {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist === 0) return { x1: ax, y1: ay, x2: bx, y2: by };
+  const ux = dx / dist;
+  const uy = dy / dist;
+  return {
+    x1: ax + ux * ar,
+    y1: ay + uy * ar,
+    x2: bx - ux * br,
+    y2: by - uy * br
+  };
+};
+
 const FiveAreasDiagram = memo(({ currentStep, completedSteps, onNodePress, snippets, mode }: FiveAreasDiagramProps) => {
   const { width: screenWidth } = useWindowDimensions();
-  const canvasWidth = Math.min(screenWidth - 32, 400);
-  const scale = canvasWidth / 300;
-  const canvasHeight = 240 * scale;
+  const canvasWidth = Math.min(screenWidth - 32, 420);
+  const scale = canvasWidth / VB_W;
+  const canvasHeight = VB_H * scale;
 
-  const boldFont = useFont(require('@/assets/fonts/Lato-Bold.ttf'), 9 * scale);
-  const regularFont = useFont(require('@/assets/fonts/Lato-Regular.ttf'), 7 * scale);
+  const boldFont = useFont(require('@/assets/fonts/Lato-Bold.ttf'), 10 * scale);
+  const regularFont = useFont(require('@/assets/fonts/Lato-Regular.ttf'), 8 * scale);
 
   const nodeState = useCallback(
     (index: number): 'locked' | 'current' | 'completed' => {
@@ -107,8 +126,8 @@ const FiveAreasDiagram = memo(({ currentStep, completedSteps, onNodePress, snipp
   // Pre-compute scaled node positions
   const scaled = useMemo(() => NODES.map((n) => ({ x: n.x * scale, y: n.y * scale, r: n.r * scale })), [scale]);
 
-  // Centre of bun area (average of nodes 1-4)
-  const bunCentre = useMemo(() => ({ x: 150 * scale, y: 130 * scale }), [scale]);
+  // Centre of bun area (average of core nodes 1-4)
+  const bunCentre = useMemo(() => ({ x: 160 * scale, y: 155 * scale }), [scale]);
 
   if (!boldFont) return null;
 
@@ -133,15 +152,16 @@ const FiveAreasDiagram = memo(({ currentStep, completedSteps, onNodePress, snipp
           style="stroke"
         />
 
-        {/* ── bun connection lines ── */}
+        {/* ── bun connection lines (clipped to circle edges) ── */}
         {BUN_EDGES.map(([a, b]) => {
           const bothDone = completedSteps.has(AREA_KEYS[a]) && completedSteps.has(AREA_KEYS[b]);
           const lineColor = mode === 'view' || bothDone ? COL_TEAL : COL_GREY;
+          const cl = clipLine(scaled[a].x, scaled[a].y, scaled[a].r, scaled[b].x, scaled[b].y, scaled[b].r);
           return (
             <Line
               key={`${a}-${b}`}
-              p1={vec(scaled[a].x, scaled[a].y)}
-              p2={vec(scaled[b].x, scaled[b].y)}
+              p1={vec(cl.x1, cl.y1)}
+              p2={vec(cl.x2, cl.y2)}
               color={lineColor}
               strokeWidth={1.5 * scale}
               style="stroke"
@@ -184,7 +204,8 @@ const FiveAreasDiagram = memo(({ currentStep, completedSteps, onNodePress, snipp
 
           const labelWidth = boldFont.measureText(label).width;
           const labelX = x - labelWidth / 2;
-          const labelY = y + (9 * scale) / 3;
+          const hasSnippet = !!snippets?.[key];
+          const labelY = hasSnippet ? y - 1 * scale : y + (10 * scale) / 3;
 
           const isCompleted = state === 'completed';
           const snippet = snippets?.[key];
@@ -198,7 +219,7 @@ const FiveAreasDiagram = memo(({ currentStep, completedSteps, onNodePress, snipp
               {showCheck && (
                 <Text
                   x={x - boldFont.measureText('✓').width / 2}
-                  y={labelY + 9 * scale}
+                  y={labelY + 10 * scale}
                   text="✓"
                   font={boldFont}
                   color={COL_TEAL}
@@ -207,7 +228,7 @@ const FiveAreasDiagram = memo(({ currentStep, completedSteps, onNodePress, snipp
               {showSnippet && truncated && (
                 <Text
                   x={x - regularFont.measureText(truncated).width / 2}
-                  y={labelY + 8 * scale}
+                  y={labelY + 10 * scale}
                   text={truncated}
                   font={regularFont}
                   color={color}
