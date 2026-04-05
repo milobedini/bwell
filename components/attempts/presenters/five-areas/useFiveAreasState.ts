@@ -46,6 +46,7 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
   const [currentStep, setCurrentStep] = useState(0);
   const [highestStep, setHighestStep] = useState(0); // track furthest step reached
   const [showReview, setShowReview] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     const serverData = attempt.fiveAreas;
@@ -121,24 +122,35 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
   }, [currentStep, saveDirtyAndThen]);
 
   const goBack = useCallback(() => {
-    if (currentStep <= 0) return;
+    if (currentStep <= 0) {
+      saveDirtyAndThen(() => setModalOpen(false));
+      return;
+    }
     saveDirtyAndThen(() => setCurrentStep((s) => s - 1));
   }, [currentStep, saveDirtyAndThen]);
 
-  const goToStep = useCallback(
+  const openModal = useCallback(
     (step: number) => {
       if (step < 0 || step >= AREA_KEYS.length) return;
-      // Allow navigating to any step the user has previously reached
       if (step > highestStep && step !== currentStep) return;
 
       Haptics.selectionAsync().catch(() => {});
       saveDirtyAndThen(() => {
         setCurrentStep(step);
         setShowReview(false);
+        setModalOpen(true);
       });
     },
     [highestStep, currentStep, saveDirtyAndThen]
   );
+
+  const closeModal = useCallback(() => {
+    saveDirtyAndThen(() => setModalOpen(false));
+  }, [saveDirtyAndThen]);
+
+  const goToReview = useCallback(() => {
+    saveDirtyAndThen(() => setShowReview(true));
+  }, [saveDirtyAndThen]);
 
   const handleSubmit = useCallback(() => {
     saveDirtyAndThen(() => {
@@ -156,6 +168,8 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
     currentStep,
     currentKey,
     showReview,
+    modalOpen,
+    highestStep,
     completedSteps,
     canEdit,
     isSaving,
@@ -163,7 +177,9 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
     updateField,
     goForward,
     goBack,
-    goToStep,
+    openModal,
+    closeModal,
+    goToReview,
     handleSubmit
   };
 };

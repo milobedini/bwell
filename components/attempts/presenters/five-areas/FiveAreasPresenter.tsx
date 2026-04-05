@@ -1,13 +1,14 @@
 import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
+import { AnimatePresence, MotiView } from 'moti';
 import ContentContainer from '@/components/ContentContainer';
 import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import type { AttemptDetailResponseItem } from '@milobedini/shared-types';
 
+import AreaInputModal from './AreaInputModal';
 import AreaReviewCard from './AreaReviewCard';
-import AreaStep from './AreaStep';
 import FiveAreasDiagram from './FiveAreasDiagram';
 import { AREA_KEYS, AREA_LABELS, type AreaKey, useFiveAreasState } from './useFiveAreasState';
 
@@ -24,7 +25,7 @@ const FiveAreasPresenter = ({ attempt, mode, patientName }: FiveAreasPresenterPr
   const handleNodePress = useCallback(
     (step: number) => {
       if (state.canEdit) {
-        state.goToStep(step);
+        state.openModal(step);
         return;
       }
       const key = AREA_KEYS[step];
@@ -86,8 +87,13 @@ const FiveAreasPresenter = ({ attempt, mode, patientName }: FiveAreasPresenterPr
 
         {/* Full text cards */}
         <ScrollView className="mt-4" contentContainerStyle={{ paddingBottom: 40 }}>
-          {AREA_KEYS.map((key) => (
-            <AreaReviewCard key={key} areaKey={key} value={state.fields[key] ?? ''} />
+          {AREA_KEYS.map((key, index) => (
+            <AreaReviewCard
+              key={key}
+              areaKey={key}
+              value={state.fields[key] ?? ''}
+              onPress={state.canEdit ? () => state.openModal(index) : undefined}
+            />
           ))}
 
           {/* User note */}
@@ -117,53 +123,59 @@ const FiveAreasPresenter = ({ attempt, mode, patientName }: FiveAreasPresenterPr
     );
   }
 
-  // ── Edit mode (stepped flow) ──
+  // ── Edit mode (two-state: diagram idle vs modal open) ──
   return (
     <ContentContainer padded={false}>
       <View className="flex-1">
-        {/* Diagram */}
+        {/* Diagram — always rendered, dimmed when modal is open */}
         <View className="px-4 pt-2">
           <FiveAreasDiagram
             currentStep={state.currentStep}
             completedSteps={state.completedSteps}
-            onNodePress={state.goToStep}
+            onNodePress={handleNodePress}
             mode="edit"
+            dimmed={state.modalOpen}
           />
         </View>
 
-        {/* Step indicator */}
-        <View className="px-4 pb-2 pt-1">
-          <ThemedText type="small" style={{ color: Colors.sway.darkGrey, textAlign: 'center' }}>
-            Step {state.currentStep + 1} of {AREA_KEYS.length}
-          </ThemedText>
-        </View>
+        {/* Idle state: prompt + optional review button */}
+        {!state.modalOpen && (
+          <View className="items-center px-4 pt-2">
+            <ThemedText type="small" style={{ color: Colors.sway.darkGrey, textAlign: 'center' }}>
+              Tap any area to edit
+            </ThemedText>
 
-        {/* Current area input */}
-        <AreaStep
-          areaKey={state.currentKey}
-          value={state.fields[state.currentKey] ?? ''}
-          onChangeText={(text) => state.updateField(state.currentKey, text)}
-          editable
-        />
+            {state.completedSteps.size === AREA_KEYS.length && (
+              <View className="mt-4 w-full">
+                <ThemedButton title="Review & Submit" onPress={state.goToReview} disabled={state.isSaving} />
+              </View>
+            )}
+          </View>
+        )}
 
-        {/* Navigation buttons */}
-        <View className="flex-row gap-3 px-4 pb-6 pt-4">
-          {state.currentStep > 0 && (
-            <ThemedButton
-              className="flex-1"
-              variant="outline"
-              title="Back"
-              onPress={state.goBack}
-              disabled={state.isSaving}
-            />
+        {/* Modal overlay */}
+        <AnimatePresence>
+          {state.modalOpen && (
+            <MotiView
+              from={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ type: 'timing', duration: 250 }}
+              className="absolute inset-0 bg-sway-dark"
+            >
+              <AreaInputModal
+                areaKey={state.currentKey}
+                currentStep={state.currentStep}
+                value={state.fields[state.currentKey] ?? ''}
+                onChangeText={(text) => state.updateField(state.currentKey, text)}
+                onNext={state.goForward}
+                onBack={state.goBack}
+                onClose={state.closeModal}
+                isSaving={state.isSaving}
+              />
+            </MotiView>
           )}
-          <ThemedButton
-            className="flex-1"
-            title={state.currentStep === AREA_KEYS.length - 1 ? 'Review' : 'Next'}
-            onPress={state.goForward}
-            disabled={state.isSaving || !state.fields[state.currentKey]?.trim()}
-          />
-        </View>
+        </AnimatePresence>
       </View>
     </ContentContainer>
   );

@@ -1,8 +1,10 @@
 import { Fragment, memo, useCallback, useMemo } from 'react';
 import { Pressable, useWindowDimensions } from 'react-native';
+import { MotiView } from 'moti';
 import { Colors } from '@/constants/Colors';
 import { Canvas, Circle, Line, Text, useFont, vec } from '@shopify/react-native-skia';
 
+import { CANVAS_H_PAD, MAX_CANVAS_W, NODE_POSITIONS, VB_H, VB_W } from './fiveAreasLayout';
 import { AREA_KEYS, type AreaKey } from './useFiveAreasState';
 
 // Short labels for the diagram nodes (full labels overflow the circles)
@@ -21,28 +23,18 @@ type FiveAreasDiagramProps = {
   onNodePress?: (step: number) => void;
   snippets?: Partial<Record<AreaKey, string>>;
   mode: 'edit' | 'view';
+  dimmed?: boolean;
 };
 
-/* ── viewbox & sizing ── */
-
-const VB_W = 320;
-const VB_H = 290;
-const MAX_CANVAS_W = 420;
-const CANVAS_H_PAD = 32; // horizontal padding subtracted from screen width
-
-/* ── node layout (viewbox coordinates) ── */
+/* ── node layout ── */
 
 const CORE_RADIUS = 32;
 const REFLECT_RADIUS = 28;
 
-const NODES: { x: number; y: number; r: number }[] = [
-  { x: 160, y: 36, r: CORE_RADIUS }, // 0 — situation
-  { x: 75, y: 115, r: CORE_RADIUS }, // 1 — thoughts
-  { x: 245, y: 115, r: CORE_RADIUS }, // 2 — emotions
-  { x: 75, y: 205, r: CORE_RADIUS }, // 3 — physical
-  { x: 245, y: 205, r: CORE_RADIUS }, // 4 — behaviours
-  { x: 160, y: 260, r: REFLECT_RADIUS } // 5 — reflection
-];
+const NODES = NODE_POSITIONS.map((pos, i) => ({
+  ...pos,
+  r: i === 5 ? REFLECT_RADIUS : CORE_RADIUS
+}));
 
 // Centre of the four core nodes (used for vertical arrow lines)
 const BUN_CENTRE_X = 160;
@@ -116,158 +108,162 @@ const clipLine = (ax: number, ay: number, ar: number, bx: number, by: number, br
   };
 };
 
-const FiveAreasDiagram = memo(({ currentStep, completedSteps, onNodePress, snippets, mode }: FiveAreasDiagramProps) => {
-  const { width: screenWidth } = useWindowDimensions();
-  const canvasWidth = Math.min(screenWidth - CANVAS_H_PAD, MAX_CANVAS_W);
-  const scale = canvasWidth / VB_W;
-  const canvasHeight = VB_H * scale;
+const FiveAreasDiagram = memo(
+  ({ currentStep, completedSteps, onNodePress, snippets, mode, dimmed }: FiveAreasDiagramProps) => {
+    const { width: screenWidth } = useWindowDimensions();
+    const canvasWidth = Math.min(screenWidth - CANVAS_H_PAD, MAX_CANVAS_W);
+    const scale = canvasWidth / VB_W;
+    const canvasHeight = VB_H * scale;
 
-  const boldFont = useFont(require('@/assets/fonts/Lato-Bold.ttf'), FONT_BOLD_SIZE * scale);
-  const regularFont = useFont(require('@/assets/fonts/Lato-Regular.ttf'), FONT_REGULAR_SIZE * scale);
+    const boldFont = useFont(require('@/assets/fonts/Lato-Bold.ttf'), FONT_BOLD_SIZE * scale);
+    const regularFont = useFont(require('@/assets/fonts/Lato-Regular.ttf'), FONT_REGULAR_SIZE * scale);
 
-  const nodeState = (index: number): 'locked' | 'current' | 'completed' => {
-    if (mode === 'view') return 'completed';
-    if (completedSteps.has(AREA_KEYS[index])) return 'completed';
-    if (index === currentStep) return 'current';
-    return 'locked';
-  };
+    const nodeState = (index: number): 'locked' | 'current' | 'completed' => {
+      if (mode === 'view') return 'completed';
+      if (completedSteps.has(AREA_KEYS[index])) return 'completed';
+      if (index === currentStep) return 'current';
+      return 'locked';
+    };
 
-  const handlePress = useCallback(
-    (e: { nativeEvent: { locationX: number; locationY: number } }) => {
-      if (!onNodePress) return;
-      const tx = e.nativeEvent.locationX;
-      const ty = e.nativeEvent.locationY;
+    const handlePress = useCallback(
+      (e: { nativeEvent: { locationX: number; locationY: number } }) => {
+        if (!onNodePress) return;
+        const tx = e.nativeEvent.locationX;
+        const ty = e.nativeEvent.locationY;
 
-      for (const [i, node] of NODES.entries()) {
-        const nx = node.x * scale;
-        const ny = node.y * scale;
-        const hitR = (node.r + HIT_RADIUS_EXTRA) * scale;
-        const dx = tx - nx;
-        const dy = ty - ny;
-        if (dx * dx + dy * dy <= hitR * hitR) {
-          onNodePress(i);
-          return;
+        for (const [i, node] of NODES.entries()) {
+          const nx = node.x * scale;
+          const ny = node.y * scale;
+          const hitR = (node.r + HIT_RADIUS_EXTRA) * scale;
+          const dx = tx - nx;
+          const dy = ty - ny;
+          if (dx * dx + dy * dy <= hitR * hitR) {
+            onNodePress(i);
+            return;
+          }
         }
-      }
-    },
-    [onNodePress, scale]
-  );
+      },
+      [onNodePress, scale]
+    );
 
-  // Pre-compute scaled node positions
-  const scaled = useMemo(() => NODES.map((n) => ({ x: n.x * scale, y: n.y * scale, r: n.r * scale })), [scale]);
+    // Pre-compute scaled node positions
+    const scaled = useMemo(() => NODES.map((n) => ({ x: n.x * scale, y: n.y * scale, r: n.r * scale })), [scale]);
 
-  // Centre of bun area (scaled)
-  const bunCentre = useMemo(() => ({ x: BUN_CENTRE_X * scale, y: BUN_CENTRE_Y * scale }), [scale]);
+    // Centre of bun area (scaled)
+    const bunCentre = useMemo(() => ({ x: BUN_CENTRE_X * scale, y: BUN_CENTRE_Y * scale }), [scale]);
 
-  // Half the vertical gap between bun centre and the nearest core node row
-  const arrowGap = useMemo(() => ((NODES[3].y - NODES[1].y) / 2 - CORE_RADIUS) * scale, [scale]);
+    // Half the vertical gap between bun centre and the nearest core node row
+    const arrowGap = useMemo(() => ((NODES[3].y - NODES[1].y) / 2 - CORE_RADIUS) * scale, [scale]);
 
-  const labelWidths = useMemo(() => {
-    if (!boldFont) return null;
-    return Object.fromEntries(AREA_KEYS.map((key) => [key, boldFont.measureText(DIAGRAM_LABELS[key]).width]));
-  }, [boldFont]);
+    const labelWidths = useMemo(() => {
+      if (!boldFont) return null;
+      return Object.fromEntries(AREA_KEYS.map((key) => [key, boldFont.measureText(DIAGRAM_LABELS[key]).width]));
+    }, [boldFont]);
 
-  if (!boldFont || !labelWidths) return null;
+    if (!boldFont || !labelWidths) return null;
 
-  return (
-    <Pressable onPressIn={handlePress}>
-      <Canvas style={{ width: canvasWidth, height: canvasHeight }} pointerEvents="none">
-        {/* ── arrow: situation → bun centre ── */}
-        <Line
-          p1={vec(scaled[0].x, scaled[0].y + scaled[0].r)}
-          p2={vec(bunCentre.x, bunCentre.y - arrowGap)}
-          color={COL_GREY}
-          strokeWidth={LINE_WIDTH * scale}
-          style="stroke"
-        />
-
-        {/* ── arrow: bun centre → reflection ── */}
-        <Line
-          p1={vec(bunCentre.x, bunCentre.y + arrowGap)}
-          p2={vec(scaled[5].x, scaled[5].y - scaled[5].r)}
-          color={COL_GREY}
-          strokeWidth={LINE_WIDTH * scale}
-          style="stroke"
-        />
-
-        {/* ── bun connection lines (clipped to circle edges) ── */}
-        {BUN_EDGES.map(([a, b]) => {
-          const bothDone = completedSteps.has(AREA_KEYS[a]) && completedSteps.has(AREA_KEYS[b]);
-          const lineColor = mode === 'view' || bothDone ? COL_TEAL : COL_GREY;
-          const cl = clipLine(scaled[a].x, scaled[a].y, scaled[a].r, scaled[b].x, scaled[b].y, scaled[b].r);
-          return (
+    return (
+      <MotiView animate={{ opacity: dimmed ? 0.15 : 1 }} transition={{ type: 'timing', duration: 300 }}>
+        <Pressable onPressIn={dimmed ? undefined : handlePress}>
+          <Canvas style={{ width: canvasWidth, height: canvasHeight }} pointerEvents="none">
+            {/* ── arrow: situation → bun centre ── */}
             <Line
-              key={`${a}-${b}`}
-              p1={vec(cl.x1, cl.y1)}
-              p2={vec(cl.x2, cl.y2)}
-              color={lineColor}
+              p1={vec(scaled[0].x, scaled[0].y + scaled[0].r)}
+              p2={vec(bunCentre.x, bunCentre.y - arrowGap)}
+              color={COL_GREY}
               strokeWidth={LINE_WIDTH * scale}
               style="stroke"
             />
-          );
-        })}
 
-        {/* ── node fills ── */}
-        {NODES.map((_, i) => {
-          const state = nodeState(i);
-          const { x, y, r } = scaled[i];
-          return <Circle key={`fill-${i}`} cx={x} cy={y} r={r} color={getNodeFill(state)} />;
-        })}
-
-        {/* ── node strokes ── */}
-        {NODES.map((_, i) => {
-          const state = nodeState(i);
-          const { x, y, r } = scaled[i];
-          const strokeW = (state === 'current' ? STROKE_CURRENT : STROKE_DEFAULT) * scale;
-          return (
-            <Circle
-              key={`stroke-${i}`}
-              cx={x}
-              cy={y}
-              r={r}
-              color={getNodeStroke(state)}
-              strokeWidth={strokeW}
+            {/* ── arrow: bun centre → reflection ── */}
+            <Line
+              p1={vec(bunCentre.x, bunCentre.y + arrowGap)}
+              p2={vec(scaled[5].x, scaled[5].y - scaled[5].r)}
+              color={COL_GREY}
+              strokeWidth={LINE_WIDTH * scale}
               style="stroke"
             />
-          );
-        })}
 
-        {/* ── text labels and snippets ── */}
-        {NODES.map((_, i) => {
-          const state = nodeState(i);
-          const { x, y } = scaled[i];
-          const key = AREA_KEYS[i];
-          const label = DIAGRAM_LABELS[key];
-          const color = getTextColor(state);
-
-          const labelX = x - labelWidths[key] / 2;
-          const hasSnippet = !!snippets?.[key];
-          const labelY = hasSnippet ? y + LABEL_Y_SNIPPET_NUDGE * scale : y + LABEL_Y_OFFSET * scale;
-
-          const snippet = snippets?.[key];
-          const showSnippet = snippet && regularFont;
-          const truncated =
-            snippet && snippet.length > SNIPPET_MAX_CHARS ? `${snippet.slice(0, SNIPPET_MAX_CHARS)}…` : snippet;
-
-          return (
-            <Fragment key={`text-${i}`}>
-              <Text x={labelX} y={labelY} text={label} font={boldFont} color={color} />
-              {showSnippet && truncated && (
-                <Text
-                  x={x - regularFont.measureText(truncated).width / 2}
-                  y={labelY + SECONDARY_TEXT_GAP * scale}
-                  text={truncated}
-                  font={regularFont}
-                  color={color}
+            {/* ── bun connection lines (clipped to circle edges) ── */}
+            {BUN_EDGES.map(([a, b]) => {
+              const bothDone = completedSteps.has(AREA_KEYS[a]) && completedSteps.has(AREA_KEYS[b]);
+              const lineColor = mode === 'view' || bothDone ? COL_TEAL : COL_GREY;
+              const cl = clipLine(scaled[a].x, scaled[a].y, scaled[a].r, scaled[b].x, scaled[b].y, scaled[b].r);
+              return (
+                <Line
+                  key={`${a}-${b}`}
+                  p1={vec(cl.x1, cl.y1)}
+                  p2={vec(cl.x2, cl.y2)}
+                  color={lineColor}
+                  strokeWidth={LINE_WIDTH * scale}
+                  style="stroke"
                 />
-              )}
-            </Fragment>
-          );
-        })}
-      </Canvas>
-    </Pressable>
-  );
-});
+              );
+            })}
+
+            {/* ── node fills ── */}
+            {NODES.map((_, i) => {
+              const state = nodeState(i);
+              const { x, y, r } = scaled[i];
+              return <Circle key={`fill-${i}`} cx={x} cy={y} r={r} color={getNodeFill(state)} />;
+            })}
+
+            {/* ── node strokes ── */}
+            {NODES.map((_, i) => {
+              const state = nodeState(i);
+              const { x, y, r } = scaled[i];
+              const strokeW = (state === 'current' ? STROKE_CURRENT : STROKE_DEFAULT) * scale;
+              return (
+                <Circle
+                  key={`stroke-${i}`}
+                  cx={x}
+                  cy={y}
+                  r={r}
+                  color={getNodeStroke(state)}
+                  strokeWidth={strokeW}
+                  style="stroke"
+                />
+              );
+            })}
+
+            {/* ── text labels and snippets ── */}
+            {NODES.map((_, i) => {
+              const state = nodeState(i);
+              const { x, y } = scaled[i];
+              const key = AREA_KEYS[i];
+              const label = DIAGRAM_LABELS[key];
+              const color = getTextColor(state);
+
+              const labelX = x - labelWidths[key] / 2;
+              const hasSnippet = !!snippets?.[key];
+              const labelY = hasSnippet ? y + LABEL_Y_SNIPPET_NUDGE * scale : y + LABEL_Y_OFFSET * scale;
+
+              const snippet = snippets?.[key];
+              const showSnippet = snippet && regularFont;
+              const truncated =
+                snippet && snippet.length > SNIPPET_MAX_CHARS ? `${snippet.slice(0, SNIPPET_MAX_CHARS)}…` : snippet;
+
+              return (
+                <Fragment key={`text-${i}`}>
+                  <Text x={labelX} y={labelY} text={label} font={boldFont} color={color} />
+                  {showSnippet && truncated && (
+                    <Text
+                      x={x - regularFont.measureText(truncated).width / 2}
+                      y={labelY + SECONDARY_TEXT_GAP * scale}
+                      text={truncated}
+                      font={regularFont}
+                      color={color}
+                    />
+                  )}
+                </Fragment>
+              );
+            })}
+          </Canvas>
+        </Pressable>
+      </MotiView>
+    );
+  }
+);
 
 FiveAreasDiagram.displayName = 'FiveAreasDiagram';
 
