@@ -1,5 +1,6 @@
 import { Fragment, memo, useCallback, useMemo } from 'react';
-import { Pressable, useWindowDimensions, View } from 'react-native';
+import { Pressable, useWindowDimensions } from 'react-native';
+import { MotiView } from 'moti';
 import { Colors } from '@/constants/Colors';
 import { Canvas, Circle, Line, Text, useFont, vec } from '@shopify/react-native-skia';
 
@@ -172,7 +173,7 @@ const FiveAreasDiagram = memo(
     if (!boldFont || !labelWidths) return null;
 
     return (
-      <View style={{ opacity: dimmed ? 0.15 : 1 }}>
+      <MotiView animate={{ opacity: dimmed ? 0.15 : 1 }} transition={{ type: 'timing', duration: 300 }}>
         <Pressable onPressIn={dimmed ? undefined : handlePress}>
           <Canvas style={{ width: canvasWidth, height: canvasHeight }} pointerEvents="none">
             {/* ── arrow: situation → bun centre ── */}
@@ -269,7 +270,7 @@ const FiveAreasDiagram = memo(
             })}
           </Canvas>
         </Pressable>
-      </View>
+      </MotiView>
     );
   }
 );

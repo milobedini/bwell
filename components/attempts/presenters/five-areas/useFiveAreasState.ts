@@ -111,10 +111,7 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
 
   const goForward = useCallback(() => {
     if (currentStep >= AREA_KEYS.length - 1) {
-      saveDirtyAndThen(() => {
-        setModalOpen(false);
-        setShowReview(true);
-      });
+      saveDirtyAndThen(() => setShowReview(true));
       return;
     }
     saveDirtyAndThen(() => {
@@ -166,6 +163,10 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
     saveDirtyAndThen(() => setModalOpen(false));
   }, [saveDirtyAndThen]);
 
+  const goToReview = useCallback(() => {
+    saveDirtyAndThen(() => setShowReview(true));
+  }, [saveDirtyAndThen]);
+
   const handleSubmit = useCallback(() => {
     saveDirtyAndThen(() => {
       submitAttempt(assignmentId ? { assignmentId: String(assignmentId) } : {}, {
@@ -194,6 +195,7 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
     goToStep,
     openModal,
     closeModal,
+    goToReview,
     handleSubmit
   };
 };

@@ -87,8 +87,13 @@ const FiveAreasPresenter = ({ attempt, mode, patientName }: FiveAreasPresenterPr
 
         {/* Full text cards */}
         <ScrollView className="mt-4" contentContainerStyle={{ paddingBottom: 40 }}>
-          {AREA_KEYS.map((key) => (
-            <AreaReviewCard key={key} areaKey={key} value={state.fields[key] ?? ''} />
+          {AREA_KEYS.map((key, index) => (
+            <AreaReviewCard
+              key={key}
+              areaKey={key}
+              value={state.fields[key] ?? ''}
+              onPress={state.canEdit ? () => state.openModal(index) : undefined}
+            />
           ))}
 
           {/* User note */}
@@ -133,15 +138,18 @@ const FiveAreasPresenter = ({ attempt, mode, patientName }: FiveAreasPresenterPr
           />
         </View>
 
-        {/* Idle state: step indicator + prompt */}
+        {/* Idle state: prompt + optional review button */}
         {!state.modalOpen && (
           <View className="items-center px-4 pt-2">
             <ThemedText type="small" style={{ color: Colors.sway.darkGrey, textAlign: 'center' }}>
-              Step {state.currentStep + 1} of {AREA_KEYS.length}
+              Tap any area to edit
             </ThemedText>
-            <ThemedText type="small" style={{ color: Colors.sway.darkGrey, textAlign: 'center', marginTop: 8 }}>
-              Tap a node to {state.highestStep > 0 || state.fields[AREA_KEYS[0]]?.trim() ? 'continue' : 'begin'}
-            </ThemedText>
+
+            {state.completedSteps.size === AREA_KEYS.length && (
+              <View className="mt-4 w-full">
+                <ThemedButton title="Review & Submit" onPress={state.goToReview} disabled={state.isSaving} />
+              </View>
+            )}
           </View>
         )}
 
@@ -162,6 +170,7 @@ const FiveAreasPresenter = ({ attempt, mode, patientName }: FiveAreasPresenterPr
                 onChangeText={(text) => state.updateField(state.currentKey, text)}
                 onNext={state.goForward}
                 onBack={state.goBack}
+                onClose={state.closeModal}
                 isSaving={state.isSaving}
               />
             </MotiView>
