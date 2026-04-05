@@ -65,57 +65,41 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
     setDirtyKeys((prev) => new Set(prev).add(key));
   }, []);
 
-  const buildPayload = useCallback(() => {
-    const fiveAreas: Partial<FiveAreasData> = {};
-    for (const key of dirtyKeys) {
-      fiveAreas[key] = fields[key] ?? '';
-    }
-    return { fiveAreas };
-  }, [dirtyKeys, fields]);
+  const saveDirtyAndThen = useCallback(
+    (onDone: () => void) => {
+      if (dirtyKeys.size === 0) {
+        onDone();
+        return;
+      }
+      const fiveAreas: Partial<FiveAreasData> = {};
+      for (const key of dirtyKeys) {
+        fiveAreas[key] = fields[key] ?? '';
+      }
+      saveAttemptSilently(
+        { fiveAreas },
+        {
+          onSuccess: () => {
+            setDirtyKeys(new Set());
+            onDone();
+          }
+        }
+      );
+    },
+    [dirtyKeys, fields, saveAttemptSilently]
+  );
 
   const goForward = useCallback(() => {
     if (currentStep >= AREA_KEYS.length - 1) {
-      if (hasDirtyChanges) {
-        const payload = buildPayload();
-        saveAttemptSilently(payload, {
-          onSuccess: () => {
-            setDirtyKeys(new Set());
-            setShowReview(true);
-          }
-        });
-      } else {
-        setShowReview(true);
-      }
+      saveDirtyAndThen(() => setShowReview(true));
       return;
     }
-
-    if (hasDirtyChanges) {
-      const payload = buildPayload();
-      saveAttemptSilently(payload, {
-        onSuccess: () => {
-          setDirtyKeys(new Set());
-          setCurrentStep((s) => s + 1);
-        }
-      });
-    } else {
-      setCurrentStep((s) => s + 1);
-    }
-  }, [currentStep, hasDirtyChanges, buildPayload, saveAttemptSilently]);
+    saveDirtyAndThen(() => setCurrentStep((s) => s + 1));
+  }, [currentStep, saveDirtyAndThen]);
 
   const goBack = useCallback(() => {
     if (currentStep <= 0) return;
-    if (hasDirtyChanges) {
-      const payload = buildPayload();
-      saveAttemptSilently(payload, {
-        onSuccess: () => {
-          setDirtyKeys(new Set());
-          setCurrentStep((s) => s - 1);
-        }
-      });
-    } else {
-      setCurrentStep((s) => s - 1);
-    }
-  }, [currentStep, hasDirtyChanges, buildPayload, saveAttemptSilently]);
+    saveDirtyAndThen(() => setCurrentStep((s) => s - 1));
+  }, [currentStep, saveDirtyAndThen]);
 
   const goToStep = useCallback(
     (step: number) => {
@@ -124,60 +108,28 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
       if (!completedSteps.has(targetKey) && step !== currentStep) return;
 
       Haptics.selectionAsync().catch(() => {});
-
-      if (hasDirtyChanges) {
-        const payload = buildPayload();
-        saveAttemptSilently(payload, {
-          onSuccess: () => {
-            setDirtyKeys(new Set());
-            setCurrentStep(step);
-            setShowReview(false);
-          }
-        });
-      } else {
+      saveDirtyAndThen(() => {
         setCurrentStep(step);
         setShowReview(false);
-      }
+      });
     },
-    [completedSteps, currentStep, hasDirtyChanges, buildPayload, saveAttemptSilently]
+    [completedSteps, currentStep, saveDirtyAndThen]
   );
 
   const handleSubmit = useCallback(() => {
-    const afterSave = () => {
+    saveDirtyAndThen(() => {
       submitAttempt(assignmentId ? { assignmentId: String(assignmentId) } : {}, {
         onSuccess: () => {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
           router.back();
         }
       });
-    };
-
-    if (hasDirtyChanges) {
-      const payload = buildPayload();
-      saveAttemptSilently(payload, {
-        onSuccess: () => {
-          setDirtyKeys(new Set());
-          afterSave();
-        }
-      });
-    } else {
-      afterSave();
-    }
-  }, [hasDirtyChanges, buildPayload, saveAttemptSilently, submitAttempt, assignmentId, router]);
+    });
+  }, [saveDirtyAndThen, submitAttempt, assignmentId, router]);
 
   const handleExit = useCallback(() => {
-    if (hasDirtyChanges) {
-      const payload = buildPayload();
-      saveAttemptSilently(payload, {
-        onSuccess: () => {
-          setDirtyKeys(new Set());
-          router.back();
-        }
-      });
-    } else {
-      router.back();
-    }
-  }, [hasDirtyChanges, buildPayload, saveAttemptSilently, router]);
+    saveDirtyAndThen(() => router.back());
+  }, [saveDirtyAndThen, router]);
 
   return {
     fields,
