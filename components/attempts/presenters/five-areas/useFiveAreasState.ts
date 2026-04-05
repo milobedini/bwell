@@ -49,16 +49,16 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
     const serverData = attempt.fiveAreas;
     if (serverData) {
       setFields({ ...serverData });
-      if (canEdit) {
+      const canEditNow = mode === 'edit' && attempt.status !== 'submitted';
+      if (canEditNow) {
         const firstEmpty = AREA_KEYS.findIndex((key) => !serverData[key]?.trim());
         const resumeStep = firstEmpty === -1 ? AREA_KEYS.length - 1 : firstEmpty;
         setCurrentStep(resumeStep);
         setHighestStep(resumeStep);
       }
     }
-  }, [attempt._id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [attempt._id, attempt.fiveAreas, attempt.status, mode]);
 
-  const hasDirtyChanges = dirtyKeys.size > 0;
   const currentKey = AREA_KEYS[currentStep];
 
   // A step is "completed" (tappable) if it has content OR the user has progressed past it
@@ -69,7 +69,12 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
 
   const updateField = useCallback((key: AreaKey, value: string) => {
     setFields((prev) => ({ ...prev, [key]: value }));
-    setDirtyKeys((prev) => new Set(prev).add(key));
+    setDirtyKeys((prev) => {
+      if (prev.has(key)) return prev;
+      const next = new Set(prev);
+      next.add(key);
+      return next;
+    });
   }, []);
 
   const saveDirtyAndThen = useCallback(
@@ -138,10 +143,6 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
     });
   }, [saveDirtyAndThen, submitAttempt, assignmentId, router]);
 
-  const handleExit = useCallback(() => {
-    saveDirtyAndThen(() => router.back());
-  }, [saveDirtyAndThen, router]);
-
   return {
     fields,
     currentStep,
@@ -151,12 +152,10 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
     canEdit,
     isSaving,
     isSubmitting,
-    hasDirtyChanges,
     updateField,
     goForward,
     goBack,
     goToStep,
-    handleSubmit,
-    handleExit
+    handleSubmit
   };
 };

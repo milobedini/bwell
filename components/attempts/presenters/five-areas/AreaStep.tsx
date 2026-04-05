@@ -1,7 +1,7 @@
-import { useCallback, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
+import useToggle from '@/hooks/useToggle';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
 import { AREA_HINTS, AREA_LABELS, type AreaKey } from './useFiveAreasState';
@@ -14,14 +14,10 @@ type AreaStepProps = {
 };
 
 const AreaStep = ({ areaKey, value, onChangeText, editable }: AreaStepProps) => {
-  const [hintVisible, setHintVisible] = useState(true);
+  const [hintVisible, toggleHint] = useToggle(true);
   const label = AREA_LABELS[areaKey];
   const hint = AREA_HINTS[areaKey];
   const isReflection = areaKey === 'reflection';
-
-  const toggleHint = useCallback(() => {
-    setHintVisible((prev) => !prev);
-  }, []);
 
   return (
     <View className="flex-1 px-4">

@@ -125,15 +125,12 @@ const FiveAreasDiagram = memo(({ currentStep, completedSteps, onNodePress, snipp
   const boldFont = useFont(require('@/assets/fonts/Lato-Bold.ttf'), FONT_BOLD_SIZE * scale);
   const regularFont = useFont(require('@/assets/fonts/Lato-Regular.ttf'), FONT_REGULAR_SIZE * scale);
 
-  const nodeState = useCallback(
-    (index: number): 'locked' | 'current' | 'completed' => {
-      if (mode === 'view') return 'completed';
-      if (completedSteps.has(AREA_KEYS[index])) return 'completed';
-      if (index === currentStep) return 'current';
-      return 'locked';
-    },
-    [mode, completedSteps, currentStep]
-  );
+  const nodeState = (index: number): 'locked' | 'current' | 'completed' => {
+    if (mode === 'view') return 'completed';
+    if (completedSteps.has(AREA_KEYS[index])) return 'completed';
+    if (index === currentStep) return 'current';
+    return 'locked';
+  };
 
   const handlePress = useCallback(
     (e: { nativeEvent: { locationX: number; locationY: number } }) => {
@@ -165,7 +162,12 @@ const FiveAreasDiagram = memo(({ currentStep, completedSteps, onNodePress, snipp
   // Half the vertical gap between bun centre and the nearest core node row
   const arrowGap = useMemo(() => ((NODES[3].y - NODES[1].y) / 2 - CORE_RADIUS) * scale, [scale]);
 
-  if (!boldFont) return null;
+  const labelWidths = useMemo(() => {
+    if (!boldFont) return null;
+    return Object.fromEntries(AREA_KEYS.map((key) => [key, boldFont.measureText(DIAGRAM_LABELS[key]).width]));
+  }, [boldFont]);
+
+  if (!boldFont || !labelWidths) return null;
 
   return (
     <Pressable onPressIn={handlePress}>
@@ -238,8 +240,7 @@ const FiveAreasDiagram = memo(({ currentStep, completedSteps, onNodePress, snipp
           const label = DIAGRAM_LABELS[key];
           const color = getTextColor(state);
 
-          const labelWidth = boldFont.measureText(label).width;
-          const labelX = x - labelWidth / 2;
+          const labelX = x - labelWidths[key] / 2;
           const hasSnippet = !!snippets?.[key];
           const labelY = hasSnippet ? y + LABEL_Y_SNIPPET_NUDGE * scale : y + LABEL_Y_OFFSET * scale;
 

@@ -17,7 +17,7 @@ type FiveAreasPresenterProps = {
   patientName?: string;
 };
 
-const FiveAreasPresenter = ({ attempt, mode, patientName: _patientName }: FiveAreasPresenterProps) => {
+const FiveAreasPresenter = ({ attempt, mode }: FiveAreasPresenterProps) => {
   const state = useFiveAreasState({ attempt, mode });
   const [tooltipKey, setTooltipKey] = useState<AreaKey | null>(null);
 
