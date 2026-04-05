@@ -1,5 +1,6 @@
 import { Fragment, memo, useCallback, useMemo } from 'react';
 import { Pressable, useWindowDimensions } from 'react-native';
+import { Colors } from '@/constants/Colors';
 import { Canvas, Circle, Line, Text, useFont, vec } from '@shopify/react-native-skia';
 
 import { AREA_KEYS, AREA_LABELS, type AreaKey } from './useFiveAreasState';
@@ -35,13 +36,13 @@ const BUN_EDGES: [number, number][] = [
 
 /* ── colours ── */
 
-const COL_TEAL = '#18cdba';
-const COL_GREY = '#3A496B';
-const COL_LIGHT = '#e0e9f3';
+const COL_TEAL = Colors.sway.bright;
+const COL_GREY = Colors.chip.dotInactive;
+const COL_LIGHT = Colors.sway.lightGrey;
 
 const getNodeFill = (state: 'locked' | 'current' | 'completed') => {
-  if (state === 'current') return 'rgba(24,205,186,0.3)';
-  if (state === 'completed') return 'rgba(24,205,186,0.15)';
+  if (state === 'current') return Colors.tint.tealBorder; // rgba(24,205,186,0.3)
+  if (state === 'completed') return Colors.tint.teal; // rgba(24,205,186,0.15)
   return 'transparent';
 };
 

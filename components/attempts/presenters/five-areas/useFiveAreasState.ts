@@ -60,8 +60,6 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
 
   const completedSteps = useMemo(() => new Set(AREA_KEYS.filter((key) => !!fields[key]?.trim())), [fields]);
 
-  const allComplete = AREA_KEYS.every((key) => completedSteps.has(key));
-
   const updateField = useCallback((key: AreaKey, value: string) => {
     setFields((prev) => ({ ...prev, [key]: value }));
     setDirtyKeys((prev) => new Set(prev).add(key));
@@ -74,16 +72,6 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
     }
     return { fiveAreas };
   }, [dirtyKeys, fields]);
-
-  const saveProgress = useCallback(() => {
-    if (!hasDirtyChanges) return;
-    const payload = buildPayload();
-    saveAttemptSilently(payload, {
-      onSuccess: () => {
-        setDirtyKeys(new Set());
-      }
-    });
-  }, [hasDirtyChanges, buildPayload, saveAttemptSilently]);
 
   const goForward = useCallback(() => {
     if (currentStep >= AREA_KEYS.length - 1) {
@@ -197,13 +185,11 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
     currentKey,
     showReview,
     completedSteps,
-    allComplete,
     canEdit,
     isSaving,
     isSubmitting,
     hasDirtyChanges,
     updateField,
-    saveProgress,
     goForward,
     goBack,
     goToStep,
