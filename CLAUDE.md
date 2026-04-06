@@ -69,8 +69,8 @@ The app has three tiers (from `docs/proposal.pdf`):
 
 - Use conventional commits, keep messages concise
 - Never include AI co-author references in commit messages
-- Before staging, run `npx prettier --write .` to format all files
 - Pre-commit hook runs `lint-staged` (ESLint fix + Prettier on staged files only)
+- Pre-push hook runs `tsc --noEmit` (type check)
 - After a successful commit and push, run `npm run publish` to publish an OTA update
 
 ## Commands
@@ -95,9 +95,10 @@ The app has three tiers (from `docs/proposal.pdf`):
 
 ## Validation Workflow
 
-1. Run `npx eslint --fix .` to auto-fix eslint issues (import sorting, etc.)
-2. Run `npx prettier --write .` to format all files
-3. Run `npm run lint` to validate everything passes
+- **On commit:** Husky pre-commit hook runs `lint-staged` (ESLint fix + Prettier on staged files) — no manual step needed
+- **On push:** Husky pre-push hook runs `tsc --noEmit` — catches type errors before CI
+- **On PR / push to main:** CI runs full `npm run lint` + `npm test`
+- `npm run lint` is available for a full manual sweep when needed but is not the primary workflow
 
 ## Web Debugging
 
