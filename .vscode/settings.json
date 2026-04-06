@@ -2,5 +2,6 @@
   "eslint.enable": true,
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "editor.formatOnSave": true,
-  "cSpell.words": ["Pressable"]
+  "cSpell.words": ["Pressable"],
+  "jest.runMode": "on-demand"
 }
