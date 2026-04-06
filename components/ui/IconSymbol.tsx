@@ -5,7 +5,7 @@ import { OpaqueColorValue, type StyleProp, type TextStyle } from 'react-native';
 import { SymbolViewProps, SymbolWeight } from 'expo-symbols';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 
-type IconMapping = Record<SymbolViewProps['name'], ComponentProps<typeof MaterialIcons>['name']>;
+type IconMapping = Record<Extract<SymbolViewProps['name'], string>, ComponentProps<typeof MaterialIcons>['name']>;
 type IconSymbolName = keyof typeof MAPPING;
 type IconSymbolProps = {
   name: IconSymbolName;
