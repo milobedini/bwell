@@ -74,7 +74,7 @@ describe('useCreateModule', () => {
     const { result } = renderHook(() => useCreateModule(), { wrapper: createQueryClientWrapper() });
 
     act(() => {
-      result.current.mutate({ title: 'New Module', type: 'questionnaire' });
+      result.current.mutate({ title: 'New Module', type: 'questionnaire', description: 'Test', program: 'p1' });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));

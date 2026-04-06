@@ -132,7 +132,7 @@ describe('useSaveModuleAttempt', () => {
     const { result } = renderHook(() => useSaveModuleAttempt('at1'), { wrapper: createQueryClientWrapper() });
 
     act(() => {
-      result.current.mutate({ responses: [] });
+      result.current.mutate({ answers: [] });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -149,7 +149,7 @@ describe('useSubmitAttempt', () => {
     const { result } = renderHook(() => useSubmitAttempt('at1'), { wrapper: createQueryClientWrapper() });
 
     act(() => {
-      result.current.mutate({ responses: [] });
+      result.current.mutate({ assignmentId: 'a1' });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));

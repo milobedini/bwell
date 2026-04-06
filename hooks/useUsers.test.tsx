@@ -159,7 +159,7 @@ describe('useAddRemoveTherapist', () => {
     const { result } = renderHook(() => useAddRemoveTherapist(), { wrapper: createQueryClientWrapper() });
 
     act(() => {
-      result.current.mutate({ patientId: 'p1', therapistId: 't1', action: 'add' });
+      result.current.mutate({ patientId: 'p1', therapistId: 't1' });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
