@@ -1,8 +1,7 @@
-import { type ReactNode } from 'react';
 import { api } from '@/api/api';
 import { useAuthStore } from '@/stores/authStore';
+import { createQueryClientWrapper } from '@/test-utils/createQueryClientWrapper';
 import type { AuthUser } from '@milobedini/shared-types';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 
 import {
@@ -41,23 +40,16 @@ const mockUser = {
   isVerifiedTherapist: false
 } as AuthUser;
 
-const createWrapper = () => {
-  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return function Wrapper({ children }: { children: ReactNode }) {
-    return <QueryClientProvider client={qc}>{children}</QueryClientProvider>;
-  };
-};
-
 describe('useIsLoggedIn', () => {
   it('returns true when user is in store', () => {
     useAuthStore.setState({ user: mockUser });
-    const { result } = renderHook(() => useIsLoggedIn(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useIsLoggedIn(), { wrapper: createQueryClientWrapper() });
     expect(result.current).toBe(true);
   });
 
   it('returns false when user is null', () => {
     useAuthStore.setState({ user: null });
-    const { result } = renderHook(() => useIsLoggedIn(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useIsLoggedIn(), { wrapper: createQueryClientWrapper() });
     expect(result.current).toBe(false);
   });
 });
@@ -72,7 +64,7 @@ describe('useProfile', () => {
     const mockProfile = { _id: 'u1', name: 'Test' };
     (api.get as jest.Mock).mockResolvedValueOnce({ data: mockProfile });
 
-    const { result } = renderHook(() => useProfile(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useProfile(), { wrapper: createQueryClientWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(api.get).toHaveBeenCalledWith('/user');
@@ -80,7 +72,7 @@ describe('useProfile', () => {
 
   it('does not fetch when not logged in', () => {
     useAuthStore.setState({ user: null });
-    const { result } = renderHook(() => useProfile(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useProfile(), { wrapper: createQueryClientWrapper() });
     expect(result.current.fetchStatus).toBe('idle');
   });
 });
@@ -94,7 +86,7 @@ describe('useAllPatients', () => {
   it('fetches patients', async () => {
     (api.get as jest.Mock).mockResolvedValueOnce({ data: { patients: [] } });
 
-    const { result } = renderHook(() => useAllPatients(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useAllPatients(), { wrapper: createQueryClientWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(api.get).toHaveBeenCalledWith('/user/patients');
@@ -110,7 +102,9 @@ describe('useClients', () => {
   it('fetches clients with query params', async () => {
     (api.get as jest.Mock).mockResolvedValueOnce({ data: { patients: [] } });
 
-    const { result } = renderHook(() => useClients({ q: 'test', sort: 'name' }), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useClients({ q: 'test', sort: 'name' }), {
+      wrapper: createQueryClientWrapper()
+    });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(api.get).toHaveBeenCalledWith('/user/clients', { params: { q: 'test', sort: 'name' } });
@@ -127,7 +121,7 @@ describe('useAllUsers', () => {
     const mockPage = { users: [], page: 1, totalPages: 1 };
     (api.get as jest.Mock).mockResolvedValueOnce({ data: mockPage });
 
-    const { result } = renderHook(() => useAllUsers({ limit: 10 }), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useAllUsers({ limit: 10 }), { wrapper: createQueryClientWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(api.get).toHaveBeenCalledWith(
@@ -146,7 +140,7 @@ describe('useAdminStats', () => {
   it('fetches admin stats', async () => {
     (api.get as jest.Mock).mockResolvedValueOnce({ data: { totalUsers: 10 } });
 
-    const { result } = renderHook(() => useAdminStats(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useAdminStats(), { wrapper: createQueryClientWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(api.get).toHaveBeenCalledWith('/user/admin/stats');
@@ -162,12 +156,10 @@ describe('useAddRemoveTherapist', () => {
   it('calls POST /user/assign', async () => {
     (api.post as jest.Mock).mockResolvedValueOnce({ data: { message: 'Therapist added' } });
 
-    const { result } = renderHook(() => useAddRemoveTherapist(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useAddRemoveTherapist(), { wrapper: createQueryClientWrapper() });
 
     act(() => {
-      result.current.mutate({ patientId: 'p1', therapistId: 't1', action: 'add' } as Parameters<
-        typeof result.current.mutate
-      >[0]);
+      result.current.mutate({ patientId: 'p1', therapistId: 't1', action: 'add' });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -184,10 +176,10 @@ describe('useAdminVerifyTherapist', () => {
   it('calls POST /user/verify', async () => {
     (api.post as jest.Mock).mockResolvedValueOnce({ data: { message: 'Verified' } });
 
-    const { result } = renderHook(() => useAdminVerifyTherapist(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useAdminVerifyTherapist(), { wrapper: createQueryClientWrapper() });
 
     act(() => {
-      result.current.mutate({ therapistId: 't1' } as Parameters<typeof result.current.mutate>[0]);
+      result.current.mutate({ therapistId: 't1' });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));

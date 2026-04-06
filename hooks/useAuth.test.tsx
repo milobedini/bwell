@@ -1,8 +1,7 @@
-import { type ReactNode } from 'react';
 import { api } from '@/api/api';
 import { useAuthStore } from '@/stores/authStore';
+import { createQueryClientWrapper } from '@/test-utils/createQueryClientWrapper';
 import type { AuthUser } from '@milobedini/shared-types';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 
 import { useChangePassword, useLogin, useLogout, useRegister, useUpdateName, useVerify } from './useAuth';
@@ -35,13 +34,6 @@ const mockUser = {
   isVerifiedTherapist: false
 } as AuthUser;
 
-const createWrapper = () => {
-  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return function Wrapper({ children }: { children: ReactNode }) {
-    return <QueryClientProvider client={qc}>{children}</QueryClientProvider>;
-  };
-};
-
 describe('useRegister', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -51,7 +43,7 @@ describe('useRegister', () => {
   it('calls POST /register', async () => {
     (api.post as jest.Mock).mockResolvedValueOnce({ data: { user: mockUser } });
 
-    const { result } = renderHook(() => useRegister(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useRegister(), { wrapper: createQueryClientWrapper() });
 
     act(() => {
       result.current.mutate({ username: 'testuser', email: 'test@test.com', password: 'pass123', roles: ['patient'] });
@@ -71,7 +63,7 @@ describe('useLogin', () => {
   it('calls POST /login and sets user in store', async () => {
     (api.post as jest.Mock).mockResolvedValueOnce({ data: { user: mockUser } });
 
-    const { result } = renderHook(() => useLogin(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useLogin(), { wrapper: createQueryClientWrapper() });
 
     act(() => {
       result.current.mutate({ identifier: 'test@test.com', password: 'pass123' });
@@ -92,7 +84,7 @@ describe('useLogout', () => {
   it('calls POST /logout and clears user', async () => {
     (api.post as jest.Mock).mockResolvedValueOnce({ data: { message: 'Logged out' } });
 
-    const { result } = renderHook(() => useLogout(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useLogout(), { wrapper: createQueryClientWrapper() });
 
     act(() => {
       result.current.mutate(undefined);
@@ -106,7 +98,7 @@ describe('useLogout', () => {
   it('clears user even when logout request fails', async () => {
     (api.post as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
 
-    const { result } = renderHook(() => useLogout(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useLogout(), { wrapper: createQueryClientWrapper() });
 
     act(() => {
       result.current.mutate(undefined);
@@ -127,7 +119,7 @@ describe('useVerify', () => {
   it('calls POST /verify-email and sets user', async () => {
     (api.post as jest.Mock).mockResolvedValueOnce({ data: { user: mockUser } });
 
-    const { result } = renderHook(() => useVerify(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useVerify(), { wrapper: createQueryClientWrapper() });
 
     act(() => {
       result.current.mutate({ verificationCode: 'abc123' });
@@ -149,7 +141,7 @@ describe('useUpdateName', () => {
     const updated = { ...mockUser, name: 'New Name' };
     (api.put as jest.Mock).mockResolvedValueOnce({ data: { user: updated } });
 
-    const { result } = renderHook(() => useUpdateName(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useUpdateName(), { wrapper: createQueryClientWrapper() });
 
     act(() => {
       result.current.mutate({ newName: 'New Name', userId: 'u1' });
@@ -169,7 +161,7 @@ describe('useChangePassword', () => {
   it('calls PUT /change-password', async () => {
     (api.put as jest.Mock).mockResolvedValueOnce({ data: { success: true } });
 
-    const { result } = renderHook(() => useChangePassword(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useChangePassword(), { wrapper: createQueryClientWrapper() });
 
     act(() => {
       result.current.mutate({ currentPassword: 'old', newPassword: 'new123' });

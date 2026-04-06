@@ -1,9 +1,8 @@
-import { type ReactNode } from 'react';
 import { useMyPractice } from '@/hooks/usePractice';
 import { useScoreTrends } from '@/hooks/useScoreTrends';
+import { createQueryClientWrapper } from '@/test-utils/createQueryClientWrapper';
 import { mockQueryResult } from '@/test-utils/mockQueryResult';
 import type { PracticeItem, PracticeResponse, ScoreTrendsResponse } from '@milobedini/shared-types';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react-native';
 
 import { usePatientDashboard } from './usePatientDashboard';
@@ -14,14 +13,6 @@ jest.mock('@/hooks/useScoreTrends');
 
 const mockUseMyPractice = jest.mocked(useMyPractice);
 const mockUseScoreTrends = jest.mocked(useScoreTrends);
-
-function Wrapper({ children }: { children: ReactNode }) {
-  return (
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
-      {children}
-    </QueryClientProvider>
-  );
-}
 
 const makePracticeItem = (overrides: Partial<PracticeItem> = {}): PracticeItem =>
   ({
@@ -76,11 +67,15 @@ describe('usePatientDashboard', () => {
     jest.clearAllMocks();
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('returns null data while pending', () => {
     mockUseMyPractice.mockReturnValue(pendingPractice());
     mockUseScoreTrends.mockReturnValue(pendingTrends());
 
-    const { result } = renderHook(() => usePatientDashboard(), { wrapper: Wrapper });
+    const { result } = renderHook(() => usePatientDashboard(), { wrapper: createQueryClientWrapper() });
 
     expect(result.current.data).toBeNull();
     expect(result.current.isPending).toBe(true);
@@ -90,7 +85,7 @@ describe('usePatientDashboard', () => {
     mockUseMyPractice.mockReturnValue(loadedPractice(emptyPractice));
     mockUseScoreTrends.mockReturnValue(loadedTrends(emptyTrends));
 
-    const { result } = renderHook(() => usePatientDashboard(), { wrapper: Wrapper });
+    const { result } = renderHook(() => usePatientDashboard(), { wrapper: createQueryClientWrapper() });
 
     expect(result.current.data).not.toBeNull();
     expect(result.current.data!.hasData).toBe(false);
@@ -107,11 +102,9 @@ describe('usePatientDashboard', () => {
     mockUseMyPractice.mockReturnValue(loadedPractice({ ...emptyPractice, today: [overdue2, overdue1] }));
     mockUseScoreTrends.mockReturnValue(loadedTrends(emptyTrends));
 
-    const { result } = renderHook(() => usePatientDashboard(), { wrapper: Wrapper });
+    const { result } = renderHook(() => usePatientDashboard(), { wrapper: createQueryClientWrapper() });
 
     expect(result.current.data!.focusAssignment?.assignmentId).toBe('a1');
-
-    jest.useRealTimers();
   });
 
   it('picks nearest upcoming when no overdue', () => {
@@ -124,11 +117,9 @@ describe('usePatientDashboard', () => {
     mockUseMyPractice.mockReturnValue(loadedPractice({ ...emptyPractice, thisWeek: [upcoming1, upcoming2] }));
     mockUseScoreTrends.mockReturnValue(loadedTrends(emptyTrends));
 
-    const { result } = renderHook(() => usePatientDashboard(), { wrapper: Wrapper });
+    const { result } = renderHook(() => usePatientDashboard(), { wrapper: createQueryClientWrapper() });
 
     expect(result.current.data!.focusAssignment?.assignmentId).toBe('a2');
-
-    jest.useRealTimers();
   });
 
   it('limits upcoming assignments to 3, excluding focus card', () => {
@@ -142,13 +133,11 @@ describe('usePatientDashboard', () => {
     mockUseMyPractice.mockReturnValue(loadedPractice({ ...emptyPractice, thisWeek: items }));
     mockUseScoreTrends.mockReturnValue(loadedTrends(emptyTrends));
 
-    const { result } = renderHook(() => usePatientDashboard(), { wrapper: Wrapper });
+    const { result } = renderHook(() => usePatientDashboard(), { wrapper: createQueryClientWrapper() });
 
     expect(result.current.data!.focusAssignment?.assignmentId).toBe('a0');
     expect(result.current.data!.upcomingAssignments).toHaveLength(3);
     expect(result.current.data!.upcomingAssignments.map((a) => a.assignmentId)).toEqual(['a1', 'a2', 'a3']);
-
-    jest.useRealTimers();
   });
 
   it('calculates on-time streak correctly', () => {
@@ -176,12 +165,10 @@ describe('usePatientDashboard', () => {
     mockUseMyPractice.mockReturnValue(loadedPractice({ ...emptyPractice, recentlyCompleted: completed }));
     mockUseScoreTrends.mockReturnValue(loadedTrends(emptyTrends));
 
-    const { result } = renderHook(() => usePatientDashboard(), { wrapper: Wrapper });
+    const { result } = renderHook(() => usePatientDashboard(), { wrapper: createQueryClientWrapper() });
 
     expect(result.current.data!.onTimeStreak.current).toBe(2);
     expect(result.current.data!.onTimeStreak.history).toHaveLength(3);
-
-    jest.useRealTimers();
   });
 
   it('reports isError when either query errors', () => {
@@ -196,7 +183,7 @@ describe('usePatientDashboard', () => {
     );
     mockUseScoreTrends.mockReturnValue(loadedTrends(emptyTrends));
 
-    const { result } = renderHook(() => usePatientDashboard(), { wrapper: Wrapper });
+    const { result } = renderHook(() => usePatientDashboard(), { wrapper: createQueryClientWrapper() });
     expect(result.current.isError).toBe(true);
   });
 });

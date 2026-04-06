@@ -124,8 +124,10 @@ The app has three tiers (from `docs/proposal.pdf`):
 - **Runner:** Jest with `jest-expo` preset, `@testing-library/react-native` for component tests
 - Colocate test files next to the code they test: `Component.test.tsx`, `util.test.ts`
 - Test behaviour, not implementation — query by text/testID, not internal state
-- Use `jest.useFakeTimers()` + `jest.setSystemTime()` for time-dependent logic
+- Use `jest.useFakeTimers()` + `jest.setSystemTime()` for time-dependent logic — always restore via `afterEach(() => jest.useRealTimers())`, not inline cleanup
 - RN style props are arrays — use `expect.arrayContaining([expect.objectContaining(...)])` for style assertions
+- **Shared test utilities** live in `test-utils/` — use `createQueryClientWrapper()` for hook tests that need a `QueryClientProvider`, and `mockQueryResult()` to build mock `UseQueryResult` objects
+- `jest.setup.ts` provides global mocks (AsyncStorage) — add new global mocks there, not per-file
 
 ## CI (GitHub Actions)
 

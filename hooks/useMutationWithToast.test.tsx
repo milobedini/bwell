@@ -1,6 +1,5 @@
-import { type ReactNode } from 'react';
 import { toast } from 'sonner-native';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createQueryClientWrapper } from '@/test-utils/createQueryClientWrapper';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 
 import { useMutationWithToast } from './useMutationWithToast';
@@ -13,11 +12,7 @@ jest.mock('sonner-native', () => ({
   }
 }));
 
-const wrapper = ({ children }: { children: ReactNode }) => (
-  <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
-    {children}
-  </QueryClientProvider>
-);
+const wrapper = createQueryClientWrapper();
 
 describe('useMutationWithToast', () => {
   beforeEach(() => {

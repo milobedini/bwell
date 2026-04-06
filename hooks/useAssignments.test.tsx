@@ -1,6 +1,5 @@
-import { type ReactNode } from 'react';
 import { api } from '@/api/api';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createQueryClientWrapper } from '@/test-utils/createQueryClientWrapper';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 
 import {
@@ -27,20 +26,13 @@ jest.mock('sonner-native', () => ({
   }
 }));
 
-const createWrapper = () => {
-  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return function Wrapper({ children }: { children: ReactNode }) {
-    return <QueryClientProvider client={qc}>{children}</QueryClientProvider>;
-  };
-};
-
 describe('useCreateAssignment', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('calls POST /assignments', async () => {
     (api.post as jest.Mock).mockResolvedValueOnce({ data: { assignment: { _id: 'a1' } } });
 
-    const { result } = renderHook(() => useCreateAssignment(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useCreateAssignment(), { wrapper: createQueryClientWrapper() });
 
     act(() => {
       result.current.mutate({ userId: 'p1', moduleId: 'm1' });
@@ -57,10 +49,10 @@ describe('useUpdateAssignmentStatus', () => {
   it('calls PATCH /assignments/:id', async () => {
     (api.patch as jest.Mock).mockResolvedValueOnce({ data: { success: true } });
 
-    const { result } = renderHook(() => useUpdateAssignmentStatus('a1'), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useUpdateAssignmentStatus('a1'), { wrapper: createQueryClientWrapper() });
 
     act(() => {
-      result.current.mutate({ status: 'completed' } as Parameters<typeof result.current.mutate>[0]);
+      result.current.mutate({ status: 'completed' });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -74,7 +66,7 @@ describe('useRemoveAssignment', () => {
   it('calls DELETE /assignments/:id', async () => {
     (api.delete as jest.Mock).mockResolvedValueOnce({ data: { success: true } });
 
-    const { result } = renderHook(() => useRemoveAssignment(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useRemoveAssignment(), { wrapper: createQueryClientWrapper() });
 
     act(() => {
       result.current.mutate({ assignmentId: 'a1' });
@@ -91,12 +83,12 @@ describe('useUpdateAssignment', () => {
   it('calls PATCH /assignments/:id with updates', async () => {
     (api.patch as jest.Mock).mockResolvedValueOnce({ data: { success: true, assignment: {} } });
 
-    const { result } = renderHook(() => useUpdateAssignment(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useUpdateAssignment(), { wrapper: createQueryClientWrapper() });
 
     act(() => {
       result.current.mutate({
         assignmentId: 'a1',
-        updates: { dueAt: '2026-04-10' } as Parameters<typeof result.current.mutate>[0]['updates']
+        updates: { dueAt: '2026-04-10' }
       });
     });
 

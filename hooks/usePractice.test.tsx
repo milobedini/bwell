@@ -1,6 +1,5 @@
-import { type ReactNode } from 'react';
 import { api } from '@/api/api';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createQueryClientWrapper } from '@/test-utils/createQueryClientWrapper';
 import { renderHook, waitFor } from '@testing-library/react-native';
 
 import {
@@ -22,13 +21,6 @@ jest.mock('./useUsers', () => ({
   useIsLoggedIn: () => true
 }));
 
-const createWrapper = () => {
-  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return function Wrapper({ children }: { children: ReactNode }) {
-    return <QueryClientProvider client={qc}>{children}</QueryClientProvider>;
-  };
-};
-
 describe('useMyPractice', () => {
   beforeEach(() => jest.clearAllMocks());
 
@@ -36,7 +28,7 @@ describe('useMyPractice', () => {
     const mockData = { today: [], thisWeek: [], upcoming: [], recentlyCompleted: [] };
     (api.get as jest.Mock).mockResolvedValueOnce({ data: mockData });
 
-    const { result } = renderHook(() => useMyPractice(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useMyPractice(), { wrapper: createQueryClientWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(api.get).toHaveBeenCalledWith('/user/practice');
@@ -51,7 +43,7 @@ describe('useMyPracticeHistory', () => {
     const mockPage = { items: [{ _id: 'i1' }], nextCursor: null };
     (api.get as jest.Mock).mockResolvedValueOnce({ data: mockPage });
 
-    const { result } = renderHook(() => useMyPracticeHistory(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useMyPracticeHistory(), { wrapper: createQueryClientWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(api.get).toHaveBeenCalledWith('/user/practice/history', { params: {} });
@@ -62,7 +54,7 @@ describe('useMyPracticeHistory', () => {
     (api.get as jest.Mock).mockResolvedValueOnce({ data: mockPage });
 
     const { result } = renderHook(() => useMyPracticeHistory({ moduleType: 'questionnaire', limit: 10 }), {
-      wrapper: createWrapper()
+      wrapper: createQueryClientWrapper()
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -75,7 +67,7 @@ describe('useMyPracticeHistory', () => {
     const mockPage = { items: [{ _id: 'i1' }, { _id: 'i2' }], nextCursor: 'abc' };
     (api.get as jest.Mock).mockResolvedValueOnce({ data: mockPage });
 
-    const { result } = renderHook(() => useMyPracticeHistory(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useMyPracticeHistory(), { wrapper: createQueryClientWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.items).toEqual([{ _id: 'i1' }, { _id: 'i2' }]);
@@ -89,14 +81,14 @@ describe('usePatientPractice', () => {
   it('fetches patient practice for given ID', async () => {
     (api.get as jest.Mock).mockResolvedValueOnce({ data: { assignments: [] } });
 
-    const { result } = renderHook(() => usePatientPractice('p1'), { wrapper: createWrapper() });
+    const { result } = renderHook(() => usePatientPractice('p1'), { wrapper: createQueryClientWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(api.get).toHaveBeenCalledWith('/user/therapist/patients/p1/practice');
   });
 
   it('does not fetch when patientId is undefined', () => {
-    const { result } = renderHook(() => usePatientPractice(undefined), { wrapper: createWrapper() });
+    const { result } = renderHook(() => usePatientPractice(undefined), { wrapper: createQueryClientWrapper() });
     expect(result.current.fetchStatus).toBe('idle');
   });
 });
@@ -108,7 +100,7 @@ describe('usePatientModules', () => {
     const mockModules = { modules: [{ _id: 'm1', title: 'PHQ-9' }] };
     (api.get as jest.Mock).mockResolvedValueOnce({ data: mockModules });
 
-    const { result } = renderHook(() => usePatientModules('p1'), { wrapper: createWrapper() });
+    const { result } = renderHook(() => usePatientModules('p1'), { wrapper: createQueryClientWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(api.get).toHaveBeenCalledWith('/user/therapist/patients/p1/modules');
@@ -123,7 +115,7 @@ describe('useTherapistReviewModules', () => {
     const mockData = { modules: [{ _id: 'm1' }] };
     (api.get as jest.Mock).mockResolvedValueOnce({ data: mockData });
 
-    const { result } = renderHook(() => useTherapistReviewModules(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useTherapistReviewModules(), { wrapper: createQueryClientWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(api.get).toHaveBeenCalledWith('/user/therapist/attempts/modules');
@@ -140,7 +132,7 @@ describe('useTherapistReview', () => {
     };
     (api.get as jest.Mock).mockResolvedValueOnce({ data: mockPage });
 
-    const { result } = renderHook(() => useTherapistReview(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useTherapistReview(), { wrapper: createQueryClientWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(api.get).toHaveBeenCalledWith('/user/therapist/review', { params: {} });
@@ -156,7 +148,7 @@ describe('useTherapistReview', () => {
     (api.get as jest.Mock).mockResolvedValueOnce({ data: mockPage });
 
     const { result } = renderHook(() => useTherapistReview({ sort: 'newest', patientId: 'p1' }), {
-      wrapper: createWrapper()
+      wrapper: createQueryClientWrapper()
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));

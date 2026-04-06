@@ -14,7 +14,6 @@ const mockUser = {
 
 describe('authStore', () => {
   beforeEach(() => {
-    // Reset to initial state before each test
     useAuthStore.setState({ user: null });
   });
 
