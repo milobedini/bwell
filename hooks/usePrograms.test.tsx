@@ -5,6 +5,7 @@ import { renderHook, waitFor } from '@testing-library/react-native';
 
 import { useProgram, usePrograms } from './usePrograms';
 
+// TODO: extract shared api mock to test-utils/mockApi.ts — this block is duplicated across 9+ test files
 jest.mock('@/api/api', () => ({
   api: {
     get: jest.fn(),
@@ -15,6 +16,7 @@ jest.mock('@/api/api', () => ({
   }
 }));
 
+// TODO: move inline mock data to test-utils/factories.ts as typed factories with Partial<T> overrides
 const mockPrograms: Program[] = [
   {
     _id: 'p1',

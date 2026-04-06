@@ -5,6 +5,7 @@ import { renderHook, waitFor } from '@testing-library/react-native';
 
 import { useScoreTrends } from './useScoreTrends';
 
+// TODO: extract shared api mock to test-utils/mockApi.ts — this block is duplicated across 9+ test files
 jest.mock('@/api/api', () => ({
   api: {
     get: jest.fn(),
@@ -15,11 +16,11 @@ jest.mock('@/api/api', () => ({
   }
 }));
 
-jest.mock('./useUsers', () => ({
+jest.mock('@/hooks/useUsers', () => ({
   useIsLoggedIn: jest.fn()
 }));
 
-const { useIsLoggedIn } = require('./useUsers');
+const { useIsLoggedIn } = require('@/hooks/useUsers');
 
 const mockTrends: ScoreTrendsResponse = {
   success: true,

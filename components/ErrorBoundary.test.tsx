@@ -1,3 +1,4 @@
+import { Text } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { ErrorBoundary } from './ErrorBoundary';
@@ -12,7 +13,6 @@ const ThrowingChild = () => {
 
 describe('ErrorBoundary', () => {
   beforeEach(() => {
-    // Suppress React error boundary console output during tests
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
@@ -23,11 +23,11 @@ describe('ErrorBoundary', () => {
   it('renders children when no error occurs', () => {
     render(
       <ErrorBoundary>
-        <ThrowingChild />
+        <Text>Safe content</Text>
       </ErrorBoundary>
     );
-    // getDerivedStateFromError will catch and show fallback
-    expect(screen.getByText('Something went wrong')).toBeTruthy();
+    expect(screen.getByText('Safe content')).toBeTruthy();
+    expect(screen.queryByText('Something went wrong')).toBeNull();
   });
 
   it('shows fallback UI when a child throws', () => {
@@ -50,17 +50,15 @@ describe('ErrorBoundary', () => {
 
     expect(screen.getByText('Something went wrong')).toBeTruthy();
 
-    // Swap the child to a non-throwing one before pressing reset
-    // (otherwise it'll re-throw immediately)
     rerender(
       <ErrorBoundary>
-        <ThrowingChild />
+        <Text>Recovered</Text>
       </ErrorBoundary>
     );
 
     fireEvent.press(screen.getByText('Try Again'));
 
-    // After reset with a still-throwing child, it catches again
-    expect(screen.getByText('Something went wrong')).toBeTruthy();
+    expect(screen.getByText('Recovered')).toBeTruthy();
+    expect(screen.queryByText('Something went wrong')).toBeNull();
   });
 });

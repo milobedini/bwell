@@ -1,4 +1,4 @@
-import { AccessPolicy, CanStartReason } from '@/types/types';
+import { AccessPolicy, AssignmentStatus, CanStartReason } from '@/types/types';
 import type { AssignmentRecurrence, AvailableModulesItem } from '@milobedini/shared-types';
 import { render, screen } from '@testing-library/react-native';
 
@@ -73,12 +73,12 @@ describe('CanStartChip', () => {
 
 describe('AssignmentStatusChip', () => {
   it('renders "Assigned" for assigned status', () => {
-    render(<AssignmentStatusChip status="assigned" />);
+    render(<AssignmentStatusChip status={AssignmentStatus.ASSIGNED} />);
     expect(screen.getByText('Assigned')).toBeTruthy();
   });
 
   it('renders "In progress" for in_progress status', () => {
-    render(<AssignmentStatusChip status="in_progress" />);
+    render(<AssignmentStatusChip status={AssignmentStatus.IN_PROGRESS} />);
     expect(screen.getByText('In progress')).toBeTruthy();
   });
 
@@ -134,8 +134,8 @@ describe('TimeLeftChip', () => {
 
   it('renders "1 day left" for singular', () => {
     jest.setSystemTime(new Date('2025-06-14T00:00:00Z'));
-    render(<TimeLeftChip dueAt="2025-06-15T12:00:00Z" />);
-    expect(screen.getByText(/days? left/)).toBeTruthy();
+    render(<TimeLeftChip dueAt="2025-06-15T00:00:00Z" />);
+    expect(screen.getByText('1 day left')).toBeTruthy();
   });
 });
 
