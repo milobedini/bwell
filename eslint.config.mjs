@@ -15,7 +15,7 @@ export default defineConfig([
   // Ignore build output and files with config.cjs
   { ignores: ['dist/**', '.expo/**', '.worktrees/**', '**.cjs', '**.config.js'] },
 
-  // Jest test files — expose globals (describe, it, expect, jest, etc.)
+  // Jest test files — expose globals (must appear before main rules for languageOptions)
   {
     files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', 'jest.setup.ts', 'test-utils/**/*.{ts,tsx}'],
     languageOptions: {
@@ -90,6 +90,18 @@ export default defineConfig([
       tailwindcss: {
         callees: ['clsx', 'cn', 'cva']
       }
+    }
+  },
+
+  // Jest test file rule overrides (must appear after main rules to take precedence)
+  {
+    files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', 'jest.setup.ts', 'test-utils/**/*.{ts,tsx}'],
+    rules: {
+      // require() is the documented Jest pattern for accessing mock references
+      // after jest.mock() factory calls (jest hoisting makes import bindings stale)
+      '@typescript-eslint/no-require-imports': 'off',
+      // Tests frequently spy on / restore console methods — not actual logging
+      'no-console': 'off'
     }
   }
 ]);
