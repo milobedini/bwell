@@ -12,8 +12,6 @@ jest.mock('sonner-native', () => ({
   }
 }));
 
-const wrapper = createQueryClientWrapper();
-
 describe('useMutationWithToast', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -28,7 +26,7 @@ describe('useMutationWithToast', () => {
           mutationFn,
           toast: { pending: 'Saving...', success: 'Saved' }
         }),
-      { wrapper }
+      { wrapper: createQueryClientWrapper() }
     );
 
     act(() => {
@@ -50,7 +48,7 @@ describe('useMutationWithToast', () => {
           mutationFn,
           toast: { pending: 'Saving...', success: 'Saved', error: 'Custom error' }
         }),
-      { wrapper }
+      { wrapper: createQueryClientWrapper() }
     );
 
     act(() => {
@@ -72,7 +70,7 @@ describe('useMutationWithToast', () => {
           mutationFn,
           toast: { pending: 'Saving...', success: (data: { name: string }) => `Saved ${data.name}` }
         }),
-      { wrapper }
+      { wrapper: createQueryClientWrapper() }
     );
 
     act(() => {
@@ -93,7 +91,7 @@ describe('useMutationWithToast', () => {
           mutationFn,
           toast: { pending: 'Saving...', success: 'Saved' }
         }),
-      { wrapper }
+      { wrapper: createQueryClientWrapper() }
     );
 
     act(() => {

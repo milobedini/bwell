@@ -24,15 +24,14 @@ jest.mock('sonner-native', () => ({
   }
 }));
 
-const mockUser = {
+const mockUser: AuthUser = {
   _id: 'u1',
   username: 'testuser',
   name: 'Test',
   email: 'test@test.com',
   roles: ['patient'],
-  isVerified: true,
   isVerifiedTherapist: false
-} as AuthUser;
+};
 
 describe('useRegister', () => {
   beforeEach(() => {

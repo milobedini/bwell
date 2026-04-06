@@ -2,15 +2,14 @@ import type { AuthUser } from '@milobedini/shared-types';
 
 import { useAuthStore } from './authStore';
 
-const mockUser = {
+const mockUser: AuthUser = {
   _id: 'u1',
   username: 'testuser',
   name: 'Test User',
   email: 'test@example.com',
   roles: ['patient'],
-  isVerified: true,
   isVerifiedTherapist: false
-} as AuthUser;
+};
 
 describe('authStore', () => {
   beforeEach(() => {

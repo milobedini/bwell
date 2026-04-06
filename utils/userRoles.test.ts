@@ -10,6 +10,13 @@ import {
   isVerifiedTherapist
 } from './userRoles';
 
+const baseUser: AuthUser = {
+  _id: 'u1',
+  username: 'testuser',
+  email: 'test@test.com',
+  roles: ['patient']
+};
+
 describe('displayUserRoles', () => {
   it('joins roles with comma', () => {
     expect(displayUserRoles(['patient', 'therapist'])).toBe('patient, therapist');
@@ -68,17 +75,17 @@ describe('isPatient', () => {
 
 describe('isVerifiedTherapist', () => {
   it('returns true for verified therapist', () => {
-    const user = { roles: [UserRole.THERAPIST], isVerifiedTherapist: true } as AuthUser;
+    const user: AuthUser = { ...baseUser, roles: [UserRole.THERAPIST], isVerifiedTherapist: true };
     expect(isVerifiedTherapist(user)).toBe(true);
   });
 
   it('returns false for unverified therapist', () => {
-    const user = { roles: [UserRole.THERAPIST], isVerifiedTherapist: false } as AuthUser;
+    const user: AuthUser = { ...baseUser, roles: [UserRole.THERAPIST], isVerifiedTherapist: false };
     expect(isVerifiedTherapist(user)).toBe(false);
   });
 
   it('returns false for patient', () => {
-    const user = { roles: [UserRole.PATIENT], isVerifiedTherapist: false } as AuthUser;
+    const user: AuthUser = { ...baseUser, roles: [UserRole.PATIENT], isVerifiedTherapist: false };
     expect(isVerifiedTherapist(user)).toBe(false);
   });
 
@@ -87,24 +94,24 @@ describe('isVerifiedTherapist', () => {
   });
 
   it('returns false for user with empty roles', () => {
-    const user = { roles: [] } as unknown as AuthUser;
+    const user: AuthUser = { ...baseUser, roles: [] };
     expect(isVerifiedTherapist(user)).toBe(false);
   });
 });
 
 describe('isAdminOrTherapist', () => {
   it('returns true for admin', () => {
-    const user = { roles: [UserRole.ADMIN] } as AuthUser;
+    const user: AuthUser = { ...baseUser, roles: [UserRole.ADMIN] };
     expect(isAdminOrTherapist(user)).toBe(true);
   });
 
   it('returns true for therapist', () => {
-    const user = { roles: [UserRole.THERAPIST] } as AuthUser;
+    const user: AuthUser = { ...baseUser, roles: [UserRole.THERAPIST] };
     expect(isAdminOrTherapist(user)).toBe(true);
   });
 
   it('returns false for patient only', () => {
-    const user = { roles: [UserRole.PATIENT] } as AuthUser;
+    const user: AuthUser = { ...baseUser, roles: [UserRole.PATIENT] };
     expect(isAdminOrTherapist(user)).toBe(false);
   });
 
