@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Expo_SDK-54-blue?logo=expo" alt="Expo SDK 54" />
-  <img src="https://img.shields.io/badge/React_Native-0.81-61dafb?logo=react" alt="React Native" />
+  <img src="https://img.shields.io/badge/Expo_SDK-55-blue?logo=expo" alt="Expo SDK 55" />
+  <img src="https://img.shields.io/badge/React_Native-0.83-61dafb?logo=react" alt="React Native" />
   <img src="https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20%7C%20Web-lightgrey" alt="Platform" />
 </p>
@@ -63,7 +63,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 | Layer | Technology |
 | --- | --- |
-| Framework | Expo SDK 54, React Native 0.81, React 19 |
+| Framework | Expo SDK 55, React Native 0.83, React 19 |
 | Routing | expo-router (file-based) |
 | Language | TypeScript (strict) |
 | Styling | NativeWind (Tailwind CSS for RN) |
@@ -133,9 +133,22 @@ From the dev server, press **i** for iOS simulator, **a** for Android emulator, 
 | `npm run publish` | Publish OTA update via EAS |
 | `npm run publish-web` | Export and deploy web build |
 | `npm run update-types` | Reinstall `@milobedini/shared-types` to latest |
+| `npm test` | Run all unit/component tests (Jest) |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:coverage` | Run tests with coverage report |
 | `npm run build:ios-sim` | Build dev app for iOS simulator (E2E) |
 | `npm run test:e2e` | Run all Maestro E2E flows |
+| `npm run test:e2e:studio` | Launch Maestro Studio for interactive flow authoring |
 | `npm run test:e2e:full` | Full E2E pipeline (BE + build + Maestro) |
+
+## Testing
+
+| Layer | Tool | Details |
+| --- | --- | --- |
+| Unit | Jest + `jest-expo` | Utility functions, pure logic — colocated as `*.test.ts` |
+| Component | Jest + React Testing Library | Render components, assert behaviour by text/testID — colocated as `*.test.tsx` |
+| E2E | Maestro | Full user flows on iOS simulator — flows in `.maestro/flows/`, reusable subflows in `.maestro/subflows/` |
+| CI | GitHub Actions | PR validation runs ESLint, Prettier, TypeScript, and Jest on every push to main and every PR |
 
 ## Architecture
 

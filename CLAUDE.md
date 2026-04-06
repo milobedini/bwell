@@ -19,7 +19,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 
 ## Stack
 
-- **Framework:** Expo SDK 54, React Native 0.81.5, React 19.1, expo-router (file-based routing)
+- **Framework:** Expo SDK 55, React Native 0.83.4, React 19.2, expo-router (file-based routing)
 - **Language:** TypeScript (strict mode)
 - **Styling:** NativeWind (Tailwind CSS) — prefer className over StyleSheet where possible
 - **State:** Zustand (client/auth), TanStack React Query (server state)
@@ -38,7 +38,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - `app/` — expo-router pages (`(auth)/`, `(main)/`, `(welcome)/`)
 - `app/(main)/(tabs)/` — authenticated tab navigator: `home/`, `journey/`, `practice/`, `patients/`, `review/`, `programs/`, `all-users/`, `profile/`
 - `components/` — shared and feature-specific components
-- `components/attempts/presenters/` — module-type presenter components (questionnaires, diary, reading)
+- `components/attempts/presenters/` — module-type presenter components (questionnaires, diary, five-areas, reading)
 - `hooks/` — custom React hooks (data fetching, mutations)
 - `api/` — Axios instance and API helpers
 - `constants/` — Colors, shared constants
