@@ -17,7 +17,7 @@ export default defineConfig([
 
   // Jest test files — expose globals (describe, it, expect, jest, etc.)
   {
-    files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}'],
+    files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', 'jest.setup.ts', 'test-utils/**/*.{ts,tsx}'],
     languageOptions: {
       globals: {
         describe: 'readonly',

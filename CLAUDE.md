@@ -69,8 +69,8 @@ The app has three tiers (from `docs/proposal.pdf`):
 
 - Use conventional commits, keep messages concise
 - Never include AI co-author references in commit messages
-- Before staging, run `npx prettier --write .` to format all files
 - Pre-commit hook runs `lint-staged` (ESLint fix + Prettier on staged files only)
+- Pre-push hook runs `tsc --noEmit` (type check)
 - After a successful commit and push, run `npm run publish` to publish an OTA update
 
 ## Commands
@@ -95,9 +95,10 @@ The app has three tiers (from `docs/proposal.pdf`):
 
 ## Validation Workflow
 
-1. Run `npx eslint --fix .` to auto-fix eslint issues (import sorting, etc.)
-2. Run `npx prettier --write .` to format all files
-3. Run `npm run lint` to validate everything passes
+- **On commit:** Husky pre-commit hook runs `lint-staged` (ESLint fix + Prettier on staged files) — no manual step needed
+- **On push:** Husky pre-push hook runs `tsc --noEmit` — catches type errors before CI
+- **On PR / push to main:** CI runs full `npm run lint` + `npm test`
+- `npm run lint` is available for a full manual sweep when needed but is not the primary workflow
 
 ## Web Debugging
 
@@ -124,8 +125,11 @@ The app has three tiers (from `docs/proposal.pdf`):
 - **Runner:** Jest with `jest-expo` preset, `@testing-library/react-native` for component tests
 - Colocate test files next to the code they test: `Component.test.tsx`, `util.test.ts`
 - Test behaviour, not implementation — query by text/testID, not internal state
-- Use `jest.useFakeTimers()` + `jest.setSystemTime()` for time-dependent logic
+- Use `jest.useFakeTimers()` + `jest.setSystemTime()` for time-dependent logic — always restore via `afterEach(() => jest.useRealTimers())`, not inline cleanup
 - RN style props are arrays — use `expect.arrayContaining([expect.objectContaining(...)])` for style assertions
+- **Shared test utilities** live in `test-utils/` — use `createQueryClientWrapper()` for hook tests that need a `QueryClientProvider`, and `mockQueryResult()` to build mock `UseQueryResult` objects
+- `jest.setup.ts` provides global mocks (AsyncStorage) — add new global mocks there, not per-file
+- Avoid `as` type casts in test data — construct mock objects that satisfy the real types from `@milobedini/shared-types`. Casts hide mismatches between test data and the actual API contract; if the type doesn't fit, fix the data, not the type
 
 ## CI (GitHub Actions)
 
