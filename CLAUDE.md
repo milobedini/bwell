@@ -129,7 +129,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - RN style props are arrays — use `expect.arrayContaining([expect.objectContaining(...)])` for style assertions
 - **Shared test utilities** live in `test-utils/` — use `createQueryClientWrapper()` for hook tests that need a `QueryClientProvider`, and `mockQueryResult()` to build mock `UseQueryResult` objects
 - `jest.setup.ts` provides global mocks (AsyncStorage) — add new global mocks there, not per-file
-- Avoid `as` type casts in test data — construct mock objects that satisfy the real types from `@milobedini/shared-types`. Casts hide mismatches between test data and the actual API contract; if the type doesn't fit, fix the data, not the type
+- Avoid `as` type casts in test data — use mock factories in `test-utils/factories.ts` that return real types with sensible defaults and accept `Partial<T>` overrides. Tests should only specify the fields they care about. Casts hide mismatches between test data and the actual API contract; if the type doesn't fit, fix the factory defaults, not the type
 
 ## CI (GitHub Actions)
 

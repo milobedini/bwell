@@ -155,6 +155,7 @@ describe('ComponentName', () => {
 ```typescript
 import { renderHook, waitFor } from '@testing-library/react-native';
 import { useHookName } from './useHookName';
+import { createQueryClientWrapper } from '@/test-utils';
 
 // Mock API layer
 jest.mock('@/api/api', () => ({
@@ -164,19 +165,12 @@ jest.mock('@/api/api', () => ({
   },
 }));
 
-// Wrap in QueryClientProvider for data-fetching hooks
-const wrapper = ({ children }) => (
-  <QueryClientProvider client={new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  })}>
-    {children}
-  </QueryClientProvider>
-);
-
 describe('useHookName', () => {
   it('returns data on success', async () => {
     (api.get as jest.Mock).mockResolvedValueOnce({ data: mockData });
-    const { result } = renderHook(() => useHookName(), { wrapper });
+    const { result } = renderHook(() => useHookName(), {
+      wrapper: createQueryClientWrapper(),
+    });
     await waitFor(() => expect(result.current.data).toEqual(mockData));
   });
 });
@@ -257,9 +251,30 @@ For each approved item:
    - `@/` path alias for imports
    - `describe`/`it` structure matching existing tests
    - `expect.arrayContaining([expect.objectContaining(...)])` for RN style assertions
-   - `jest.useFakeTimers()` + `jest.setSystemTime()` for time-dependent logic
+   - `jest.useFakeTimers()` + `jest.setSystemTime()` for time-dependent logic — always restore via `afterEach(() => jest.useRealTimers())`, not inline cleanup
    - Wrap dev-only logging assertions in `__DEV__` checks
    - Test behavior, not implementation — query by text/testID, not internal state
+   - Use `createQueryClientWrapper()` from `test-utils/` for hook tests that need a `QueryClientProvider` — don't create inline wrappers
+   - Use `mockQueryResult()` from `test-utils/` to build mock `UseQueryResult` objects
+   - Global mocks (AsyncStorage, etc.) live in `jest.setup.ts` — add new global mocks there, not per-file
+   - **Never use `as` type casts in test data** — use mock factories (see below) that return real types with sensible defaults. Casts hide mismatches between test data and the actual API contract; if the type doesn't fit, fix the data, not the type
+   - **Use mock factories for complex shared types** — add factory functions to `test-utils/factories.ts` that return fully typed objects with sensible defaults, accepting `Partial<T>` overrides. Tests should only specify the fields they care about, not build 40-line mock objects. Example:
+     ```typescript
+     // test-utils/factories.ts
+     import type { Patient } from '@milobedini/shared-types';
+
+     export const makePatient = (overrides?: Partial<Patient>): Patient => ({
+       _id: 'patient-1',
+       firstName: 'Test',
+       lastName: 'User',
+       email: 'test@example.com',
+       role: 'patient',
+       ...overrides,
+     });
+
+     // in a test — focused and type-safe
+     const patient = makePatient({ firstName: 'Alice' });
+     ```
 
 ### 7. Run & verify each test
 
@@ -306,7 +321,7 @@ After all tests are written:
 
 - **No files need testing:** Report "all files in scope are either tested or below the testing threshold" — don't write tests for the sake of it.
 - **Source file has external dependencies that are hard to mock:** Use `jest.mock()` at the module level. For Expo/RN native modules, add to `transformIgnorePatterns` or create a manual mock in `__mocks__/`.
-- **Component requires providers (QueryClient, Paper, etc.):** Create a test utility wrapper. If writing multiple component tests, extract the wrapper to a shared `test-utils.tsx` file.
+- **Component requires providers (QueryClient, Paper, etc.):** Use `createQueryClientWrapper()` from `test-utils/`. If a new shared wrapper is needed, add it to `test-utils/` rather than creating per-file utilities.
 - **Hook uses navigation (expo-router):** Mock `expo-router` with `jest.mock('expo-router', () => ({ useRouter: jest.fn(), useLocalSearchParams: jest.fn() }))`.
 - **File was recently refactored:** Re-read the source — don't rely on stale knowledge from the scan phase.
 - **User asks to test a file the skill classified as "skip":** Write the test anyway — user judgment overrides the heuristic. Note in the output that the file was below the normal threshold.
