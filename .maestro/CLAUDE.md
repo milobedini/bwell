@@ -13,8 +13,7 @@
 ## Build & Environment
 
 - `npm run build:ios-sim` builds a dev app with `EXPO_PUBLIC_E2E=true` — this suppresses `LogBox` to prevent the debugger banner from blocking Maestro interactions
-- **Do NOT change `npm run ios`/`npm run android`** — these are Expo Go commands (`expo start --ios`), not native builds. Maestro uses `build:ios-sim` (`expo run:ios`) which is a completely different command
-- `expo run:ios` (used by `build:ios-sim`) rewrites `ios`/`android` scripts in `package.json` from `expo start` to `expo run` during prebuild — restore them after building
+- `npm run ios`/`npm run android` use `expo run:ios`/`expo run:android` (native builds), same as `build:ios-sim` but without the `EXPO_PUBLIC_E2E=true` flag. For Expo Go dev server, use `npm start`
 - Maestro env vars (EMAIL, PASSWORD) live in `.maestro/.env` with `-e KEY=VALUE` format — Maestro reads this via `@.maestro/.env` syntax, NOT from shell env or project `.env`
 
 ## Platform Quirks

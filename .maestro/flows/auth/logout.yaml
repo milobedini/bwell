@@ -1,0 +1,28 @@
+appId: com.milobedini.bwell
+env:
+  EMAIL: ${EMAIL}
+  PASSWORD: ${PASSWORD}
+---
+# Logout flow
+# Launches app WITHOUT clearing state.
+# Ensures we are logged in, then logs out.
+
+- launchApp
+
+# Wait for the app to settle after launch
+- extendedWaitUntil:
+    visible:
+      id: 'home-screen'
+    timeout: 5000
+    optional: true
+
+# If not logged in, log in first so we can test logout
+- runFlow:
+    when:
+      notVisible:
+        id: 'home-screen'
+    file: ../../subflows/login.yaml
+
+# Now we're logged in — log out
+- runFlow:
+    file: ../../subflows/logout.yaml

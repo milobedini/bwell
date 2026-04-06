@@ -4,13 +4,18 @@ env:
   PASSWORD: ${PASSWORD}
 ---
 # Log in with existing credentials
-# Expects: onboarding already completed, on signup screen
+# Expects: on either the signup or login screen
 
-# Navigate to login from signup screen
-- tapOn:
-    id: 'signup-unlock-button'
-- tapOn:
-    id: 'signup-login-link'
+# If on signup screen, navigate to login first
+- runFlow:
+    when:
+      visible:
+        id: 'signup-unlock-button'
+    commands:
+      - tapOn:
+          id: 'signup-unlock-button'
+      - tapOn:
+          id: 'signup-login-link'
 
 # Open login sheet
 - tapOn:

@@ -72,9 +72,10 @@ const PrimaryButton = ({ onPress, title, logo, className, textClasses, logoClass
   </Pressable>
 );
 
-const SecondaryButton = ({ onPress, title, children }: ThemedButtonProps) => (
+const SecondaryButton = ({ onPress, title, children, testID }: ThemedButtonProps) => (
   <Pressable
     onPress={onPress}
+    testID={testID}
     className="group my-2.5 w-full rounded-xl bg-sway-buttonBackground p-3 hover:bg-sway-buttonBackgroundSolid"
     accessibilityRole="button"
   >
