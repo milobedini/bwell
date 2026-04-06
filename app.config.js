@@ -47,7 +47,12 @@ export default {
           supportsPictureInPicture: true
         }
       ],
-      ['expo-mail-composer']
+      ['expo-mail-composer'],
+      '@react-native-community/datetimepicker',
+      'expo-font',
+      'expo-image',
+      'expo-localization',
+      'expo-web-browser'
     ],
     experiments: {
       typedRoutes: true
