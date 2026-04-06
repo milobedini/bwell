@@ -119,7 +119,8 @@ export default function MainTabsLayout() {
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color, size }) => <Ionicons name="person" color={color} size={size} />
+          tabBarIcon: ({ color, size }) => <Ionicons name="person" color={color} size={size} />,
+          tabBarAccessibilityLabel: 'Profile tab'
         }}
       />
     </Tabs>

@@ -76,7 +76,7 @@ export default function Profile() {
               </Link>
             </>
           )}
-          <SecondaryButton onPress={handleLogout} disabled={!profile} title="Log Out" />
+          <SecondaryButton onPress={handleLogout} disabled={!profile} title="Log Out" testID="profile-logout-button" />
 
           <EditNameDialog visible={editNameVisible} onDismiss={dismissEditName} />
           <ChangePasswordDialog visible={changePasswordVisible} onDismiss={dismissChangePassword} />

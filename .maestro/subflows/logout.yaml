@@ -1,0 +1,15 @@
+appId: com.milobedini.bwell
+---
+# Log out from an authenticated session
+# Expects: user is logged in and on any screen within the main app
+
+# Navigate to Profile tab
+- tapOn: 'Profile tab'
+
+# Tap Log Out
+- tapOn:
+    id: 'profile-logout-button'
+
+# Assert we reached the login screen
+- assertVisible:
+    id: 'login-unlock-button'

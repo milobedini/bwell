@@ -115,6 +115,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - Wrap dev-only logging in `if (__DEV__)`
 - Keep sorting, filtering, and pagination logic on the backend (`../cbt/`) — the FE should pass query parameters to the API and render results, not re-sort or filter client-side
 - **Keyboard awareness:** Every screen or modal with text inputs must account for the software keyboard. Use `KeyboardAvoidingWrapper`, bottom-sheet built-in keyboard handling, or manual `KeyboardAvoidingView` — never let the keyboard obscure inputs or submit buttons. Test on iOS where keyboard behaviour is most aggressive.
+- **Known issues:** When you spot a pattern that needs fixing but is out of scope for the current task (e.g. duplicated code, missing abstractions, tech debt), leave a `// TODO:` comment in the code explaining what needs to change and why — don't silently skip it
 
 ## Design System
 
@@ -130,6 +131,8 @@ The app has three tiers (from `docs/proposal.pdf`):
 - **Shared test utilities** live in `test-utils/` — use `createQueryClientWrapper()` for hook tests that need a `QueryClientProvider`, and `mockQueryResult()` to build mock `UseQueryResult` objects
 - `jest.setup.ts` provides global mocks (AsyncStorage) — add new global mocks there, not per-file
 - Avoid `as` type casts in test data — use mock factories in `test-utils/factories.ts` that return real types with sensible defaults and accept `Partial<T>` overrides. Tests should only specify the fields they care about. Casts hide mismatches between test data and the actual API contract; if the type doesn't fit, fix the factory defaults, not the type
+- **Mock references after `jest.mock()` factories:** Use `require()` to get a reference to the mocked module — this is the documented Jest pattern because `jest.mock()` hoisting makes ES import bindings stale. `@typescript-eslint/no-require-imports` is disabled for test files in `eslint.config.mjs`. Example: `jest.mock('./useUsers', () => ({ useIsLoggedIn: jest.fn() })); const { useIsLoggedIn } = require('./useUsers');`
+- When a mock only needs a fixed return value (never changes between tests), a direct factory is fine: `jest.mock('./useUsers', () => ({ useIsLoggedIn: () => true }))`
 
 ## CI (GitHub Actions)
 
