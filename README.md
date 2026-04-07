@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Expo_SDK-55-blue?logo=expo" alt="Expo SDK 55" />
-  <img src="https://img.shields.io/badge/React_Native-0.83-61dafb?logo=react" alt="React Native" />
+  <img src="https://img.shields.io/badge/Expo_SDK-54-blue?logo=expo" alt="Expo SDK 54" />
+  <img src="https://img.shields.io/badge/React_Native-0.81-61dafb?logo=react" alt="React Native" />
   <img src="https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20%7C%20Web-lightgrey" alt="Platform" />
 </p>
@@ -63,7 +63,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 | Layer | Technology |
 | --- | --- |
-| Framework | Expo SDK 55, React Native 0.83, React 19 |
+| Framework | Expo SDK 54, React Native 0.81, React 19 |
 | Routing | expo-router (file-based) |
 | Language | TypeScript (strict) |
 | Styling | NativeWind (Tailwind CSS for RN) |
