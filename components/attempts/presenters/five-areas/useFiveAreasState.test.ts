@@ -4,6 +4,9 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { AREA_KEYS, useFiveAreasState } from './useFiveAreasState';
 
 // --- Mocks ---
+// TODO: expo-router, useAttempts, and expo-haptics mocks are duplicated across
+// useFiveAreasState.test.ts and useDiaryState.test.ts. Extract shared mock
+// factories to test-utils/ once more attempt-presenter tests are added.
 
 const mockRouter = { back: jest.fn() };
 jest.mock('expo-router', () => ({
@@ -104,7 +107,6 @@ describe('useFiveAreasState', () => {
       result.current.goForward();
     });
 
-    // Should call saveSilently with dirty fields
     expect(mockSaveSilently).toHaveBeenCalledTimes(1);
     const payload = mockSaveSilently.mock.calls[0][0];
     expect(payload.fiveAreas).toEqual({ situation: 'Something happened' });
@@ -127,7 +129,6 @@ describe('useFiveAreasState', () => {
       result.current.goForward();
     });
 
-    // No save call — no dirty fields
     expect(mockSaveSilently).not.toHaveBeenCalled();
     expect(result.current.currentStep).toBe(1);
   });

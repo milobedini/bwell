@@ -45,8 +45,6 @@ describe('api module', () => {
     it('calls clearUser on 401 response', async () => {
       const api = loadApi();
 
-      // Grab the error handler from the response interceptor
-      // Axios interceptors are stored in the manager
       const errorHandler = api.interceptors.response.handlers[0]?.rejected;
       expect(errorHandler).toBeDefined();
 

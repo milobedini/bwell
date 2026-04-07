@@ -4,6 +4,9 @@ import { act, renderHook } from '@testing-library/react-native';
 import { useDiaryState } from './useDiaryState';
 
 // --- Mocks ---
+// TODO: expo-router, useAttempts, and expo-haptics mocks are duplicated across
+// useDiaryState.test.ts and useFiveAreasState.test.ts. Extract shared mock
+// factories to test-utils/ once more attempt-presenter tests are added.
 
 const mockRouter = { back: jest.fn() };
 jest.mock('expo-router', () => ({
@@ -47,8 +50,7 @@ const makeDiary = (days: DiaryDetail['days'] = EMPTY_DAYS): DiaryDetail => ({
 });
 
 const makeAttempt = (
-  overrides: Partial<AttemptDetailResponseItem> = {},
-  diary?: DiaryDetail
+  overrides: Partial<AttemptDetailResponseItem> = {}
 ): AttemptDetailResponseItem & { diary: DiaryDetail } =>
   ({
     _id: 'attempt-1',
@@ -59,7 +61,7 @@ const makeAttempt = (
     weekStart: '2025-01-06T00:00:00.000Z',
     startedAt: '2025-01-06T10:00:00.000Z',
     updatedAt: '2025-01-06T10:00:00.000Z',
-    diary: diary ?? makeDiary(),
+    diary: makeDiary(),
     ...overrides
   }) as AttemptDetailResponseItem & { diary: DiaryDetail };
 
