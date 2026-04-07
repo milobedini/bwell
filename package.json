@@ -125,6 +125,17 @@
     "setupFiles": [
       "./jest.setup.ts"
     ],
+    "collectCoverageFrom": [
+      "app/**/*.{ts,tsx}",
+      "components/**/*.{ts,tsx}",
+      "hooks/**/*.{ts,tsx}",
+      "stores/**/*.{ts,tsx}",
+      "utils/**/*.{ts,tsx}",
+      "api/**/*.{ts,tsx}",
+      "!**/*.test.{ts,tsx}",
+      "!**/*.d.ts",
+      "!**/index.ts"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg|@milobedini/shared-types)"
     ]

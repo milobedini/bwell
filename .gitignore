@@ -50,3 +50,6 @@ android/
 
 # Maestro test output
 .maestro/test_output/
+
+# Jest coverage
+coverage/
