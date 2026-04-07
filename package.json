@@ -26,7 +26,7 @@
     "build:ios-sim": "EXPO_PUBLIC_E2E=true npx expo run:ios",
     "test:e2e": "maestro test @.maestro/.env .maestro/flows/**",
     "test:e2e:studio": "maestro studio",
-    "test": "jest --runInBand",
+    "test": "jest",
     "test:watch": "jest --watchAll",
     "test:coverage": "jest --coverage",
     "test:e2e:full": "bash scripts/run-e2e.sh"
