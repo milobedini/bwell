@@ -75,6 +75,16 @@ git diff --name-only HEAD~10 -- '*.ts' '*.tsx' ':!*.test.*' ':!*.spec.*'
 2. Files changed on current branch vs main
 3. Full codebase scan (if no recent changes or user asks for full audit)
 
+### 1b. Capture baseline coverage
+
+Before writing any tests, run coverage to get the baseline:
+
+```bash
+npm run test:coverage 2>&1 | grep "^All files"
+```
+
+This reports on **all** source files (via `collectCoverageFrom`), not just files imported by tests. Record the Stmts/Branch/Funcs/Lines percentages for the summary report.
+
 ### 2. Scan & classify files
 
 For each source file in scope, classify it:
@@ -308,13 +318,23 @@ After all tests are written:
 | `hooks/usePatientDashboard.ts` | Source bug: returns undefined when no patient ID |
 
 ### Coverage impact
-- Before: X test files
-- After: Y test files
-- New test cases: Z
+
+Run `npm run test:coverage` after all tests are written and compare with the baseline from step 1b.
+
+| Metric | Before | After | Delta |
+|--------|--------|-------|-------|
+| Statements | X% | Y% | +Z% |
+| Branches | X% | Y% | +Z% |
+| Functions | X% | Y% | +Z% |
+| Lines | X% | Y% | +Z% |
+
+- New test files: N
+- New test cases: M
 
 ### Suggested next steps
 - [Any E2E flows that should be added]
 - [Any source bugs discovered]
+- [Files with lowest coverage that should be prioritised next]
 ```
 
 ## Edge cases

@@ -133,6 +133,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - Avoid `as` type casts in test data — use mock factories in `test-utils/factories.ts` that return real types with sensible defaults and accept `Partial<T>` overrides. Tests should only specify the fields they care about. Casts hide mismatches between test data and the actual API contract; if the type doesn't fit, fix the factory defaults, not the type
 - **Mock references after `jest.mock()` factories:** Use `require()` to get a reference to the mocked module — this is the documented Jest pattern because `jest.mock()` hoisting makes ES import bindings stale. `@typescript-eslint/no-require-imports` is disabled for test files in `eslint.config.mjs`. Example: `jest.mock('./useUsers', () => ({ useIsLoggedIn: jest.fn() })); const { useIsLoggedIn } = require('./useUsers');`
 - When a mock only needs a fixed return value (never changes between tests), a direct factory is fine: `jest.mock('./useUsers', () => ({ useIsLoggedIn: () => true }))`
+- **Coverage:** `npm run test:coverage` reports on **all** source files (via `collectCoverageFrom` in `package.json`), not just files imported by tests. Use this to see true project coverage. The `coverage/` output directory is gitignored.
 
 ## CI (GitHub Actions)
 
