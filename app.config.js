@@ -9,7 +9,7 @@ export default {
     userInterfaceStyle: 'dark',
     newArchEnabled: true,
     jsEngine: 'hermes',
-    owner: 'milobedini',
+    owner: 'bwelltherapy',
     runtimeVersion: {
       policy: 'appVersion'
     },
