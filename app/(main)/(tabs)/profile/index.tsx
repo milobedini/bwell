@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { Link, useRouter } from 'expo-router';
-import { MotiView, SafeAreaView } from 'moti';
+import { MotiView } from 'moti';
+import Container from '@/components/Container';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import ChangePasswordDialog from '@/components/profile/ChangePasswordDialog';
@@ -42,7 +43,7 @@ export default function Profile() {
   if (isError || !profile) return <ErrorComponent errorType={ErrorTypes.UNAUTHORIZED} redirectLogin />;
 
   return (
-    <SafeAreaView className="flex-1 bg-sway-dark">
+    <Container>
       <ScrollView
         className="flex-1 bg-sway-dark"
         contentContainerStyle={{
@@ -82,6 +83,6 @@ export default function Profile() {
           <ChangePasswordDialog visible={changePasswordVisible} onDismiss={dismissChangePassword} />
         </MotiView>
       </ScrollView>
-    </SafeAreaView>
+    </Container>
   );
 }
