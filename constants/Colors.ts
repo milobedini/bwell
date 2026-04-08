@@ -69,6 +69,8 @@ export const Colors = {
     moodCool: '#5b8def',
     closeness: '#e76f9a',
     enjoyment: '#a78bfa',
-    promptBg: '#1a3a4a'
+    promptBg: '#1a3a4a',
+    panelBg: '#1a2540',
+    panelBorder: 'rgba(24,205,186,0.2)'
   }
 };
