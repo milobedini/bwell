@@ -8,6 +8,7 @@ import {
   dayLabel,
   FIELD_NAMES,
   FIELDS_PER_SLOT,
+  isSlotComplete,
   isSlotFilled,
   moodColor,
   slotLabel,
@@ -142,6 +143,46 @@ describe('isSlotFilled', () => {
 
   it('returns false when activity is whitespace only', () => {
     expect(isSlotFilled({ ...emptySlot, activity: '   ' })).toBe(false);
+  });
+});
+
+describe('isSlotComplete', () => {
+  const emptySlot: SlotValue = { at: new Date('2025-01-06T06:00:00Z'), label: '06:00–08:00', activity: '' };
+
+  it('returns false for empty slot', () => {
+    expect(isSlotComplete(emptySlot)).toBe(false);
+  });
+
+  it('returns false when only activity is filled', () => {
+    expect(isSlotComplete({ ...emptySlot, activity: 'Walking' })).toBe(false);
+  });
+
+  it('returns false when mood is missing', () => {
+    expect(isSlotComplete({ ...emptySlot, activity: 'Walking', achievement: 5, closeness: 5, enjoyment: 5 })).toBe(
+      false
+    );
+  });
+
+  it('returns false when one stepper is missing', () => {
+    expect(isSlotComplete({ ...emptySlot, activity: 'Walking', mood: 50, achievement: 5, closeness: 5 })).toBe(false);
+  });
+
+  it('returns true when all fields are filled', () => {
+    expect(
+      isSlotComplete({ ...emptySlot, activity: 'Walking', mood: 50, achievement: 5, closeness: 5, enjoyment: 5 })
+    ).toBe(true);
+  });
+
+  it('returns false when activity is only whitespace', () => {
+    expect(
+      isSlotComplete({ ...emptySlot, activity: '   ', mood: 50, achievement: 5, closeness: 5, enjoyment: 5 })
+    ).toBe(false);
+  });
+
+  it('returns true when mood is 0 (explicitly set)', () => {
+    expect(
+      isSlotComplete({ ...emptySlot, activity: 'Resting', mood: 0, achievement: 0, closeness: 0, enjoyment: 0 })
+    ).toBe(true);
   });
 });
 
