@@ -200,6 +200,21 @@ describe('useDiaryState', () => {
     expect(payload.userNote).toBe('My reflection');
   });
 
+  it('computes slotFillCounts for each day', () => {
+    const attempt = makeAttempt();
+    const { result } = renderHook(() => useDiaryState({ attempt, mode: 'edit' }));
+
+    const firstDayISO = result.current.activeDayISO;
+    expect(result.current.slotFillCounts[firstDayISO]).toBe(0);
+
+    const firstSlotKey = result.current.dayRows[0]?.key;
+    act(() => {
+      result.current.updateSlot(firstSlotKey, { activity: 'Walk' });
+    });
+
+    expect(result.current.slotFillCounts[firstDayISO]).toBe(1);
+  });
+
   it('canEdit is false in view mode', () => {
     const attempt = makeAttempt();
     const { result } = renderHook(() => useDiaryState({ attempt, mode: 'view' }));

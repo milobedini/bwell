@@ -125,6 +125,14 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
     [weekSlots, slots]
   );
 
+  const slotFillCounts = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(slotFillsByDay).map(([iso, fills]) => [iso, fills.filter(Boolean).length])
+      ) as Record<string, number>,
+    [slotFillsByDay]
+  );
+
   const markDirty = useCallback((k: SlotKey) => {
     setDirtyKeys((prev) => {
       if (prev.has(k)) return prev;
@@ -243,6 +251,7 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
     days,
     dayRows,
     slotFillsByDay,
+    slotFillCounts,
     progress,
     allAnswered,
     canEdit,
