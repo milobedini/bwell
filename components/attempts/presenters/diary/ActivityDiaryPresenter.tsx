@@ -78,9 +78,9 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
             {state.isSaving ? (
               <ActivityIndicator size="small" color={Colors.sway.bright} />
             ) : state.hasDirtyChanges ? (
-              <MaterialCommunityIcons name="content-save-edit-outline" size={16} color={Colors.primary.warning} />
+              <MaterialCommunityIcons name="content-save-edit-outline" size={20} color={Colors.primary.warning} />
             ) : (
-              <MaterialCommunityIcons name="check-circle-outline" size={16} color={Colors.primary.success} />
+              <MaterialCommunityIcons name="check-circle" size={20} color={Colors.sway.bright} />
             )}
           </Pressable>
         )}
@@ -166,16 +166,21 @@ const floatingStyles = StyleSheet.create({
   container: {
     position: 'absolute',
     top: 8,
-    right: 20,
+    right: 16,
     zIndex: 10,
-    backgroundColor: Colors.chip.darkCard,
-    borderRadius: 20,
-    width: 32,
-    height: 32,
+    backgroundColor: Colors.chip.darkCardDeep,
+    borderRadius: 22,
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: Colors.chip.darkCardAlt
+    borderColor: Colors.tint.tealBorder,
+    shadowColor: Colors.sway.bright,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 8
   }
 });
 
