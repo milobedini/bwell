@@ -115,6 +115,7 @@ The app has three tiers (from `docs/proposal.pdf`):
 - Wrap dev-only logging in `if (__DEV__)`
 - Keep sorting, filtering, and pagination logic on the backend (`../cbt/`) — the FE should pass query parameters to the API and render results, not re-sort or filter client-side
 - **Keyboard awareness:** Every screen or modal with text inputs must account for the software keyboard. Use `KeyboardAvoidingWrapper`, bottom-sheet built-in keyboard handling, or manual `KeyboardAvoidingView` — never let the keyboard obscure inputs or submit buttons. Test on iOS where keyboard behaviour is most aggressive.
+- **Virtualised lists:** Use `FlatList` or `SectionList` for dynamic or potentially long lists (API data, search results, timelines). Use `ScrollView` only for short, fixed-length content where all items fit comfortably in memory (e.g. a form, a settings screen, a handful of cards). If the list has more than ~20 items or is driven by paginated data, it must be virtualised. Never render a dynamic-length array of components inside a plain `ScrollView`.
 - **Known issues:** When you spot a pattern that needs fixing but is out of scope for the current task (e.g. duplicated code, missing abstractions, tech debt), leave a `// TODO:` comment in the code explaining what needs to change and why — don't silently skip it
 
 ## Design System
