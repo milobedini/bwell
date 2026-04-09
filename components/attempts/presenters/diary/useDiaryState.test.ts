@@ -75,7 +75,6 @@ describe('useDiaryState', () => {
 
     expect(result.current.canEdit).toBe(true);
     expect(result.current.hasDirtyChanges).toBe(false);
-    expect(result.current.progress).toBe(0);
     expect(result.current.allAnswered).toBe(false);
     expect(result.current.days).toHaveLength(7);
   });

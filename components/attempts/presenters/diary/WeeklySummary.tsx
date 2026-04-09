@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { LayoutAnimation, Platform, Pressable, UIManager, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
@@ -18,7 +18,7 @@ type MetricConfig = {
 
 const METRICS: MetricConfig[] = [
   { key: 'avgMood', label: 'Mood', color: Colors.diary.moodWarm },
-  { key: 'avgAchievement', label: 'Achieve', color: Colors.diary.enjoyment },
+  { key: 'avgAchievement', label: 'Achieve', color: Colors.diary.achievement },
   { key: 'avgCloseness', label: 'Close', color: Colors.diary.closeness },
   { key: 'avgEnjoyment', label: 'Enjoy', color: Colors.diary.enjoyment }
 ];
@@ -31,14 +31,15 @@ type WeeklySummaryProps = {
 const WeeklySummary = memo(
   ({ totals, defaultOpen = false }: WeeklySummaryProps) => {
     const [open, setOpen] = useState(defaultOpen);
+
+    const toggle = useCallback(() => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setOpen((prev) => !prev);
+    }, []);
+
     const visibleMetrics = METRICS.filter((m) => totals[m.key] != null);
 
     if (visibleMetrics.length === 0) return null;
-
-    const toggle = () => {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      setOpen((prev) => !prev);
-    };
 
     return (
       <View style={{ backgroundColor: Colors.chip.darkCard, borderRadius: 12, padding: 14, marginTop: 8 }}>

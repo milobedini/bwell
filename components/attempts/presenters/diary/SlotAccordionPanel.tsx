@@ -78,7 +78,6 @@ const SlotAccordionPanel = memo(
           padding: 16
         }}
       >
-        {/* Header row */}
         <Pressable
           onPress={onCollapse}
           accessibilityRole="button"
@@ -100,12 +99,9 @@ const SlotAccordionPanel = memo(
           <MaterialCommunityIcons name="chevron-down" size={16} color={Colors.sway.darkGrey} />
         </Pressable>
 
-        {/* Content */}
         <View className="mt-3 gap-3">
-          {/* Reflection prompt */}
           {showReflectionPrompt && canEdit && <ReflectionPrompt prompt={reflectionPrompt} />}
 
-          {/* Activity */}
           {canEdit ? (
             <View>
               <ThemedText
@@ -145,16 +141,14 @@ const SlotAccordionPanel = memo(
             )
           )}
 
-          {/* Mood slider */}
           <MoodSlider value={mood} onChange={onMoodChange} disabled={!canEdit} />
 
-          {/* Stepper grid */}
           <View className="flex-row gap-2">
             <View className="flex-1">
               <MetricStepper
                 label="Achievement"
                 value={achievement}
-                color={Colors.diary.enjoyment}
+                color={Colors.diary.achievement}
                 onChange={handleAchievementChange}
                 disabled={!canEdit}
               />

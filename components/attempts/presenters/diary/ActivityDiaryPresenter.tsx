@@ -44,17 +44,6 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
     [state]
   );
 
-  const handleExpandSlot = useCallback(
-    (slotIdx: number) => {
-      nav.expandSlot(slotIdx);
-    },
-    [nav]
-  );
-
-  const handleCollapseSlot = useCallback(() => {
-    nav.collapseSlot();
-  }, [nav]);
-
   const handleSlotUpdate = useCallback(
     (key: SlotKey, patch: Partial<SlotValue>) => {
       state.updateSlot(key, patch);
@@ -105,7 +94,6 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
             setDisclaimerOpen={state.setDisclaimerOpen}
           />
 
-          {/* Accordion slots */}
           <View style={{ gap: 6, paddingBottom: 8 }}>
             {state.dayRows.map((row, slotIdx) => {
               const isExpanded = nav.expandedSlotIdx === slotIdx;
@@ -137,7 +125,7 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                     onActivityChange={(text) => handleSlotUpdate(row.key, { activity: text })}
                     onMoodChange={(value) => handleSlotUpdate(row.key, { mood: value })}
                     onStepperChange={(field, value) => handleSlotUpdate(row.key, { [field]: value })}
-                    onCollapse={handleCollapseSlot}
+                    onCollapse={nav.collapseSlot}
                   />
                 );
               }
@@ -148,16 +136,14 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
                   label={row.value.label}
                   activityPreview={row.value.activity}
                   isFilled={filled}
-                  onPress={() => handleExpandSlot(slotIdx)}
+                  onPress={() => nav.expandSlot(slotIdx)}
                 />
               );
             })}
           </View>
 
-          {/* Weekly summary */}
           <WeeklySummary totals={state.diary.totals} defaultOpen={mode === 'view'} />
 
-          {/* Footer */}
           <DiaryFooter
             mode={mode}
             canEdit={state.canEdit}

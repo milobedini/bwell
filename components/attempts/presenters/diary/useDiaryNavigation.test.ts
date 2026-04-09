@@ -37,11 +37,4 @@ describe('useDiaryNavigation', () => {
     rerender({ iso: '2025-01-07' });
     expect(result.current.expandedSlotIdx).toBeNull();
   });
-
-  it('tracks whether prompt has been shown', () => {
-    const { result } = renderHook(() => useDiaryNavigation('2025-01-06'));
-    expect(result.current.hasShownPrompt).toBe(false);
-    act(() => result.current.markPromptShown());
-    expect(result.current.hasShownPrompt).toBe(true);
-  });
 });

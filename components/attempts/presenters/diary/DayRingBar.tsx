@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { memo } from 'react';
 import { ScrollView, View } from 'react-native';
 import { dateISO, dayLabel } from '@/utils/activityHelpers';
 
@@ -12,40 +12,37 @@ type DayRingBarProps = {
   onSelectDay: (iso: string) => void;
 };
 
-const DayRingBar = memo(({ days, activeDayISO, slotFillCounts, totalSlots, onSelectDay }: DayRingBarProps) => {
-  const handlePress = useCallback((iso: string) => () => onSelectDay(iso), [onSelectDay]);
-
-  return (
-    <View style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(30,42,69,0.6)' }} className="bg-sway-dark">
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: 'space-between',
-          paddingHorizontal: 16,
-          paddingTop: 12,
-          paddingBottom: 16
-        }}
-      >
-        {days.map((d) => {
-          const iso = dateISO(d);
-          return (
-            <ProgressRing
-              key={iso}
-              dateNumber={d.getDate()}
-              dayLabel={dayLabel(d)}
-              filledCount={slotFillCounts[iso] ?? 0}
-              totalCount={totalSlots}
-              isActive={iso === activeDayISO}
-              onPress={handlePress(iso)}
-            />
-          );
-        })}
-      </ScrollView>
-    </View>
-  );
-});
+const DayRingBar = memo(({ days, activeDayISO, slotFillCounts, totalSlots, onSelectDay }: DayRingBarProps) => (
+  <View style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(30,42,69,0.6)' }} className="bg-sway-dark">
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{
+        flexGrow: 1,
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        paddingTop: 12,
+        paddingBottom: 16
+      }}
+    >
+      {days.map((d) => {
+        const iso = dateISO(d);
+        return (
+          <ProgressRing
+            key={iso}
+            iso={iso}
+            dateNumber={d.getDate()}
+            dayLabel={dayLabel(d)}
+            filledCount={slotFillCounts[iso] ?? 0}
+            totalCount={totalSlots}
+            isActive={iso === activeDayISO}
+            onSelectDay={onSelectDay}
+          />
+        );
+      })}
+    </ScrollView>
+  </View>
+));
 
 DayRingBar.displayName = 'DayRingBar';
 export default DayRingBar;

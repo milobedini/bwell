@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { Pressable, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
@@ -24,6 +24,8 @@ const DiaryHeader = ({
   const lastSaved = useMemo(() => timeAgo(updatedAt), [updatedAt]);
   const label = lastSaved.relative ? `Last saved ${lastSaved.relative}` : `Last saved ${lastSaved.formatted}`;
 
+  const toggleDisclaimer = useCallback(() => setDisclaimerOpen(!disclaimerOpen), [setDisclaimerOpen, disclaimerOpen]);
+
   return (
     <View className="gap-2 px-4 pb-2 pt-3">
       {patientName && <ThemedText type="subtitle">{`by ${patientName}`}</ThemedText>}
@@ -35,7 +37,7 @@ const DiaryHeader = ({
 
         {moduleSnapshot?.disclaimer ? (
           <Pressable
-            onPress={() => setDisclaimerOpen(!disclaimerOpen)}
+            onPress={toggleDisclaimer}
             hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel="Safety information"

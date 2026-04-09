@@ -70,7 +70,12 @@ export const Colors = {
     closeness: '#e76f9a',
     enjoyment: '#a78bfa',
     promptBg: '#1a3a4a',
+    achievement: '#f4a261',
     panelBg: '#1a2540',
     panelBorder: 'rgba(24,205,186,0.2)'
+  },
+  tintSubtle: {
+    teal: 'rgba(24,205,186,0.06)',
+    tealBorder: 'rgba(24,205,186,0.12)'
   }
 };

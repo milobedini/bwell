@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
@@ -7,12 +8,12 @@ type ReflectionPromptProps = {
   prompt: string;
 };
 
-const ReflectionPrompt = ({ prompt }: ReflectionPromptProps) => (
+const ReflectionPrompt = memo(({ prompt }: ReflectionPromptProps) => (
   <View
     style={{
-      backgroundColor: 'rgba(24,205,186,0.06)',
+      backgroundColor: Colors.tintSubtle.teal,
       borderWidth: 1,
-      borderColor: 'rgba(24,205,186,0.12)',
+      borderColor: Colors.tintSubtle.tealBorder,
       borderRadius: 8,
       padding: 10,
       paddingHorizontal: 12,
@@ -26,6 +27,8 @@ const ReflectionPrompt = ({ prompt }: ReflectionPromptProps) => (
       {prompt}
     </ThemedText>
   </View>
-);
+));
+
+ReflectionPrompt.displayName = 'ReflectionPrompt';
 
 export default ReflectionPrompt;

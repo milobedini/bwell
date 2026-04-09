@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
@@ -15,6 +15,11 @@ type MoodSliderProps = {
 const MoodSlider = memo(({ value, onChange, disabled }: MoodSliderProps) => {
   const [displayValue, setDisplayValue] = useState(value);
 
+  // Sync displayValue when the prop changes (e.g. switching days)
+  useEffect(() => {
+    setDisplayValue(value);
+  }, [value]);
+
   const handleValueChange = useCallback((v: number) => {
     setDisplayValue(Math.round(v));
   }, []);
@@ -28,42 +33,24 @@ const MoodSlider = memo(({ value, onChange, disabled }: MoodSliderProps) => {
     [onChange]
   );
 
-  if (disabled) {
-    return (
-      <View accessibilityLabel={value !== undefined ? `Mood: ${value}` : 'Mood: not set'} className="gap-1">
-        <View className="flex-row items-center justify-between">
-          <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
-            Mood
-          </ThemedText>
-          <ThemedText type="small" style={{ color: Colors.sway.bright }}>
-            {value !== undefined ? String(value) : '—'}
-          </ThemedText>
-        </View>
-        <Slider
-          value={value ?? 0}
-          minimumValue={0}
-          maximumValue={100}
-          disabled
-          minimumTrackTintColor={Colors.diary.moodCool}
-          maximumTrackTintColor={Colors.chip.pill}
-          thumbTintColor="transparent"
-          style={styles.slider}
-        />
-      </View>
-    );
-  }
+  const shown = disabled ? value : displayValue;
+  const shownLabel = shown !== undefined ? String(shown) : '—';
+  const a11yLabel = disabled
+    ? shown !== undefined
+      ? `Mood: ${shown}`
+      : 'Mood: not set'
+    : shown !== undefined
+      ? `Mood slider, value ${shown}`
+      : 'Mood slider, not set';
 
   return (
-    <View
-      accessibilityLabel={displayValue !== undefined ? `Mood slider, value ${displayValue}` : 'Mood slider, not set'}
-      className="gap-1"
-    >
+    <View accessibilityLabel={a11yLabel} className="gap-1">
       <View className="flex-row items-center justify-between">
         <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
           Mood
         </ThemedText>
         <ThemedText type="small" style={{ color: Colors.sway.bright }}>
-          {displayValue !== undefined ? String(displayValue) : '—'}
+          {shownLabel}
         </ThemedText>
       </View>
 
@@ -71,24 +58,27 @@ const MoodSlider = memo(({ value, onChange, disabled }: MoodSliderProps) => {
         value={value ?? 0}
         minimumValue={0}
         maximumValue={100}
-        step={1}
-        tapToSeek
-        onValueChange={handleValueChange}
-        onSlidingComplete={handleSlidingComplete}
+        step={disabled ? undefined : 1}
+        tapToSeek={!disabled}
+        disabled={disabled}
+        onValueChange={disabled ? undefined : handleValueChange}
+        onSlidingComplete={disabled ? undefined : handleSlidingComplete}
         minimumTrackTintColor={Colors.diary.moodCool}
         maximumTrackTintColor={Colors.chip.pill}
-        thumbTintColor={Colors.sway.bright}
+        thumbTintColor={disabled ? 'transparent' : Colors.sway.bright}
         style={styles.slider}
       />
 
-      <View className="flex-row items-center justify-between">
-        <ThemedText type="small" style={{ color: Colors.chip.dotInactive }}>
-          Low
-        </ThemedText>
-        <ThemedText type="small" style={{ color: Colors.chip.dotInactive }}>
-          High
-        </ThemedText>
-      </View>
+      {!disabled && (
+        <View className="flex-row items-center justify-between">
+          <ThemedText type="small" style={{ color: Colors.chip.dotInactive }}>
+            Low
+          </ThemedText>
+          <ThemedText type="small" style={{ color: Colors.chip.dotInactive }}>
+            High
+          </ThemedText>
+        </View>
+      )}
     </View>
   );
 });

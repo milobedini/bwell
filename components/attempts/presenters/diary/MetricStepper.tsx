@@ -1,8 +1,9 @@
-import { memo, useCallback, useRef } from 'react';
+import { memo, useCallback, useEffect, useRef } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Colors } from '@/constants/Colors';
+import { clamp } from '@/utils/helpers';
 
 const MIN = 0;
 const MAX = 10;
@@ -44,8 +45,8 @@ const MetricStepper = memo(({ label, value, color, onChange, disabled }: MetricS
         return;
       }
 
-      const next = value + direction;
-      if (next < MIN || next > MAX) return;
+      const next = clamp(value + direction, MIN, MAX);
+      if (next === value) return;
 
       onChange(next);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -54,6 +55,12 @@ const MetricStepper = memo(({ label, value, color, onChange, disabled }: MetricS
     [value, onChange, triggerPulse]
   );
 
+  // Keep a ref to the latest step so the interval always uses current value
+  const stepRef = useRef(step);
+  useEffect(() => {
+    stepRef.current = step;
+  }, [step]);
+
   const clearRepeat = useCallback(() => {
     if (intervalRef.current !== null) {
       clearInterval(intervalRef.current);
@@ -61,33 +68,27 @@ const MetricStepper = memo(({ label, value, color, onChange, disabled }: MetricS
     }
   }, []);
 
+  // Clean up interval on unmount
+  useEffect(() => () => clearRepeat(), [clearRepeat]);
+
   const startRepeat = useCallback(
     (direction: 1 | -1) => {
       clearRepeat();
       intervalRef.current = setInterval(() => {
-        step(direction);
+        stepRef.current(direction);
       }, REPEAT_INTERVAL);
     },
-    [step, clearRepeat]
-  );
-
-  const handleLongPress = useCallback(
-    (direction: 1 | -1) => () => {
-      startRepeat(direction);
-    },
-    [startRepeat]
+    [clearRepeat]
   );
 
   const handlePressOut = useCallback(() => {
     clearRepeat();
   }, [clearRepeat]);
 
-  const handlePress = useCallback(
-    (direction: 1 | -1) => () => {
-      step(direction);
-    },
-    [step]
-  );
+  const handleDecrementPress = useCallback(() => step(-1), [step]);
+  const handleIncrementPress = useCallback(() => step(1), [step]);
+  const handleDecrementLongPress = useCallback(() => startRepeat(-1), [startRepeat]);
+  const handleIncrementLongPress = useCallback(() => startRepeat(1), [startRepeat]);
 
   const isNull = value === undefined;
   const displayValue = isNull ? '—' : String(value);
@@ -111,8 +112,8 @@ const MetricStepper = memo(({ label, value, color, onChange, disabled }: MetricS
       </View>
       <View style={styles.row}>
         <Pressable
-          onPress={handlePress(-1)}
-          onLongPress={handleLongPress(-1)}
+          onPress={handleDecrementPress}
+          onLongPress={handleDecrementLongPress}
           delayLongPress={LONG_PRESS_DELAY}
           onPressOut={handlePressOut}
           style={styles.button}
@@ -125,8 +126,8 @@ const MetricStepper = memo(({ label, value, color, onChange, disabled }: MetricS
         <Animated.Text style={[styles.value, { color: valueColor }, animatedValueStyle]}>{displayValue}</Animated.Text>
 
         <Pressable
-          onPress={handlePress(1)}
-          onLongPress={handleLongPress(1)}
+          onPress={handleIncrementPress}
+          onLongPress={handleIncrementLongPress}
           delayLongPress={LONG_PRESS_DELAY}
           onPressOut={handlePressOut}
           style={styles.button}

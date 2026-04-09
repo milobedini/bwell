@@ -37,7 +37,7 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
   const { mutate: submitAttempt } = useSubmitAttempt(attempt._id);
 
   const canEdit = mode === 'edit';
-  const { moduleSnapshot, weekStart, startedAt, completedAt, diary, updatedAt, userNote } = attempt;
+  const { moduleSnapshot, weekStart, diary, updatedAt, userNote } = attempt;
 
   const [dirtyKeys, setDirtyKeys] = useState<Set<SlotKey>>(new Set());
   const [userNoteText, setUserNoteText] = useState(attempt.userNote ?? '');
@@ -99,13 +99,6 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
     }
     setSlots(seed);
   }, [attempt._id, weekSlots, diary.days]);
-
-  const progress = useMemo(() => {
-    const vals = Object.values(slots);
-    if (!vals.length) return 0;
-    const filled = vals.filter(isSlotFilled).length;
-    return filled / vals.length;
-  }, [slots]);
 
   const allAnswered = useMemo(() => Object.values(slots).every((v) => v.activity.trim().length > 0), [slots]);
 
@@ -250,14 +243,10 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
     reflectionPrompt,
     days,
     dayRows,
-    slotFillsByDay,
     slotFillCounts,
-    progress,
     allAnswered,
     canEdit,
     moduleSnapshot,
-    startedAt,
-    completedAt,
     updatedAt,
     userNote,
     diary,
