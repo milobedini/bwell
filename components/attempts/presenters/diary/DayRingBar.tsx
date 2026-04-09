@@ -1,5 +1,5 @@
 import { memo, useCallback } from 'react';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { dateISO, dayLabel } from '@/utils/activityHelpers';
 
 import { ProgressRing } from './ProgressRing';
@@ -16,24 +16,33 @@ const DayRingBar = memo(({ days, activeDayISO, slotFillCounts, totalSlots, onSel
   const handlePress = useCallback((iso: string) => () => onSelectDay(iso), [onSelectDay]);
 
   return (
-    <View
-      style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(30,42,69,0.6)' }}
-      className="flex-row items-center justify-between bg-sway-dark px-4 pb-4 pt-3"
-    >
-      {days.map((d) => {
-        const iso = dateISO(d);
-        return (
-          <ProgressRing
-            key={iso}
-            dateNumber={d.getDate()}
-            dayLabel={dayLabel(d)}
-            filledCount={slotFillCounts[iso] ?? 0}
-            totalCount={totalSlots}
-            isActive={iso === activeDayISO}
-            onPress={handlePress(iso)}
-          />
-        );
-      })}
+    <View style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(30,42,69,0.6)' }} className="bg-sway-dark">
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: 'space-between',
+          paddingHorizontal: 16,
+          paddingTop: 12,
+          paddingBottom: 16
+        }}
+      >
+        {days.map((d) => {
+          const iso = dateISO(d);
+          return (
+            <ProgressRing
+              key={iso}
+              dateNumber={d.getDate()}
+              dayLabel={dayLabel(d)}
+              filledCount={slotFillCounts[iso] ?? 0}
+              totalCount={totalSlots}
+              isActive={iso === activeDayISO}
+              onPress={handlePress(iso)}
+            />
+          );
+        })}
+      </ScrollView>
     </View>
   );
 });

@@ -1,6 +1,6 @@
 import { memo, useMemo } from 'react';
 import { Pressable, View } from 'react-native';
-import Animated, { useAnimatedProps, useDerivedValue, withSpring } from 'react-native-reanimated';
+import Animated, { useAnimatedProps } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
@@ -28,17 +28,14 @@ const ProgressRing = memo(({ dateNumber, dayLabel, filledCount, totalCount, isAc
 
   const progress = useMemo(() => (totalCount > 0 ? filledCount / totalCount : 0), [filledCount, totalCount]);
 
-  const animatedOffset = useDerivedValue(
-    () =>
-      withSpring(circumference * (1 - progress), {
-        damping: 15
-      }),
-    [circumference, progress]
-  );
+  const targetOffset = circumference * (1 - progress);
 
-  const animatedProps = useAnimatedProps(() => ({
-    strokeDashoffset: animatedOffset.value
-  }));
+  const animatedProps = useAnimatedProps(
+    () => ({
+      strokeDashoffset: targetOffset
+    }),
+    [targetOffset]
+  );
 
   const isComplete = filledCount === totalCount && totalCount > 0;
   const isEmpty = filledCount === 0;

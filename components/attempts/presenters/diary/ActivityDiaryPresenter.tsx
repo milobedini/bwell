@@ -1,7 +1,17 @@
 import { useCallback, useRef } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View
+} from 'react-native';
+import { Colors } from '@/constants/Colors';
 import { isSlotComplete, isSlotFilled, type SlotKey, type SlotValue } from '@/utils/activityHelpers';
 import type { AttemptDetailResponseItem, DiaryDetail } from '@milobedini/shared-types';
+import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
 import DayRingBar from './DayRingBar';
 import DiaryFooter from './DiaryFooter';
@@ -13,7 +23,6 @@ import { useDiaryState } from './useDiaryState';
 import WeeklySummary from './WeeklySummary';
 
 const TOTAL_SLOTS = 9;
-const AUTO_ADVANCE_DELAY = 500;
 
 type ActivityDiaryPresenterProps = {
   attempt: AttemptDetailResponseItem & { diary: DiaryDetail };
@@ -25,7 +34,6 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   const state = useDiaryState({ attempt, mode });
   const nav = useDiaryNavigation(state.activeDayISO);
 
-  const autoAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const promptShownRef = useRef(false);
 
   const handleSelectDay = useCallback(
@@ -47,36 +55,11 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
     nav.collapseSlot();
   }, [nav]);
 
-  const scheduleAutoAdvance = useCallback(
-    (currentSlotIdx: number) => {
-      if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
-      autoAdvanceTimer.current = setTimeout(() => {
-        const nextIdx = state.dayRows.findIndex((row, idx) => idx > currentSlotIdx && !isSlotComplete(row.value));
-        if (nextIdx >= 0) {
-          nav.expandSlot(nextIdx);
-        } else {
-          nav.collapseSlot();
-        }
-      }, AUTO_ADVANCE_DELAY);
-    },
-    [state.dayRows, nav]
-  );
-
   const handleSlotUpdate = useCallback(
-    (key: SlotKey, patch: Partial<SlotValue>, slotIdx: number) => {
+    (key: SlotKey, patch: Partial<SlotValue>) => {
       state.updateSlot(key, patch);
-
-      if (mode === 'edit') {
-        const currentValue = state.dayRows[slotIdx]?.value;
-        if (currentValue) {
-          const merged = { ...currentValue, ...patch };
-          if (isSlotComplete(merged)) {
-            scheduleAutoAdvance(slotIdx);
-          }
-        }
-      }
     },
-    [state, mode, scheduleAutoAdvance]
+    [state]
   );
 
   return (
@@ -93,89 +76,121 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
         onSelectDay={handleSelectDay}
       />
 
-      <ScrollView className="flex-1 bg-sway-dark" contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 4 }}>
-        <DiaryHeader
-          patientName={patientName}
-          mode={mode}
-          startedAt={state.startedAt}
-          completedAt={state.completedAt}
-          updatedAt={state.updatedAt}
-          hasDirtyChanges={state.hasDirtyChanges}
-          isSaving={state.isSaving}
-          saved={state.saved}
-          moduleSnapshot={state.moduleSnapshot}
-          disclaimerOpen={state.disclaimerOpen}
-          setDisclaimerOpen={state.setDisclaimerOpen}
-        />
+      <View className="flex-1">
+        {(state.hasDirtyChanges || state.isSaving || state.saved) && (
+          <Pressable
+            style={floatingStyles.container}
+            onPress={state.saveDirty}
+            disabled={state.isSaving || !state.hasDirtyChanges}
+            accessibilityRole="button"
+            accessibilityLabel={state.isSaving ? 'Saving' : state.hasDirtyChanges ? 'Save changes' : 'Saved'}
+            hitSlop={8}
+          >
+            {state.isSaving ? (
+              <ActivityIndicator size="small" color={Colors.sway.bright} />
+            ) : state.hasDirtyChanges ? (
+              <MaterialCommunityIcons name="content-save-edit-outline" size={16} color={Colors.primary.warning} />
+            ) : (
+              <MaterialCommunityIcons name="check-circle-outline" size={16} color={Colors.primary.success} />
+            )}
+          </Pressable>
+        )}
 
-        {/* Accordion slots */}
-        <View style={{ gap: 6, paddingBottom: 8 }}>
-          {state.dayRows.map((row, slotIdx) => {
-            const isExpanded = nav.expandedSlotIdx === slotIdx;
-            const filled = isSlotFilled(row.value);
-            const complete = isSlotComplete(row.value);
+        <ScrollView className="flex-1 bg-sway-dark" contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 4 }}>
+          <DiaryHeader
+            patientName={patientName}
+            updatedAt={state.updatedAt}
+            moduleSnapshot={state.moduleSnapshot}
+            disclaimerOpen={state.disclaimerOpen}
+            setDisclaimerOpen={state.setDisclaimerOpen}
+          />
 
-            // Show reflection prompt on the first slot opened this session (edit mode only).
-            // Use a ref so the check happens during render before React batches the state update.
-            const showPrompt = isExpanded && !promptShownRef.current && mode === 'edit';
-            if (isExpanded && !promptShownRef.current) {
-              promptShownRef.current = true;
-            }
+          {/* Accordion slots */}
+          <View style={{ gap: 6, paddingBottom: 8 }}>
+            {state.dayRows.map((row, slotIdx) => {
+              const isExpanded = nav.expandedSlotIdx === slotIdx;
+              const filled = isSlotFilled(row.value);
+              const complete = isSlotComplete(row.value);
 
-            if (isExpanded) {
+              // Show reflection prompt on the first slot opened this session (edit mode only).
+              // Use a ref so the check happens during render before React batches the state update.
+              const showPrompt = isExpanded && !promptShownRef.current && mode === 'edit';
+              if (isExpanded && !promptShownRef.current) {
+                promptShownRef.current = true;
+              }
+
+              if (isExpanded) {
+                return (
+                  <SlotAccordionPanel
+                    key={row.key}
+                    label={row.value.label}
+                    activity={row.value.activity}
+                    mood={row.value.mood}
+                    achievement={row.value.achievement}
+                    closeness={row.value.closeness}
+                    enjoyment={row.value.enjoyment}
+                    isFilled={filled}
+                    isComplete={complete}
+                    canEdit={state.canEdit}
+                    showReflectionPrompt={showPrompt}
+                    reflectionPrompt={state.reflectionPrompt}
+                    onActivityChange={(text) => handleSlotUpdate(row.key, { activity: text })}
+                    onMoodChange={(value) => handleSlotUpdate(row.key, { mood: value })}
+                    onStepperChange={(field, value) => handleSlotUpdate(row.key, { [field]: value })}
+                    onCollapse={handleCollapseSlot}
+                  />
+                );
+              }
+
               return (
-                <SlotAccordionPanel
+                <SlotAccordionRow
                   key={row.key}
                   label={row.value.label}
-                  activity={row.value.activity}
-                  mood={row.value.mood}
-                  achievement={row.value.achievement}
-                  closeness={row.value.closeness}
-                  enjoyment={row.value.enjoyment}
+                  activityPreview={row.value.activity}
                   isFilled={filled}
-                  isComplete={complete}
-                  canEdit={state.canEdit}
-                  showReflectionPrompt={showPrompt}
-                  reflectionPrompt={state.reflectionPrompt}
-                  onActivityChange={(text) => handleSlotUpdate(row.key, { activity: text }, slotIdx)}
-                  onMoodChange={(value) => handleSlotUpdate(row.key, { mood: value }, slotIdx)}
-                  onStepperChange={(field, value) => handleSlotUpdate(row.key, { [field]: value }, slotIdx)}
-                  onCollapse={handleCollapseSlot}
+                  onPress={() => handleExpandSlot(slotIdx)}
                 />
               );
-            }
+            })}
+          </View>
 
-            return (
-              <SlotAccordionRow
-                key={row.key}
-                label={row.value.label}
-                activityPreview={row.value.activity}
-                isFilled={filled}
-                onPress={() => handleExpandSlot(slotIdx)}
-              />
-            );
-          })}
-        </View>
+          {/* Weekly summary */}
+          <WeeklySummary totals={state.diary.totals} defaultOpen={mode === 'view'} />
 
-        {/* Weekly summary */}
-        <WeeklySummary totals={state.diary.totals} defaultOpen={mode === 'view'} />
-
-        {/* Footer */}
-        <DiaryFooter
-          mode={mode}
-          canEdit={state.canEdit}
-          userNoteText={state.userNoteText}
-          setUserNoteText={state.setUserNoteText}
-          setNoteDirty={state.setNoteDirty}
-          userNote={state.userNote}
-          allAnswered={state.allAnswered}
-          hasDirtyChanges={state.hasDirtyChanges}
-          onSubmitOrExit={state.handleSubmitOrExit}
-          onDiscard={state.router.back}
-        />
-      </ScrollView>
+          {/* Footer */}
+          <DiaryFooter
+            mode={mode}
+            canEdit={state.canEdit}
+            userNoteText={state.userNoteText}
+            setUserNoteText={state.setUserNoteText}
+            setNoteDirty={state.setNoteDirty}
+            userNote={state.userNote}
+            allAnswered={state.allAnswered}
+            hasDirtyChanges={state.hasDirtyChanges}
+            onSubmitOrExit={state.handleSubmitOrExit}
+            onDiscard={state.router.back}
+          />
+        </ScrollView>
+      </View>
     </KeyboardAvoidingView>
   );
 };
+
+const floatingStyles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    top: 8,
+    right: 20,
+    zIndex: 10,
+    backgroundColor: Colors.chip.darkCard,
+    borderRadius: 20,
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: Colors.chip.darkCardAlt
+  }
+});
 
 export default ActivityDiaryPresenter;
