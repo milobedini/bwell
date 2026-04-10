@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -13,6 +13,7 @@ import { isSlotComplete, isSlotFilled, type SlotKey, type SlotValue } from '@/ut
 import type { AttemptDetailResponseItem, DiaryDetail } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
+import AnimatedAccordionSlot from './AnimatedAccordionSlot';
 import DayRingBar from './DayRingBar';
 import DiaryFooter from './DiaryFooter';
 import DiaryHeader from './DiaryHeader';
@@ -34,7 +35,15 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   const state = useDiaryState({ attempt, mode });
   const nav = useDiaryNavigation(state.activeDayISO);
 
-  const promptShownRef = useRef(false);
+  const [promptShown, setPromptShown] = useState(false);
+  const promptSlotIdx = nav.expandedSlotIdx;
+
+  // Mark prompt as shown after the first slot expansion (effect, not during render)
+  useEffect(() => {
+    if (promptSlotIdx !== null && !promptShown) {
+      setPromptShown(true);
+    }
+  }, [promptSlotIdx, promptShown]);
 
   const handleSelectDay = useCallback(
     (iso: string) => {
@@ -100,44 +109,40 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
               const filled = isSlotFilled(row.value);
               const complete = isSlotComplete(row.value);
 
-              // Show reflection prompt on the first slot opened this session (edit mode only).
-              // Use a ref so the check happens during render before React batches the state update.
-              const showPrompt = isExpanded && !promptShownRef.current && mode === 'edit';
-              if (isExpanded && !promptShownRef.current) {
-                promptShownRef.current = true;
-              }
-
-              if (isExpanded) {
-                return (
-                  <SlotAccordionPanel
-                    key={row.key}
-                    label={row.value.label}
-                    activity={row.value.activity}
-                    mood={row.value.mood}
-                    achievement={row.value.achievement}
-                    closeness={row.value.closeness}
-                    enjoyment={row.value.enjoyment}
-                    isFilled={filled}
-                    isComplete={complete}
-                    canEdit={state.canEdit}
-                    showReflectionPrompt={showPrompt}
-                    reflectionPrompt={state.reflectionPrompt}
-                    onActivityChange={(text) => handleSlotUpdate(row.key, { activity: text })}
-                    onMoodChange={(value) => handleSlotUpdate(row.key, { mood: value })}
-                    onStepperChange={(field, value) => handleSlotUpdate(row.key, { [field]: value })}
-                    onCollapse={nav.collapseSlot}
-                  />
-                );
-              }
+              // Show reflection prompt only on the very first slot expanded this session (edit mode).
+              // promptShown is false until the useEffect fires after the first expansion render.
+              const showPrompt = isExpanded && !promptShown && mode === 'edit';
 
               return (
-                <SlotAccordionRow
-                  key={row.key}
-                  label={row.value.label}
-                  activityPreview={row.value.activity}
-                  isFilled={filled}
-                  onPress={() => nav.expandSlot(slotIdx)}
-                />
+                <View key={row.key}>
+                  {!isExpanded && (
+                    <SlotAccordionRow
+                      label={row.value.label}
+                      activityPreview={row.value.activity}
+                      isFilled={filled}
+                      onPress={() => nav.expandSlot(slotIdx)}
+                    />
+                  )}
+                  <AnimatedAccordionSlot isExpanded={isExpanded}>
+                    <SlotAccordionPanel
+                      label={row.value.label}
+                      activity={row.value.activity}
+                      mood={row.value.mood}
+                      achievement={row.value.achievement}
+                      closeness={row.value.closeness}
+                      enjoyment={row.value.enjoyment}
+                      isFilled={filled}
+                      isComplete={complete}
+                      canEdit={state.canEdit}
+                      showReflectionPrompt={showPrompt}
+                      reflectionPrompt={state.reflectionPrompt}
+                      onActivityChange={(text) => handleSlotUpdate(row.key, { activity: text })}
+                      onMoodChange={(value) => handleSlotUpdate(row.key, { mood: value })}
+                      onStepperChange={(field, value) => handleSlotUpdate(row.key, { [field]: value })}
+                      onCollapse={nav.collapseSlot}
+                    />
+                  </AnimatedAccordionSlot>
+                </View>
               );
             })}
           </View>
@@ -153,7 +158,8 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
             userNote={state.userNote}
             allAnswered={state.allAnswered}
             hasDirtyChanges={state.hasDirtyChanges}
-            onSubmitOrExit={state.handleSubmitOrExit}
+            onSaveDraft={state.handleSaveDraft}
+            onSubmit={state.handleSubmit}
             onDiscard={state.router.back}
           />
         </ScrollView>

@@ -13,7 +13,8 @@ type DiaryFooterProps = {
   userNote?: string;
   allAnswered: boolean;
   hasDirtyChanges: boolean;
-  onSubmitOrExit: () => void;
+  onSaveDraft: () => void;
+  onSubmit: () => void;
   onDiscard: () => void;
 };
 
@@ -26,7 +27,8 @@ const DiaryFooter = ({
   userNote,
   allAnswered,
   hasDirtyChanges,
-  onSubmitOrExit,
+  onSaveDraft,
+  onSubmit,
   onDiscard
 }: DiaryFooterProps) => (
   <View className="pb-6 pt-4">
@@ -86,12 +88,12 @@ const DiaryFooter = ({
         <View style={{ flex: 1 }}>
           <ThemedButton
             title={hasDirtyChanges ? 'Save Draft' : 'Exit'}
-            onPress={hasDirtyChanges ? onSubmitOrExit : onDiscard}
+            onPress={hasDirtyChanges ? onSaveDraft : onDiscard}
             variant="outline"
           />
         </View>
         <View style={{ flex: 1 }}>
-          <ThemedButton title="Submit" onPress={onSubmitOrExit} disabled={!allAnswered} />
+          <ThemedButton title="Submit" onPress={onSubmit} disabled={!allAnswered} />
         </View>
       </View>
     ) : (

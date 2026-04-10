@@ -136,19 +136,19 @@ describe('useDiaryState', () => {
     expect(mockSaveSilently).not.toHaveBeenCalled();
   });
 
-  it('handleSubmitOrExit navigates back when not editable and no dirty changes', () => {
+  it('handleSaveDraft navigates back when no dirty changes', () => {
     const attempt = makeAttempt();
     const { result } = renderHook(() => useDiaryState({ attempt, mode: 'view' }));
 
     act(() => {
-      result.current.handleSubmitOrExit();
+      result.current.handleSaveDraft();
     });
 
     expect(mockRouter.back).toHaveBeenCalled();
     expect(mockSaveMutate).not.toHaveBeenCalled();
   });
 
-  it('handleSubmitOrExit saves dirty changes before navigating back in view mode', () => {
+  it('handleSaveDraft saves dirty changes before navigating back', () => {
     const attempt = makeAttempt();
     const { result } = renderHook(() => useDiaryState({ attempt, mode: 'view' }));
 
@@ -159,7 +159,7 @@ describe('useDiaryState', () => {
     });
 
     act(() => {
-      result.current.handleSubmitOrExit();
+      result.current.handleSaveDraft();
     });
 
     expect(mockSaveMutate).toHaveBeenCalledTimes(1);

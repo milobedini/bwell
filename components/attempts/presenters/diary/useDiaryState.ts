@@ -176,35 +176,40 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
         setDirtyKeys(new Set());
         setNoteDirty(false);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      },
+      onError: () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
       }
     });
   }, [hasDirtyChanges, buildSavePayload, saveAttemptSilently]);
 
-  const handleSubmitOrExit = useCallback(() => {
-    if (!canEdit || !allAnswered) {
-      if (hasDirtyChanges) {
-        saveAttempt(buildSavePayload(), {
-          onSuccess: () => {
-            setDirtyKeys(new Set());
-            setNoteDirty(false);
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-            router.back();
-          },
-          onError: () => {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
-          }
-        });
-      } else {
-        router.back();
-      }
+  const handleSaveDraft = useCallback(() => {
+    if (!hasDirtyChanges) {
+      router.back();
       return;
     }
+    saveAttempt(buildSavePayload(), {
+      onSuccess: () => {
+        setDirtyKeys(new Set());
+        setNoteDirty(false);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+        router.back();
+      },
+      onError: () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+      }
+    });
+  }, [hasDirtyChanges, buildSavePayload, saveAttempt, router]);
 
+  const handleSubmit = useCallback(() => {
     const afterSave = () =>
       submitAttempt(assignmentId ? { assignmentId: String(assignmentId) } : {}, {
         onSuccess: () => {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
           router.back();
+        },
+        onError: () => {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
         }
       });
 
@@ -214,22 +219,15 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
           setDirtyKeys(new Set());
           setNoteDirty(false);
           afterSave();
+        },
+        onError: () => {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
         }
       });
     } else {
       afterSave();
     }
-  }, [
-    canEdit,
-    allAnswered,
-    hasDirtyChanges,
-    buildSavePayload,
-    saveAttempt,
-    saveAttemptSilently,
-    submitAttempt,
-    assignmentId,
-    router
-  ]);
+  }, [hasDirtyChanges, buildSavePayload, saveAttemptSilently, submitAttempt, assignmentId, router]);
 
   return {
     activeDayISO,
@@ -254,7 +252,8 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
     saved,
     updateSlot,
     saveDirty,
-    handleSubmitOrExit,
+    handleSaveDraft,
+    handleSubmit,
     router
   };
 };

@@ -1,7 +1,14 @@
 import { memo, useCallback, useEffect, useRef } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withSequence,
+  withTiming
+} from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { clamp } from '@/utils/helpers';
 
@@ -12,6 +19,7 @@ const LONG_PRESS_DELAY = 400;
 const REPEAT_INTERVAL = 150;
 const PULSE_DURATION = 75;
 const PULSE_SCALE = 1.15;
+const HIT_SLOP = 8;
 
 type MetricStepperProps = {
   label: string;
@@ -23,18 +31,20 @@ type MetricStepperProps = {
 
 const MetricStepper = memo(({ label, value, color, onChange, disabled }: MetricStepperProps) => {
   const scale = useSharedValue(1);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const directionRef = useRef<1 | -1 | null>(null);
+  const shouldReduceMotion = useReducedMotion();
 
   const animatedValueStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }]
   }));
 
   const triggerPulse = useCallback(() => {
+    if (shouldReduceMotion) return;
     scale.value = withSequence(
       withTiming(PULSE_SCALE, { duration: PULSE_DURATION }),
       withTiming(1, { duration: PULSE_DURATION })
     );
-  }, [scale]);
+  }, [scale, shouldReduceMotion]);
 
   const step = useCallback(
     (direction: 1 | -1) => {
@@ -55,35 +65,29 @@ const MetricStepper = memo(({ label, value, color, onChange, disabled }: MetricS
     [value, onChange, triggerPulse]
   );
 
-  // Keep a ref to the latest step so the interval always uses current value
+  // Keep a ref to the latest step so the timeout chain always uses current value
   const stepRef = useRef(step);
   useEffect(() => {
     stepRef.current = step;
   }, [step]);
 
-  const clearRepeat = useCallback(() => {
-    if (intervalRef.current !== null) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
+  const scheduleRepeat = useCallback(() => {
+    if (directionRef.current === null) return;
+    stepRef.current(directionRef.current);
+    setTimeout(scheduleRepeat, REPEAT_INTERVAL);
   }, []);
-
-  // Clean up interval on unmount
-  useEffect(() => () => clearRepeat(), [clearRepeat]);
 
   const startRepeat = useCallback(
     (direction: 1 | -1) => {
-      clearRepeat();
-      intervalRef.current = setInterval(() => {
-        stepRef.current(direction);
-      }, REPEAT_INTERVAL);
+      directionRef.current = direction;
+      setTimeout(scheduleRepeat, REPEAT_INTERVAL);
     },
-    [clearRepeat]
+    [scheduleRepeat]
   );
 
   const handlePressOut = useCallback(() => {
-    clearRepeat();
-  }, [clearRepeat]);
+    directionRef.current = null;
+  }, []);
 
   const handleDecrementPress = useCallback(() => step(-1), [step]);
   const handleIncrementPress = useCallback(() => step(1), [step]);
@@ -98,9 +102,11 @@ const MetricStepper = memo(({ label, value, color, onChange, disabled }: MetricS
     return (
       <View style={styles.container} accessibilityRole="text">
         <View style={styles.labelRow}>
-          <Animated.Text style={styles.label}>{label}</Animated.Text>
+          <ThemedText type="small" style={styles.label}>
+            {label}
+          </ThemedText>
         </View>
-        <Animated.Text style={[styles.value, { color: valueColor }]}>{displayValue}</Animated.Text>
+        <ThemedText style={[styles.value, { color: valueColor }]}>{displayValue}</ThemedText>
       </View>
     );
   }
@@ -108,7 +114,9 @@ const MetricStepper = memo(({ label, value, color, onChange, disabled }: MetricS
   return (
     <View style={styles.container}>
       <View style={styles.labelRow}>
-        <Animated.Text style={styles.label}>{label}</Animated.Text>
+        <ThemedText type="small" style={styles.label}>
+          {label}
+        </ThemedText>
       </View>
       <View style={styles.row}>
         <Pressable
@@ -117,10 +125,11 @@ const MetricStepper = memo(({ label, value, color, onChange, disabled }: MetricS
           delayLongPress={LONG_PRESS_DELAY}
           onPressOut={handlePressOut}
           style={styles.button}
+          hitSlop={HIT_SLOP}
           accessibilityLabel={`Decrease ${label}`}
           accessibilityRole="button"
         >
-          <Animated.Text style={styles.buttonText}>−</Animated.Text>
+          <ThemedText style={styles.buttonText}>−</ThemedText>
         </Pressable>
 
         <Animated.Text style={[styles.value, { color: valueColor }, animatedValueStyle]}>{displayValue}</Animated.Text>
@@ -131,10 +140,11 @@ const MetricStepper = memo(({ label, value, color, onChange, disabled }: MetricS
           delayLongPress={LONG_PRESS_DELAY}
           onPressOut={handlePressOut}
           style={styles.button}
+          hitSlop={HIT_SLOP}
           accessibilityLabel={`Increase ${label}`}
           accessibilityRole="button"
         >
-          <Animated.Text style={styles.buttonText}>+</Animated.Text>
+          <ThemedText style={styles.buttonText}>+</ThemedText>
         </Pressable>
       </View>
     </View>
