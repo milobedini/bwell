@@ -75,7 +75,6 @@ describe('useDiaryState', () => {
 
     expect(result.current.canEdit).toBe(true);
     expect(result.current.hasDirtyChanges).toBe(false);
-    expect(result.current.progress).toBe(0);
     expect(result.current.allAnswered).toBe(false);
     expect(result.current.days).toHaveLength(7);
   });
@@ -137,19 +136,19 @@ describe('useDiaryState', () => {
     expect(mockSaveSilently).not.toHaveBeenCalled();
   });
 
-  it('handleSubmitOrExit navigates back when not editable and no dirty changes', () => {
+  it('handleSaveDraft navigates back when no dirty changes', () => {
     const attempt = makeAttempt();
     const { result } = renderHook(() => useDiaryState({ attempt, mode: 'view' }));
 
     act(() => {
-      result.current.handleSubmitOrExit();
+      result.current.handleSaveDraft();
     });
 
     expect(mockRouter.back).toHaveBeenCalled();
     expect(mockSaveMutate).not.toHaveBeenCalled();
   });
 
-  it('handleSubmitOrExit saves dirty changes before navigating back in view mode', () => {
+  it('handleSaveDraft saves dirty changes before navigating back', () => {
     const attempt = makeAttempt();
     const { result } = renderHook(() => useDiaryState({ attempt, mode: 'view' }));
 
@@ -160,7 +159,7 @@ describe('useDiaryState', () => {
     });
 
     act(() => {
-      result.current.handleSubmitOrExit();
+      result.current.handleSaveDraft();
     });
 
     expect(mockSaveMutate).toHaveBeenCalledTimes(1);
@@ -198,6 +197,21 @@ describe('useDiaryState', () => {
     expect(mockSaveSilently).toHaveBeenCalledTimes(1);
     const payload = mockSaveSilently.mock.calls[0][0];
     expect(payload.userNote).toBe('My reflection');
+  });
+
+  it('computes slotFillCounts for each day', () => {
+    const attempt = makeAttempt();
+    const { result } = renderHook(() => useDiaryState({ attempt, mode: 'edit' }));
+
+    const firstDayISO = result.current.activeDayISO;
+    expect(result.current.slotFillCounts[firstDayISO]).toBe(0);
+
+    const firstSlotKey = result.current.dayRows[0]?.key;
+    act(() => {
+      result.current.updateSlot(firstSlotKey, { activity: 'Walk' });
+    });
+
+    expect(result.current.slotFillCounts[firstDayISO]).toBe(1);
   });
 
   it('canEdit is false in view mode', () => {

@@ -45,7 +45,8 @@ export const Colors = {
     darkCardDeep: '#0B1A2A',
     dotInactive: '#3A496B',
     pill: '#1E2A45',
-    pillPressed: '#253352'
+    pillPressed: '#253352',
+    pillBorder: 'rgba(30,42,69,0.6)'
   },
   tint: {
     teal: 'rgba(24,205,186,0.15)',
@@ -69,6 +70,13 @@ export const Colors = {
     moodCool: '#5b8def',
     closeness: '#e76f9a',
     enjoyment: '#a78bfa',
-    promptBg: '#1a3a4a'
+    promptBg: '#1a3a4a',
+    achievement: '#f4a261',
+    panelBg: '#1a2540',
+    panelBorder: 'rgba(24,205,186,0.2)'
+  },
+  tintSubtle: {
+    teal: 'rgba(24,205,186,0.06)',
+    tealBorder: 'rgba(24,205,186,0.12)'
   }
 };

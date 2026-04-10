@@ -37,7 +37,7 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
   const { mutate: submitAttempt } = useSubmitAttempt(attempt._id);
 
   const canEdit = mode === 'edit';
-  const { moduleSnapshot, weekStart, startedAt, completedAt, diary, updatedAt, userNote } = attempt;
+  const { moduleSnapshot, weekStart, diary, updatedAt, userNote } = attempt;
 
   const [dirtyKeys, setDirtyKeys] = useState<Set<SlotKey>>(new Set());
   const [userNoteText, setUserNoteText] = useState(attempt.userNote ?? '');
@@ -100,13 +100,6 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
     setSlots(seed);
   }, [attempt._id, weekSlots, diary.days]);
 
-  const progress = useMemo(() => {
-    const vals = Object.values(slots);
-    if (!vals.length) return 0;
-    const filled = vals.filter(isSlotFilled).length;
-    return filled / vals.length;
-  }, [slots]);
-
   const allAnswered = useMemo(() => Object.values(slots).every((v) => v.activity.trim().length > 0), [slots]);
 
   const dayRows = useMemo(
@@ -123,6 +116,14 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
         ])
       ) as Record<string, boolean[]>,
     [weekSlots, slots]
+  );
+
+  const slotFillCounts = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(slotFillsByDay).map(([iso, fills]) => [iso, fills.filter(Boolean).length])
+      ) as Record<string, number>,
+    [slotFillsByDay]
   );
 
   const markDirty = useCallback((k: SlotKey) => {
@@ -175,35 +176,40 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
         setDirtyKeys(new Set());
         setNoteDirty(false);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      },
+      onError: () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
       }
     });
   }, [hasDirtyChanges, buildSavePayload, saveAttemptSilently]);
 
-  const handleSubmitOrExit = useCallback(() => {
-    if (!canEdit || !allAnswered) {
-      if (hasDirtyChanges) {
-        saveAttempt(buildSavePayload(), {
-          onSuccess: () => {
-            setDirtyKeys(new Set());
-            setNoteDirty(false);
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-            router.back();
-          },
-          onError: () => {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
-          }
-        });
-      } else {
-        router.back();
-      }
+  const handleSaveDraft = useCallback(() => {
+    if (!hasDirtyChanges) {
+      router.back();
       return;
     }
+    saveAttempt(buildSavePayload(), {
+      onSuccess: () => {
+        setDirtyKeys(new Set());
+        setNoteDirty(false);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+        router.back();
+      },
+      onError: () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+      }
+    });
+  }, [hasDirtyChanges, buildSavePayload, saveAttempt, router]);
 
+  const handleSubmit = useCallback(() => {
     const afterSave = () =>
       submitAttempt(assignmentId ? { assignmentId: String(assignmentId) } : {}, {
         onSuccess: () => {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
           router.back();
+        },
+        onError: () => {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
         }
       });
 
@@ -213,22 +219,15 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
           setDirtyKeys(new Set());
           setNoteDirty(false);
           afterSave();
+        },
+        onError: () => {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
         }
       });
     } else {
       afterSave();
     }
-  }, [
-    canEdit,
-    allAnswered,
-    hasDirtyChanges,
-    buildSavePayload,
-    saveAttempt,
-    saveAttemptSilently,
-    submitAttempt,
-    assignmentId,
-    router
-  ]);
+  }, [hasDirtyChanges, buildSavePayload, saveAttemptSilently, submitAttempt, assignmentId, router]);
 
   return {
     activeDayISO,
@@ -242,13 +241,10 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
     reflectionPrompt,
     days,
     dayRows,
-    slotFillsByDay,
-    progress,
+    slotFillCounts,
     allAnswered,
     canEdit,
     moduleSnapshot,
-    startedAt,
-    completedAt,
     updatedAt,
     userNote,
     diary,
@@ -256,7 +252,8 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
     saved,
     updateSlot,
     saveDirty,
-    handleSubmitOrExit,
+    handleSaveDraft,
+    handleSubmit,
     router
   };
 };

@@ -1,15 +1,29 @@
-import { useCallback } from 'react';
-import { FlatList, KeyboardAvoidingView, ListRenderItemInfo, Platform } from 'react-native';
-import type { SlotKey, SlotValue } from '@/utils/activityHelpers';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View
+} from 'react-native';
+import { Colors } from '@/constants/Colors';
+import { isSlotComplete, isSlotFilled, type SlotKey, type SlotValue } from '@/utils/activityHelpers';
 import type { AttemptDetailResponseItem, DiaryDetail } from '@milobedini/shared-types';
+import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
-import DayNavBar from './DayNavBar';
+import AnimatedAccordionSlot from './AnimatedAccordionSlot';
+import DayRingBar from './DayRingBar';
 import DiaryFooter from './DiaryFooter';
 import DiaryHeader from './DiaryHeader';
-import DiaryInputToolbar from './DiaryInputToolbar';
-import SlotCard from './SlotCard';
-import { refKey, useDiaryNavigation } from './useDiaryNavigation';
+import SlotAccordionPanel from './SlotAccordionPanel';
+import SlotAccordionRow from './SlotAccordionRow';
+import { useDiaryNavigation } from './useDiaryNavigation';
 import { useDiaryState } from './useDiaryState';
+import WeeklySummary from './WeeklySummary';
+
+const TOTAL_SLOTS = 9;
 
 type ActivityDiaryPresenterProps = {
   attempt: AttemptDetailResponseItem & { diary: DiaryDetail };
@@ -19,23 +33,31 @@ type ActivityDiaryPresenterProps = {
 
 const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPresenterProps) => {
   const state = useDiaryState({ attempt, mode });
-  const nav = useDiaryNavigation(state.dayRows, state.activeDayISO);
+  const nav = useDiaryNavigation(state.activeDayISO);
 
-  const renderSlot = useCallback(
-    ({ item, index: slotIdx }: ListRenderItemInfo<{ key: SlotKey; value: SlotValue }>) => (
-      <SlotCard
-        slotKey={item.key}
-        value={item.value}
-        slotIdx={slotIdx}
-        canEdit={state.canEdit}
-        mode={mode}
-        refKey={refKey}
-        getRefCallback={nav.getRefCallback}
-        setFocusedFieldIdx={nav.setFocusedFieldIdx}
-        onUpdate={state.updateSlot}
-      />
-    ),
-    [state.canEdit, state.updateSlot, mode, nav.getRefCallback, nav.setFocusedFieldIdx]
+  const [promptShown, setPromptShown] = useState(false);
+  const promptSlotIdx = nav.expandedSlotIdx;
+
+  // Mark prompt as shown after the first slot expansion (effect, not during render)
+  useEffect(() => {
+    if (promptSlotIdx !== null && !promptShown) {
+      setPromptShown(true);
+    }
+  }, [promptSlotIdx, promptShown]);
+
+  const handleSelectDay = useCallback(
+    (iso: string) => {
+      if (state.hasDirtyChanges) state.saveDirty();
+      state.setActiveDayISO(iso);
+    },
+    [state]
+  );
+
+  const handleSlotUpdate = useCallback(
+    (key: SlotKey, patch: Partial<SlotValue>) => {
+      state.updateSlot(key, patch);
+    },
+    [state]
   );
 
   return (
@@ -44,51 +66,89 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.select({ ios: 120, default: 0 })}
     >
-      <DayNavBar
+      <DayRingBar
         days={state.days}
         activeDayISO={state.activeDayISO}
-        slotFillsByDay={state.slotFillsByDay}
-        hasDirtyChanges={state.hasDirtyChanges}
-        onSelectDay={state.setActiveDayISO}
-        onSave={state.saveDirty}
+        slotFillCounts={state.slotFillCounts}
+        totalSlots={TOTAL_SLOTS}
+        onSelectDay={handleSelectDay}
       />
 
-      <FlatList
-        ref={nav.flatListRef}
-        data={state.dayRows}
-        keyExtractor={(row) => row.key}
-        renderItem={renderSlot}
-        getItemLayout={nav.getItemLayout}
-        onScrollToIndexFailed={(info) => {
-          setTimeout(() => {
-            nav.flatListRef.current?.scrollToIndex({ index: info.index, animated: true, viewPosition: 0.3 });
-          }, 100);
-        }}
-        initialNumToRender={4}
-        maxToRenderPerBatch={4}
-        windowSize={5}
-        removeClippedSubviews
-        ListHeaderComponent={
+      <View className="flex-1">
+        {(state.hasDirtyChanges || state.isSaving || state.saved) && (
+          <Pressable
+            style={floatingStyles.container}
+            onPress={state.saveDirty}
+            disabled={state.isSaving || !state.hasDirtyChanges}
+            accessibilityRole="button"
+            accessibilityLabel={state.isSaving ? 'Saving' : state.hasDirtyChanges ? 'Save changes' : 'Saved'}
+            hitSlop={8}
+          >
+            {state.isSaving ? (
+              <ActivityIndicator size="small" color={Colors.sway.bright} />
+            ) : state.hasDirtyChanges ? (
+              <MaterialCommunityIcons name="content-save-edit-outline" size={20} color={Colors.primary.warning} />
+            ) : (
+              <MaterialCommunityIcons name="check-circle" size={20} color={Colors.sway.bright} />
+            )}
+          </Pressable>
+        )}
+
+        <ScrollView className="flex-1 bg-sway-dark" contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 4 }}>
           <DiaryHeader
             patientName={patientName}
-            progress={state.progress}
-            mode={mode}
-            canEdit={state.canEdit}
-            startedAt={state.startedAt}
-            completedAt={state.completedAt}
             updatedAt={state.updatedAt}
-            hasDirtyChanges={state.hasDirtyChanges}
-            isSaving={state.isSaving}
-            saved={state.saved}
             moduleSnapshot={state.moduleSnapshot}
             disclaimerOpen={state.disclaimerOpen}
             setDisclaimerOpen={state.setDisclaimerOpen}
-            reflectionPrompt={state.reflectionPrompt}
-            diary={state.diary}
-            saveDirty={state.saveDirty}
           />
-        }
-        ListFooterComponent={
+
+          <View style={{ gap: 6, paddingBottom: 8 }}>
+            {state.dayRows.map((row, slotIdx) => {
+              const isExpanded = nav.expandedSlotIdx === slotIdx;
+              const filled = isSlotFilled(row.value);
+              const complete = isSlotComplete(row.value);
+
+              // Show reflection prompt only on the very first slot expanded this session (edit mode).
+              // promptShown is false until the useEffect fires after the first expansion render.
+              const showPrompt = isExpanded && !promptShown && mode === 'edit';
+
+              return (
+                <View key={row.key}>
+                  {!isExpanded && (
+                    <SlotAccordionRow
+                      label={row.value.label}
+                      activityPreview={row.value.activity}
+                      isFilled={filled}
+                      onPress={() => nav.expandSlot(slotIdx)}
+                    />
+                  )}
+                  <AnimatedAccordionSlot isExpanded={isExpanded}>
+                    <SlotAccordionPanel
+                      label={row.value.label}
+                      activity={row.value.activity}
+                      mood={row.value.mood}
+                      achievement={row.value.achievement}
+                      closeness={row.value.closeness}
+                      enjoyment={row.value.enjoyment}
+                      isFilled={filled}
+                      isComplete={complete}
+                      canEdit={state.canEdit}
+                      showReflectionPrompt={showPrompt}
+                      reflectionPrompt={state.reflectionPrompt}
+                      onActivityChange={(text) => handleSlotUpdate(row.key, { activity: text })}
+                      onMoodChange={(value) => handleSlotUpdate(row.key, { mood: value })}
+                      onStepperChange={(field, value) => handleSlotUpdate(row.key, { [field]: value })}
+                      onCollapse={nav.collapseSlot}
+                    />
+                  </AnimatedAccordionSlot>
+                </View>
+              );
+            })}
+          </View>
+
+          <WeeklySummary totals={state.diary.totals} defaultOpen={mode === 'view'} />
+
           <DiaryFooter
             mode={mode}
             canEdit={state.canEdit}
@@ -98,31 +158,36 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
             userNote={state.userNote}
             allAnswered={state.allAnswered}
             hasDirtyChanges={state.hasDirtyChanges}
-            onSubmitOrExit={state.handleSubmitOrExit}
+            onSaveDraft={state.handleSaveDraft}
+            onSubmit={state.handleSubmit}
             onDiscard={state.router.back}
           />
-        }
-      />
-
-      {state.canEdit && nav.focusedFieldIdx != null && (
-        <DiaryInputToolbar
-          label={nav.toolbarLabel}
-          canGoPrev={nav.focusedFieldIdx > 0}
-          canGoNext={nav.focusedFieldIdx < nav.totalFields - 1}
-          onPrev={() => {
-            if (nav.focusedFieldIdx != null && nav.focusedFieldIdx > 0) {
-              nav.focusField(nav.focusedFieldIdx - 1);
-            }
-          }}
-          onNext={() => {
-            if (nav.focusedFieldIdx != null && nav.focusedFieldIdx < nav.totalFields - 1) {
-              nav.focusField(nav.focusedFieldIdx + 1);
-            }
-          }}
-        />
-      )}
+        </ScrollView>
+      </View>
     </KeyboardAvoidingView>
   );
 };
+
+const floatingStyles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    top: 8,
+    right: 16,
+    zIndex: 10,
+    backgroundColor: Colors.chip.darkCardDeep,
+    borderRadius: 22,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: Colors.tint.tealBorder,
+    shadowColor: Colors.sway.bright,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 8
+  }
+});
 
 export default ActivityDiaryPresenter;

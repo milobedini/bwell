@@ -1,10 +1,8 @@
 import { memo } from 'react';
-import { View } from 'react-native';
-import { Card, TextInput } from 'react-native-paper';
-import { PrimaryButton } from '@/components/ThemedButton';
+import { TextInput, View } from 'react-native';
+import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
-import { Fonts } from '@/constants/Typography';
 
 type DiaryFooterProps = {
   mode: 'view' | 'edit';
@@ -15,59 +13,10 @@ type DiaryFooterProps = {
   userNote?: string;
   allAnswered: boolean;
   hasDirtyChanges: boolean;
-  onSubmitOrExit: () => void;
+  onSaveDraft: () => void;
+  onSubmit: () => void;
   onDiscard: () => void;
 };
-
-const NoteCardEdit = ({
-  userNoteText,
-  setUserNoteText,
-  setNoteDirty
-}: Pick<DiaryFooterProps, 'userNoteText' | 'setUserNoteText' | 'setNoteDirty'>) => (
-  <Card style={{ backgroundColor: Colors.sway.buttonBackground, marginBottom: 10, marginHorizontal: 8 }}>
-    <Card.Title title="Note for therapist" titleStyle={{ color: 'white', fontFamily: Fonts.Bold }} />
-    <Card.Content>
-      <TextInput
-        mode="flat"
-        placeholder="Anything you'd like your therapist to know this week..."
-        placeholderTextColor={Colors.sway.darkGrey}
-        value={userNoteText}
-        onChangeText={(t) => {
-          setUserNoteText(t);
-          setNoteDirty(true);
-        }}
-        multiline
-        maxLength={500}
-        style={{ backgroundColor: 'transparent', minHeight: 64 }}
-        className="overflow-hidden text-ellipsis border border-sway-darkGrey text-white"
-        textColor="white"
-        underlineColor="transparent"
-        activeUnderlineColor={Colors.sway.bright}
-        theme={{ colors: { onSurfaceVariant: Colors.sway.lightGrey } }}
-        clearButtonMode="always"
-      />
-      <ThemedText
-        type="small"
-        style={{
-          textAlign: 'right',
-          marginTop: 4,
-          color: userNoteText.length >= 450 ? Colors.primary.error : Colors.sway.darkGrey
-        }}
-      >
-        {`${userNoteText.length}/500`}
-      </ThemedText>
-    </Card.Content>
-  </Card>
-);
-
-const NoteCardView = ({ userNote }: { userNote: string }) => (
-  <Card style={{ backgroundColor: Colors.sway.buttonBackground, marginBottom: 10, marginHorizontal: 8 }}>
-    <Card.Title title="Patient note" titleStyle={{ color: 'white', fontFamily: Fonts.Bold }} />
-    <Card.Content>
-      <ThemedText style={{ color: Colors.sway.lightGrey }}>{userNote}</ThemedText>
-    </Card.Content>
-  </Card>
-);
 
 const DiaryFooter = ({
   mode,
@@ -78,28 +27,78 @@ const DiaryFooter = ({
   userNote,
   allAnswered,
   hasDirtyChanges,
-  onSubmitOrExit,
+  onSaveDraft,
+  onSubmit,
   onDiscard
 }: DiaryFooterProps) => (
-  <View>
+  <View className="pb-6 pt-4">
+    {/* Therapist note */}
     {canEdit ? (
-      <NoteCardEdit userNoteText={userNoteText} setUserNoteText={setUserNoteText} setNoteDirty={setNoteDirty} />
+      <View style={{ backgroundColor: Colors.chip.darkCard, borderRadius: 12, padding: 14, marginBottom: 12 }}>
+        <ThemedText style={{ color: Colors.sway.lightGrey, fontSize: 13, fontWeight: '700', marginBottom: 10 }}>
+          Note to Therapist
+        </ThemedText>
+        <View
+          style={{
+            backgroundColor: Colors.sway.dark,
+            borderRadius: 8,
+            padding: 12,
+            minHeight: 60,
+            borderWidth: 1,
+            borderColor: Colors.chip.pill
+          }}
+        >
+          <TextInput
+            value={userNoteText}
+            onChangeText={(t) => {
+              setUserNoteText(t);
+              setNoteDirty(true);
+            }}
+            placeholder="Anything you'd like your therapist to know this week..."
+            placeholderTextColor={Colors.chip.dotInactive}
+            style={{ color: Colors.sway.lightGrey, fontSize: 13, padding: 0 }}
+            multiline
+            maxLength={500}
+          />
+        </View>
+        <ThemedText
+          type="small"
+          style={{
+            textAlign: 'right',
+            marginTop: 6,
+            color: userNoteText.length >= 450 ? Colors.primary.error : Colors.chip.dotInactive,
+            fontSize: 10
+          }}
+        >
+          {`${userNoteText.length} / 500`}
+        </ThemedText>
+      </View>
     ) : userNote ? (
-      <NoteCardView userNote={userNote} />
+      <View style={{ backgroundColor: Colors.chip.darkCard, borderRadius: 12, padding: 14, marginBottom: 12 }}>
+        <ThemedText style={{ color: Colors.sway.lightGrey, fontSize: 13, fontWeight: '700', marginBottom: 10 }}>
+          Patient Note
+        </ThemedText>
+        <ThemedText style={{ color: Colors.sway.lightGrey, fontSize: 13 }}>{userNote}</ThemedText>
+      </View>
     ) : null}
 
-    {mode === 'edit' && (
-      <View className="gap-3 pb-2">
-        <PrimaryButton
-          className="mb-2"
-          title={allAnswered ? 'Submit diary' : hasDirtyChanges ? 'Save & Exit' : 'Exit'}
-          onPress={onSubmitOrExit}
-        />
-        {hasDirtyChanges && <PrimaryButton title="Discard changes" onPress={onDiscard} variant="error" />}
+    {/* Action buttons */}
+    {mode === 'edit' ? (
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        <View style={{ flex: 1 }}>
+          <ThemedButton
+            title={hasDirtyChanges ? 'Save Draft' : 'Exit'}
+            onPress={hasDirtyChanges ? onSaveDraft : onDiscard}
+            variant="outline"
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <ThemedButton title="Submit" onPress={onSubmit} disabled={!allAnswered} />
+        </View>
       </View>
+    ) : (
+      <ThemedButton title="Exit" onPress={onDiscard} variant="outline" />
     )}
-
-    {mode !== 'edit' && <PrimaryButton className="mb-2" title="Exit" onPress={onDiscard} />}
   </View>
 );
 

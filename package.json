@@ -38,6 +38,7 @@
     "@lottiefiles/dotlottie-react": "^0.13.5",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/datetimepicker": "8.4.4",
+    "@react-native-community/slider": "5.0.1",
     "@react-native-vector-icons/ant-design": "^12.3.0",
     "@react-native-vector-icons/ionicons": "^12.3.0",
     "@react-native-vector-icons/material-design-icons": "^12.3.0",
