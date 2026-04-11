@@ -58,9 +58,15 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 | Diary closeness | `Colors.diary.closeness` / `bg-diary-closeness` | `#e76f9a` |
 | Diary enjoyment | `Colors.diary.enjoyment` / `bg-diary-enjoyment` | `#a78bfa` |
 | Diary prompt bg | `Colors.diary.promptBg` / `bg-diary-promptBg` | `#1a3a4a` |
+| Diary achievement | `Colors.diary.achievement` | `#f4a261` |
+| Diary panel bg | `Colors.diary.panelBg` | `#1a2540` |
+| Diary panel border | `Colors.diary.panelBorder` | `rgba(24,205,186,0.2)` |
 | Chip dot inactive | `Colors.chip.dotInactive` / `bg-chip-dotInactive` | `#3A496B` |
+| Chip pill border | `Colors.chip.pillBorder` | `rgba(30,42,69,0.6)` |
 | Overlay section header | `Colors.overlay.sectionHeader` | `rgba(38,46,66,0.5)` |
 | Gradient pink | `Colors.gradient.pink` | `#E70696` |
+| Tint subtle teal | `Colors.tintSubtle.teal` | `rgba(24,205,186,0.06)` |
+| Tint subtle teal border | `Colors.tintSubtle.tealBorder` | `rgba(24,205,186,0.12)` |
 
 **Status chip color pairs** (background + border):
 

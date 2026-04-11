@@ -48,6 +48,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ## Recent Milestones
 
+- **Activity diary redesign** — accordion layout with animated expand/collapse, split save/submit, Reanimated progress ring, mood slider, metric stepper with stale closure fixes, teal glow save indicator (2026-04-10)
 - **Five Areas Model** — interactive CBT hot cross bun diagram (Skia), node-expand modal input, stepped edit/review flow, area review cards (2026-04-05)
 - **Maestro E2E testing** — login flow with reusable subflows, full pipeline script with BE healthcheck, iOS simulator build with LogBox suppression, testID conventions (2026-04-04)
 - **Therapist dashboard UX improvements** — overdue chips, relative dates, progress bars on client detail cards, reason tags on attention cards, week-scoped assignment framing (2026-04-04)
@@ -57,7 +58,6 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 - **Therapist assignments redesign** — SectionList grouped by patient, sort/filter drawer, edit modal (due date, notes, recurrence), collapsible sections, shared chip styles (2026-03-27)
 - **Patient dashboard** — focus card, effort strip, coming up list, Skia sparkline score trends, pull-to-refresh (2026-03-26)
 - **Therapist dashboard** — triage buckets with client cards, stat pills, score deltas, assignment dots, progress bars (2026-03-25)
-- **Diary keyboard toolbar** — native-style prev/next chevron navigation for numeric fields, keyboard-aware positioning (2026-03-24)
 
 ## Tech Stack
 
