@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useSaveModuleAttempt, useSubmitAttempt } from '@/hooks/useAttempts';
 import type { AttemptDetailResponseItem, GeneralGoalEntry, GeneralGoalsData } from '@milobedini/shared-types';
 
@@ -10,7 +10,7 @@ type UseGeneralGoalsStateParams = {
 export const useGeneralGoalsState = ({ attempt, mode }: UseGeneralGoalsStateParams) => {
   const initialData = attempt.generalGoals;
   const isReRating = initialData?.isReRating ?? false;
-  const previousRatings = initialData?.previousRatings ?? [];
+  const previousRatings = useMemo(() => initialData?.previousRatings ?? [], [initialData?.previousRatings]);
 
   const [goals, setGoals] = useState<GeneralGoalEntry[]>(initialData?.goals?.length ? initialData.goals : []);
   const [reflection, setReflection] = useState(initialData?.reflection ?? '');
