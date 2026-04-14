@@ -1,4 +1,4 @@
-import type { AttemptDetail, AttemptDetailResponseItem, DiaryDetail } from '@milobedini/shared-types';
+import type { AttemptDetail, AttemptDetailResponseItem, DiaryDetail, GeneralGoalsData } from '@milobedini/shared-types';
 
 export function isQuestionnaireAttempt(
   a: AttemptDetailResponseItem
@@ -15,4 +15,10 @@ export function isReadingAttempt(a: AttemptDetailResponseItem): a is AttemptDeta
   moduleSnapshot: NonNullable<AttemptDetailResponseItem['moduleSnapshot']>;
 } {
   return a.moduleType === 'reading' && !!a.moduleSnapshot;
+}
+
+export function isGeneralGoalsAttempt(
+  a: AttemptDetailResponseItem
+): a is AttemptDetailResponseItem & { generalGoals: GeneralGoalsData } {
+  return a.moduleType === 'general_goals' && !!a.generalGoals;
 }
