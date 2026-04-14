@@ -17,6 +17,15 @@ The app has three tiers (from `docs/proposal.pdf`):
 - **Primary:** Depression, Generalised Anxiety (GAD-7), Panic Disorder (PDSS), OCD, Health Anxiety, Stress, Phobias, PTSD, Agoraphobia, Social Anxiety
 - **Additional:** Sleep, Assertiveness, ACT
 
+## Behavioural Guidelines
+
+These bias toward caution over speed. For trivial tasks, use judgement.
+
+- **Surface confusion early** — if uncertain, state assumptions explicitly. If multiple interpretations exist, present them rather than picking silently. Push back when a simpler approach exists.
+- **Minimum code, nothing speculative** — no features beyond what was asked, no abstractions for single-use code, no error handling for impossible scenarios. If 200 lines could be 50, rewrite.
+- **Surgical changes** — don't "improve" adjacent code, comments, or formatting. Match existing style. Remove only imports/variables/functions that your changes made unused; mention (don't delete) pre-existing dead code. Every changed line should trace directly to the request.
+- **Goal-driven execution** — transform tasks into verifiable goals (e.g. "fix the bug" becomes "write a test that reproduces it, then make it pass"). For multi-step tasks, state a brief plan with a verification check per step.
+
 ## Stack
 
 - **Framework:** Expo SDK 54, React Native 0.81.5, React 19.1, expo-router (file-based routing)
