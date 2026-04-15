@@ -16,12 +16,59 @@ type GoalCardProps = {
   isReRating: boolean;
   canEdit: boolean;
   previousRatings: PreviousRating[];
+  currentDate?: string;
   onGoalTextChange?: (text: string) => void;
   onRatingChange?: (rating: number) => void;
   onRemove?: () => void;
 };
 
-// ── Previous ratings timeline ──
+// ── Single row in the ratings timeline ──
+const RatingRow = ({
+  label,
+  value,
+  accent,
+  isCurrent
+}: {
+  label: string;
+  value: number | null | undefined;
+  accent: string;
+  isCurrent?: boolean;
+}) => {
+  const progress = value != null ? value / 10 : 0;
+  const barOpacity = isCurrent ? 1 : 0.45;
+
+  return (
+    <View className="flex-row items-center gap-2">
+      <ThemedText
+        type={isCurrent ? 'smallBold' : 'small'}
+        style={{ color: isCurrent ? accent : Colors.sway.darkGrey, width: 84 }}
+        numberOfLines={1}
+      >
+        {label}
+      </ThemedText>
+
+      <View className="flex-1">
+        <View className="h-1.5 overflow-hidden rounded-full" style={{ backgroundColor: Colors.chip.darkCardAlt }}>
+          {value != null && (
+            <View
+              className="h-full rounded-full"
+              style={{ width: `${progress * 100}%`, backgroundColor: accent, opacity: barOpacity }}
+            />
+          )}
+        </View>
+      </View>
+
+      <ThemedText
+        type="smallBold"
+        style={{ color: isCurrent ? accent : Colors.sway.darkGrey, width: 24, textAlign: 'right' }}
+      >
+        {value ?? '—'}
+      </ThemedText>
+    </View>
+  );
+};
+
+// ── Previous ratings timeline (edit mode only) ──
 const PreviousRatingsTimeline = ({
   entries,
   goalIndex,
@@ -38,38 +85,70 @@ const PreviousRatingsTimeline = ({
       <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
         Previous ratings
       </ThemedText>
-      {entries.map((entry) => {
-        const value = entry.ratings[goalIndex];
-        const progress = value != null ? value / 10 : 0;
+      {entries.map((entry, i) => (
+        <RatingRow
+          key={entry.date}
+          label={`#${i + 1} \u00B7 ${new Date(entry.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`}
+          value={entry.ratings[goalIndex]}
+          accent={accent}
+        />
+      ))}
+    </View>
+  );
+};
 
-        return (
-          <View key={entry.date} className="flex-row items-center gap-3">
-            <ThemedText type="small" style={{ color: Colors.sway.darkGrey, width: 52 }}>
-              {new Date(entry.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-            </ThemedText>
+// ── Full ratings history (view mode: previous + current in one timeline) ──
+const formatDate = (date: string) => new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 
-            {/* Mini progress bar */}
-            <View className="flex-1">
-              <View className="h-1.5 overflow-hidden rounded-full" style={{ backgroundColor: Colors.chip.darkCardAlt }}>
-                {value != null && (
-                  <View
-                    className="h-full rounded-full"
-                    style={{
-                      width: `${progress * 100}%`,
-                      backgroundColor: accent,
-                      opacity: 0.6
-                    }}
-                  />
-                )}
-              </View>
-            </View>
+// ── Full ratings history (view mode: previous + current in one timeline) ──
+const RatingsHistory = ({
+  entries,
+  currentRating,
+  currentDate,
+  goalIndex,
+  accent
+}: {
+  entries: PreviousRating[];
+  currentRating: number | null;
+  currentDate: string;
+  goalIndex: number;
+  accent: string;
+}) => {
+  const lastPrevious = entries.length > 0 ? entries[entries.length - 1].ratings[goalIndex] : null;
+  const trend: 'up' | 'down' | 'same' | null =
+    currentRating != null && lastPrevious != null
+      ? currentRating > lastPrevious
+        ? 'up'
+        : currentRating < lastPrevious
+          ? 'down'
+          : 'same'
+      : null;
 
-            <ThemedText type="smallBold" style={{ color: accent, width: 28, textAlign: 'right' }}>
-              {value ?? '—'}
-            </ThemedText>
-          </View>
-        );
-      })}
+  const trendIcon = trend === 'up' ? 'trending-up' : trend === 'down' ? 'trending-down' : null;
+  const trendColour = trend === 'up' ? Colors.primary.success : trend === 'down' ? Colors.primary.error : undefined;
+
+  return (
+    <View className="mt-3 gap-2">
+      <View className="flex-row items-center gap-2">
+        <ThemedText type="smallBold" style={{ color: Colors.sway.darkGrey }}>
+          Rating history
+        </ThemedText>
+        {trendIcon && trendColour && <MaterialCommunityIcons name={trendIcon} size={16} color={trendColour} />}
+      </View>
+      {entries.map((entry, i) => (
+        <RatingRow
+          key={entry.date}
+          label={`#${i + 1} \u00B7 ${formatDate(entry.date)}`}
+          value={entry.ratings[goalIndex]}
+          accent={accent}
+        />
+      ))}
+      <RatingRow
+        label={`#${entries.length + 1} \u00B7 ${formatDate(currentDate)}`}
+        value={currentRating}
+        accent={accent}
+        isCurrent
+      />
     </View>
   );
 };
@@ -81,6 +160,7 @@ const GoalCard = ({
   isReRating,
   canEdit,
   previousRatings,
+  currentDate,
   onGoalTextChange,
   onRatingChange,
   onRemove
@@ -154,8 +234,10 @@ const GoalCard = ({
           </View>
         )}
 
-        {/* Previous ratings timeline (re-rating mode) */}
-        {isReRating && <PreviousRatingsTimeline entries={previousRatings} goalIndex={index} accent={accent} />}
+        {/* Previous ratings timeline (edit re-rating mode only) */}
+        {canEdit && isReRating && (
+          <PreviousRatingsTimeline entries={previousRatings} goalIndex={index} accent={accent} />
+        )}
 
         {/* Rating input or display */}
         {canEdit ? (
@@ -166,48 +248,16 @@ const GoalCard = ({
               label={isReRating ? 'New rating' : 'How close are you to this goal?'}
             />
           </View>
+        ) : isReRating ? (
+          <RatingsHistory
+            entries={previousRatings}
+            currentRating={rating}
+            currentDate={currentDate ?? new Date().toISOString()}
+            goalIndex={index}
+            accent={accent}
+          />
         ) : (
-          <View className="mt-1 flex-row items-center gap-3">
-            <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
-              Rating
-            </ThemedText>
-            <View className="flex-row items-center gap-2">
-              <View
-                className="h-8 w-8 items-center justify-center rounded-lg"
-                style={{ backgroundColor: accent, opacity: 0.9 }}
-              >
-                <ThemedText type="smallBold" style={{ color: Colors.sway.dark }}>
-                  {rating !== null && rating !== undefined ? String(rating) : '—'}
-                </ThemedText>
-              </View>
-              <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
-                /10
-              </ThemedText>
-            </View>
-
-            {/* View-mode progress bar */}
-            {rating !== null && rating !== undefined && (
-              <View className="flex-1">
-                <View
-                  className="h-1.5 overflow-hidden rounded-full"
-                  style={{ backgroundColor: Colors.chip.darkCardAlt }}
-                >
-                  <View
-                    className="h-full rounded-full"
-                    style={{
-                      width: `${(rating / 10) * 100}%`,
-                      backgroundColor: accent
-                    }}
-                  />
-                </View>
-              </View>
-            )}
-          </View>
-        )}
-
-        {/* View-mode previous ratings */}
-        {!canEdit && isReRating && (
-          <PreviousRatingsTimeline entries={previousRatings} goalIndex={index} accent={accent} />
+          <RatingRow label="Rating" value={rating} accent={accent} isCurrent />
         )}
       </View>
     </View>

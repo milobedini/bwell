@@ -25,7 +25,7 @@ const GeneralGoalsPresenter = ({ attempt, mode, patientName }: GeneralGoalsPrese
   if (!state.canEdit) {
     return (
       <ContentContainer>
-        <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+        <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
           {/* In-progress indicator for therapist */}
           {mode === 'view' && attempt.status !== 'submitted' && (
             <View
@@ -72,6 +72,7 @@ const GeneralGoalsPresenter = ({ attempt, mode, patientName }: GeneralGoalsPrese
               isReRating={state.isReRating}
               canEdit={false}
               previousRatings={state.previousRatings}
+              currentDate={attempt.lastInteractionAt}
             />
           ))}
 
@@ -122,6 +123,7 @@ const GeneralGoalsPresenter = ({ attempt, mode, patientName }: GeneralGoalsPrese
           bottomOffset={62}
           contentContainerStyle={{ paddingBottom: 120 }}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
           {/* Header */}
           <View className="mb-4">
