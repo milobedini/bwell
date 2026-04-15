@@ -47,7 +47,7 @@ These bias toward caution over speed. For trivial tasks, use judgement.
 - `app/` — expo-router pages (`(auth)/`, `(main)/`, `(welcome)/`)
 - `app/(main)/(tabs)/` — authenticated tab navigator: `home/`, `journey/`, `practice/`, `patients/`, `review/`, `programs/`, `all-users/`, `profile/`
 - `components/` — shared and feature-specific components
-- `components/attempts/presenters/` — module-type presenter components (questionnaires, diary, five-areas, reading)
+- `components/attempts/presenters/` — module-type presenter components (questionnaires, diary, five-areas, reading, general-goals)
 - `hooks/` — custom React hooks (data fetching, mutations)
 - `api/` — Axios instance and API helpers
 - `constants/` — Colors, shared constants
@@ -138,7 +138,7 @@ These bias toward caution over speed. For trivial tasks, use judgement.
 - Test behaviour, not implementation — query by text/testID, not internal state
 - Use `jest.useFakeTimers()` + `jest.setSystemTime()` for time-dependent logic — always restore via `afterEach(() => jest.useRealTimers())`, not inline cleanup
 - RN style props are arrays — use `expect.arrayContaining([expect.objectContaining(...)])` for style assertions
-- **Shared test utilities** live in `test-utils/` — use `createQueryClientWrapper()` for hook tests that need a `QueryClientProvider`, and `mockQueryResult()` to build mock `UseQueryResult` objects
+- **Shared test utilities** live in `test-utils/` — use `createQueryClientWrapper()` for hook tests that need a `QueryClientProvider`, `mockQueryResult()` to build mock `UseQueryResult` objects, and `presenterMocks.ts` for shared presenter hook test mocks (expo-router, expo-haptics, sonner-native, toastOptions, useAttempts)
 - `jest.setup.ts` provides global mocks (AsyncStorage) — add new global mocks there, not per-file
 - Avoid `as` type casts in test data — use mock factories in `test-utils/factories.ts` that return real types with sensible defaults and accept `Partial<T>` overrides. Tests should only specify the fields they care about. Casts hide mismatches between test data and the actual API contract; if the type doesn't fit, fix the factory defaults, not the type
 - **Mock references after `jest.mock()` factories:** Use `require()` to get a reference to the mocked module — this is the documented Jest pattern because `jest.mock()` hoisting makes ES import bindings stale. `@typescript-eslint/no-require-imports` is disabled for test files in `eslint.config.mjs`. Example: `jest.mock('./useUsers', () => ({ useIsLoggedIn: jest.fn() })); const { useIsLoggedIn } = require('./useUsers');`

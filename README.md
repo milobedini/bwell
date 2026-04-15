@@ -19,7 +19,7 @@
 
 ## Overview
 
-BWell connects **patients**, **therapists**, and **admins** in a mental health platform. Therapists assign therapeutic modules (questionnaires, reading content, activity diaries) to patients and track their progress. Admins oversee the system, verify therapists, and monitor platform-wide metrics.
+BWell connects **patients**, **therapists**, and **admins** in a mental health platform. Therapists assign therapeutic modules (questionnaires, reading content, activity diaries, Five Areas Model, general goals) to patients and track their progress. Admins oversee the system, verify therapists, and monitor platform-wide metrics.
 
 ## Features
 
@@ -29,7 +29,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 - Journey tab with score sparklines and progress history
 - Practice tab with active and completed practice items
 - Browse programs and modules
-- Complete assigned questionnaires, reading content, and Five Areas Model (CBT hot cross bun)
+- Complete assigned questionnaires, reading content, Five Areas Model (CBT hot cross bun), and general goals with re-rating check-ins
 - View attempt history and detailed practice item submissions
 
 ### Therapist
@@ -48,6 +48,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ## Recent Milestones
 
+- **General Goals module** — goal rating with slider tracks, re-rating check-ins with unified timeline and trend indicators, reflection section, "Check-in" label across all views (2026-04-15)
 - **Activity diary redesign** — accordion layout with animated expand/collapse, split save/submit, Reanimated progress ring, mood slider, metric stepper with stale closure fixes, teal glow save indicator (2026-04-10)
 - **Five Areas Model** — interactive CBT hot cross bun diagram (Skia), node-expand modal input, stepped edit/review flow, area review cards (2026-04-05)
 - **Maestro E2E testing** — login flow with reusable subflows, full pipeline script with BE healthcheck, iOS simulator build with LogBox suppression, testID conventions (2026-04-04)
@@ -57,7 +58,6 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 - **Destructive action confirmation** — ActionMenu built-in confirmation step for all destructive actions with customisable title, description, and label (2026-03-29)
 - **Therapist assignments redesign** — SectionList grouped by patient, sort/filter drawer, edit modal (due date, notes, recurrence), collapsible sections, shared chip styles (2026-03-27)
 - **Patient dashboard** — focus card, effort strip, coming up list, Skia sparkline score trends, pull-to-refresh (2026-03-26)
-- **Therapist dashboard** — triage buckets with client cards, stat pills, score deltas, assignment dots, progress bars (2026-03-25)
 
 ## Tech Stack
 
