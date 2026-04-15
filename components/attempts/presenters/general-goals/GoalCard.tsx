@@ -97,7 +97,6 @@ const PreviousRatingsTimeline = ({
   );
 };
 
-// ── Full ratings history (view mode: previous + current in one timeline) ──
 const formatDate = (date: string) => new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 
 // ── Full ratings history (view mode: previous + current in one timeline) ──
@@ -178,7 +177,6 @@ const GoalCard = ({
       }}
     >
       <View className="p-4">
-        {/* Header row */}
         <View className="mb-3 flex-row items-center justify-between">
           <View className="flex-row items-center gap-2">
             <View className="h-6 w-6 items-center justify-center rounded-md" style={{ backgroundColor: `${accent}20` }}>
@@ -207,7 +205,6 @@ const GoalCard = ({
           )}
         </View>
 
-        {/* Goal text */}
         {canEdit && !isReRating ? (
           <TextInput
             value={goalText}
@@ -234,20 +231,17 @@ const GoalCard = ({
           </View>
         )}
 
-        {/* Previous ratings timeline (edit re-rating mode only) */}
         {canEdit && isReRating && (
           <PreviousRatingsTimeline entries={previousRatings} goalIndex={index} accent={accent} />
         )}
 
-        {/* Rating input or display */}
         {canEdit ? (
-          <View style={{ marginTop: isReRating ? 12 : 0 }}>
-            <RatingTrack
-              selected={rating}
-              onSelect={onRatingChange}
-              label={isReRating ? 'New rating' : 'How close are you to this goal?'}
-            />
-          </View>
+          <RatingTrack
+            selected={rating}
+            onSelect={onRatingChange}
+            label={isReRating ? 'New rating' : 'How close are you to this goal?'}
+            style={isReRating ? { marginTop: 12 } : undefined}
+          />
         ) : isReRating ? (
           <RatingsHistory
             entries={previousRatings}

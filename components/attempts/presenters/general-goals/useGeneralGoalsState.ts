@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useSaveModuleAttempt, useSubmitAttempt } from '@/hooks/useAttempts';
+import { AttemptStatus } from '@/types/types';
 import type { AttemptDetailResponseItem, GeneralGoalEntry, GeneralGoalsData } from '@milobedini/shared-types';
 
 type UseGeneralGoalsStateParams = {
@@ -16,7 +17,7 @@ export const useGeneralGoalsState = ({ attempt, mode }: UseGeneralGoalsStatePara
   const [reflection, setReflection] = useState(initialData?.reflection ?? '');
   const [isDirty, setIsDirty] = useState(false);
 
-  const canEdit = mode === 'edit' && attempt.status !== 'submitted';
+  const canEdit = mode === 'edit' && attempt.status !== AttemptStatus.SUBMITTED;
   const canAddGoal = canEdit && !isReRating && goals.length < 3;
 
   const { mutateSilently: saveAttemptSilently, isPending: isSaving } = useSaveModuleAttempt(attempt._id);
@@ -44,50 +45,46 @@ export const useGeneralGoalsState = ({ attempt, mode }: UseGeneralGoalsStatePara
     );
   }, [canEdit, isDirty, saveAttemptSilently, buildPayload]);
 
-  const markDirty = useCallback(() => {
-    setIsDirty(true);
-  }, []);
-
   const addGoal = useCallback(() => {
     if (!canAddGoal) return;
     setGoals((prev) => [...prev, { goalText: '', rating: null }]);
-    markDirty();
-  }, [canAddGoal, markDirty]);
+    setIsDirty(true);
+  }, [canAddGoal]);
 
   const updateGoalText = useCallback(
     (index: number, text: string) => {
       if (!canEdit || isReRating) return;
       setGoals((prev) => prev.map((g, i) => (i === index ? { ...g, goalText: text } : g)));
-      markDirty();
+      setIsDirty(true);
     },
-    [canEdit, isReRating, markDirty]
+    [canEdit, isReRating]
   );
 
   const updateGoalRating = useCallback(
     (index: number, rating: number) => {
       if (!canEdit) return;
       setGoals((prev) => prev.map((g, i) => (i === index ? { ...g, rating } : g)));
-      markDirty();
+      setIsDirty(true);
     },
-    [canEdit, markDirty]
+    [canEdit]
   );
 
   const removeGoal = useCallback(
     (index: number) => {
       if (!canEdit || isReRating) return;
       setGoals((prev) => prev.filter((_, i) => i !== index));
-      markDirty();
+      setIsDirty(true);
     },
-    [canEdit, isReRating, markDirty]
+    [canEdit, isReRating]
   );
 
   const updateReflection = useCallback(
     (text: string) => {
       if (!canEdit) return;
       setReflection(text);
-      markDirty();
+      setIsDirty(true);
     },
-    [canEdit, markDirty]
+    [canEdit]
   );
 
   const canSubmit =

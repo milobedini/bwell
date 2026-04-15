@@ -5,6 +5,7 @@ import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import EmptyState from '@/components/ui/EmptyState';
 import { Colors } from '@/constants/Colors';
+import { AttemptStatus } from '@/types/types';
 import type { AttemptDetailResponseItem } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
@@ -27,7 +28,7 @@ const GeneralGoalsPresenter = ({ attempt, mode, patientName }: GeneralGoalsPrese
       <ContentContainer>
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
           {/* In-progress indicator for therapist */}
-          {mode === 'view' && attempt.status !== 'submitted' && (
+          {mode === 'view' && attempt.status !== AttemptStatus.SUBMITTED && (
             <View
               className="mb-4 flex-row items-center gap-2 rounded-xl p-3"
               style={{

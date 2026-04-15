@@ -8,7 +8,8 @@ enum ModuleType {
   QUESTIONNAIRE = 'questionnaire',
   READING = 'reading',
   ACTIVITY_DIARY = 'activity_diary',
-  FIVE_AREAS_MODEL = 'five_areas_model'
+  FIVE_AREAS_MODEL = 'five_areas_model',
+  GENERAL_GOALS = 'general_goals'
 }
 
 enum AccessPolicy {

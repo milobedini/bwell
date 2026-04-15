@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, View, type ViewStyle } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
@@ -11,9 +11,10 @@ type RatingTrackProps = {
   onSelect?: (rating: number) => void;
   disabled?: boolean;
   label?: string;
+  style?: ViewStyle;
 };
 
-const RatingTrack = ({ selected, onSelect, disabled, label }: RatingTrackProps) => {
+const RatingTrack = ({ selected, onSelect, disabled, label, style }: RatingTrackProps) => {
   const handleSelect = useCallback(
     (n: number) => {
       if (disabled || !onSelect) return;
@@ -24,7 +25,7 @@ const RatingTrack = ({ selected, onSelect, disabled, label }: RatingTrackProps) 
   );
 
   return (
-    <View className="gap-2">
+    <View className="gap-2" style={style}>
       {label && (
         <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
           {label}
