@@ -1,6 +1,6 @@
 import type { AttemptDetailResponseItem } from '@milobedini/shared-types';
 
-import { isDiaryAttempt, isQuestionnaireAttempt, isReadingAttempt } from './types';
+import { isDiaryAttempt, isGeneralGoalsAttempt, isQuestionnaireAttempt, isReadingAttempt } from './types';
 
 const baseAttempt = {
   _id: '1',
@@ -77,5 +77,34 @@ describe('isReadingAttempt', () => {
       moduleSnapshot: { title: 'Test' }
     } as unknown as AttemptDetailResponseItem;
     expect(isReadingAttempt(a)).toBe(false);
+  });
+});
+
+describe('isGeneralGoalsAttempt', () => {
+  it('returns true for general_goals with generalGoals data', () => {
+    const a = {
+      ...baseAttempt,
+      moduleType: 'general_goals',
+      generalGoals: { goals: [], reflection: '' }
+    } as unknown as AttemptDetailResponseItem;
+    expect(isGeneralGoalsAttempt(a)).toBe(true);
+  });
+
+  it('returns false for general_goals without generalGoals data', () => {
+    const a = {
+      ...baseAttempt,
+      moduleType: 'general_goals',
+      generalGoals: null
+    } as unknown as AttemptDetailResponseItem;
+    expect(isGeneralGoalsAttempt(a)).toBe(false);
+  });
+
+  it('returns false for non-general_goals type', () => {
+    const a = {
+      ...baseAttempt,
+      moduleType: 'questionnaire',
+      generalGoals: { goals: [], reflection: '' }
+    } as unknown as AttemptDetailResponseItem;
+    expect(isGeneralGoalsAttempt(a)).toBe(false);
   });
 });
