@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { dueLabel, formatShortDate } from '@/utils/dates';
-import { getModuleIcon } from '@/utils/moduleIcons';
+import { getModuleDisplayTitle, getModuleIcon } from '@/utils/moduleIcons';
 import type { PracticeItem as PracticeItemType } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
@@ -19,13 +19,18 @@ const PracticeItemBase = ({ item, basePath = '/(main)/(tabs)/practice/[id]' }: P
   const isCompleted = item.status === 'completed';
   const isInProgress = item.status === 'in_progress';
   const icon = getModuleIcon(item.moduleType);
+  const displayTitle = getModuleDisplayTitle(
+    item.moduleTitle,
+    item.moduleType,
+    item.latestAttempt?.iteration ?? item.attemptCount
+  );
 
   const handlePress = () => {
     router.push({
       pathname: basePath,
       params: {
         id: item.assignmentId,
-        headerTitle: item.moduleTitle,
+        headerTitle: displayTitle,
         ...(item.latestAttempt?.attemptId ? { attemptId: item.latestAttempt.attemptId } : {})
       }
     });
@@ -64,7 +69,7 @@ const PracticeItemBase = ({ item, basePath = '/(main)/(tabs)/practice/[id]' }: P
 
         {/* Content */}
         <View className="flex-1 gap-1">
-          <ThemedText type="smallBold">{item.moduleTitle}</ThemedText>
+          <ThemedText type="smallBold">{displayTitle}</ThemedText>
 
           <View className="flex-row flex-wrap gap-2">
             {item.therapistName ? (

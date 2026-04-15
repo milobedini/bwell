@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { AttemptStatus } from '@/types/types';
 import { dueLabel, formatShortDate } from '@/utils/dates';
-import { getModuleIcon } from '@/utils/moduleIcons';
+import { getModuleDisplayTitle, getModuleIcon } from '@/utils/moduleIcons';
 import type { AttemptListItem } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
@@ -32,6 +32,7 @@ type AttemptCardProps = {
 
 const AttemptCard = memo(({ item, onPress }: AttemptCardProps) => {
   const icon = getModuleIcon(item.moduleType);
+  const displayTitle = getModuleDisplayTitle(item.module.title, item.moduleType, item.iteration);
   const isCompleted = item.status === AttemptStatus.SUBMITTED;
 
   const statusText = (() => {
@@ -58,7 +59,7 @@ const AttemptCard = memo(({ item, onPress }: AttemptCardProps) => {
 
         <View className="flex-1 gap-0.5">
           <ThemedText type="smallBold" style={{ flexShrink: 1 }}>
-            {item.module.title}
+            {displayTitle}
           </ThemedText>
           <ThemedText type="small" style={{ color: isCompleted ? Colors.sway.darkGrey : Colors.sway.bright }}>
             {statusText}

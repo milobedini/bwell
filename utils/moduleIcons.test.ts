@@ -1,4 +1,4 @@
-import { getModuleIcon } from './moduleIcons';
+import { getModuleDisplayTitle, getModuleIcon } from './moduleIcons';
 
 describe('getModuleIcon', () => {
   it('returns clipboard icon for questionnaire', () => {
@@ -27,5 +27,31 @@ describe('getModuleIcon', () => {
 
   it('returns fallback icon for empty string', () => {
     expect(getModuleIcon('')).toBe('file-document-outline');
+  });
+
+  it('returns bullseye-arrow icon for general_goals', () => {
+    expect(getModuleIcon('general_goals')).toBe('bullseye-arrow');
+  });
+});
+
+describe('getModuleDisplayTitle', () => {
+  it('returns original title for non-general_goals module', () => {
+    expect(getModuleDisplayTitle('PHQ-9', 'questionnaire', 3)).toBe('PHQ-9');
+  });
+
+  it('returns original title for general_goals with iteration 1', () => {
+    expect(getModuleDisplayTitle('General Goals', 'general_goals', 1)).toBe('General Goals');
+  });
+
+  it('returns original title for general_goals with undefined iteration', () => {
+    expect(getModuleDisplayTitle('General Goals', 'general_goals', undefined)).toBe('General Goals');
+  });
+
+  it('appends (Check-in) for general_goals with iteration > 1', () => {
+    expect(getModuleDisplayTitle('General Goals', 'general_goals', 2)).toBe('General Goals (Check-in)');
+  });
+
+  it('appends (Check-in) for general_goals with iteration 5', () => {
+    expect(getModuleDisplayTitle('General Goals', 'general_goals', 5)).toBe('General Goals (Check-in)');
   });
 });

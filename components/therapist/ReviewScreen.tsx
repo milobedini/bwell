@@ -15,7 +15,7 @@ import { useTherapistReview, useTherapistReviewModules } from '@/hooks/usePracti
 import { useClients } from '@/hooks/useUsers';
 import { filterChipStyle, filterChipTextStyle } from '@/utils/chipStyles';
 import { type DateSection, groupByDate, timeAgo } from '@/utils/dates';
-import { getModuleIcon } from '@/utils/moduleIcons';
+import { getModuleDisplayTitle, getModuleIcon } from '@/utils/moduleIcons';
 import { getSeverityColors } from '@/utils/severity';
 import type { ReviewItem, SortOption } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
@@ -43,6 +43,11 @@ const ReviewListItemBase = ({ item }: { item: ReviewItem }) => {
   const severity = getSeverityColors(item.latestAttempt?.scoreBandLabel);
   const { relative, formatted } = timeAgo(item.latestAttempt?.completedAt ?? '');
   const icon = getModuleIcon(item.moduleType);
+  const displayTitle = getModuleDisplayTitle(
+    item.moduleTitle,
+    item.moduleType,
+    item.latestAttempt?.iteration ?? item.attemptCount
+  );
   const attemptId = item.latestAttempt?.attemptId;
 
   const handlePress = () => {
@@ -62,7 +67,7 @@ const ReviewListItemBase = ({ item }: { item: ReviewItem }) => {
           <View className="flex-row items-center gap-2">
             <MaterialCommunityIcons name={icon} size={18} color={Colors.sway.darkGrey} />
             <ThemedText type="smallBold" className="flex-1 flex-shrink" numberOfLines={1}>
-              {item.moduleTitle}
+              {displayTitle}
             </ThemedText>
 
             {/* Score pill (questionnaires only) */}

@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { dueLabel } from '@/utils/dates';
+import { getModuleDisplayTitle } from '@/utils/moduleIcons';
 import type { PracticeItem } from '@milobedini/shared-types';
 
 type ComingUpListProps = {
@@ -14,13 +15,18 @@ type ComingUpListProps = {
 
 const AssignmentRow = memo(({ assignment }: { assignment: PracticeItem }) => {
   const router = useRouter();
+  const displayTitle = getModuleDisplayTitle(
+    assignment.moduleTitle,
+    assignment.moduleType,
+    assignment.latestAttempt?.iteration ?? assignment.attemptCount
+  );
 
   const handlePress = useCallback(() => {
     router.push({
       pathname: '/(main)/(tabs)/home/practice/[id]',
-      params: { id: assignment.assignmentId, headerTitle: assignment.moduleTitle }
+      params: { id: assignment.assignmentId, headerTitle: displayTitle }
     });
-  }, [assignment, router]);
+  }, [assignment, displayTitle, router]);
 
   const label = assignment.dueAt ? dueLabel(assignment.dueAt) : 'No due date';
   const hasDraft = assignment.latestAttempt && !assignment.latestAttempt.completedAt;
@@ -32,7 +38,7 @@ const AssignmentRow = memo(({ assignment }: { assignment: PracticeItem }) => {
     >
       <View className="mr-3 flex-1">
         <ThemedText type="default" style={{ fontWeight: '600', fontSize: 15 }}>
-          {assignment.moduleTitle}
+          {displayTitle}
         </ThemedText>
         <ThemedText type="small" className="mt-0.5" style={{ color: Colors.sway.darkGrey }}>
           {label}
