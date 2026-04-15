@@ -1,44 +1,30 @@
+import { mockCreatePresenterRefs, mockHaptics, mockSonner } from '@/test-utils/presenterMocks';
 import type { AttemptDetailResponseItem, DiaryDetail } from '@milobedini/shared-types';
 import { act, renderHook } from '@testing-library/react-native';
 
 import { useDiaryState } from './useDiaryState';
 
 // --- Mocks ---
-// TODO: expo-router, useAttempts, and expo-haptics mocks are duplicated across
-// useDiaryState.test.ts and useFiveAreasState.test.ts. Extract shared mock
-// factories to test-utils/ once more attempt-presenter tests are added.
+const mocks = mockCreatePresenterRefs();
 
-const mockRouter = { back: jest.fn() };
 jest.mock('expo-router', () => ({
-  useRouter: () => mockRouter,
+  useRouter: () => mocks.router,
   useLocalSearchParams: () => ({})
 }));
-
-const mockSaveMutate = jest.fn();
-const mockSaveSilently = jest.fn();
-const mockSubmitMutate = jest.fn();
-
 jest.mock('@/hooks/useAttempts', () => ({
   useSaveModuleAttempt: () => ({
-    mutate: mockSaveMutate,
-    mutateSilently: mockSaveSilently,
+    mutate: mocks.saveMutate,
+    mutateSilently: mocks.saveSilently,
     isPending: false,
     isSuccess: false
   }),
   useSubmitAttempt: () => ({
-    mutate: mockSubmitMutate,
+    mutate: mocks.submitMutate,
     isPending: false
   })
 }));
-
-jest.mock('expo-haptics', () => ({
-  notificationAsync: jest.fn(() => Promise.resolve()),
-  NotificationFeedbackType: { Success: 'success', Error: 'error' }
-}));
-
-jest.mock('sonner-native', () => ({
-  toast: { loading: jest.fn(), success: jest.fn(), error: jest.fn() }
-}));
+jest.mock('expo-haptics', () => mockHaptics);
+jest.mock('sonner-native', () => mockSonner);
 
 // --- Helpers ---
 
@@ -118,8 +104,8 @@ describe('useDiaryState', () => {
       result.current.saveDirty();
     });
 
-    expect(mockSaveSilently).toHaveBeenCalledTimes(1);
-    const payload = mockSaveSilently.mock.calls[0][0];
+    expect(mocks.saveSilently).toHaveBeenCalledTimes(1);
+    const payload = mocks.saveSilently.mock.calls[0][0];
     expect(payload.merge).toBe(true);
     expect(payload.diaryEntries).toHaveLength(1);
     expect(payload.diaryEntries[0].activity).toBe('Read a book');
@@ -133,7 +119,7 @@ describe('useDiaryState', () => {
       result.current.saveDirty();
     });
 
-    expect(mockSaveSilently).not.toHaveBeenCalled();
+    expect(mocks.saveSilently).not.toHaveBeenCalled();
   });
 
   it('handleSaveDraft navigates back when no dirty changes', () => {
@@ -144,8 +130,8 @@ describe('useDiaryState', () => {
       result.current.handleSaveDraft();
     });
 
-    expect(mockRouter.back).toHaveBeenCalled();
-    expect(mockSaveMutate).not.toHaveBeenCalled();
+    expect(mocks.router.back).toHaveBeenCalled();
+    expect(mocks.saveMutate).not.toHaveBeenCalled();
   });
 
   it('handleSaveDraft saves dirty changes before navigating back', () => {
@@ -162,7 +148,7 @@ describe('useDiaryState', () => {
       result.current.handleSaveDraft();
     });
 
-    expect(mockSaveMutate).toHaveBeenCalledTimes(1);
+    expect(mocks.saveMutate).toHaveBeenCalledTimes(1);
   });
 
   it('switching active day updates dayRows', () => {
@@ -194,8 +180,8 @@ describe('useDiaryState', () => {
       result.current.saveDirty();
     });
 
-    expect(mockSaveSilently).toHaveBeenCalledTimes(1);
-    const payload = mockSaveSilently.mock.calls[0][0];
+    expect(mocks.saveSilently).toHaveBeenCalledTimes(1);
+    const payload = mocks.saveSilently.mock.calls[0][0];
     expect(payload.userNote).toBe('My reflection');
   });
 

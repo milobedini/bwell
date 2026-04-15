@@ -1,39 +1,28 @@
+import { mockCreatePresenterRefs, mockHaptics, mockSonner, mockToastOptions } from '@/test-utils/presenterMocks';
 import type { AttemptDetailResponseItem } from '@milobedini/shared-types';
 import { act, renderHook } from '@testing-library/react-native';
 
 import { useGeneralGoalsState } from './useGeneralGoalsState';
 
-const mockSaveSilently = jest.fn();
-const mockSubmitMutate = jest.fn();
+// --- Mocks ---
+const mocks = mockCreatePresenterRefs();
 
 jest.mock('expo-router', () => ({
   useLocalSearchParams: () => ({ assignmentId: 'assignment-from-params' })
 }));
-
-jest.mock('expo-haptics', () => ({
-  notificationAsync: jest.fn(() => Promise.resolve()),
-  NotificationFeedbackType: { Error: 'error' }
-}));
-
-jest.mock('sonner-native', () => ({
-  toast: { error: jest.fn() }
-}));
-
-jest.mock('@/components/toast/toastOptions', () => ({
-  TOAST_DURATIONS: { error: 3000 },
-  TOAST_STYLES: { error: {} }
-}));
-
 jest.mock('@/hooks/useAttempts', () => ({
   useSaveModuleAttempt: () => ({
-    mutateSilently: mockSaveSilently,
+    mutateSilently: mocks.saveSilently,
     isPending: false
   }),
   useSubmitAttempt: () => ({
-    mutate: mockSubmitMutate,
+    mutate: mocks.submitMutate,
     isPending: false
   })
 }));
+jest.mock('expo-haptics', () => mockHaptics);
+jest.mock('sonner-native', () => mockSonner);
+jest.mock('@/components/toast/toastOptions', () => mockToastOptions);
 
 const makeAttempt = (overrides: Partial<AttemptDetailResponseItem> = {}): AttemptDetailResponseItem =>
   ({
@@ -320,11 +309,11 @@ describe('useGeneralGoalsState', () => {
     act(() => result.current.addGoal());
     act(() => result.current.save());
 
-    expect(mockSaveSilently).toHaveBeenCalledTimes(1);
-    expect(mockSaveSilently.mock.calls[0][0]).toEqual({
+    expect(mocks.saveSilently).toHaveBeenCalledTimes(1);
+    expect(mocks.saveSilently.mock.calls[0][0]).toEqual({
       generalGoals: expect.objectContaining({ goals: [{ goalText: '', rating: null }] })
     });
-    expect(mockSaveSilently.mock.calls[0][1]).toEqual(expect.objectContaining({ onError: expect.any(Function) }));
+    expect(mocks.saveSilently.mock.calls[0][1]).toEqual(expect.objectContaining({ onError: expect.any(Function) }));
   });
 
   it('save does nothing when not dirty', () => {
@@ -332,7 +321,7 @@ describe('useGeneralGoalsState', () => {
 
     act(() => result.current.save());
 
-    expect(mockSaveSilently).not.toHaveBeenCalled();
+    expect(mocks.saveSilently).not.toHaveBeenCalled();
   });
 
   it('save clears isDirty on success', () => {
@@ -343,7 +332,7 @@ describe('useGeneralGoalsState', () => {
 
     act(() => result.current.save());
 
-    const onSuccess = mockSaveSilently.mock.calls[0][1].onSuccess;
+    const onSuccess = mocks.saveSilently.mock.calls[0][1].onSuccess;
     act(() => onSuccess());
 
     expect(result.current.isDirty).toBe(false);
@@ -364,13 +353,13 @@ describe('useGeneralGoalsState', () => {
 
     act(() => result.current.handleSubmit());
 
-    expect(mockSaveSilently).toHaveBeenCalledTimes(1);
+    expect(mocks.saveSilently).toHaveBeenCalledTimes(1);
 
     // Trigger save onSuccess to fire submitAttempt
-    const onSuccess = mockSaveSilently.mock.calls[0][1].onSuccess;
+    const onSuccess = mocks.saveSilently.mock.calls[0][1].onSuccess;
     act(() => onSuccess());
 
-    expect(mockSubmitMutate).toHaveBeenCalledWith(
+    expect(mocks.submitMutate).toHaveBeenCalledWith(
       { assignmentId: 'assignment-from-params' },
       expect.objectContaining({ onError: expect.any(Function) })
     );
@@ -381,7 +370,7 @@ describe('useGeneralGoalsState', () => {
 
     act(() => result.current.handleSubmit());
 
-    expect(mockSaveSilently).not.toHaveBeenCalled();
-    expect(mockSubmitMutate).not.toHaveBeenCalled();
+    expect(mocks.saveSilently).not.toHaveBeenCalled();
+    expect(mocks.submitMutate).not.toHaveBeenCalled();
   });
 });
