@@ -4,7 +4,7 @@ import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { dueLabel, submittedLabel } from '@/utils/dates';
-import { getModuleIcon } from '@/utils/moduleIcons';
+import { getModuleDisplayTitle, getModuleIcon } from '@/utils/moduleIcons';
 import type { PracticeItem } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
@@ -27,6 +27,12 @@ const PatientPracticeCardBase = ({ item, sparkline, patientName, onLongPress }: 
   const isCompleted = item.status === 'completed';
   const isInProgress = item.status === 'in_progress';
   const icon = getModuleIcon(item.moduleType);
+
+  const displayTitle = getModuleDisplayTitle(
+    item.moduleTitle,
+    item.moduleType,
+    item.latestAttempt?.iteration ?? item.attemptCount
+  );
 
   const canNavigate =
     item.status !== 'not_started' && !!item.latestAttempt?.attemptId && !(isInProgress && item.percentComplete === 0);
@@ -88,7 +94,7 @@ const PatientPracticeCardBase = ({ item, sparkline, patientName, onLongPress }: 
         <View className="flex-1 gap-0.5">
           <View className="flex-row items-center gap-2">
             <ThemedText type="smallBold" style={{ flexShrink: 1 }}>
-              {item.moduleTitle}
+              {displayTitle}
             </ThemedText>
             {item.attemptCount > 1 ? (
               <View

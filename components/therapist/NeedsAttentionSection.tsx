@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/Colors';
+import { getModuleDisplayTitle } from '@/utils/moduleIcons';
 import type { AttentionPriority, AttentionReason, ReviewItem } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
@@ -26,6 +27,11 @@ const AttentionItemBase = ({ item }: AttentionItemProps) => {
   const priorityColor = item.attentionPriority ? PRIORITY_COLORS[item.attentionPriority] : Colors.sway.darkGrey;
   const reasonLabel = item.attentionReason ? REASON_LABELS[item.attentionReason] : undefined;
   const attemptId = item.latestAttempt?.attemptId;
+  const displayTitle = getModuleDisplayTitle(
+    item.moduleTitle,
+    item.moduleType,
+    item.latestAttempt?.iteration ?? item.attemptCount
+  );
 
   const handlePress = () => {
     if (attemptId) {
@@ -43,7 +49,7 @@ const AttentionItemBase = ({ item }: AttentionItemProps) => {
           <View className="flex-1 gap-0.5">
             <ThemedText type="smallBold">{item.patientName}</ThemedText>
             <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
-              {item.moduleTitle}
+              {displayTitle}
               {item.latestAttempt?.totalScore != null ? ` · ${item.latestAttempt.totalScore}` : ''}
             </ThemedText>
           </View>

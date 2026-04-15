@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { dueLabel } from '@/utils/dates';
+import { getModuleDisplayTitle } from '@/utils/moduleIcons';
 import type { PracticeItem } from '@milobedini/shared-types';
 
 type FocusCardProps = {
@@ -46,6 +47,13 @@ const URGENCY_STYLES = {
 
 const FocusCard = memo(({ assignment }: FocusCardProps) => {
   const router = useRouter();
+  const displayTitle = assignment
+    ? getModuleDisplayTitle(
+        assignment.moduleTitle,
+        assignment.moduleType,
+        assignment.latestAttempt?.iteration ?? assignment.attemptCount
+      )
+    : '';
 
   const handlePress = useCallback(() => {
     if (!assignment) {
@@ -54,9 +62,9 @@ const FocusCard = memo(({ assignment }: FocusCardProps) => {
     }
     router.push({
       pathname: '/(main)/(tabs)/home/practice/[id]',
-      params: { id: assignment.assignmentId, headerTitle: assignment.moduleTitle }
+      params: { id: assignment.assignmentId, headerTitle: displayTitle }
     });
-  }, [assignment, router]);
+  }, [assignment, displayTitle, router]);
 
   // "All caught up" state
   if (!assignment) {
@@ -102,7 +110,7 @@ const FocusCard = memo(({ assignment }: FocusCardProps) => {
         {styles.label}
       </ThemedText>
       <ThemedText type="smallTitle" className="mb-1">
-        {assignment.moduleTitle}
+        {displayTitle}
       </ThemedText>
       <ThemedText type="small" className="mb-3.5" style={{ color: Colors.sway.darkGrey }}>
         {assignment.dueAt ? dueLabel(assignment.dueAt) : 'No due date'}

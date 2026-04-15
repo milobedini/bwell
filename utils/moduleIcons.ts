@@ -13,3 +13,10 @@ const MODULE_TYPE_ICONS: Record<string, MCIName> = {
 
 export const getModuleIcon = (moduleType?: string): MCIName =>
   (moduleType && MODULE_TYPE_ICONS[moduleType]) || 'file-document-outline';
+
+/**
+ * Appends "(Check-in)" to the title for General Goals re-rating attempts.
+ * Works with both PracticeItem (iteration on latestAttempt) and AttemptListItem (iteration directly).
+ */
+export const getModuleDisplayTitle = (title: string, moduleType: string, iteration: number | undefined): string =>
+  moduleType === 'general_goals' && (iteration ?? 0) > 1 ? `${title} (Check-in)` : title;
