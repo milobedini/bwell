@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import Container from '@/components/Container';
 import EmptyState from '@/components/ui/EmptyState';
-import { isDiaryAttempt, isQuestionnaireAttempt, isReadingAttempt } from '@/utils/types';
+import { isDiaryAttempt, isGeneralGoalsAttempt, isQuestionnaireAttempt, isReadingAttempt } from '@/utils/types';
 import type { AttemptDetailResponseItem } from '@milobedini/shared-types';
 
 import ActivityDiaryPresenter from './diary/ActivityDiaryPresenter';
@@ -35,7 +35,7 @@ const AttemptPresenter = ({ attempt, mode, patientName }: AttemptPresenterProps)
     return <FiveAreasPresenter attempt={attempt} mode={mode} patientName={patientName} />;
   }
 
-  if (attempt.moduleType === 'general_goals') {
+  if (isGeneralGoalsAttempt(attempt)) {
     return <GeneralGoalsPresenter attempt={attempt} mode={mode} patientName={patientName} />;
   }
 

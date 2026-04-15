@@ -37,7 +37,7 @@ const ReflectionSection = ({ reflection, isReRating, canEdit, onReflectionChange
           style={{
             backgroundColor: Colors.diary.promptBg,
             borderWidth: 1,
-            borderColor: 'rgba(24,205,186,0.12)'
+            borderColor: Colors.tintSubtle.tealBorder
           }}
         >
           <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginBottom: 6 }}>

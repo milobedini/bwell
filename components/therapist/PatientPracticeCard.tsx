@@ -96,7 +96,7 @@ const PatientPracticeCardBase = ({ item, sparkline, patientName, onLongPress }: 
             <ThemedText type="smallBold" style={{ flexShrink: 1 }}>
               {displayTitle}
             </ThemedText>
-            {item.attemptCount > 1 ? (
+            {item.attemptCount > 1 && item.moduleType !== 'general_goals' ? (
               <View
                 className="items-center justify-center rounded-full px-1.5 py-0.5"
                 style={{ backgroundColor: Colors.chip.pill }}

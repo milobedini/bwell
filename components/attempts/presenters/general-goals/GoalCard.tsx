@@ -9,6 +9,13 @@ import RatingTrack from './RatingTrack';
 // ── Accent colours per goal position ──
 const GOAL_ACCENTS = [Colors.sway.bright, Colors.diary.enjoyment, Colors.diary.moodCool] as const;
 
+// Faded accent backgrounds for goal number badges (12% opacity)
+const ACCENT_FADED: Record<string, string> = {
+  [Colors.sway.bright]: 'rgba(24,205,186,0.12)',
+  [Colors.diary.enjoyment]: 'rgba(167,139,250,0.12)',
+  [Colors.diary.moodCool]: 'rgba(91,141,239,0.12)'
+};
+
 type GoalCardProps = {
   index: number;
   goalText: string;
@@ -179,7 +186,10 @@ const GoalCard = ({
       <View className="p-4">
         <View className="mb-3 flex-row items-center justify-between">
           <View className="flex-row items-center gap-2">
-            <View className="h-6 w-6 items-center justify-center rounded-md" style={{ backgroundColor: `${accent}20` }}>
+            <View
+              className="h-6 w-6 items-center justify-center rounded-md"
+              style={{ backgroundColor: ACCENT_FADED[accent] ?? Colors.tintSubtle.teal }}
+            >
               <ThemedText type="smallBold" style={{ color: accent, fontSize: 12 }}>
                 {index + 1}
               </ThemedText>

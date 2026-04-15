@@ -15,9 +15,9 @@ describe('RatingTrack', () => {
   it('renders 11 rating buttons (0-10)', () => {
     render(<RatingTrack selected={null} />);
 
-    for (let i = 0; i <= 10; i++) {
+    Array.from({ length: 11 }, (_, i) => i).forEach((i) => {
       expect(screen.getByLabelText(`Rate ${i} out of 10`)).toBeTruthy();
-    }
+    });
   });
 
   it('renders label when provided', () => {

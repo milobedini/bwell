@@ -6,6 +6,24 @@ import { useGeneralGoalsState } from './useGeneralGoalsState';
 const mockSaveSilently = jest.fn();
 const mockSubmitMutate = jest.fn();
 
+jest.mock('expo-router', () => ({
+  useLocalSearchParams: () => ({ assignmentId: 'assignment-from-params' })
+}));
+
+jest.mock('expo-haptics', () => ({
+  notificationAsync: jest.fn(() => Promise.resolve()),
+  NotificationFeedbackType: { Error: 'error' }
+}));
+
+jest.mock('sonner-native', () => ({
+  toast: { error: jest.fn() }
+}));
+
+jest.mock('@/components/toast/toastOptions', () => ({
+  TOAST_DURATIONS: { error: 3000 },
+  TOAST_STYLES: { error: {} }
+}));
+
 jest.mock('@/hooks/useAttempts', () => ({
   useSaveModuleAttempt: () => ({
     mutateSilently: mockSaveSilently,
@@ -52,7 +70,7 @@ describe('useGeneralGoalsState', () => {
     });
     const { result } = renderHook(() => useGeneralGoalsState({ attempt, mode: 'edit' }));
 
-    expect(result.current.goals).toEqual([{ goalText: 'Be calmer', rating: 5 }]);
+    expect(result.current.goals).toEqual([expect.objectContaining({ goalText: 'Be calmer', rating: 5 })]);
     expect(result.current.reflection).toBe('Some thoughts');
   });
 
@@ -119,7 +137,8 @@ describe('useGeneralGoalsState', () => {
 
     act(() => result.current.addGoal());
 
-    expect(result.current.goals).toEqual([{ goalText: '', rating: null }]);
+    expect(result.current.goals).toEqual([expect.objectContaining({ goalText: '', rating: null })]);
+    expect(result.current.goals[0]).toHaveProperty('_uid');
     expect(result.current.isDirty).toBe(true);
   });
 
@@ -203,7 +222,7 @@ describe('useGeneralGoalsState', () => {
 
     act(() => result.current.removeGoal(0));
 
-    expect(result.current.goals).toEqual([{ goalText: 'B', rating: 2 }]);
+    expect(result.current.goals).toEqual([expect.objectContaining({ goalText: 'B', rating: 2 })]);
     expect(result.current.isDirty).toBe(true);
   });
 
@@ -305,6 +324,7 @@ describe('useGeneralGoalsState', () => {
     expect(mockSaveSilently.mock.calls[0][0]).toEqual({
       generalGoals: expect.objectContaining({ goals: [{ goalText: '', rating: null }] })
     });
+    expect(mockSaveSilently.mock.calls[0][1]).toEqual(expect.objectContaining({ onError: expect.any(Function) }));
   });
 
   it('save does nothing when not dirty', () => {
@@ -331,7 +351,7 @@ describe('useGeneralGoalsState', () => {
 
   // ── handleSubmit ──
 
-  it('handleSubmit saves then submits when canSubmit', () => {
+  it('handleSubmit saves then submits with assignmentId from route params', () => {
     const attempt = makeAttempt({
       generalGoals: {
         goals: [{ goalText: 'Goal', rating: 5 }],
@@ -342,7 +362,7 @@ describe('useGeneralGoalsState', () => {
     });
     const { result } = renderHook(() => useGeneralGoalsState({ attempt, mode: 'edit' }));
 
-    act(() => result.current.handleSubmit('assignment-1'));
+    act(() => result.current.handleSubmit());
 
     expect(mockSaveSilently).toHaveBeenCalledTimes(1);
 
@@ -350,7 +370,10 @@ describe('useGeneralGoalsState', () => {
     const onSuccess = mockSaveSilently.mock.calls[0][1].onSuccess;
     act(() => onSuccess());
 
-    expect(mockSubmitMutate).toHaveBeenCalledWith({ assignmentId: 'assignment-1' });
+    expect(mockSubmitMutate).toHaveBeenCalledWith(
+      { assignmentId: 'assignment-from-params' },
+      expect.objectContaining({ onError: expect.any(Function) })
+    );
   });
 
   it('handleSubmit does nothing when canSubmit is false', () => {

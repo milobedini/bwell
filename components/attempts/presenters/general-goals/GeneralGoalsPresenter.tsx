@@ -1,4 +1,4 @@
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import ContentContainer from '@/components/ContentContainer';
 import ThemedButton from '@/components/ThemedButton';
@@ -66,14 +66,14 @@ const GeneralGoalsPresenter = ({ attempt, mode, patientName }: GeneralGoalsPrese
 
           {state.goals.map((goal, index) => (
             <GoalCard
-              key={index}
+              key={goal._uid}
               index={index}
               goalText={goal.goalText}
               rating={goal.rating}
               isReRating={state.isReRating}
               canEdit={false}
               previousRatings={state.previousRatings}
-              currentDate={attempt.lastInteractionAt}
+              currentDate={attempt.lastInteractionAt ?? attempt.createdAt}
             />
           ))}
 
@@ -105,7 +105,17 @@ const GeneralGoalsPresenter = ({ attempt, mode, patientName }: GeneralGoalsPrese
         {/* Floating save indicator */}
         {(state.isDirty || state.isSaving) && (
           <Pressable
-            style={floatingStyles.container}
+            className="absolute right-4 top-2 z-10 h-10 w-10 items-center justify-center rounded-full"
+            style={{
+              backgroundColor: Colors.chip.darkCardDeep,
+              borderWidth: 1,
+              borderColor: Colors.tint.tealBorder,
+              shadowColor: Colors.sway.bright,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.35,
+              shadowRadius: 8,
+              elevation: 8
+            }}
             onPress={state.save}
             disabled={state.isSaving || !state.isDirty}
             accessibilityRole="button"
@@ -151,7 +161,7 @@ const GeneralGoalsPresenter = ({ attempt, mode, patientName }: GeneralGoalsPrese
           {/* Goal cards */}
           {state.goals.map((goal, index) => (
             <GoalCard
-              key={index}
+              key={goal._uid}
               index={index}
               goalText={goal.goalText}
               rating={goal.rating}
@@ -200,7 +210,7 @@ const GeneralGoalsPresenter = ({ attempt, mode, patientName }: GeneralGoalsPrese
             <View className="mt-6">
               <ThemedButton
                 title={state.isSubmitting ? 'Submitting...' : 'Submit'}
-                onPress={() => state.handleSubmit(undefined)}
+                onPress={state.handleSubmit}
                 disabled={!state.canSubmit || state.isSubmitting}
               />
             </View>
@@ -210,27 +220,5 @@ const GeneralGoalsPresenter = ({ attempt, mode, patientName }: GeneralGoalsPrese
     </ContentContainer>
   );
 };
-
-const floatingStyles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    top: 8,
-    right: 16,
-    zIndex: 10,
-    backgroundColor: Colors.chip.darkCardDeep,
-    borderRadius: 22,
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: Colors.tint.tealBorder,
-    shadowColor: Colors.sway.bright,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
-    elevation: 8
-  }
-});
 
 export default GeneralGoalsPresenter;

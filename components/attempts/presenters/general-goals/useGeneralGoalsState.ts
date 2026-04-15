@@ -1,4 +1,8 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import * as Haptics from 'expo-haptics';
+import { useLocalSearchParams } from 'expo-router';
+import { toast } from 'sonner-native';
+import { TOAST_DURATIONS, TOAST_STYLES } from '@/components/toast/toastOptions';
 import { useSaveModuleAttempt, useSubmitAttempt } from '@/hooks/useAttempts';
 import { AttemptStatus } from '@/types/types';
 import type { AttemptDetailResponseItem, GeneralGoalEntry, GeneralGoalsData } from '@milobedini/shared-types';
@@ -8,12 +12,32 @@ type UseGeneralGoalsStateParams = {
   mode: 'view' | 'edit';
 };
 
+export type GoalWithId = GeneralGoalEntry & { _uid: string };
+
+let nextUid = 0;
+const createUid = () => `goal-${Date.now()}-${nextUid++}`;
+
+const toGoalsWithIds = (goals: GeneralGoalEntry[]): GoalWithId[] => goals.map((g) => ({ ...g, _uid: createUid() }));
+
+const stripIds = (goals: GoalWithId[]): GeneralGoalEntry[] =>
+  goals.map(({ goalText, rating }) => ({ goalText, rating }));
+
+const handleError = () => {
+  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+  toast.error('Failed to save progress', {
+    duration: TOAST_DURATIONS.error,
+    styles: TOAST_STYLES.error
+  });
+};
+
 export const useGeneralGoalsState = ({ attempt, mode }: UseGeneralGoalsStateParams) => {
+  const { assignmentId } = useLocalSearchParams<{ assignmentId?: string }>();
   const initialData = attempt.generalGoals;
   const isReRating = initialData?.isReRating ?? false;
-  const previousRatings = useMemo(() => initialData?.previousRatings ?? [], [initialData?.previousRatings]);
+  const previousRatingsRef = useRef(initialData?.previousRatings ?? []);
+  const previousRatings = previousRatingsRef.current;
 
-  const [goals, setGoals] = useState<GeneralGoalEntry[]>(initialData?.goals?.length ? initialData.goals : []);
+  const [goals, setGoals] = useState<GoalWithId[]>(initialData?.goals?.length ? toGoalsWithIds(initialData.goals) : []);
   const [reflection, setReflection] = useState(initialData?.reflection ?? '');
   const [isDirty, setIsDirty] = useState(false);
 
@@ -25,7 +49,7 @@ export const useGeneralGoalsState = ({ attempt, mode }: UseGeneralGoalsStatePara
 
   const buildPayload = useCallback(
     (): Partial<GeneralGoalsData> => ({
-      goals,
+      goals: stripIds(goals),
       reflection,
       isReRating,
       previousRatings
@@ -40,14 +64,15 @@ export const useGeneralGoalsState = ({ attempt, mode }: UseGeneralGoalsStatePara
       {
         onSuccess: () => {
           setIsDirty(false);
-        }
+        },
+        onError: handleError
       }
     );
   }, [canEdit, isDirty, saveAttemptSilently, buildPayload]);
 
   const addGoal = useCallback(() => {
     if (!canAddGoal) return;
-    setGoals((prev) => [...prev, { goalText: '', rating: null }]);
+    setGoals((prev) => [...prev, { goalText: '', rating: null, _uid: createUid() }]);
     setIsDirty(true);
   }, [canAddGoal]);
 
@@ -93,21 +118,21 @@ export const useGeneralGoalsState = ({ attempt, mode }: UseGeneralGoalsStatePara
     goals.every((g) => g.goalText?.trim() && g.rating !== null && g.rating !== undefined) &&
     reflection.trim().length > 0;
 
-  const handleSubmit = useCallback(
-    (assignmentId?: string) => {
-      if (!canSubmit) return;
-      saveAttemptSilently(
-        { generalGoals: buildPayload() },
-        {
-          onSuccess: () => {
-            setIsDirty(false);
-            submitAttempt({ assignmentId });
-          }
-        }
-      );
-    },
-    [canSubmit, saveAttemptSilently, buildPayload, submitAttempt]
-  );
+  const handleSubmit = useCallback(() => {
+    if (!canSubmit) return;
+    saveAttemptSilently(
+      { generalGoals: buildPayload() },
+      {
+        onSuccess: () => {
+          setIsDirty(false);
+          submitAttempt(assignmentId ? { assignmentId: String(assignmentId) } : {}, {
+            onError: handleError
+          });
+        },
+        onError: handleError
+      }
+    );
+  }, [canSubmit, saveAttemptSilently, buildPayload, submitAttempt, assignmentId]);
 
   return {
     goals,
