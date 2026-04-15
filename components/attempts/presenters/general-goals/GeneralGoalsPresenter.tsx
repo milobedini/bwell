@@ -1,18 +1,9 @@
-import { useCallback, useRef } from 'react';
-import {
-  ActivityIndicator,
-  type LayoutChangeEvent,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View
-} from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import ContentContainer from '@/components/ContentContainer';
 import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import EmptyState from '@/components/ui/EmptyState';
-import KeyboardAvoidingWrapper from '@/components/ui/KeyboardAvoidingWrapper';
 import { Colors } from '@/constants/Colors';
 import type { AttemptDetailResponseItem } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
@@ -29,22 +20,6 @@ type GeneralGoalsPresenterProps = {
 
 const GeneralGoalsPresenter = ({ attempt, mode, patientName }: GeneralGoalsPresenterProps) => {
   const state = useGeneralGoalsState({ attempt, mode });
-  const scrollViewRef = useRef<ScrollView>(null);
-  const cardOffsetsRef = useRef<Record<number, number>>({});
-
-  const handleCardLayout = useCallback((index: number, y: number) => {
-    cardOffsetsRef.current[index] = y;
-  }, []);
-
-  const handleInputFocus = useCallback((index: number) => {
-    const y = cardOffsetsRef.current[index];
-    if (y != null && scrollViewRef.current) {
-      // Delay to let keyboard appear, then scroll card into view
-      setTimeout(() => {
-        scrollViewRef.current?.scrollTo({ y: Math.max(0, y - 80), animated: true });
-      }, 300);
-    }
-  }, []);
 
   // ── View mode ──
   if (!state.canEdit) {
@@ -124,115 +99,111 @@ const GeneralGoalsPresenter = ({ attempt, mode, patientName }: GeneralGoalsPrese
   // ── Edit mode ──
   return (
     <ContentContainer>
-      <KeyboardAvoidingWrapper keyboardVerticalOffset={Platform.select({ ios: 120, default: 0 })}>
-        <View className="flex-1">
-          {/* Floating save indicator */}
-          {(state.isDirty || state.isSaving) && (
+      <View className="flex-1">
+        {/* Floating save indicator */}
+        {(state.isDirty || state.isSaving) && (
+          <Pressable
+            style={floatingStyles.container}
+            onPress={state.save}
+            disabled={state.isSaving || !state.isDirty}
+            accessibilityRole="button"
+            accessibilityLabel={state.isSaving ? 'Saving' : 'Save changes'}
+            hitSlop={8}
+          >
+            {state.isSaving ? (
+              <ActivityIndicator size="small" color={Colors.sway.bright} />
+            ) : (
+              <MaterialCommunityIcons name="content-save-edit-outline" size={20} color={Colors.primary.warning} />
+            )}
+          </Pressable>
+        )}
+
+        <KeyboardAwareScrollView
+          bottomOffset={62}
+          contentContainerStyle={{ paddingBottom: 120 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Header */}
+          <View className="mb-4">
+            <ThemedText type="subtitle">{state.isReRating ? 'Re-rate Your Goals' : 'Set Your Goals'}</ThemedText>
+            <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginTop: 4 }}>
+              {state.isReRating
+                ? 'Rate each goal again to track your progress.'
+                : 'Add up to 3 goals you would like to work towards.'}
+            </ThemedText>
+          </View>
+
+          {/* Empty state */}
+          {state.goals.length === 0 && (
+            <View className="mb-4">
+              <EmptyState
+                icon="flag-outline"
+                title="No goals yet"
+                subtitle="Add your first therapy goal to get started."
+                action={{ label: 'Add Goal', onPress: state.addGoal }}
+              />
+            </View>
+          )}
+
+          {/* Goal cards */}
+          {state.goals.map((goal, index) => (
+            <GoalCard
+              key={index}
+              index={index}
+              goalText={goal.goalText}
+              rating={goal.rating}
+              isReRating={state.isReRating}
+              canEdit
+              previousRatings={state.previousRatings}
+              onGoalTextChange={(text) => state.updateGoalText(index, text)}
+              onRatingChange={(rating) => state.updateGoalRating(index, rating)}
+              onRemove={() => state.removeGoal(index)}
+            />
+          ))}
+
+          {/* Add goal button */}
+          {state.canAddGoal && state.goals.length > 0 && (
             <Pressable
-              style={floatingStyles.container}
-              onPress={state.save}
-              disabled={state.isSaving || !state.isDirty}
+              onPress={state.addGoal}
+              className="mb-4 flex-row items-center justify-center gap-2 rounded-xl p-3 active:opacity-70"
+              style={{
+                borderWidth: 1,
+                borderColor: Colors.tint.tealBorder,
+                borderStyle: 'dashed',
+                backgroundColor: Colors.tintSubtle.teal
+              }}
               accessibilityRole="button"
-              accessibilityLabel={state.isSaving ? 'Saving' : 'Save changes'}
-              hitSlop={8}
+              accessibilityLabel="Add another goal"
             >
-              {state.isSaving ? (
-                <ActivityIndicator size="small" color={Colors.sway.bright} />
-              ) : (
-                <MaterialCommunityIcons name="content-save-edit-outline" size={20} color={Colors.primary.warning} />
-              )}
+              <MaterialCommunityIcons name="plus-circle-outline" size={20} color={Colors.sway.bright} />
+              <ThemedText type="smallBold" style={{ color: Colors.sway.bright }}>
+                Add Goal ({state.goals.length}/3)
+              </ThemedText>
             </Pressable>
           )}
 
-          <ScrollView
-            ref={scrollViewRef}
-            contentContainerStyle={{ paddingBottom: 60 }}
-            keyboardShouldPersistTaps="handled"
-          >
-            {/* Header */}
-            <View className="mb-4">
-              <ThemedText type="subtitle">{state.isReRating ? 'Re-rate Your Goals' : 'Set Your Goals'}</ThemedText>
-              <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginTop: 4 }}>
-                {state.isReRating
-                  ? 'Rate each goal again to track your progress.'
-                  : 'Add up to 3 goals you would like to work towards.'}
-              </ThemedText>
-            </View>
+          {/* Reflection */}
+          {state.goals.length > 0 && (
+            <ReflectionSection
+              reflection={state.reflection}
+              isReRating={state.isReRating}
+              canEdit
+              onReflectionChange={state.updateReflection}
+            />
+          )}
 
-            {/* Empty state */}
-            {state.goals.length === 0 && (
-              <View className="mb-4">
-                <EmptyState
-                  icon="flag-outline"
-                  title="No goals yet"
-                  subtitle="Add your first therapy goal to get started."
-                  action={{ label: 'Add Goal', onPress: state.addGoal }}
-                />
-              </View>
-            )}
-
-            {/* Goal cards */}
-            {state.goals.map((goal, index) => (
-              <View key={index} onLayout={(e: LayoutChangeEvent) => handleCardLayout(index, e.nativeEvent.layout.y)}>
-                <GoalCard
-                  index={index}
-                  goalText={goal.goalText}
-                  rating={goal.rating}
-                  isReRating={state.isReRating}
-                  canEdit
-                  previousRatings={state.previousRatings}
-                  onGoalTextChange={(text) => state.updateGoalText(index, text)}
-                  onRatingChange={(rating) => state.updateGoalRating(index, rating)}
-                  onRemove={() => state.removeGoal(index)}
-                  onInputFocus={() => handleInputFocus(index)}
-                />
-              </View>
-            ))}
-
-            {/* Add goal button */}
-            {state.canAddGoal && state.goals.length > 0 && (
-              <Pressable
-                onPress={state.addGoal}
-                className="mb-4 flex-row items-center justify-center gap-2 rounded-xl p-3 active:opacity-70"
-                style={{
-                  borderWidth: 1,
-                  borderColor: Colors.tint.tealBorder,
-                  borderStyle: 'dashed',
-                  backgroundColor: Colors.tintSubtle.teal
-                }}
-                accessibilityRole="button"
-                accessibilityLabel="Add another goal"
-              >
-                <MaterialCommunityIcons name="plus-circle-outline" size={20} color={Colors.sway.bright} />
-                <ThemedText type="smallBold" style={{ color: Colors.sway.bright }}>
-                  Add Goal ({state.goals.length}/3)
-                </ThemedText>
-              </Pressable>
-            )}
-
-            {/* Reflection */}
-            {state.goals.length > 0 && (
-              <ReflectionSection
-                reflection={state.reflection}
-                isReRating={state.isReRating}
-                canEdit
-                onReflectionChange={state.updateReflection}
+          {/* Submit button */}
+          {state.goals.length > 0 && (
+            <View className="mt-6">
+              <ThemedButton
+                title={state.isSubmitting ? 'Submitting...' : 'Submit'}
+                onPress={() => state.handleSubmit(undefined)}
+                disabled={!state.canSubmit || state.isSubmitting}
               />
-            )}
-
-            {/* Submit button */}
-            {state.goals.length > 0 && (
-              <View className="mt-6">
-                <ThemedButton
-                  title={state.isSubmitting ? 'Submitting...' : 'Submit'}
-                  onPress={() => state.handleSubmit(undefined)}
-                  disabled={!state.canSubmit || state.isSubmitting}
-                />
-              </View>
-            )}
-          </ScrollView>
-        </View>
-      </KeyboardAvoidingWrapper>
+            </View>
+          )}
+        </KeyboardAwareScrollView>
+      </View>
     </ContentContainer>
   );
 };

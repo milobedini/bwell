@@ -1,5 +1,6 @@
 import { LogBox } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { MD3DarkTheme, PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Slot } from 'expo-router';
@@ -60,26 +61,28 @@ export default function RootLayout() {
         <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.sway.dark }}>
           <SafeAreaProvider>
             <PaperProvider theme={paperTheme}>
-              <FontsContainer>
-                <Slot />
-                <Toaster
-                  position="top-center"
-                  offset={60}
-                  toastOptions={{
-                    style: {
-                      backgroundColor: Colors.sway.dark
-                    },
-                    titleStyle: {
-                      color: Colors.primary.white,
-                      fontFamily: 'SpaceGrotesk-SemiBold'
-                    },
-                    descriptionStyle: {
-                      color: Colors.sway.darkGrey,
-                      fontFamily: 'SpaceGrotesk-Regular'
-                    }
-                  }}
-                />
-              </FontsContainer>
+              <KeyboardProvider>
+                <FontsContainer>
+                  <Slot />
+                  <Toaster
+                    position="top-center"
+                    offset={60}
+                    toastOptions={{
+                      style: {
+                        backgroundColor: Colors.sway.dark
+                      },
+                      titleStyle: {
+                        color: Colors.primary.white,
+                        fontFamily: 'SpaceGrotesk-SemiBold'
+                      },
+                      descriptionStyle: {
+                        color: Colors.sway.darkGrey,
+                        fontFamily: 'SpaceGrotesk-Regular'
+                      }
+                    }}
+                  />
+                </FontsContainer>
+              </KeyboardProvider>
             </PaperProvider>
           </SafeAreaProvider>
         </GestureHandlerRootView>

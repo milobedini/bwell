@@ -64,6 +64,8 @@ const ReflectionSection = ({ reflection, isReRating, canEdit, onReflectionChange
           placeholder="Write your reflection..."
           placeholderTextColor={Colors.sway.darkGrey}
           multiline
+          blurOnSubmit
+          returnKeyType="done"
           textAlignVertical="top"
           style={{
             backgroundColor: Colors.chip.darkCardDeep,
