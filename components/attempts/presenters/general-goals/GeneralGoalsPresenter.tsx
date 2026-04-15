@@ -1,12 +1,19 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useCallback, useRef } from 'react';
+import {
+  ActivityIndicator,
+  type LayoutChangeEvent,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View
+} from 'react-native';
 import ContentContainer from '@/components/ContentContainer';
 import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import EmptyState from '@/components/ui/EmptyState';
 import KeyboardAvoidingWrapper from '@/components/ui/KeyboardAvoidingWrapper';
 import { Colors } from '@/constants/Colors';
-import useDebouncedCallback from '@/utils/debounce';
 import type { AttemptDetailResponseItem } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
@@ -22,41 +29,22 @@ type GeneralGoalsPresenterProps = {
 
 const GeneralGoalsPresenter = ({ attempt, mode, patientName }: GeneralGoalsPresenterProps) => {
   const state = useGeneralGoalsState({ attempt, mode });
+  const scrollViewRef = useRef<ScrollView>(null);
+  const cardOffsetsRef = useRef<Record<number, number>>({});
 
-  // Debounced auto-save
-  const debouncedSave = useDebouncedCallback(state.save, 2000);
-  const prevDirtyRef = useRef(state.isDirty);
+  const handleCardLayout = useCallback((index: number, y: number) => {
+    cardOffsetsRef.current[index] = y;
+  }, []);
 
-  useEffect(() => {
-    if (state.isDirty && !prevDirtyRef.current) {
-      debouncedSave();
+  const handleInputFocus = useCallback((index: number) => {
+    const y = cardOffsetsRef.current[index];
+    if (y != null && scrollViewRef.current) {
+      // Delay to let keyboard appear, then scroll card into view
+      setTimeout(() => {
+        scrollViewRef.current?.scrollTo({ y: Math.max(0, y - 80), animated: true });
+      }, 300);
     }
-    prevDirtyRef.current = state.isDirty;
-  }, [state.isDirty, debouncedSave]);
-
-  const handleGoalTextChange = useCallback(
-    (index: number, text: string) => {
-      state.updateGoalText(index, text);
-      debouncedSave();
-    },
-    [state.updateGoalText, debouncedSave]
-  );
-
-  const handleRatingChange = useCallback(
-    (index: number, rating: number) => {
-      state.updateGoalRating(index, rating);
-      debouncedSave();
-    },
-    [state.updateGoalRating, debouncedSave]
-  );
-
-  const handleReflectionChange = useCallback(
-    (text: string) => {
-      state.updateReflection(text);
-      debouncedSave();
-    },
-    [state.updateReflection, debouncedSave]
-  );
+  }, []);
 
   // ── View mode ──
   if (!state.canEdit) {
@@ -156,7 +144,11 @@ const GeneralGoalsPresenter = ({ attempt, mode, patientName }: GeneralGoalsPrese
             </Pressable>
           )}
 
-          <ScrollView contentContainerStyle={{ paddingBottom: 60 }} keyboardShouldPersistTaps="handled">
+          <ScrollView
+            ref={scrollViewRef}
+            contentContainerStyle={{ paddingBottom: 60 }}
+            keyboardShouldPersistTaps="handled"
+          >
             {/* Header */}
             <View className="mb-4">
               <ThemedText type="subtitle">{state.isReRating ? 'Re-rate Your Goals' : 'Set Your Goals'}</ThemedText>
@@ -181,18 +173,20 @@ const GeneralGoalsPresenter = ({ attempt, mode, patientName }: GeneralGoalsPrese
 
             {/* Goal cards */}
             {state.goals.map((goal, index) => (
-              <GoalCard
-                key={index}
-                index={index}
-                goalText={goal.goalText}
-                rating={goal.rating}
-                isReRating={state.isReRating}
-                canEdit
-                previousRatings={state.previousRatings}
-                onGoalTextChange={(text) => handleGoalTextChange(index, text)}
-                onRatingChange={(rating) => handleRatingChange(index, rating)}
-                onRemove={() => state.removeGoal(index)}
-              />
+              <View key={index} onLayout={(e: LayoutChangeEvent) => handleCardLayout(index, e.nativeEvent.layout.y)}>
+                <GoalCard
+                  index={index}
+                  goalText={goal.goalText}
+                  rating={goal.rating}
+                  isReRating={state.isReRating}
+                  canEdit
+                  previousRatings={state.previousRatings}
+                  onGoalTextChange={(text) => state.updateGoalText(index, text)}
+                  onRatingChange={(rating) => state.updateGoalRating(index, rating)}
+                  onRemove={() => state.removeGoal(index)}
+                  onInputFocus={() => handleInputFocus(index)}
+                />
+              </View>
             ))}
 
             {/* Add goal button */}
@@ -222,7 +216,7 @@ const GeneralGoalsPresenter = ({ attempt, mode, patientName }: GeneralGoalsPrese
                 reflection={state.reflection}
                 isReRating={state.isReRating}
                 canEdit
-                onReflectionChange={handleReflectionChange}
+                onReflectionChange={state.updateReflection}
               />
             )}
 

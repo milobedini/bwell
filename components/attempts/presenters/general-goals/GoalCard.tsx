@@ -19,6 +19,7 @@ type GoalCardProps = {
   onGoalTextChange?: (text: string) => void;
   onRatingChange?: (rating: number) => void;
   onRemove?: () => void;
+  onInputFocus?: () => void;
 };
 
 // ── Previous ratings timeline ──
@@ -83,7 +84,8 @@ const GoalCard = ({
   previousRatings,
   onGoalTextChange,
   onRatingChange,
-  onRemove
+  onRemove,
+  onInputFocus
 }: GoalCardProps) => {
   const accent = GOAL_ACCENTS[index] ?? Colors.sway.bright;
   const showRemove = canEdit && !isReRating && onRemove;
@@ -132,6 +134,7 @@ const GoalCard = ({
           <TextInput
             value={goalText}
             onChangeText={onGoalTextChange}
+            onFocus={onInputFocus}
             placeholder="What would you like to achieve?"
             placeholderTextColor={Colors.sway.darkGrey}
             multiline

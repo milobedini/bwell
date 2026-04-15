@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useSaveModuleAttempt, useSubmitAttempt } from '@/hooks/useAttempts';
 import type { AttemptDetailResponseItem, GeneralGoalEntry, GeneralGoalsData } from '@milobedini/shared-types';
 
@@ -14,7 +14,7 @@ export const useGeneralGoalsState = ({ attempt, mode }: UseGeneralGoalsStatePara
 
   const [goals, setGoals] = useState<GeneralGoalEntry[]>(initialData?.goals?.length ? initialData.goals : []);
   const [reflection, setReflection] = useState(initialData?.reflection ?? '');
-  const dirtyRef = useRef(false);
+  const [isDirty, setIsDirty] = useState(false);
 
   const canEdit = mode === 'edit' && attempt.status !== 'submitted';
   const canAddGoal = canEdit && !isReRating && goals.length < 3;
@@ -33,19 +33,19 @@ export const useGeneralGoalsState = ({ attempt, mode }: UseGeneralGoalsStatePara
   );
 
   const save = useCallback(() => {
-    if (!canEdit || !dirtyRef.current) return;
+    if (!canEdit || !isDirty) return;
     saveAttemptSilently(
       { generalGoals: buildPayload() },
       {
         onSuccess: () => {
-          dirtyRef.current = false;
+          setIsDirty(false);
         }
       }
     );
-  }, [canEdit, saveAttemptSilently, buildPayload]);
+  }, [canEdit, isDirty, saveAttemptSilently, buildPayload]);
 
   const markDirty = useCallback(() => {
-    dirtyRef.current = true;
+    setIsDirty(true);
   }, []);
 
   const addGoal = useCallback(() => {
@@ -103,7 +103,7 @@ export const useGeneralGoalsState = ({ attempt, mode }: UseGeneralGoalsStatePara
         { generalGoals: buildPayload() },
         {
           onSuccess: () => {
-            dirtyRef.current = false;
+            setIsDirty(false);
             submitAttempt({ assignmentId });
           }
         }
@@ -122,7 +122,7 @@ export const useGeneralGoalsState = ({ attempt, mode }: UseGeneralGoalsStatePara
     canSubmit,
     isSaving,
     isSubmitting,
-    isDirty: dirtyRef.current,
+    isDirty,
     addGoal,
     updateGoalText,
     updateGoalRating,
