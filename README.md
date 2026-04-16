@@ -48,6 +48,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ## Recent Milestones
 
+- **Profile redesign** — role-aware dashboard layout with identity header, therapist/client relationship cards, stats strip, iOS-style grouped settings, shared initials utility and new colour tokens (2026-04-16)
 - **General Goals module** — goal rating with slider tracks, re-rating check-ins with unified timeline and trend indicators, reflection section, "Check-in" label across all views (2026-04-15)
 - **Activity diary redesign** — accordion layout with animated expand/collapse, split save/submit, Reanimated progress ring, mood slider, metric stepper with stale closure fixes, teal glow save indicator (2026-04-10)
 - **Five Areas Model** — interactive CBT hot cross bun diagram (Skia), node-expand modal input, stepped edit/review flow, area review cards (2026-04-05)
@@ -57,7 +58,6 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 - **Reading module type** — replaced psychoeducation/exercise with unified reading presenter, markdown rendering, scroll progress bar, reader notes (2026-04-01)
 - **Destructive action confirmation** — ActionMenu built-in confirmation step for all destructive actions with customisable title, description, and label (2026-03-29)
 - **Therapist assignments redesign** — SectionList grouped by patient, sort/filter drawer, edit modal (due date, notes, recurrence), collapsible sections, shared chip styles (2026-03-27)
-- **Patient dashboard** — focus card, effort strip, coming up list, Skia sparkline score trends, pull-to-refresh (2026-03-26)
 
 ## Tech Stack
 
@@ -88,7 +88,7 @@ app/
     ├── review/          # Therapist: review patient submissions
     ├── programs/        # Browse programs & modules
     ├── all-users/       # Admin: search, filter & sort all users
-    └── profile/         # User profile & logout
+    └── profile/         # Role-aware profile dashboard & settings
 
 api/                     # Axios instance & interceptors
 components/              # Shared UI components

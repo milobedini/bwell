@@ -53,7 +53,7 @@ These bias toward caution over speed. For trivial tasks, use judgement.
 - `constants/` — Colors, shared constants
 - `stores/` — Zustand stores
 - `types/` — local TypeScript types
-- `utils/` — helper functions (date formatting, severity colours, role checks, debounce, shared chip styles, module icons)
+- `utils/` — helper functions (date formatting, severity colours, role checks, debounce, shared chip styles, module icons, initials)
 
 - Query defaults (1-hour staleTime, refetchOnWindowFocus/refetchOnReconnect disabled) are centralized in `QueryClient` in `app/_layout.tsx` — only override in hooks when a shorter staleTime is needed
 - Use `invalidateQueries` (not `refetchQueries`) in mutation `onSuccess` callbacks for consistency

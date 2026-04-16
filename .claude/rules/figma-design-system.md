@@ -67,6 +67,13 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 | Gradient pink | `Colors.gradient.pink` | `#E70696` |
 | Tint subtle teal | `Colors.tintSubtle.teal` | `rgba(24,205,186,0.06)` |
 | Tint subtle teal border | `Colors.tintSubtle.tealBorder` | `rgba(24,205,186,0.12)` |
+| Therapist purple | `Colors.therapist.purple` | `#7C3AED` |
+| Therapist purple light | `Colors.therapist.purpleLight` | `#A855F7` |
+| Therapist tint | `Colors.therapist.tint` | `rgba(124,58,237,0.15)` |
+| Therapist tint border | `Colors.therapist.tintBorder` | `rgba(124,58,237,0.3)` |
+| Therapist tint subtle | `Colors.therapist.tintSubtle` | `rgba(124,58,237,0.2)` |
+| Divider light | `Colors.divider.light` | `rgba(166,173,187,0.1)` |
+| Divider medium | `Colors.divider.medium` | `rgba(166,173,187,0.15)` |
 
 **Status chip color pairs** (background + border):
 
