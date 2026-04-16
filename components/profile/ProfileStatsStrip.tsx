@@ -1,5 +1,5 @@
 import { type ComponentProps } from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import type { DashboardStats, PatientProfileStatsResponse } from '@milobedini/shared-types';
@@ -14,31 +14,51 @@ type StatItemProps = {
   iconColour?: string;
   sublabel?: string;
   sublabelColour?: string;
+  onPress?: () => void;
 };
 
-const StatItem = ({ label, value, icon, iconColour, sublabel, sublabelColour }: StatItemProps) => (
-  <View className="flex-1 items-center gap-1 py-3">
-    <MaterialCommunityIcons name={icon} size={18} color={iconColour ?? Colors.sway.darkGrey} />
-    <ThemedText type="smallTitle" style={{ marginBottom: 0 }}>
-      {value}
-    </ThemedText>
-    <ThemedText type="small" style={{ color: Colors.sway.darkGrey, textAlign: 'center', fontSize: 12, lineHeight: 16 }}>
-      {label}
-    </ThemedText>
-    {sublabel && (
+const StatItem = ({ label, value, icon, iconColour, sublabel, sublabelColour, onPress }: StatItemProps) => {
+  const inner = (
+    <>
+      <MaterialCommunityIcons name={icon} size={18} color={iconColour ?? Colors.sway.darkGrey} />
+      <ThemedText type="smallTitle" style={{ marginBottom: 0 }}>
+        {value}
+      </ThemedText>
       <ThemedText
         type="small"
-        style={{
-          color: sublabelColour ?? Colors.sway.darkGrey,
-          fontSize: 11,
-          lineHeight: 14
-        }}
+        style={{ color: Colors.sway.darkGrey, textAlign: 'center', fontSize: 12, lineHeight: 16 }}
       >
-        {sublabel}
+        {label}
       </ThemedText>
-    )}
-  </View>
-);
+      {sublabel && (
+        <ThemedText
+          type="small"
+          style={{
+            color: sublabelColour ?? Colors.sway.darkGrey,
+            fontSize: 11,
+            lineHeight: 14
+          }}
+        >
+          {sublabel}
+        </ThemedText>
+      )}
+    </>
+  );
+
+  if (onPress) {
+    return (
+      <Pressable
+        onPress={onPress}
+        className="flex-1 items-center gap-1 py-3 active:opacity-70"
+        accessibilityRole="button"
+      >
+        {inner}
+      </Pressable>
+    );
+  }
+
+  return <View className="flex-1 items-center gap-1 py-3">{inner}</View>;
+};
 
 const Divider = () => (
   <View
@@ -106,9 +126,10 @@ const PatientStats = ({ stats }: PatientStatsProps) => {
 
 type TherapistStatsProps = {
   stats: DashboardStats;
+  onPress?: () => void;
 };
 
-const TherapistStats = ({ stats }: TherapistStatsProps) => (
+const TherapistStats = ({ stats, onPress }: TherapistStatsProps) => (
   <View
     className="mx-4 flex-row rounded-2xl"
     style={{
@@ -118,13 +139,12 @@ const TherapistStats = ({ stats }: TherapistStatsProps) => (
     }}
     testID="therapist-stats-strip"
   >
-    <StatItem label="Clients" value={stats.totalClients} icon="account-group-outline" iconColour="#A855F7" />
-    <Divider />
     <StatItem
       label="Attention"
       value={stats.needsAttention}
       icon="alert-circle-outline"
       iconColour={stats.needsAttention > 0 ? Colors.primary.error : Colors.sway.darkGrey}
+      onPress={onPress}
     />
     <Divider />
     <StatItem
@@ -132,6 +152,7 @@ const TherapistStats = ({ stats }: TherapistStatsProps) => (
       value={stats.submittedThisWeek}
       icon="check-circle-outline"
       iconColour={Colors.primary.success}
+      onPress={onPress}
     />
     <Divider />
     <StatItem
@@ -139,6 +160,7 @@ const TherapistStats = ({ stats }: TherapistStatsProps) => (
       value={stats.overdueAssignments}
       icon="clock-alert-outline"
       iconColour={stats.overdueAssignments > 0 ? Colors.primary.warning : Colors.sway.darkGrey}
+      onPress={onPress}
     />
   </View>
 );

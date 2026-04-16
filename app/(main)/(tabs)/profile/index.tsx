@@ -39,6 +39,8 @@ export default function Profile() {
   const { data: clients } = useClients(undefined, isTherapistRole);
 
   const handleLogout = useCallback(() => logout.mutate(), [logout]);
+
+  const navigateToDashboard = useCallback(() => router.push('/(main)/(tabs)/home'), [router]);
   const dismissEditName = useCallback(() => setEditNameVisible(false), []);
   const dismissChangePassword = useCallback(() => setChangePasswordVisible(false), []);
 
@@ -97,7 +99,7 @@ export default function Profile() {
             (dashboardLoading ? (
               <StatsStripSkeleton />
             ) : (
-              dashboardData && <TherapistStats stats={dashboardData.stats} />
+              dashboardData && <TherapistStats stats={dashboardData.stats} onPress={navigateToDashboard} />
             ))}
         </MotiView>
 
