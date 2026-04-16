@@ -78,5 +78,16 @@ export const Colors = {
   tintSubtle: {
     teal: 'rgba(24,205,186,0.06)',
     tealBorder: 'rgba(24,205,186,0.12)'
+  },
+  therapist: {
+    purple: '#7C3AED',
+    purpleLight: '#A855F7',
+    tint: 'rgba(124,58,237,0.15)',
+    tintBorder: 'rgba(124,58,237,0.3)',
+    tintSubtle: 'rgba(124,58,237,0.2)'
+  },
+  divider: {
+    light: 'rgba(166,173,187,0.1)',
+    medium: 'rgba(166,173,187,0.15)'
   }
 };

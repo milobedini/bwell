@@ -20,6 +20,8 @@ import { useTherapistDashboard } from '@/hooks/useTherapistDashboard';
 import { useClients, useProfile } from '@/hooks/useUsers';
 import { isPatient, isTherapist } from '@/utils/userRoles';
 
+const APP_VERSION = Constants.expoConfig?.version ?? '0.0.0';
+
 export default function Profile() {
   const router = useRouter();
   const { data: profile, isError, isPending } = useProfile();
@@ -33,7 +35,6 @@ export default function Profile() {
   const isTherapistRole = useMemo(() => isTherapist(profile?.roles), [profile?.roles]);
   const isPatientRole = useMemo(() => isPatient(profile?.roles), [profile?.roles]);
 
-  // Role-guarded data fetching — only call APIs relevant to the user's role
   const { data: patientStats, isPending: statsLoading } = useProfileStats(isPatientRole);
   const { data: dashboardData, isPending: dashboardLoading } = useTherapistDashboard(isTherapistRole);
   const { data: clients } = useClients(undefined, isTherapistRole);
@@ -54,8 +55,6 @@ export default function Profile() {
 
   if (isError || !profile) return <ErrorComponent errorType={ErrorTypes.UNAUTHORIZED} redirectLogin />;
 
-  const appVersion = Constants.expoConfig?.version ?? '0.0.0';
-
   return (
     <Container>
       <ScrollView
@@ -63,7 +62,6 @@ export default function Profile() {
         contentContainerStyle={{ paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Section 1: Identity Header */}
         <MotiView
           from={{ opacity: 0, translateY: 12 }}
           animate={{ opacity: 1, translateY: 0 }}
@@ -73,7 +71,6 @@ export default function Profile() {
           <ProfileHeader profile={profile} />
         </MotiView>
 
-        {/* Section 2: Relationship Card */}
         <MotiView
           from={{ opacity: 0, translateY: 12 }}
           animate={{ opacity: 1, translateY: 0 }}
@@ -86,7 +83,6 @@ export default function Profile() {
           )}
         </MotiView>
 
-        {/* Section 3: Stats Strip */}
         <MotiView
           from={{ opacity: 0, translateY: 12 }}
           animate={{ opacity: 1, translateY: 0 }}
@@ -103,20 +99,17 @@ export default function Profile() {
             ))}
         </MotiView>
 
-        {/* Section 4: Grouped Settings */}
         <MotiView
           from={{ opacity: 0, translateY: 12 }}
           animate={{ opacity: 1, translateY: 0 }}
           transition={{ type: 'timing', duration: 300, delay: 240 }}
         >
-          {/* Account */}
           <SettingsGroup title="Account">
             <SettingsRow icon="account-edit-outline" label="Edit Name" onPress={() => setEditNameVisible(true)} />
             <SettingsRow icon="lock-outline" label="Change Password" onPress={() => setChangePasswordVisible(true)} />
             <SettingsRow icon="email-outline" label="Email" trailing={profile.email} showChevron={false} />
           </SettingsGroup>
 
-          {/* Client Management (therapist only) */}
           {isTherapistRole && (
             <SettingsGroup title="Client Management">
               <SettingsRow
@@ -127,14 +120,12 @@ export default function Profile() {
             </SettingsGroup>
           )}
 
-          {/* Support */}
           <SettingsGroup title="Support">
             <SettingsRow icon="help-circle-outline" label="Help & FAQ" />
             <SettingsRow icon="message-text-outline" label="Send Feedback" />
-            <SettingsRow icon="information-outline" label="About" trailing={`v${appVersion}`} showChevron={false} />
+            <SettingsRow icon="information-outline" label="About" trailing={`v${APP_VERSION}`} showChevron={false} />
           </SettingsGroup>
 
-          {/* Danger Zone */}
           <SettingsGroup title="Danger Zone">
             <SettingsRow
               icon="logout"

@@ -9,7 +9,6 @@ type SettingsGroupProps = {
 };
 
 const SettingsGroup = ({ title, children }: SettingsGroupProps) => {
-  // Filter out nulls/undefined from conditional children
   const validChildren = Array.isArray(children) ? children.filter(Boolean) : children ? [children] : [];
 
   return (
@@ -36,7 +35,7 @@ const SettingsGroup = ({ title, children }: SettingsGroupProps) => {
         style={{
           backgroundColor: Colors.chip.darkCard,
           borderWidth: 1,
-          borderColor: 'rgba(166,173,187,0.1)'
+          borderColor: Colors.divider.light
         }}
       >
         {validChildren.map((child, index) => (
@@ -45,7 +44,7 @@ const SettingsGroup = ({ title, children }: SettingsGroupProps) => {
               <View
                 style={{
                   height: 1,
-                  backgroundColor: 'rgba(166,173,187,0.1)',
+                  backgroundColor: Colors.divider.light,
                   marginLeft: 52
                 }}
               />

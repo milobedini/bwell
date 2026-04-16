@@ -75,7 +75,7 @@ const Divider = () => (
       width: 1,
       alignSelf: 'stretch',
       marginVertical: 12,
-      backgroundColor: 'rgba(166,173,187,0.15)'
+      backgroundColor: Colors.divider.medium
     }}
   />
 );
@@ -141,7 +141,7 @@ const TherapistStats = ({ stats, onPress }: TherapistStatsProps) => (
     style={{
       backgroundColor: Colors.chip.darkCard,
       borderWidth: 1,
-      borderColor: 'rgba(124,58,237,0.2)'
+      borderColor: Colors.therapist.tintSubtle
     }}
     testID="therapist-stats-strip"
   >

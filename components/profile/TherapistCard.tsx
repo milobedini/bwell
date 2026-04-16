@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { MotiView } from 'moti';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
+import { getInitials } from '@/utils/initials';
 import type { User } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
@@ -15,12 +16,7 @@ const AVATAR_SIZE = 40;
 const TherapistCard = ({ therapist }: TherapistCardProps) => {
   const initials = useMemo(() => {
     if (!therapist) return '';
-    const displayName = therapist.name ?? therapist.username;
-    const parts = displayName.trim().split(/\s+/);
-    if (parts.length >= 2) {
-      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-    }
-    return displayName.slice(0, 2).toUpperCase();
+    return getInitials(therapist.name ?? therapist.username);
   }, [therapist]);
 
   if (!therapist) {
@@ -88,7 +84,7 @@ const TherapistCard = ({ therapist }: TherapistCardProps) => {
               width: AVATAR_SIZE,
               height: AVATAR_SIZE,
               borderRadius: AVATAR_SIZE / 2,
-              backgroundColor: '#7C3AED',
+              backgroundColor: Colors.therapist.purple,
               alignItems: 'center',
               justifyContent: 'center'
             }}

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Pressable, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
+import { getInitials } from '@/utils/initials';
 import type { AuthUser } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
@@ -14,16 +15,7 @@ const MINI_AVATAR = 32;
 const MAX_VISIBLE = 4;
 const OVERLAP = 10;
 
-const getInitials = (client: AuthUser): string => {
-  const name = client.name ?? client.username;
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  }
-  return name.slice(0, 1).toUpperCase();
-};
-
-const AVATAR_COLOURS = [Colors.sway.bright, '#7C3AED', Colors.diary.closeness, Colors.diary.moodCool];
+const AVATAR_COLOURS = [Colors.sway.bright, Colors.therapist.purple, Colors.diary.closeness, Colors.diary.moodCool];
 
 const ClientsSummaryCard = ({ clients, onPress }: ClientsSummaryCardProps) => {
   const visibleClients = useMemo(() => clients.slice(0, MAX_VISIBLE), [clients]);
@@ -64,7 +56,7 @@ const ClientsSummaryCard = ({ clients, onPress }: ClientsSummaryCardProps) => {
         style={{
           backgroundColor: Colors.chip.darkCard,
           borderWidth: 1,
-          borderColor: 'rgba(124,58,237,0.2)'
+          borderColor: Colors.therapist.tintSubtle
         }}
       >
         <ThemedText
@@ -81,7 +73,6 @@ const ClientsSummaryCard = ({ clients, onPress }: ClientsSummaryCardProps) => {
         </ThemedText>
 
         <View className="flex-row items-center justify-between">
-          {/* Stacked avatars */}
           <View style={{ width: stackWidth, height: MINI_AVATAR }} className="flex-row">
             {visibleClients.map((client, index) => (
               <View
@@ -101,7 +92,7 @@ const ClientsSummaryCard = ({ clients, onPress }: ClientsSummaryCardProps) => {
                 }}
               >
                 <ThemedText type="smallBold" style={{ color: Colors.primary.white, fontSize: 12 }}>
-                  {getInitials(client)}
+                  {getInitials(client.name ?? client.username)}
                 </ThemedText>
               </View>
             ))}
