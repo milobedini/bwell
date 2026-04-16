@@ -118,7 +118,7 @@ export const useAllPatients = () => {
   });
 };
 
-export const useClients = (query?: { q?: string; sort?: string }) => {
+export const useClients = (query?: { q?: string; sort?: string }, enabled = true) => {
   const isLoggedIn = useIsLoggedIn();
 
   return useQuery<PatientsResponse>({
@@ -130,7 +130,7 @@ export const useClients = (query?: { q?: string; sort?: string }) => {
       const { data } = await api.get<PatientsResponse>('/user/clients', { params });
       return data;
     },
-    enabled: isLoggedIn,
+    enabled: isLoggedIn && enabled,
     staleTime: 1000 * 60 * 5
   });
 };
