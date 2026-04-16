@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { MotiView } from 'moti';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
@@ -8,12 +8,11 @@ import MaterialCommunityIcons from '@react-native-vector-icons/material-design-i
 
 type TherapistCardProps = {
   therapist: User | null;
-  onPress?: () => void;
 };
 
 const AVATAR_SIZE = 40;
 
-const TherapistCard = ({ therapist, onPress }: TherapistCardProps) => {
+const TherapistCard = ({ therapist }: TherapistCardProps) => {
   const initials = useMemo(() => {
     if (!therapist) return '';
     const displayName = therapist.name ?? therapist.username;
@@ -64,7 +63,7 @@ const TherapistCard = ({ therapist, onPress }: TherapistCardProps) => {
     );
   }
 
-  const displayName = therapist.name ?? therapist.username;
+  const displayName = therapist.name || therapist.username;
 
   return (
     <MotiView
@@ -72,15 +71,14 @@ const TherapistCard = ({ therapist, onPress }: TherapistCardProps) => {
       animate={{ opacity: 1, translateY: 0 }}
       transition={{ type: 'timing', duration: 250, delay: 100 }}
     >
-      <Pressable
-        className="mx-4 rounded-2xl p-4 active:opacity-80"
+      <View
+        className="mx-4 rounded-2xl p-4"
         style={{
           backgroundColor: Colors.chip.darkCard,
           borderWidth: 1,
           borderColor: Colors.tintSubtle.tealBorder
         }}
-        onPress={onPress}
-        accessibilityRole="button"
+        accessibilityRole="text"
         accessibilityLabel={`Your therapist: ${displayName}`}
         testID="therapist-card"
       >
@@ -109,10 +107,8 @@ const TherapistCard = ({ therapist, onPress }: TherapistCardProps) => {
               <MaterialCommunityIcons name="check-decagram" size={14} color={Colors.sway.bright} />
             </View>
           </View>
-
-          <MaterialCommunityIcons name="chevron-right" size={24} color={Colors.sway.darkGrey} />
         </View>
-      </Pressable>
+      </View>
     </MotiView>
   );
 };

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 
 jest.mock('moti', () => {
   const { View } = require('react-native');
@@ -38,12 +38,11 @@ describe('TherapistCard', () => {
     expect(screen.getByText('drsmith')).toBeTruthy();
   });
 
-  it('calls onPress when tapped', () => {
+  it('renders as a non-interactive display card', () => {
     const therapist = { _id: 't1', username: 'drsmith', email: 'dr@example.com', name: 'Dr Smith' };
-    const onPress = jest.fn();
-    render(<TherapistCard therapist={therapist} onPress={onPress} />);
+    render(<TherapistCard therapist={therapist} />);
 
-    fireEvent.press(screen.getByTestId('therapist-card'));
-    expect(onPress).toHaveBeenCalledTimes(1);
+    const card = screen.getByTestId('therapist-card');
+    expect(card.props.accessibilityRole).toBe('text');
   });
 });

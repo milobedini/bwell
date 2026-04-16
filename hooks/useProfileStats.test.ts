@@ -21,7 +21,7 @@ describe('useProfileStats', () => {
 
   it('fetches patient profile stats', async () => {
     const mockStats = {
-      latestScore: { moduleTitle: 'PHQ-9', score: 12, band: 'Moderate', trend: 'improving' as const },
+      latestCompletion: { attemptId: 'a1', moduleTitle: 'PHQ-9', completedAt: '2026-04-15T10:00:00.000Z' },
       sessionsThisWeek: 3,
       assignmentsDue: 2
     };
@@ -47,9 +47,9 @@ describe('useProfileStats', () => {
     expect(api.get).not.toHaveBeenCalled();
   });
 
-  it('handles null latest score', async () => {
+  it('handles null latest completion', async () => {
     const mockStats = {
-      latestScore: null,
+      latestCompletion: null,
       sessionsThisWeek: 0,
       assignmentsDue: 0
     };
@@ -62,6 +62,6 @@ describe('useProfileStats', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(result.current.data?.latestScore).toBeNull();
+    expect(result.current.data?.latestCompletion).toBeNull();
   });
 });

@@ -19,7 +19,8 @@ const baseProfile: ProfileResponse = {
   roles: ['patient'],
   isVerifiedTherapist: false,
   patients: [],
-  therapist: null
+  therapist: null,
+  createdAt: '2025-06-15T10:00:00.000Z'
 };
 
 describe('ProfileHeader', () => {
@@ -71,5 +72,11 @@ describe('ProfileHeader', () => {
     render(<ProfileHeader profile={therapistProfile} />);
 
     expect(screen.getByText('Pending')).toBeTruthy();
+  });
+
+  it('shows member since date', () => {
+    render(<ProfileHeader profile={baseProfile} />);
+
+    expect(screen.getByText('Member since Jun 2025')).toBeTruthy();
   });
 });

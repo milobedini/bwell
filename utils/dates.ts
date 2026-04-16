@@ -107,6 +107,13 @@ export const formatRelativeTime = (isoDate: string): string => {
   return formatShortDate(isoDate);
 };
 
+/** "Member since Jan 2025" */
+export const formatMemberSince = (isoDate: string): string => {
+  const date = new Date(isoDate);
+  if (isNaN(date.getTime())) return '';
+  return `Member since ${date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}`;
+};
+
 export type DateSection<T> = {
   title: string;
   data: T[];

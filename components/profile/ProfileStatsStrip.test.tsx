@@ -12,47 +12,55 @@ jest.mock('@react-native-vector-icons/material-design-icons', () => {
 const { PatientStats, TherapistStats, StatsStripSkeleton } = require('./ProfileStatsStrip');
 
 describe('PatientStats', () => {
-  it('renders score, sessions, and assignments due', () => {
+  it('renders last completion, sessions, and assignments', () => {
     const stats: PatientProfileStatsResponse = {
-      latestScore: { moduleTitle: 'PHQ-9', score: 12, band: 'Moderate', trend: 'improving' },
+      latestCompletion: {
+        attemptId: 'a1',
+        moduleTitle: 'PHQ-9',
+        completedAt: new Date(Date.now() - 3_600_000).toISOString() // 1h ago
+      },
       sessionsThisWeek: 3,
       assignmentsDue: 2
     };
     render(<PatientStats stats={stats} />);
 
-    expect(screen.getByText('12')).toBeTruthy();
-    expect(screen.getByText('Moderate')).toBeTruthy();
-    expect(screen.getByText('Improving')).toBeTruthy();
+    expect(screen.getByText('LAST DONE')).toBeTruthy();
+    expect(screen.getByText('1h ago')).toBeTruthy();
+    expect(screen.getByText('PHQ-9')).toBeTruthy();
+    expect(screen.getByText('COMPLETED')).toBeTruthy();
     expect(screen.getByText('3')).toBeTruthy();
+    expect(screen.getByText('This week')).toBeTruthy();
+    expect(screen.getByText('HOMEWORK')).toBeTruthy();
     expect(screen.getByText('2')).toBeTruthy();
+    expect(screen.getByText('Assignments due')).toBeTruthy();
   });
 
-  it('shows dashes when no latest score', () => {
+  it('shows dashes when no completions', () => {
     const stats: PatientProfileStatsResponse = {
-      latestScore: null,
+      latestCompletion: null,
       sessionsThisWeek: 0,
       assignmentsDue: 0
     };
     render(<PatientStats stats={stats} />);
 
     expect(screen.getByText('--')).toBeTruthy();
-    expect(screen.getByText('Score')).toBeTruthy();
+    expect(screen.getByText('Nothing yet')).toBeTruthy();
   });
 
-  it('renders with worsening trend', () => {
+  it('shows singular label for single assignment due', () => {
     const stats: PatientProfileStatsResponse = {
-      latestScore: { moduleTitle: 'GAD-7', score: 18, band: 'Severe', trend: 'worsening' },
-      sessionsThisWeek: 1,
-      assignmentsDue: 0
+      latestCompletion: null,
+      sessionsThisWeek: 0,
+      assignmentsDue: 1
     };
     render(<PatientStats stats={stats} />);
 
-    expect(screen.getByText('Worsening')).toBeTruthy();
+    expect(screen.getByText('Assignment due')).toBeTruthy();
   });
 });
 
 describe('TherapistStats', () => {
-  it('renders all therapist stats', () => {
+  it('renders all therapist stats with clear labels', () => {
     const stats: DashboardStats = {
       totalClients: 8,
       needsAttention: 2,
@@ -61,12 +69,13 @@ describe('TherapistStats', () => {
     };
     render(<TherapistStats stats={stats} />);
 
-    expect(screen.getByText('8')).toBeTruthy();
-    expect(screen.getByText('Clients')).toBeTruthy();
+    expect(screen.getByText('CLIENTS')).toBeTruthy();
     expect(screen.getByText('2')).toBeTruthy();
-    expect(screen.getByText('Attention')).toBeTruthy();
+    expect(screen.getByText('Need attention')).toBeTruthy();
+    expect(screen.getByText('SUBMITTED')).toBeTruthy();
     expect(screen.getByText('5')).toBeTruthy();
-    expect(screen.getByText('Submitted')).toBeTruthy();
+    expect(screen.getByText('This week')).toBeTruthy();
+    expect(screen.getByText('HOMEWORK')).toBeTruthy();
     expect(screen.getByText('1')).toBeTruthy();
     expect(screen.getByText('Overdue')).toBeTruthy();
   });

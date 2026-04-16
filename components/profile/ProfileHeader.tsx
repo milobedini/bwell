@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
+import { formatMemberSince } from '@/utils/dates';
 import { isTherapist as checkTherapist } from '@/utils/userRoles';
 import type { ProfileResponse } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
@@ -28,8 +29,10 @@ const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
 
   const displayName = profile.name || profile.username;
 
+  const memberSince = formatMemberSince(profile.createdAt);
+
   return (
-    <View className="flex-row items-center gap-4 px-4 pb-2">
+    <View className="items-center px-4 pb-2">
       {/* Avatar */}
       <View
         style={{
@@ -47,7 +50,7 @@ const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
       </View>
 
       {/* Name / username / badges */}
-      <View className="flex-1 gap-0.5">
+      <View className="mt-3 items-center gap-0.5">
         <ThemedText type="smallTitle" style={{ marginBottom: 0 }}>
           {displayName}
         </ThemedText>
@@ -58,7 +61,7 @@ const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
           </ThemedText>
         )}
 
-        <View className="mt-1 flex-row items-center gap-2">
+        <View className="mt-1.5 flex-row items-center gap-2">
           {/* Role badge */}
           <View
             style={{
@@ -101,6 +104,12 @@ const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
             </View>
           )}
         </View>
+
+        {memberSince ? (
+          <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginTop: 6, fontSize: 12 }}>
+            {memberSince}
+          </ThemedText>
+        ) : null}
       </View>
     </View>
   );
