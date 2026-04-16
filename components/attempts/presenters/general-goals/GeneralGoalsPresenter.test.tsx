@@ -36,7 +36,7 @@ const mockState = {
 
 const mockUseGeneralGoalsState = jest.fn(() => mockState);
 jest.mock('./useGeneralGoalsState', () => ({
-  useGeneralGoalsState: (...args: unknown[]) => mockUseGeneralGoalsState(...args)
+  useGeneralGoalsState: (...args: unknown[]) => mockUseGeneralGoalsState(args[0])
 }));
 
 jest.mock('./GoalCard', () => {

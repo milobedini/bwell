@@ -73,7 +73,8 @@ describe('PatientPracticeCard', () => {
         completedAt: '2026-04-10',
         iteration: 1,
         totalScore: 12,
-        scoreBandLabel: 'Moderate'
+        scoreBandLabel: 'Moderate',
+        status: 'submitted'
       }
     });
     render(<PatientPracticeCard {...defaultProps} item={item} />);
@@ -96,7 +97,8 @@ describe('PatientPracticeCard', () => {
         completedAt: '2026-04-10',
         iteration: 1,
         totalScore: 15,
-        scoreBandLabel: 'Moderate'
+        scoreBandLabel: 'Moderate',
+        status: 'submitted'
       }
     });
     render(<PatientPracticeCard {...defaultProps} item={item} />);
@@ -155,7 +157,8 @@ describe('PatientPracticeCard', () => {
         completedAt: '2026-04-10',
         iteration: 1,
         totalScore: 10,
-        scoreBandLabel: 'Mild'
+        scoreBandLabel: 'Mild',
+        status: 'submitted'
       }
     });
     render(<PatientPracticeCard {...defaultProps} item={item} sparkline={[5, 10, 15]} />);
@@ -166,7 +169,7 @@ describe('PatientPracticeCard', () => {
   it('navigates on press when attempt is available', () => {
     const item = makeItem({
       status: 'completed',
-      latestAttempt: { attemptId: 'att-1', completedAt: '2026-04-10', iteration: 1 }
+      latestAttempt: { attemptId: 'att-1', completedAt: '2026-04-10', iteration: 1, status: 'submitted' }
     });
     render(<PatientPracticeCard {...defaultProps} item={item} />);
 
