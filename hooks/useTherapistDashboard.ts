@@ -3,7 +3,7 @@ import { useIsLoggedIn } from '@/hooks/useUsers';
 import { TherapistDashboardResponse } from '@milobedini/shared-types';
 import { useQuery } from '@tanstack/react-query';
 
-export const useTherapistDashboard = () => {
+export const useTherapistDashboard = (enabled = true) => {
   const isLoggedIn = useIsLoggedIn();
 
   return useQuery<TherapistDashboardResponse>({
@@ -12,6 +12,7 @@ export const useTherapistDashboard = () => {
       const { data } = await api.get<TherapistDashboardResponse>('/user/therapist/dashboard');
       return data;
     },
-    enabled: isLoggedIn
+    enabled: isLoggedIn && enabled,
+    staleTime: 5 * 60 * 1000 // 5 minutes — dashboard stats are dynamic
   });
 };
