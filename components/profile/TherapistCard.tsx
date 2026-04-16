@@ -4,11 +4,11 @@ import { MotiView } from 'moti';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { getInitials } from '@/utils/initials';
-import type { User } from '@milobedini/shared-types';
+import type { ProfileResponse } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
 type TherapistCardProps = {
-  therapist: User | null;
+  therapist: ProfileResponse['therapist'];
 };
 
 const AVATAR_SIZE = 40;
@@ -100,7 +100,9 @@ const TherapistCard = ({ therapist }: TherapistCardProps) => {
             </ThemedText>
             <View className="flex-row items-center gap-1.5">
               <ThemedText type="smallBold">{displayName}</ThemedText>
-              <MaterialCommunityIcons name="check-decagram" size={14} color={Colors.sway.bright} />
+              {therapist.isVerifiedTherapist && (
+                <MaterialCommunityIcons name="check-decagram" size={14} color={Colors.sway.bright} />
+              )}
             </View>
           </View>
         </View>

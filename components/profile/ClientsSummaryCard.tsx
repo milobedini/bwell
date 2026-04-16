@@ -130,4 +130,32 @@ const ClientsSummaryCard = ({ clients, onPress }: ClientsSummaryCardProps) => {
   );
 };
 
+const ClientsSummaryCardSkeleton = () => (
+  <View
+    className="mx-4 rounded-2xl p-4"
+    style={{ backgroundColor: Colors.chip.darkCard, height: 88 }}
+    testID="clients-summary-skeleton"
+  >
+    <View style={{ width: 80, height: 12, borderRadius: 4, backgroundColor: Colors.chip.darkCardAlt }} />
+    <View className="mt-3 flex-row items-center justify-between">
+      <View className="flex-row">
+        {[0, 1, 2].map((i) => (
+          <View
+            key={i}
+            style={{
+              width: MINI_AVATAR,
+              height: MINI_AVATAR,
+              borderRadius: MINI_AVATAR / 2,
+              backgroundColor: Colors.chip.darkCardAlt,
+              marginLeft: i > 0 ? -OVERLAP : 0
+            }}
+          />
+        ))}
+      </View>
+      <View style={{ width: 60, height: 18, borderRadius: 4, backgroundColor: Colors.chip.darkCardAlt }} />
+    </View>
+  </View>
+);
+
+export { ClientsSummaryCardSkeleton };
 export default ClientsSummaryCard;

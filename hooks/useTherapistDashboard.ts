@@ -12,6 +12,7 @@ export const useTherapistDashboard = (enabled = true) => {
       const { data } = await api.get<TherapistDashboardResponse>('/user/therapist/dashboard');
       return data;
     },
-    enabled: isLoggedIn && enabled
+    enabled: isLoggedIn && enabled,
+    staleTime: 5 * 60 * 1000 // 5 minutes — dashboard stats are dynamic
   });
 };

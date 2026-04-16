@@ -7,7 +7,7 @@ import Container from '@/components/Container';
 import ErrorComponent, { ErrorTypes } from '@/components/ErrorComponent';
 import { LoadingIndicator } from '@/components/LoadingScreen';
 import ChangePasswordDialog from '@/components/profile/ChangePasswordDialog';
-import ClientsSummaryCard from '@/components/profile/ClientsSummaryCard';
+import ClientsSummaryCard, { ClientsSummaryCardSkeleton } from '@/components/profile/ClientsSummaryCard';
 import EditNameDialog from '@/components/profile/EditNameDialog';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import { PatientStats, StatsStripSkeleton, TherapistStats } from '@/components/profile/ProfileStatsStrip';
@@ -37,12 +37,14 @@ export default function Profile() {
 
   const { data: patientStats, isPending: statsLoading } = useProfileStats(isPatientRole);
   const { data: dashboardData, isPending: dashboardLoading } = useTherapistDashboard(isTherapistRole);
-  const { data: clients } = useClients(undefined, isTherapistRole);
+  const { data: clients, isPending: clientsLoading } = useClients(undefined, isTherapistRole);
 
   const handleLogout = useCallback(() => logout.mutate(), [logout]);
 
   const navigateToDashboard = useCallback(() => router.push('/(main)/(tabs)/home'), [router]);
+  const openEditName = useCallback(() => setEditNameVisible(true), []);
   const dismissEditName = useCallback(() => setEditNameVisible(false), []);
+  const openChangePassword = useCallback(() => setChangePasswordVisible(true), []);
   const dismissChangePassword = useCallback(() => setChangePasswordVisible(false), []);
 
   useEffect(() => {
@@ -78,9 +80,12 @@ export default function Profile() {
           className="pb-4"
         >
           {isPatientRole && <TherapistCard therapist={profile.therapist} />}
-          {isTherapistRole && (
-            <ClientsSummaryCard clients={clients ?? []} onPress={() => router.push('/(main)/(tabs)/patients')} />
-          )}
+          {isTherapistRole &&
+            (clientsLoading ? (
+              <ClientsSummaryCardSkeleton />
+            ) : (
+              <ClientsSummaryCard clients={clients ?? []} onPress={() => router.push('/(main)/(tabs)/patients')} />
+            ))}
         </MotiView>
 
         <MotiView
@@ -89,6 +94,7 @@ export default function Profile() {
           transition={{ type: 'timing', duration: 300, delay: 160 }}
           className="pb-6"
         >
+          {/* TODO: wire onLastCompletionPress to navigate to the attempt detail screen */}
           {isPatientRole &&
             (statsLoading ? <StatsStripSkeleton /> : patientStats && <PatientStats stats={patientStats} />)}
           {isTherapistRole &&
@@ -105,8 +111,8 @@ export default function Profile() {
           transition={{ type: 'timing', duration: 300, delay: 240 }}
         >
           <SettingsGroup title="Account">
-            <SettingsRow icon="account-edit-outline" label="Edit Name" onPress={() => setEditNameVisible(true)} />
-            <SettingsRow icon="lock-outline" label="Change Password" onPress={() => setChangePasswordVisible(true)} />
+            <SettingsRow icon="account-edit-outline" label="Edit Name" onPress={openEditName} />
+            <SettingsRow icon="lock-outline" label="Change Password" onPress={openChangePassword} />
             <SettingsRow icon="email-outline" label="Email" trailing={profile.email} showChevron={false} />
           </SettingsGroup>
 

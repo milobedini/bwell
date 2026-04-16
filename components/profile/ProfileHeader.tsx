@@ -52,11 +52,9 @@ const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
 
         <View className="mt-1.5 flex-row items-center gap-2">
           <View
+            className="items-center rounded-md px-2 py-0.5"
             style={{
               backgroundColor: therapist ? Colors.therapist.tint : Colors.tint.teal,
-              borderRadius: 6,
-              paddingHorizontal: 8,
-              paddingVertical: 2,
               borderWidth: 1,
               borderColor: therapist ? Colors.therapist.tintBorder : Colors.tint.tealBorder
             }}

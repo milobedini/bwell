@@ -18,6 +18,9 @@ type StatItemProps = {
   onPress?: () => void;
 };
 
+// TODO: custom fontSize overrides (11px, 16px) bypass ThemedText type scale — consider adding
+// `micro` (11px) and `body` (16px) variants to ThemedText to eliminate inline overrides here
+// and in ProfileHeader, ClientsSummaryCard, SettingsGroup, SettingsRow
 const StatItem = ({ title, value, icon, iconColour, description, descriptionColour, onPress }: StatItemProps) => {
   const inner = (
     <>
