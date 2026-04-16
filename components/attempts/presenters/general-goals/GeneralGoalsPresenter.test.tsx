@@ -34,7 +34,7 @@ const mockState = {
   handleSubmit: jest.fn()
 };
 
-const mockUseGeneralGoalsState = jest.fn(() => mockState);
+const mockUseGeneralGoalsState = jest.fn((_params?: unknown) => mockState);
 jest.mock('./useGeneralGoalsState', () => ({
   useGeneralGoalsState: (params: unknown) => mockUseGeneralGoalsState(params)
 }));
