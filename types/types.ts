@@ -9,7 +9,8 @@ enum ModuleType {
   READING = 'reading',
   ACTIVITY_DIARY = 'activity_diary',
   FIVE_AREAS_MODEL = 'five_areas_model',
-  GENERAL_GOALS = 'general_goals'
+  GENERAL_GOALS = 'general_goals',
+  WEEKLY_GOALS = 'weekly_goals'
 }
 
 enum AccessPolicy {

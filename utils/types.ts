@@ -1,4 +1,10 @@
-import type { AttemptDetail, AttemptDetailResponseItem, DiaryDetail, GeneralGoalsData } from '@milobedini/shared-types';
+import type {
+  AttemptDetail,
+  AttemptDetailResponseItem,
+  DiaryDetail,
+  GeneralGoalsData,
+  WeeklyGoalsData
+} from '@milobedini/shared-types';
 
 export function isQuestionnaireAttempt(
   a: AttemptDetailResponseItem
@@ -21,4 +27,10 @@ export function isGeneralGoalsAttempt(
   a: AttemptDetailResponseItem
 ): a is AttemptDetailResponseItem & { generalGoals: GeneralGoalsData } {
   return a.moduleType === 'general_goals' && !!a.generalGoals;
+}
+
+export function isWeeklyGoalsAttempt(
+  a: AttemptDetailResponseItem
+): a is AttemptDetailResponseItem & { weeklyGoals: WeeklyGoalsData } {
+  return a.moduleType === 'weekly_goals' && !!a.weeklyGoals;
 }
