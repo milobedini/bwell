@@ -123,7 +123,7 @@ describe('PatientPracticeView', () => {
 
   it('shows empty state when no sections and not fetching', () => {
     usePatientPractice.mockReturnValue({
-      data: { today: [], thisWeek: [], upcoming: [], recentlyCompleted: [] } as PatientPracticeResponse,
+      data: { success: true, today: [], thisWeek: [], upcoming: [], recentlyCompleted: [] } as PatientPracticeResponse,
       isPending: false,
       isFetching: false,
       refetch: jest.fn()
@@ -137,6 +137,7 @@ describe('PatientPracticeView', () => {
   it('renders section headers when data is present', () => {
     usePatientPractice.mockReturnValue({
       data: {
+        success: true,
         today: [makeItem()],
         thisWeek: [makeItem({ assignmentId: 'a2', moduleTitle: 'GAD-7' })],
         upcoming: [],
@@ -155,6 +156,7 @@ describe('PatientPracticeView', () => {
   it('renders PatientPracticeCard for each practice item', () => {
     usePatientPractice.mockReturnValue({
       data: {
+        success: true,
         today: [makeItem(), makeItem({ assignmentId: 'a2', moduleTitle: 'GAD-7' })],
         thisWeek: [],
         upcoming: [],
@@ -174,6 +176,7 @@ describe('PatientPracticeView', () => {
   it('does not show empty sections', () => {
     usePatientPractice.mockReturnValue({
       data: {
+        success: true,
         today: [makeItem()],
         thisWeek: [],
         upcoming: [],
