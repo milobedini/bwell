@@ -102,10 +102,6 @@ const makeMockDetail = (overrides = {}) => ({
 });
 
 describe('QuestionnairePresenter', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   // ── Header / title ──
 
   it('renders module title from attempt.moduleSnapshot.title', () => {

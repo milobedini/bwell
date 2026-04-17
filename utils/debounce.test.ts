@@ -31,7 +31,7 @@ describe('useDebouncedCallback', () => {
     expect(cb).toHaveBeenCalledWith('b');
   });
 
-  it('does not fire if component unmounts before delay', () => {
+  it('still fires after unmount (does not clear on unmount by design)', () => {
     const cb = jest.fn();
     const { result, unmount } = renderHook(() => useDebouncedCallback(cb, 300));
 
@@ -39,9 +39,7 @@ describe('useDebouncedCallback', () => {
     unmount();
     act(() => jest.advanceTimersByTime(300));
 
-    // setTimeout still fires but the callback itself runs — this is expected
-    // because useDebouncedCallback doesn't clear on unmount (by design)
-    // The test documents current behaviour
+    expect(cb).toHaveBeenCalledTimes(1);
   });
 
   it('passes multiple arguments through to the callback', () => {

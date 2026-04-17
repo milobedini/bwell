@@ -8,14 +8,6 @@ jest.mock('expo-router', () => ({
   useRouter: () => ({ push: mockPush })
 }));
 
-jest.mock('@react-native-vector-icons/material-design-icons', () => {
-  const { Text } = require('react-native');
-  return {
-    __esModule: true,
-    default: ({ name }: { name: string }) => <Text>{name}</Text>
-  };
-});
-
 jest.mock('@/utils/moduleIcons', () => ({
   getModuleDisplayTitle: (title: string) => title,
   getModuleIcon: () => 'clipboard-text-outline'

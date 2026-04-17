@@ -16,7 +16,6 @@ jest.mock('@/components/ui/EmptyState', () => {
   );
 });
 jest.mock('@/utils/usePickerConstants', () => () => ({ dialogHeight: 500, verticalMargin: 50 }));
-jest.mock('@react-native-vector-icons/material-design-icons', () => 'MaterialCommunityIcons');
 jest.mock('@react-native-vector-icons/material-icons', () => 'MaterialIcons');
 jest.mock('lottie-react-native', () => 'LottieView');
 
@@ -71,8 +70,6 @@ const defaultProps = {
 };
 
 describe('SearchPickerDialog', () => {
-  beforeEach(() => jest.clearAllMocks());
-
   it('shows loading when isPending', () => {
     render(<SearchPickerDialog {...defaultProps} isPending />);
     expect(screen.getByTestId('loading')).toBeTruthy();

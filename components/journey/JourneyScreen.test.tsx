@@ -102,8 +102,6 @@ const setup = ({
 // ── Tests ──
 
 describe('JourneyScreen', () => {
-  beforeEach(() => jest.clearAllMocks());
-
   it('shows loading indicator when isLoading is true', () => {
     setup({ isLoading: true });
     expect(screen.getByTestId('loading')).toBeTruthy();

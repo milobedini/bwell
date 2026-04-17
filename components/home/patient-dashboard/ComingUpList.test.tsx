@@ -29,8 +29,6 @@ const makeAssignment = (overrides: Partial<PracticeItem> = {}): PracticeItem =>
   }) as PracticeItem;
 
 describe('ComingUpList', () => {
-  beforeEach(() => jest.clearAllMocks());
-
   it('returns null when assignments list is empty', () => {
     const { toJSON } = render(<ComingUpList assignments={[]} hasMore={false} remainingCount={0} />);
     expect(toJSON()).toBeNull();

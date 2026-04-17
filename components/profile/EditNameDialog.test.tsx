@@ -65,8 +65,6 @@ const setup = (visible = true, userName = 'Alice Smith') => {
 // ── Tests ──
 
 describe('EditNameDialog', () => {
-  beforeEach(() => jest.clearAllMocks());
-
   it('renders "Edit Name" title when visible', () => {
     setup();
     expect(screen.getByText('Edit Name')).toBeTruthy();

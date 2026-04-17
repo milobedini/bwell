@@ -34,8 +34,6 @@ const makeItem = (overrides: Partial<DashboardClientItem> = {}): DashboardClient
 });
 
 describe('ClientCard', () => {
-  beforeEach(() => jest.clearAllMocks());
-
   it('renders patient name', () => {
     render(<ClientCard item={makeItem()} bucket="completed" />);
 

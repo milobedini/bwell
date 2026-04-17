@@ -1,14 +1,6 @@
 import type { AuthUser } from '@milobedini/shared-types';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
-jest.mock('@react-native-vector-icons/material-design-icons', () => {
-  const { Text } = require('react-native');
-  return {
-    __esModule: true,
-    default: ({ name }: { name: string }) => <Text>{name}</Text>
-  };
-});
-
 const ClientsSummaryCard = require('./ClientsSummaryCard').default;
 
 const makeClient = (id: string, name?: string): AuthUser => ({

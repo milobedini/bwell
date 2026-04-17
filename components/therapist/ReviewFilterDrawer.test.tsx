@@ -69,10 +69,6 @@ const defaultProps = {
 };
 
 describe('ReviewFilterDrawer', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('renders "Filters" title', () => {
     render(<ReviewFilterDrawer {...defaultProps} />);
     expect(screen.getByText('Filters')).toBeTruthy();

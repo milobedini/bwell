@@ -5,14 +5,6 @@ jest.mock('moti', () => {
   return { MotiView: View };
 });
 
-jest.mock('@react-native-vector-icons/material-design-icons', () => {
-  const { Text } = require('react-native');
-  return {
-    __esModule: true,
-    default: ({ name }: { name: string }) => <Text>{name}</Text>
-  };
-});
-
 const TherapistCard = require('./TherapistCard').default;
 
 describe('TherapistCard', () => {

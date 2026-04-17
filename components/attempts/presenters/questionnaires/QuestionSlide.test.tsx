@@ -51,10 +51,6 @@ const defaultColors = {
 };
 
 describe('QuestionSlide', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('renders the question text', () => {
     render(<QuestionSlide mode="view" question={makeQuestion()} colors={defaultColors} />);
 

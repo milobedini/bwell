@@ -1,10 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
-jest.mock('@react-native-vector-icons/material-design-icons', () => {
-  const { Text } = require('react-native');
-  return { __esModule: true, default: ({ name }: { name: string }) => <Text>{name}</Text> };
-});
-
 jest.mock('@/utils/dates', () => ({
   timeAgo: (d: string) => (d ? { relative: '2 hours ago', formatted: d } : { relative: null, formatted: '' })
 }));
@@ -18,8 +13,6 @@ const defaultProps = {
 };
 
 describe('DiaryHeader', () => {
-  beforeEach(() => jest.clearAllMocks());
-
   it('renders last saved time with relative format', () => {
     render(<DiaryHeader {...defaultProps} />);
 

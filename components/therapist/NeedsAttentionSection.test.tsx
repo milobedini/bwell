@@ -6,11 +6,6 @@ jest.mock('expo-router', () => ({
   router: { push: mockPush }
 }));
 
-jest.mock('@react-native-vector-icons/material-design-icons', () => {
-  const { Text } = require('react-native');
-  return { __esModule: true, default: ({ name }: { name: string }) => <Text>{name}</Text> };
-});
-
 jest.mock('@/utils/moduleIcons', () => ({
   getModuleDisplayTitle: (title: string) => title
 }));
@@ -37,8 +32,6 @@ const makeItem = (overrides: Partial<ReviewItem> = {}): ReviewItem =>
   }) as ReviewItem;
 
 describe('NeedsAttentionSection', () => {
-  beforeEach(() => jest.clearAllMocks());
-
   it('returns null when items list is empty', () => {
     const { toJSON } = render(<NeedsAttentionSection items={[]} />);
     expect(toJSON()).toBeNull();

@@ -6,11 +6,6 @@ jest.mock('react-native-keyboard-controller', () => {
   return { KeyboardAwareScrollView: ScrollView };
 });
 
-jest.mock('@react-native-vector-icons/material-design-icons', () => {
-  const { Text } = require('react-native');
-  return { __esModule: true, default: ({ name }: { name: string }) => <Text>{name}</Text> };
-});
-
 const mockState = {
   canEdit: false,
   isReRating: false,
@@ -72,7 +67,6 @@ const makeAttempt = (overrides: Partial<AttemptDetailResponseItem> = {}): Attemp
 
 describe('GeneralGoalsPresenter', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
     mockUseGeneralGoalsState.mockReturnValue({ ...mockState, canEdit: false });
   });
 

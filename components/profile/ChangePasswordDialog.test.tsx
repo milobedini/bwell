@@ -57,8 +57,6 @@ const setup = (visible = true) => {
 // ── Tests ──
 
 describe('ChangePasswordDialog', () => {
-  beforeEach(() => jest.clearAllMocks());
-
   it('renders "Change Password" title when visible', () => {
     setup();
     expect(screen.getByText('Change Password')).toBeTruthy();

@@ -95,10 +95,6 @@ describe('UserFilterDrawer', () => {
     onApply: jest.fn()
   };
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('renders "Filters" title', () => {
     render(<UserFilterDrawer {...defaultProps} />);
     expect(screen.getByText('Filters')).toBeTruthy();

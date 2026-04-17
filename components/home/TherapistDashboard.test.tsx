@@ -48,8 +48,6 @@ jest.mock('@/utils/dates', () => ({
 const { useTherapistDashboard } = require('@/hooks/useTherapistDashboard') as { useTherapistDashboard: jest.Mock };
 
 describe('TherapistDashboard', () => {
-  beforeEach(() => jest.clearAllMocks());
-
   it('shows loading indicator when isPending', () => {
     useTherapistDashboard.mockReturnValue({ isPending: true, isError: false, data: null });
 

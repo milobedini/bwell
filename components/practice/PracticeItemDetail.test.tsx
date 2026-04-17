@@ -83,8 +83,6 @@ const setup = ({
 // ── Tests ──
 
 describe('PracticeItemDetail', () => {
-  beforeEach(() => jest.clearAllMocks());
-
   it('shows loading when practice data is pending', () => {
     setup({ isPracticePending: true });
     expect(screen.getByTestId('loading')).toBeTruthy();

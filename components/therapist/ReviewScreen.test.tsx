@@ -8,11 +8,6 @@ jest.mock('expo-router', () => ({
   router: { push: jest.fn() }
 }));
 
-jest.mock('@react-native-vector-icons/material-design-icons', () => {
-  const { Text } = require('react-native');
-  return { __esModule: true, default: ({ name }: { name: string }) => <Text>{name}</Text> };
-});
-
 jest.mock('react-native-paper', () => {
   const { Text, Pressable } = require('react-native');
   return {
@@ -110,8 +105,6 @@ const setupHooks = (overrides: Record<string, unknown> = {}) => {
 };
 
 describe('ReviewScreen', () => {
-  beforeEach(() => jest.clearAllMocks());
-
   it('renders loading indicator when isLoading', () => {
     setupHooks({ isLoading: true });
     render(<ReviewScreen />);

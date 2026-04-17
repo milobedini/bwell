@@ -30,8 +30,6 @@ jest.mock('expo-router', () => ({
   Stack: { Screen: () => null }
 }));
 
-jest.mock('@react-native-vector-icons/material-design-icons', () => 'Icon');
-
 jest.mock('react-native-paper', () => ({
   Badge: () => null
 }));
@@ -105,10 +103,6 @@ const makeItem = (overrides: Partial<PracticeItem> = {}): PracticeItem =>
   }) as PracticeItem;
 
 describe('PatientPracticeView', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('shows loading indicator when isPending', () => {
     usePatientPractice.mockReturnValue({
       data: undefined,

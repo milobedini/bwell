@@ -19,11 +19,6 @@ jest.mock('moti', () => {
   };
 });
 
-jest.mock('@react-native-vector-icons/material-design-icons', () => {
-  const { Text } = require('react-native');
-  return { __esModule: true, default: ({ name }: { name: string }) => <Text>{name}</Text> };
-});
-
 const mockState = {
   fields: {
     situation: 'At work',
@@ -92,7 +87,7 @@ const FiveAreasPresenter = require('./FiveAreasPresenter').default;
 const makeAttempt = (overrides: Partial<AttemptDetailResponseItem> = {}): AttemptDetailResponseItem =>
   ({
     _id: 'att-1',
-    moduleType: 'five_areas',
+    moduleType: 'five_areas_model',
     status: 'submitted',
     createdAt: '2026-04-01',
     ...overrides
@@ -100,7 +95,6 @@ const makeAttempt = (overrides: Partial<AttemptDetailResponseItem> = {}): Attemp
 
 describe('FiveAreasPresenter', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
     mockUseFiveAreasState.mockReturnValue({ ...mockState, canEdit: false });
   });
 

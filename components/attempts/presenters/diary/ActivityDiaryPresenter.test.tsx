@@ -36,10 +36,6 @@ jest.mock('./AnimatedAccordionSlot', () => {
   return ({ children, isExpanded }: { children: ReactNode; isExpanded: boolean }) =>
     isExpanded ? <View testID="expanded-slot">{children}</View> : <View testID="collapsed-slot">{children}</View>;
 });
-jest.mock('@react-native-vector-icons/material-design-icons', () => {
-  const { Text } = require('react-native');
-  return { __esModule: true, default: ({ name }: { name: string }) => <Text>{name}</Text> };
-});
 jest.mock('@/utils/activityHelpers', () => ({
   isSlotFilled: jest.fn(() => false),
   isSlotComplete: jest.fn(() => false)
@@ -104,7 +100,6 @@ const mockAttempt = {
 
 describe('ActivityDiaryPresenter', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
     useDiaryState.mockReturnValue(makeDiaryState());
     useDiaryNavigation.mockReturnValue(mockNav());
   });

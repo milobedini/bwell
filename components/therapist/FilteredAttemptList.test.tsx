@@ -6,9 +6,9 @@ jest.mock('expo-router', () => ({
   useRouter: () => ({ push: mockPush })
 }));
 
-jest.mock('@react-native-vector-icons/material-design-icons', () => {
-  const { Text } = require('react-native');
-  return { __esModule: true, default: ({ name }: { name: string }) => <Text>{name}</Text> };
+jest.mock('../LoadingScreen', () => {
+  const { View } = require('react-native');
+  return { LoadingIndicator: () => <View testID="loading-indicator" /> };
 });
 
 jest.mock('@/utils/moduleIcons', () => ({
@@ -45,12 +45,10 @@ const defaultProps = {
 };
 
 describe('FilteredAttemptList', () => {
-  beforeEach(() => jest.clearAllMocks());
-
   it('renders loading indicator when isPending', () => {
     render(<FilteredAttemptList {...defaultProps} attempts={[]} isPending={true} />);
 
-    // LoadingIndicator renders ActivityIndicator
+    expect(screen.getByTestId('loading-indicator')).toBeTruthy();
     expect(screen.queryByText('No results')).toBeNull();
   });
 

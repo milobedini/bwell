@@ -92,10 +92,6 @@ const makeProps = (overrides: Partial<AttemptFilterDrawerProps> = {}): AttemptFi
 /* ------------------------------------------------------------------ */
 
 describe('AttemptFilterDrawer', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('renders the title', () => {
     render(<AttemptFilterDrawer {...makeProps({ title: 'My Filters' })} />);
     expect(screen.getByText('My Filters')).toBeTruthy();

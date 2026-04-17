@@ -3,6 +3,7 @@ import type { Config } from 'jest';
 const config: Config = {
   preset: 'jest-expo',
   setupFiles: ['./jest.setup.ts'],
+  clearMocks: true,
 
   collectCoverageFrom: [
     'components/**/*.{ts,tsx}',

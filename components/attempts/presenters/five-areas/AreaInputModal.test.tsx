@@ -20,11 +20,6 @@ jest.mock('moti', () => {
   };
 });
 
-jest.mock('@react-native-vector-icons/material-design-icons', () => {
-  const { Text } = require('react-native');
-  return { __esModule: true, default: ({ name }: { name: string }) => <Text>{name}</Text> };
-});
-
 jest.mock('@/components/ui/KeyboardAvoidingWrapper', () => {
   const { View } = require('react-native');
   return ({ children }: { children: ReactNode }) => <View>{children}</View>;
@@ -42,8 +37,6 @@ const defaultProps = {
 };
 
 describe('AreaInputModal', () => {
-  beforeEach(() => jest.clearAllMocks());
-
   it('renders the area label', () => {
     render(<AreaInputModal {...defaultProps} />);
 

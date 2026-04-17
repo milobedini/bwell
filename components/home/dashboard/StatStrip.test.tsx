@@ -19,8 +19,6 @@ const makeStats = (overrides: Partial<DashboardStats> = {}): DashboardStats => (
 describe('StatStrip', () => {
   const onScrollToBucket = jest.fn();
 
-  beforeEach(() => jest.clearAllMocks());
-
   it('renders 4 stat pills with correct labels', () => {
     render(<StatStrip stats={makeStats()} onScrollToBucket={onScrollToBucket} />);
 

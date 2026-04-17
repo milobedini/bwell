@@ -13,8 +13,6 @@ jest.mock('moti', () => {
   };
 });
 
-jest.mock('@react-native-vector-icons/material-design-icons', () => 'Icon');
-
 const ActionMenu = require('./ActionMenu').default;
 
 const makeAction = (overrides: Partial<ActionMenuItem> = {}): ActionMenuItem => ({
@@ -26,10 +24,6 @@ const makeAction = (overrides: Partial<ActionMenuItem> = {}): ActionMenuItem => 
 
 describe('ActionMenu', () => {
   const onDismiss = jest.fn();
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
 
   it('does not render content when visible is false', () => {
     const action = makeAction();

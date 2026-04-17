@@ -80,8 +80,6 @@ const setup = ({
 // ── Tests ──
 
 describe('PracticeScreen', () => {
-  beforeEach(() => jest.clearAllMocks());
-
   it('shows loading when isPending', () => {
     setup({ isPending: true });
     expect(screen.getByTestId('loading')).toBeTruthy();

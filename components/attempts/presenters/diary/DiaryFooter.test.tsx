@@ -16,8 +16,6 @@ const defaultProps = {
 };
 
 describe('DiaryFooter', () => {
-  beforeEach(() => jest.clearAllMocks());
-
   // ── Edit mode ──
 
   it('renders note input when canEdit is true', () => {
