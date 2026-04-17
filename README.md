@@ -48,6 +48,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ## Recent Milestones
 
+- **Jest test coverage expansion** — 47 new test files across components, hooks and utils, global mocks (AsyncStorage, material-design-icons) in `jest.setup.ts`, `clearMocks: true` replacing per-test reset boilerplate, shared `test-utils/` wrappers for React Query and presenter mocks (2026-04-17)
 - **Profile redesign** — role-aware dashboard layout with identity header, therapist/client relationship cards, stats strip, iOS-style grouped settings, shared initials utility and new colour tokens (2026-04-16)
 - **General Goals module** — goal rating with slider tracks, re-rating check-ins with unified timeline and trend indicators, reflection section, "Check-in" label across all views (2026-04-15)
 - **Activity diary redesign** — accordion layout with animated expand/collapse, split save/submit, Reanimated progress ring, mood slider, metric stepper with stale closure fixes, teal glow save indicator (2026-04-10)
@@ -57,7 +58,6 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 - **Unified practice model** — merged assignments and attempts into a single practice concept, new journey/practice/review tabs, BarSparkline component, server-side client search/sort (2026-04-01)
 - **Reading module type** — replaced psychoeducation/exercise with unified reading presenter, markdown rendering, scroll progress bar, reader notes (2026-04-01)
 - **Destructive action confirmation** — ActionMenu built-in confirmation step for all destructive actions with customisable title, description, and label (2026-03-29)
-- **Therapist assignments redesign** — SectionList grouped by patient, sort/filter drawer, edit modal (due date, notes, recurrence), collapsible sections, shared chip styles (2026-03-27)
 
 ## Tech Stack
 
