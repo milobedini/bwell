@@ -112,6 +112,7 @@
     "prettier-plugin-tailwindcss": "^0.5.14",
     "react-test-renderer": "19.1.0",
     "tailwindcss": "^3.4.17",
+    "ts-node": "^10.9.2",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.39.1"
   },
@@ -120,26 +121,6 @@
     "*.{ts,tsx,js,jsx}": [
       "eslint --fix",
       "prettier --write"
-    ]
-  },
-  "jest": {
-    "preset": "jest-expo",
-    "setupFiles": [
-      "./jest.setup.ts"
-    ],
-    "collectCoverageFrom": [
-      "app/**/*.{ts,tsx}",
-      "components/**/*.{ts,tsx}",
-      "hooks/**/*.{ts,tsx}",
-      "stores/**/*.{ts,tsx}",
-      "utils/**/*.{ts,tsx}",
-      "api/**/*.{ts,tsx}",
-      "!**/*.test.{ts,tsx}",
-      "!**/*.d.ts",
-      "!**/index.ts"
-    ],
-    "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg|@milobedini/shared-types)"
     ]
   }
 }

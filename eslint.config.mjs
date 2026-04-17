@@ -29,6 +29,9 @@ export default defineConfig([
         beforeAll: 'readonly',
         afterAll: 'readonly'
       }
+    },
+    rules: {
+      'react/display-name': 'off'
     }
   },
 
