@@ -2,15 +2,6 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import GoalCard from './GoalCard';
 
-// Minimal mock for vector icons
-jest.mock('@react-native-vector-icons/material-design-icons', () => {
-  const { Text } = require('react-native');
-  return {
-    __esModule: true,
-    default: ({ name }: { name: string }) => <Text>{name}</Text>
-  };
-});
-
 const baseProps = {
   index: 0,
   goalText: 'Be calmer',

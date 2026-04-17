@@ -1,13 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
-jest.mock('@react-native-vector-icons/material-design-icons', () => {
-  const { Text } = require('react-native');
-  return {
-    __esModule: true,
-    default: ({ name }: { name: string }) => <Text>{name}</Text>
-  };
-});
-
 const SettingsRow = require('./SettingsRow').default;
 
 describe('SettingsRow', () => {
