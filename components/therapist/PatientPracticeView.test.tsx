@@ -123,7 +123,14 @@ describe('PatientPracticeView', () => {
 
   it('shows empty state when no sections and not fetching', () => {
     usePatientPractice.mockReturnValue({
-      data: { success: true, today: [], thisWeek: [], upcoming: [], recentlyCompleted: [] } as PatientPracticeResponse,
+      data: {
+        success: true,
+        sparklines: {},
+        today: [],
+        thisWeek: [],
+        upcoming: [],
+        recentlyCompleted: []
+      } as PatientPracticeResponse,
       isPending: false,
       isFetching: false,
       refetch: jest.fn()
@@ -138,6 +145,7 @@ describe('PatientPracticeView', () => {
     usePatientPractice.mockReturnValue({
       data: {
         success: true,
+        sparklines: {},
         today: [makeItem()],
         thisWeek: [makeItem({ assignmentId: 'a2', moduleTitle: 'GAD-7' })],
         upcoming: [],
@@ -157,6 +165,7 @@ describe('PatientPracticeView', () => {
     usePatientPractice.mockReturnValue({
       data: {
         success: true,
+        sparklines: {},
         today: [makeItem(), makeItem({ assignmentId: 'a2', moduleTitle: 'GAD-7' })],
         thisWeek: [],
         upcoming: [],
@@ -177,6 +186,7 @@ describe('PatientPracticeView', () => {
     usePatientPractice.mockReturnValue({
       data: {
         success: true,
+        sparklines: {},
         today: [makeItem()],
         thisWeek: [],
         upcoming: [],
