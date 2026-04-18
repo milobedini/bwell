@@ -73,7 +73,7 @@ const ReflectionThread = ({ reflection, canEdit, onChange }: ReflectionThreadPro
                 placeholder="A sentence is plenty."
                 placeholderTextColor={Colors.sway.darkGrey}
                 multiline
-                blurOnSubmit
+                submitBehavior="blurAndSubmit"
                 returnKeyType="done"
                 textAlignVertical="top"
                 style={{

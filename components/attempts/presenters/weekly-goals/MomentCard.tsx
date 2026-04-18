@@ -193,7 +193,7 @@ const MomentCard = ({
             placeholder="Type what you'd like to do…"
             placeholderTextColor={Colors.sway.darkGrey}
             multiline
-            blurOnSubmit
+            submitBehavior="blurAndSubmit"
             returnKeyType="done"
             style={{
               color: Colors.sway.lightGrey,
@@ -327,7 +327,7 @@ const MomentCard = ({
                 placeholder="Anything you want to remember about this one?"
                 placeholderTextColor={Colors.sway.darkGrey}
                 multiline
-                blurOnSubmit
+                submitBehavior="blurAndSubmit"
                 returnKeyType="done"
                 style={{
                   backgroundColor: Colors.chip.darkCardDeep,

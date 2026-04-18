@@ -393,7 +393,7 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
                 placeholder="Type your answer…"
                 placeholderTextColor={Colors.sway.darkGrey}
                 multiline
-                blurOnSubmit
+                submitBehavior="blurAndSubmit"
                 returnKeyType="done"
                 onSubmitEditing={handleAdd}
                 style={{
