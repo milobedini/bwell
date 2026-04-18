@@ -5,6 +5,8 @@ import { MotiView } from 'moti';
 import ContentContainer from '@/components/ContentContainer';
 import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
+import type { ActionMenuItem } from '@/components/ui/ActionMenu';
+import ActionMenu from '@/components/ui/ActionMenu';
 import { Colors } from '@/constants/Colors';
 import { AttemptStatus } from '@/types/types';
 import type { AttemptDetailResponseItem } from '@milobedini/shared-types';
@@ -39,7 +41,29 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
   const state = useWeeklyGoalsState({ attempt, mode, onSubmitSuccess: handleSubmitSuccess });
   const [draft, setDraft] = useState('');
   const [activeGoalIndex, setActiveGoalIndex] = useState<number | null>(null);
+  const [resetMenuVisible, setResetMenuVisible] = useState(false);
   const draftInputRef = useRef<TextInput | null>(null);
+
+  const handleReset = useCallback(() => {
+    state.reset();
+    setDraft('');
+    setActiveGoalIndex(null);
+  }, [state]);
+
+  const resetActions: ActionMenuItem[] = [
+    {
+      icon: 'restart',
+      label: 'Reset conversation',
+      onPress: handleReset,
+      variant: 'destructive',
+      confirmTitle: 'Reset this week?',
+      confirmDescription:
+        'This clears every goal and reflection you\u2019ve added so you can start over. You can still save or submit afterwards.',
+      confirmLabel: 'Reset'
+    }
+  ];
+
+  const hasAnyContent = state.goals.length > 0 || Object.values(state.reflection).some((v) => v.trim().length > 0);
 
   const handleAdd = useCallback(() => {
     const text = draft.trim();
@@ -164,19 +188,49 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
         <BloomGlow trigger={submitBloomTrigger} size={280} />
       </View>
 
-      {/* Persistent floating save chip */}
-      {(state.isDirty || state.isSaving) && (
-        <View className="absolute right-4 top-1 z-10">
+      <ActionMenu
+        visible={resetMenuVisible}
+        onDismiss={() => setResetMenuVisible(false)}
+        title="Start over"
+        subtitle="Clear this week\u2019s draft and begin again."
+        actions={resetActions}
+      />
+
+      {/* Persistent goal rail; mitigates chat-UI lost-list anti-pattern. */}
+      <WeekRail
+        goals={state.goals}
+        activeIndex={activeGoalIndex}
+        canEdit
+        onPressGoal={(i) => setActiveGoalIndex(i)}
+        onToggle={state.toggleCompleted}
+      />
+
+      {/* Floating action stack — pinned above tab bar, always visible while
+          scrolling. Never competes with the goal rail chips. */}
+      <View
+        pointerEvents="box-none"
+        style={{ position: 'absolute', right: 16, bottom: 16, zIndex: 30 }}
+        className="gap-2"
+      >
+        <MotiView
+          from={{ opacity: 0, scale: 0.7 }}
+          animate={{
+            opacity: state.isDirty || state.isSaving ? 1 : 0,
+            scale: state.isDirty || state.isSaving ? 1 : 0.7
+          }}
+          transition={{ type: 'timing', duration: 200 }}
+          pointerEvents={state.isDirty || state.isSaving ? 'auto' : 'none'}
+        >
           <Pressable
-            className="h-10 w-10 items-center justify-center rounded-full"
+            className="h-12 w-12 items-center justify-center rounded-full"
             style={{
               backgroundColor: Colors.chip.darkCardDeep,
               borderWidth: 1,
               borderColor: Colors.tint.tealBorder,
               shadowColor: Colors.sway.bright,
-              shadowOffset: { width: 0, height: 2 },
+              shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.35,
-              shadowRadius: 8,
+              shadowRadius: 10,
               elevation: 8
             }}
             onPress={state.save}
@@ -188,20 +242,41 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
             {state.isSaving ? (
               <ActivityIndicator size="small" color={Colors.sway.bright} />
             ) : (
-              <MaterialCommunityIcons name="content-save-edit-outline" size={20} color={Colors.primary.warning} />
+              <MaterialCommunityIcons name="content-save-edit-outline" size={22} color={Colors.primary.warning} />
             )}
           </Pressable>
-        </View>
-      )}
+        </MotiView>
 
-      {/* Persistent goal rail; mitigates chat-UI lost-list anti-pattern */}
-      <WeekRail
-        goals={state.goals}
-        activeIndex={activeGoalIndex}
-        canEdit
-        onPressGoal={(i) => setActiveGoalIndex(i)}
-        onToggle={state.toggleCompleted}
-      />
+        <MotiView
+          from={{ opacity: 0, scale: 0.7 }}
+          animate={{
+            opacity: hasAnyContent ? 1 : 0,
+            scale: hasAnyContent ? 1 : 0.7
+          }}
+          transition={{ type: 'timing', duration: 200 }}
+          pointerEvents={hasAnyContent ? 'auto' : 'none'}
+        >
+          <Pressable
+            className="h-12 w-12 items-center justify-center rounded-full"
+            style={{
+              backgroundColor: Colors.chip.darkCardDeep,
+              borderWidth: 1,
+              borderColor: Colors.tint.errorBorder,
+              shadowColor: Colors.primary.error,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 10,
+              elevation: 8
+            }}
+            onPress={() => setResetMenuVisible(true)}
+            accessibilityRole="button"
+            accessibilityLabel="Reset conversation"
+            hitSlop={8}
+          >
+            <MaterialCommunityIcons name="restart" size={22} color={Colors.primary.error} />
+          </Pressable>
+        </MotiView>
+      </View>
 
       <KeyboardAwareScrollView
         bottomOffset={120}

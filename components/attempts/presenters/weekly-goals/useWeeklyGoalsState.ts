@@ -208,6 +208,14 @@ export const useWeeklyGoalsState = ({ attempt, mode, onSubmitSuccess }: UseWeekl
     [canEdit]
   );
 
+  const reset = useCallback(() => {
+    if (!canEdit) return;
+    setGoals([]);
+    setReflection({ ...emptyReflection });
+    setIsDirty(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+  }, [canEdit]);
+
   const filledGoals = useMemo(() => goals.filter((g) => g.goalText.trim().length > 0), [goals]);
   const completedCount = useMemo(() => goals.filter((g) => g.completed).length, [goals]);
   const reflectionFilled = useMemo(() => Object.values(reflection).some((v) => v.trim().length > 0), [reflection]);
@@ -254,6 +262,7 @@ export const useWeeklyGoalsState = ({ attempt, mode, onSubmitSuccess }: UseWeekl
     updatePlannedAt,
     removeGoal,
     updateReflection,
+    reset,
     save,
     handleSubmit
   };
