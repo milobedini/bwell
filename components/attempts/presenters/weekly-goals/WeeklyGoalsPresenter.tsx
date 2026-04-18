@@ -280,7 +280,7 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
 
       <KeyboardAwareScrollView
         bottomOffset={120}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 160 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 120 }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
