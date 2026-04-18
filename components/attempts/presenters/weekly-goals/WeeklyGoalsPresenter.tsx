@@ -35,6 +35,9 @@ const OPENING_PROMPTS = [
   'Last one, go for it.'
 ];
 
+// TODO: Lift to `components/ui/FloatingActionButton.tsx` when a second caller
+// appears (e.g. GeneralGoalsPresenter's save FAB) so the shared API is designed
+// against two real use sites rather than speculatively.
 type FloatingActionButtonProps = {
   visible: boolean;
   borderColor: string;
