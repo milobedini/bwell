@@ -24,9 +24,13 @@ const ReflectionThread = ({ reflection, canEdit, onChange }: ReflectionThreadPro
   }));
 
   // In edit mode: show prompts up to (and including) the next unanswered one.
+  // Once every prompt is answered, show all of them so the user can still edit.
   // In view mode: show every prompt that has an answer.
+  const firstEmptyIdx = steps.findIndex((s) => s.value.trim().length === 0);
   const visibleCount = canEdit
-    ? Math.min(steps.length, Math.max(1, steps.findIndex((s) => s.value.trim().length === 0) + 1) || steps.length)
+    ? firstEmptyIdx === -1
+      ? steps.length
+      : firstEmptyIdx + 1
     : steps.filter((s) => s.value.trim().length > 0).length;
 
   const visibleSteps = canEdit ? steps.slice(0, visibleCount) : steps.filter((s) => s.value.trim().length > 0);
