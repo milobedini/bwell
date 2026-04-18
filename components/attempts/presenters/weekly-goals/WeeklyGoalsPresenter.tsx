@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { MotiView } from 'moti';
@@ -35,6 +35,56 @@ const OPENING_PROMPTS = [
   'Last one, go for it.'
 ];
 
+type FloatingActionButtonProps = {
+  visible: boolean;
+  borderColor: string;
+  shadowColor: string;
+  shadowOpacity: number;
+  onPress: () => void;
+  disabled?: boolean;
+  accessibilityLabel: string;
+  children: ReactNode;
+};
+
+const FloatingActionButton = ({
+  visible,
+  borderColor,
+  shadowColor,
+  shadowOpacity,
+  onPress,
+  disabled,
+  accessibilityLabel,
+  children
+}: FloatingActionButtonProps) => (
+  <MotiView
+    from={{ opacity: 0, scale: 0.7 }}
+    animate={{ opacity: visible ? 1 : 0, scale: visible ? 1 : 0.7 }}
+    transition={{ type: 'timing', duration: 200 }}
+    pointerEvents={visible ? 'auto' : 'none'}
+  >
+    <Pressable
+      className="h-12 w-12 items-center justify-center rounded-full"
+      style={{
+        backgroundColor: Colors.chip.darkCardDeep,
+        borderWidth: 1,
+        borderColor,
+        shadowColor,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity,
+        shadowRadius: 10,
+        elevation: 8
+      }}
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      hitSlop={8}
+    >
+      {children}
+    </Pressable>
+  </MotiView>
+);
+
 const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresenterProps) => {
   const [submitBloomTrigger, setSubmitBloomTrigger] = useState(0);
   const handleSubmitSuccess = useCallback(() => setSubmitBloomTrigger((n) => n + 1), []);
@@ -58,27 +108,31 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
       variant: 'destructive',
       confirmTitle: 'Reset this week?',
       confirmDescription:
-        'This clears every goal and reflection you\u2019ve added so you can start over. You can still save or submit afterwards.',
+        'This clears every goal and reflection you’ve added so you can start over. You can still save or submit afterwards.',
       confirmLabel: 'Reset'
     }
   ];
 
-  const hasAnyContent = state.goals.length > 0 || Object.values(state.reflection).some((v) => v.trim().length > 0);
+  const hasAnyContent = state.goals.length > 0 || state.reflectionFilled;
 
   const handleAdd = useCallback(() => {
     const text = draft.trim();
     if (!text || !state.canAddGoal) return;
     state.addGoal(text);
     setDraft('');
-    // Keep keyboard open for a rapid add flow.
     draftInputRef.current?.focus();
   }, [draft, state]);
 
-  // ── VIEW MODE (patient post-submit or therapist) ─────────────────────────
   if (!state.canEdit) {
     return (
       <ContentContainer padded={false}>
-        <WeekRail goals={state.goals} activeIndex={null} canEdit={false} onPressGoal={() => {}} />
+        <WeekRail
+          goals={state.goals}
+          completedCount={state.completedCount}
+          activeIndex={null}
+          canEdit={false}
+          onPressGoal={() => {}}
+        />
 
         <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 48 }}>
           {mode === 'view' && attempt.status !== AttemptStatus.SUBMITTED && (
@@ -161,17 +215,14 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
     );
   }
 
-  // ── EDIT MODE: conversational flow ───────────────────────────────────────
   const nextPromptIndex = Math.min(state.goals.length, OPENING_PROMPTS.length - 1);
   const currentOpenerPrompt = OPENING_PROMPTS[nextPromptIndex];
   const showComposer = state.canAddGoal;
-  const firstEmpty = state.goals.findIndex((g) => g.goalText.trim().length === 0);
   const atLeastOneFilled = state.filledGoals.length >= 1;
 
   return (
     <ContentContainer padded={false}>
-      {/* Submit-success overlay bloom — one larger bloom that plays when the
-          week is closed. Pointer-events disabled so it never intercepts. */}
+      {/* Submit-success overlay bloom; pointer-events disabled so it never intercepts. */}
       <View
         pointerEvents="none"
         style={{
@@ -192,90 +243,50 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
         visible={resetMenuVisible}
         onDismiss={() => setResetMenuVisible(false)}
         title="Start over"
-        subtitle="Clear this week\u2019s draft and begin again."
+        subtitle="Clear this week’s draft and begin again."
         actions={resetActions}
       />
 
-      {/* Persistent goal rail; mitigates chat-UI lost-list anti-pattern. */}
       <WeekRail
         goals={state.goals}
+        completedCount={state.completedCount}
         activeIndex={activeGoalIndex}
         canEdit
         onPressGoal={(i) => setActiveGoalIndex(i)}
         onToggle={state.toggleCompleted}
       />
 
-      {/* Floating action stack — pinned above tab bar, always visible while
-          scrolling. Never competes with the goal rail chips. */}
       <View
         pointerEvents="box-none"
         style={{ position: 'absolute', right: 16, bottom: 16, zIndex: 30 }}
         className="gap-2"
       >
-        <MotiView
-          from={{ opacity: 0, scale: 0.7 }}
-          animate={{
-            opacity: state.isDirty || state.isSaving ? 1 : 0,
-            scale: state.isDirty || state.isSaving ? 1 : 0.7
-          }}
-          transition={{ type: 'timing', duration: 200 }}
-          pointerEvents={state.isDirty || state.isSaving ? 'auto' : 'none'}
+        <FloatingActionButton
+          visible={state.isDirty || state.isSaving}
+          borderColor={Colors.tint.tealBorder}
+          shadowColor={Colors.sway.bright}
+          shadowOpacity={0.35}
+          onPress={state.save}
+          disabled={state.isSaving || !state.isDirty}
+          accessibilityLabel={state.isSaving ? 'Saving' : 'Save changes'}
         >
-          <Pressable
-            className="h-12 w-12 items-center justify-center rounded-full"
-            style={{
-              backgroundColor: Colors.chip.darkCardDeep,
-              borderWidth: 1,
-              borderColor: Colors.tint.tealBorder,
-              shadowColor: Colors.sway.bright,
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.35,
-              shadowRadius: 10,
-              elevation: 8
-            }}
-            onPress={state.save}
-            disabled={state.isSaving || !state.isDirty}
-            accessibilityRole="button"
-            accessibilityLabel={state.isSaving ? 'Saving' : 'Save changes'}
-            hitSlop={8}
-          >
-            {state.isSaving ? (
-              <ActivityIndicator size="small" color={Colors.sway.bright} />
-            ) : (
-              <MaterialCommunityIcons name="content-save-edit-outline" size={22} color={Colors.primary.warning} />
-            )}
-          </Pressable>
-        </MotiView>
+          {state.isSaving ? (
+            <ActivityIndicator size="small" color={Colors.sway.bright} />
+          ) : (
+            <MaterialCommunityIcons name="content-save-edit-outline" size={22} color={Colors.primary.warning} />
+          )}
+        </FloatingActionButton>
 
-        <MotiView
-          from={{ opacity: 0, scale: 0.7 }}
-          animate={{
-            opacity: hasAnyContent ? 1 : 0,
-            scale: hasAnyContent ? 1 : 0.7
-          }}
-          transition={{ type: 'timing', duration: 200 }}
-          pointerEvents={hasAnyContent ? 'auto' : 'none'}
+        <FloatingActionButton
+          visible={hasAnyContent}
+          borderColor={Colors.tint.errorBorder}
+          shadowColor={Colors.primary.error}
+          shadowOpacity={0.3}
+          onPress={() => setResetMenuVisible(true)}
+          accessibilityLabel="Reset conversation"
         >
-          <Pressable
-            className="h-12 w-12 items-center justify-center rounded-full"
-            style={{
-              backgroundColor: Colors.chip.darkCardDeep,
-              borderWidth: 1,
-              borderColor: Colors.tint.errorBorder,
-              shadowColor: Colors.primary.error,
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 10,
-              elevation: 8
-            }}
-            onPress={() => setResetMenuVisible(true)}
-            accessibilityRole="button"
-            accessibilityLabel="Reset conversation"
-            hitSlop={8}
-          >
-            <MaterialCommunityIcons name="restart" size={22} color={Colors.primary.error} />
-          </Pressable>
-        </MotiView>
+          <MaterialCommunityIcons name="restart" size={22} color={Colors.primary.error} />
+        </FloatingActionButton>
       </View>
 
       <KeyboardAwareScrollView
@@ -284,7 +295,6 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Header: the coach's opening address */}
         <MotiView
           from={{ opacity: 0, translateY: 8 }}
           animate={{ opacity: 1, translateY: 0 }}
@@ -303,14 +313,13 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
             Weekly Goals · Session
           </ThemedText>
           <ThemedText type="title" style={{ marginTop: 2, marginBottom: 4 }}>
-            {state.goals.length === 0 ? 'Let\u2019s plan your week.' : 'Your week, shaping up.'}
+            {state.goals.length === 0 ? 'Let’s plan your week.' : 'Your week, shaping up.'}
           </ThemedText>
           <ThemedText type="small" style={{ color: Colors.sway.darkGrey, lineHeight: 20 }}>
-            {`Answer in your own words. We\u2019ll build a list together, one goal at a time. ${MAX_GOALS} max.`}
+            {`Answer in your own words. We’ll build a list together, one goal at a time. ${MAX_GOALS} max.`}
           </ThemedText>
         </MotiView>
 
-        {/* Conversation thread: each past goal reply, then a new prompt */}
         {state.goals.map((goal, i) => (
           <MomentCard
             key={goal._uid}
@@ -329,14 +338,12 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
           />
         ))}
 
-        {/* Coach's next prompt, shown whenever composer is open */}
         {showComposer && (
           <View className="mb-3">
             <CoachMessage glyph="?" prompt={currentOpenerPrompt} typewriter />
           </View>
         )}
 
-        {/* Inline composer: a single input, not a form. Enter = add. */}
         {showComposer && (
           <MotiView
             from={{ opacity: 0, translateY: 6 }}
@@ -397,7 +404,6 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
                 accessibilityLabel="Add a goal"
               />
 
-              {/* Send / add button */}
               <View className="mt-3 flex-row items-center justify-between">
                 <ThemedText type="small" style={{ color: Colors.sway.darkGrey, fontSize: 11 }}>
                   {state.goals.length} / {MAX_GOALS}
@@ -433,17 +439,15 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
           </MotiView>
         )}
 
-        {/* Refocus existing blank goal hint */}
-        {!showComposer && firstEmpty >= 0 && (
+        {!showComposer && state.firstEmptyGoalIndex >= 0 && (
           <CoachMessage
             glyph="!"
-            prompt={'You\u2019ve got a goal waiting for some words above. Tap it to finish your thought.'}
+            prompt="You’ve got a goal waiting for some words above. Tap it to finish your thought."
             typewriter={false}
             tone="muted"
           />
         )}
 
-        {/* Max reached */}
         {!state.canAddGoal && state.goals.length >= MAX_GOALS && (
           <View
             className="mb-6 rounded-sm p-3"
@@ -459,12 +463,10 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
           </View>
         )}
 
-        {/* Reflection prompts, only when there is at least one real goal */}
         {atLeastOneFilled && (
           <ReflectionThread reflection={state.reflection} canEdit onChange={state.updateReflection} />
         )}
 
-        {/* Submit CTA */}
         {atLeastOneFilled && (
           <MotiView
             from={{ opacity: 0, translateY: 10 }}
@@ -478,7 +480,7 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
                 prompt={
                   state.canSubmit
                     ? 'Ready when you are. Submitting hands this week back to your therapist.'
-                    : 'When you\u2019ve answered at least one reflection beat above, we can close the week.'
+                    : 'When you’ve answered at least one reflection beat above, we can close the week.'
                 }
                 typewriter={false}
                 tone={state.canSubmit ? 'coach' : 'muted'}

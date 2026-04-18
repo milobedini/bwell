@@ -11,8 +11,6 @@ type CoachMessageProps = {
   typewriter?: boolean;
 };
 
-// A coach "moment" — NOT an iMessage bubble. Glyph + prompt, no rounded tail.
-// Typewriter effect on first mount creates a sense of being addressed in real time.
 const CoachMessage = ({ glyph, prompt, tone = 'coach', typewriter = true }: CoachMessageProps) => {
   const [visible, setVisible] = useState(typewriter ? 0 : prompt.length);
 

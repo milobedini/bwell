@@ -18,7 +18,6 @@ export type GoalWithId = WeeklyGoalEntry & { _uid: string };
 
 export type ReflectionKey = keyof WeeklyGoalsReflection;
 
-// ── Conversation prompts ───────────────────────────────────────────────────
 // Reflection prompts are clinical — preserved verbatim per the BE spec.
 export const REFLECTION_PROMPTS: { key: ReflectionKey; prompt: string; glyph: string }[] = [
   { key: 'moodImpact', prompt: 'What activities improved or impacted your mood?', glyph: '◐' },
@@ -27,13 +26,15 @@ export const REFLECTION_PROMPTS: { key: ReflectionKey; prompt: string; glyph: st
   { key: 'barriers', prompt: 'Did anything get in the way of achieving your goals this week?', glyph: '⊘' }
 ];
 
-// ── Empty shapes ───────────────────────────────────────────────────────────
 const emptyReflection: WeeklyGoalsReflection = {
   moodImpact: '',
   takeaway: '',
   balance: '',
   barriers: ''
 };
+
+let nextUid = 0;
+const createUid = () => `wg-${Date.now()}-${nextUid++}`;
 
 const emptyGoal = (): GoalWithId => ({
   _uid: createUid(),
@@ -44,11 +45,6 @@ const emptyGoal = (): GoalWithId => ({
   plannedDiaryEntryRef: null,
   completionNotes: null
 });
-
-let nextUid = 0;
-function createUid() {
-  return `wg-${Date.now()}-${nextUid++}`;
-}
 
 const toGoalsWithIds = (goals: WeeklyGoalEntry[]): GoalWithId[] => goals.map((g) => ({ ...g, _uid: createUid() }));
 
@@ -171,24 +167,6 @@ export const useWeeklyGoalsState = ({ attempt, mode, onSubmitSuccess }: UseWeekl
     [canEdit]
   );
 
-  const updatePlannedAt = useCallback(
-    (index: number, at: Date | null, label?: string) => {
-      if (!canEdit) return;
-      setGoals((prev) =>
-        prev.map((g, i) =>
-          i === index
-            ? {
-                ...g,
-                plannedDiaryEntryRef: at ? { at: at.toISOString(), label } : null
-              }
-            : g
-        )
-      );
-      setIsDirty(true);
-    },
-    [canEdit]
-  );
-
   const removeGoal = useCallback(
     (index: number) => {
       if (!canEdit) return;
@@ -218,6 +196,7 @@ export const useWeeklyGoalsState = ({ attempt, mode, onSubmitSuccess }: UseWeekl
 
   const filledGoals = useMemo(() => goals.filter((g) => g.goalText.trim().length > 0), [goals]);
   const completedCount = useMemo(() => goals.filter((g) => g.completed).length, [goals]);
+  const firstEmptyGoalIndex = useMemo(() => goals.findIndex((g) => g.goalText.trim().length === 0), [goals]);
   const reflectionFilled = useMemo(() => Object.values(reflection).some((v) => v.trim().length > 0), [reflection]);
 
   const canSubmit = canEdit && filledGoals.length >= 1 && filledGoals.length <= MAX_GOALS && reflectionFilled;
@@ -252,6 +231,7 @@ export const useWeeklyGoalsState = ({ attempt, mode, onSubmitSuccess }: UseWeekl
     isDirty,
     completedCount,
     filledGoals,
+    firstEmptyGoalIndex,
     reflectionFilled,
     addGoal,
     updateGoalText,
@@ -259,7 +239,6 @@ export const useWeeklyGoalsState = ({ attempt, mode, onSubmitSuccess }: UseWeekl
     updateMastery,
     updatePleasure,
     updateNotes,
-    updatePlannedAt,
     removeGoal,
     updateReflection,
     reset,

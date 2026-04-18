@@ -8,6 +8,7 @@ import type { GoalWithId } from './useWeeklyGoalsState';
 
 type WeekRailProps = {
   goals: GoalWithId[];
+  completedCount: number;
   activeIndex: number | null;
   canEdit: boolean;
   onPressGoal: (index: number) => void;
@@ -15,8 +16,8 @@ type WeekRailProps = {
 };
 
 // Persistent visible list. Horizontal chips with tick toggle (patient view) or pulse (edit).
-// Explicitly NOT a list of bubbles. Each chip is a dense glance.
-const WeekRail = ({ goals, activeIndex, canEdit, onPressGoal, onToggle }: WeekRailProps) => {
+// Explicitly NOT a list of bubbles, so the user never loses sight of the week.
+const WeekRail = ({ goals, completedCount, activeIndex, canEdit, onPressGoal, onToggle }: WeekRailProps) => {
   const total = goals.length;
 
   if (total === 0) {
@@ -51,7 +52,7 @@ const WeekRail = ({ goals, activeIndex, canEdit, onPressGoal, onToggle }: WeekRa
         </ThemedText>
         <View className="flex-1" />
         <ThemedText type="smallBold" style={{ color: Colors.sway.lightGrey }}>
-          {goals.filter((g) => g.completed).length}
+          {completedCount}
           <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
             {' '}
             / {total}

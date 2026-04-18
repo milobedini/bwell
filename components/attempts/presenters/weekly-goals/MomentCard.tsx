@@ -80,11 +80,6 @@ type MomentCardProps = {
   onRemove: () => void;
 };
 
-// A user "moment". Not a bubble: sharp-edged card with a left accent bar and a
-// timeline node. When the patient ticks a goal, the card auto-expands and the
-// coach asks "How did that feel?" — moving Mastery/Pleasure from a discoverable
-// drawer to the natural next beat after completion. A soft bloom glow plays
-// behind the completion pill.
 const MomentCard = ({
   goal,
   index,
@@ -104,8 +99,7 @@ const MomentCard = ({
   const [bloomTrigger, setBloomTrigger] = useState(0);
   const prevCompletedRef = useRef(goal.completed);
 
-  // Auto-expand the card the instant the user ticks a goal and fire the bloom.
-  // Only fires on false→true transitions so un-ticking stays silent.
+  // Fire the bloom only on false→true transitions so un-ticking stays silent.
   useEffect(() => {
     if (goal.completed && !prevCompletedRef.current) {
       setExpanded(true);
@@ -123,7 +117,6 @@ const MomentCard = ({
       transition={{ type: 'timing', duration: 260 }}
       className="flex-row"
     >
-      {/* Timeline gutter: a node + connector */}
       <View className="mr-3 items-center" style={{ width: 16 }}>
         <View
           className="h-3 w-3 rounded-sm"
@@ -138,7 +131,6 @@ const MomentCard = ({
         <View className="mt-2 flex-1" style={{ width: 1, backgroundColor: Colors.divider.medium }} />
       </View>
 
-      {/* Body */}
       <View
         className="mb-5 flex-1"
         style={{
@@ -150,7 +142,6 @@ const MomentCard = ({
           paddingVertical: 14
         }}
       >
-        {/* Header row: user label + remove */}
         <View className="mb-2 flex-row items-center justify-between">
           <View className="flex-row items-center gap-2">
             <ThemedText
@@ -190,7 +181,6 @@ const MomentCard = ({
           )}
         </View>
 
-        {/* Inline-editable goal text */}
         {canEdit ? (
           <TextInput
             value={goal.goalText}
@@ -219,10 +209,8 @@ const MomentCard = ({
           <ThemedText type="default">{goal.goalText || '—'}</ThemedText>
         )}
 
-        {/* Completion toggle row — bloom glow fires behind the pill on tick */}
         {canEdit && (
           <View className="mt-3 self-start">
-            {/* Absolute bloom layer — overflow ok via negative insets */}
             <View
               pointerEvents="none"
               style={{
@@ -264,7 +252,6 @@ const MomentCard = ({
           </View>
         )}
 
-        {/* Expanded details */}
         {showDetails && (
           <MotiView
             from={{ opacity: 0, translateY: -6 }}
@@ -272,9 +259,6 @@ const MomentCard = ({
             transition={{ type: 'timing', duration: 200 }}
             className="mt-4 gap-4"
           >
-            {/* Post-tick coach framing — surfaces Mastery/Pleasure as the natural
-                next beat after completion, rather than hiding them behind the
-                chevron drawer. */}
             {goal.completed && (
               <View className="flex-row items-start gap-3">
                 <View
@@ -359,7 +343,6 @@ const MomentCard = ({
           </MotiView>
         )}
 
-        {/* Readonly rating summary (view mode) */}
         {!canEdit && (goal.masteryRating != null || goal.pleasureRating != null || goal.completionNotes) && (
           <View className="mt-3 gap-3">
             {goal.masteryRating != null && (
@@ -381,7 +364,6 @@ const MomentCard = ({
           </View>
         )}
 
-        {/* Collapse-to-compact toggle */}
         {canEdit && !isActive && expanded && (
           <Pressable
             onPress={() => setExpanded(false)}

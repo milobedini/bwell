@@ -13,9 +13,9 @@ type ReflectionThreadProps = {
   onChange: (key: ReflectionKey, value: string) => void;
 };
 
-// The four-beat end-of-week conversation. Each prompt is revealed progressively:
-// the next beat softly fades in once the previous one is non-empty, so the user
-// is never staring at four blank inputs at once.
+// Prompts are revealed progressively so the user is never staring at four
+// blank inputs at once: in edit mode, show prompts up to (and including) the
+// next unanswered one; in view mode, show every prompt that has an answer.
 const ReflectionThread = ({ reflection, canEdit, onChange }: ReflectionThreadProps) => {
   const steps = REFLECTION_PROMPTS.map((p, i) => ({
     ...p,
@@ -23,9 +23,6 @@ const ReflectionThread = ({ reflection, canEdit, onChange }: ReflectionThreadPro
     index: i
   }));
 
-  // In edit mode: show prompts up to (and including) the next unanswered one.
-  // Once every prompt is answered, show all of them so the user can still edit.
-  // In view mode: show every prompt that has an answer.
   const firstEmptyIdx = steps.findIndex((s) => s.value.trim().length === 0);
   const visibleCount = canEdit
     ? firstEmptyIdx === -1
@@ -39,7 +36,6 @@ const ReflectionThread = ({ reflection, canEdit, onChange }: ReflectionThreadPro
 
   return (
     <View className="mt-6">
-      {/* Section divider */}
       <View className="mb-5 flex-row items-center gap-3">
         <View className="h-px flex-1" style={{ backgroundColor: Colors.divider.medium }} />
         <ThemedText
@@ -68,7 +64,6 @@ const ReflectionThread = ({ reflection, canEdit, onChange }: ReflectionThreadPro
           >
             <CoachMessage glyph={step.glyph} prompt={step.prompt} typewriter={canEdit && isLast} />
 
-            {/* Connector */}
             <View className="mb-2 ml-3.5 mt-2 w-px" style={{ height: 14, backgroundColor: Colors.divider.light }} />
 
             {canEdit ? (

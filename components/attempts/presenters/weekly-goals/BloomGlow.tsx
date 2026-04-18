@@ -3,17 +3,11 @@ import { AccessibilityInfo, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 import { Colors } from '@/constants/Colors';
 
-// A soft ambient radial glow that blooms and auto-decays when `trigger` increments.
-// No character, no score — just a quiet moment of warmth on completion.
-// Respects `AccessibilityInfo.isReduceMotionEnabled()`.
-//
-// Contract: increment `trigger` to fire a single bloom (in → hold → out).
-// Using a counter instead of a boolean avoids external setTimeout juggling.
-
+// Increment `trigger` to fire a single bloom (in → hold → out). A counter
+// instead of a boolean avoids external setTimeout juggling to reset it.
 type BloomGlowProps = {
   trigger: number;
   size?: number;
-  // Soft amber by default — warm, not clinical. Accepts any rgba.
   tint?: string;
   softTint?: string;
 };
@@ -68,7 +62,6 @@ const BloomGlow = ({
 
   return (
     <View pointerEvents="none" style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-      {/* Outer soft wash */}
       <Animated.View
         style={[
           {
@@ -85,7 +78,6 @@ const BloomGlow = ({
           outerStyle
         ]}
       />
-      {/* Inner core bloom */}
       <Animated.View
         style={[
           {
