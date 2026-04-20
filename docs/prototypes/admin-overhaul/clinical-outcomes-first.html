@@ -1,0 +1,2467 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>bwell Admin Overhaul — Clinical Outcomes First</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        /* Core palette */
+        --sway-dark: #0c1527;
+        --sway-lightGrey: #e0e9f3;
+        --sway-darkGrey: #a6adbb;
+        --sway-bright: #18cdba;
+        --sway-buttonBg: rgb(43, 59, 91);
+
+        /* Status / signal */
+        --error: #ff6d5e;
+        --success: #76ab70;
+        --warning: #ffb300;
+        --info: #ffd15d;
+
+        /* Card surfaces */
+        --card: #262e42;
+        --card-alt: #334368;
+        --card-deep: #0b1a2a;
+
+        /* Chip / pill */
+        --chip-pill: #1e2a45;
+        --chip-pill-pressed: #253352;
+
+        /* Tints */
+        --tint-teal: rgba(24, 205, 186, 0.15);
+        --tint-teal-border: rgba(24, 205, 186, 0.3);
+        --tint-error: rgba(255, 109, 94, 0.15);
+        --tint-info: rgba(255, 209, 93, 0.15);
+        --tint-neutral: rgba(166, 173, 187, 0.12);
+
+        /* Therapist accent */
+        --therapist-purple: #7c3aed;
+
+        /* Overlays */
+        --overlay-medium: rgba(0, 0, 0, 0.5);
+        --divider: rgba(166, 173, 187, 0.1);
+
+        /* Deck helpers */
+        --rule: rgba(166, 173, 187, 0.08);
+        --panel-w: 375px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        background: var(--sway-dark);
+        color: var(--sway-lightGrey);
+        font-family: 'Lato', -apple-system, system-ui, sans-serif;
+        margin: 0;
+        padding: 0;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      body {
+        padding: 48px 32px 96px;
+        max-width: 1440px;
+        margin: 0 auto;
+        line-height: 1.45;
+      }
+
+      /* Typography helpers mapped from the bwell scale */
+      .t-title {
+        font-weight: 700;
+        font-size: 36px;
+        letter-spacing: -0.01em;
+        margin: 0;
+      }
+      .t-subtitle {
+        font-weight: 900;
+        font-size: 28px;
+        letter-spacing: -0.005em;
+        margin: 0;
+      }
+      .t-smalltitle {
+        font-weight: 900;
+        font-size: 20px;
+        margin: 0;
+      }
+      .t-default {
+        font-weight: 400;
+        font-size: 18px;
+        margin: 0;
+      }
+      .t-small {
+        font-weight: 400;
+        font-size: 14px;
+        margin: 0;
+        color: var(--sway-darkGrey);
+      }
+      .t-smallbold {
+        font-weight: 700;
+        font-size: 14px;
+        margin: 0;
+      }
+      .t-link {
+        font-weight: 400;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--sway-bright);
+      }
+      .t-mono {
+        font-family: 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+      }
+
+      a {
+        color: var(--sway-bright);
+      }
+
+      /* Deck scaffolding */
+      header.deck-header {
+        border-bottom: 1px solid var(--rule);
+        padding-bottom: 32px;
+        margin-bottom: 48px;
+      }
+      header.deck-header .eyebrow {
+        color: var(--sway-bright);
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 16px;
+      }
+      header.deck-header h1 {
+        font-weight: 900;
+        font-size: 56px;
+        letter-spacing: -0.02em;
+        line-height: 1.02;
+        margin: 0 0 16px 0;
+        max-width: 900px;
+      }
+      header.deck-header h1 em {
+        font-style: normal;
+        color: var(--sway-bright);
+      }
+      header.deck-header .philosophy {
+        font-size: 20px;
+        line-height: 1.5;
+        color: var(--sway-lightGrey);
+        max-width: 780px;
+        margin: 0 0 24px 0;
+      }
+      header.deck-header .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      header.deck-header .meta span {
+        background: var(--chip-pill);
+        border: 1px solid var(--rule);
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 13px;
+        color: var(--sway-darkGrey);
+      }
+
+      section.deck-section {
+        margin-bottom: 80px;
+      }
+      section.deck-section > h2 {
+        font-weight: 900;
+        font-size: 24px;
+        margin: 0 0 8px 0;
+      }
+      section.deck-section > h2 .num {
+        color: var(--sway-bright);
+        margin-right: 12px;
+        font-family: 'SF Mono', Menlo, Consolas, monospace;
+        font-weight: 400;
+        font-size: 18px;
+      }
+      section.deck-section > p.lede {
+        color: var(--sway-darkGrey);
+        font-size: 15px;
+        margin: 0 0 32px 0;
+        max-width: 720px;
+        line-height: 1.6;
+      }
+
+      /* Mobile panel chrome */
+      .panels {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 40px;
+        align-items: flex-start;
+      }
+      .panel {
+        width: var(--panel-w);
+        background: var(--sway-dark);
+        border: 1px solid var(--rule);
+        border-radius: 32px;
+        padding: 20px 16px 24px;
+        position: relative;
+        box-shadow:
+          0 0 0 6px #08101f,
+          0 30px 60px -30px rgba(0, 0, 0, 0.6);
+      }
+      .panel.wide {
+        width: 520px;
+      }
+      .panel .status-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 4px 12px 12px;
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        font-weight: 700;
+      }
+      .panel .caption {
+        width: var(--panel-w);
+        margin-top: 16px;
+      }
+      .panel.wide .caption {
+        width: 520px;
+      }
+      .panel .caption .tag {
+        color: var(--sway-bright);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin-bottom: 6px;
+      }
+      .panel .caption .title {
+        font-weight: 900;
+        font-size: 18px;
+        margin: 0 0 8px 0;
+      }
+      .panel .caption .body {
+        color: var(--sway-darkGrey);
+        font-size: 14px;
+        line-height: 1.55;
+        margin: 0;
+      }
+
+      .panel-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        position: relative;
+      }
+
+      /* Numbered pins */
+      .pin {
+        position: absolute;
+        background: var(--sway-bright);
+        color: var(--sway-dark);
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        font-weight: 900;
+        font-size: 12px;
+        display: grid;
+        place-items: center;
+        box-shadow: 0 0 0 3px var(--sway-dark);
+        z-index: 4;
+      }
+
+      /* Admin screen internals (shared primitives) */
+      .screen-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding: 0 4px 20px;
+      }
+      .screen-header .pretitle {
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin-bottom: 4px;
+      }
+      .screen-header h3 {
+        font-weight: 900;
+        font-size: 22px;
+        margin: 0;
+      }
+      .screen-header .iconbtn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--chip-pill);
+        display: grid;
+        place-items: center;
+        color: var(--sway-lightGrey);
+      }
+
+      /* Hero clinical block */
+      .hero-card {
+        background: linear-gradient(180deg, rgba(24, 205, 186, 0.06) 0%, rgba(24, 205, 186, 0) 100%);
+        border: 1px solid var(--tint-teal-border);
+        border-radius: 20px;
+        padding: 20px 18px 18px;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero-card .asof-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .hero-card .asof {
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        letter-spacing: 0.04em;
+      }
+      .hero-card .window-chip {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        background: var(--tint-teal);
+        color: var(--sway-bright);
+        border: 1px solid var(--tint-teal-border);
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-weight: 700;
+      }
+      .hero-card .lead-label {
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .hero-card .lead-programme {
+        font-weight: 900;
+        font-size: 14px;
+        color: var(--sway-lightGrey);
+        margin-bottom: 4px;
+      }
+      .hero-card .lead-figure {
+        font-weight: 900;
+        font-size: 72px;
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+        color: var(--sway-lightGrey);
+      }
+      .hero-card .lead-figure sup {
+        font-size: 28px;
+        color: var(--sway-bright);
+        font-weight: 700;
+        margin-left: 4px;
+        vertical-align: top;
+      }
+      .hero-card .lead-denom {
+        font-size: 13px;
+        color: var(--sway-darkGrey);
+        margin-top: 4px;
+      }
+
+      .layered-rates {
+        margin-top: 20px;
+        border-top: 1px solid var(--divider);
+        padding-top: 16px;
+      }
+      .rate-row {
+        display: grid;
+        grid-template-columns: 16px 1fr auto;
+        gap: 10px;
+        align-items: baseline;
+        padding: 8px 0;
+      }
+      .rate-row + .rate-row {
+        border-top: 1px dashed var(--rule);
+      }
+      .rate-row .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--sway-bright);
+        align-self: center;
+      }
+      .rate-row.imp .dot {
+        background: var(--sway-bright);
+        opacity: 0.55;
+      }
+      .rate-row.rel .dot {
+        background: var(--sway-bright);
+        opacity: 0.3;
+      }
+      .rate-row .lab {
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .rate-row .lab small {
+        display: block;
+        font-weight: 400;
+        color: var(--sway-darkGrey);
+        font-size: 11px;
+        margin-top: 2px;
+      }
+      .rate-row .fig {
+        font-weight: 900;
+        font-size: 22px;
+        letter-spacing: -0.01em;
+      }
+      .rate-row .fig small {
+        font-weight: 400;
+        color: var(--sway-darkGrey);
+        font-size: 11px;
+        margin-left: 4px;
+      }
+
+      /* Programmes summary */
+      .prog-list {
+        margin-top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .prog-row {
+        background: var(--card);
+        border: 1px solid var(--rule);
+        border-radius: 14px;
+        padding: 14px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 8px;
+      }
+      .prog-row:hover {
+        background: var(--card-alt);
+      }
+      .prog-row .pname {
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .prog-row .pinst {
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-top: 2px;
+      }
+      .prog-row .prate {
+        font-weight: 900;
+        font-size: 22px;
+      }
+      .prog-row .pn {
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        text-align: right;
+      }
+      .prog-row .sub {
+        grid-column: 1 / -1;
+        margin-top: 10px;
+        display: flex;
+        gap: 6px;
+      }
+      .tier-bar {
+        flex: 1;
+        background: var(--card-deep);
+        border-radius: 6px;
+        padding: 6px 8px;
+        border: 1px solid var(--rule);
+      }
+      .tier-bar .tl {
+        font-size: 9.5px;
+        color: var(--sway-darkGrey);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .tier-bar .tv {
+        font-weight: 700;
+        font-size: 13px;
+        margin-top: 2px;
+      }
+      .tier-bar.suppressed .tv {
+        color: var(--sway-darkGrey);
+        font-weight: 400;
+        font-size: 11px;
+        font-style: italic;
+      }
+
+      /* Non-clinical indicator */
+      .nonclin {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--card);
+        border: 1px dashed var(--rule);
+        border-radius: 14px;
+        padding: 14px;
+        margin-top: 6px;
+      }
+      .nonclin .left .lab {
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .nonclin .left .sub {
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        margin-top: 2px;
+      }
+      .nonclin .right {
+        text-align: right;
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+      }
+      .nonclin .right strong {
+        display: block;
+        font-size: 18px;
+        color: var(--sway-lightGrey);
+        font-weight: 900;
+      }
+
+      /* Timeseries sparkline */
+      .spark-card {
+        background: var(--card);
+        border: 1px solid var(--rule);
+        border-radius: 14px;
+        padding: 14px;
+        margin-top: 12px;
+      }
+      .spark-card .head {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+      .spark-card .head .lbl {
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .spark-card .head .val {
+        font-weight: 700;
+        font-size: 13px;
+      }
+      .spark-bars {
+        display: flex;
+        gap: 3px;
+        align-items: flex-end;
+        height: 54px;
+      }
+      .spark-bars span {
+        flex: 1;
+        border-radius: 2px;
+        background: var(--sway-bright);
+        opacity: 0.65;
+      }
+      .spark-bars span.sup {
+        background: var(--sway-darkGrey);
+        opacity: 0.18;
+      }
+      .spark-bars span.zero {
+        background: var(--sway-darkGrey);
+        opacity: 0.1;
+        height: 3px !important;
+      }
+      .spark-x {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 6px;
+        font-size: 10px;
+        color: var(--sway-darkGrey);
+      }
+
+      /* Ops footer block */
+      .ops-footer {
+        margin-top: 20px;
+        padding: 14px;
+        background: var(--card-deep);
+        border: 1px solid var(--rule);
+        border-radius: 14px;
+      }
+      .ops-footer .title {
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin-bottom: 10px;
+      }
+      .ops-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .ops-grid .item {
+        background: var(--card);
+        border: 1px solid var(--rule);
+        border-radius: 10px;
+        padding: 10px;
+      }
+      .ops-grid .item .k {
+        font-size: 10px;
+        color: var(--sway-darkGrey);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .ops-grid .item .v {
+        font-weight: 900;
+        font-size: 20px;
+        margin-top: 4px;
+      }
+      .ops-grid .item.warn .v {
+        color: var(--warning);
+      }
+      .ops-grid .item.err .v {
+        color: var(--error);
+      }
+      .ops-grid .item .delta {
+        font-size: 10px;
+        color: var(--sway-darkGrey);
+        margin-top: 2px;
+      }
+      .ops-grid .item .delta.up {
+        color: var(--success);
+      }
+      .ops-grid .item .delta.down {
+        color: var(--error);
+      }
+
+      /* Programme detail screen */
+      .tier-chip {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        background: var(--chip-pill);
+        border: 1px solid var(--rule);
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .tier-chip.active {
+        background: var(--tint-teal);
+        border-color: var(--tint-teal-border);
+        color: var(--sway-bright);
+      }
+
+      .tier-compare {
+        margin-top: 14px;
+        background: var(--card);
+        border: 1px solid var(--rule);
+        border-radius: 14px;
+        overflow: hidden;
+      }
+      .tier-compare .row {
+        display: grid;
+        grid-template-columns: 1fr auto auto auto;
+        gap: 8px;
+        padding: 12px 14px;
+        align-items: center;
+        border-bottom: 1px solid var(--divider);
+      }
+      .tier-compare .row:last-child {
+        border-bottom: 0;
+      }
+      .tier-compare .row.head {
+        background: var(--card-deep);
+        color: var(--sway-darkGrey);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 700;
+      }
+      .tier-compare .cell {
+        font-weight: 700;
+        font-size: 13px;
+        text-align: right;
+        min-width: 48px;
+      }
+      .tier-compare .cell small {
+        display: block;
+        font-size: 10px;
+        color: var(--sway-darkGrey);
+        font-weight: 400;
+      }
+      .tier-compare .cell.sup {
+        color: var(--sway-darkGrey);
+        font-weight: 400;
+        font-style: italic;
+        font-size: 11px;
+      }
+      .tier-compare .tier-name .pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .tier-compare .pill.sh {
+        background: var(--tint-neutral);
+        color: var(--sway-darkGrey);
+      }
+      .tier-compare .pill.cbt {
+        background: var(--tint-teal);
+        color: var(--sway-bright);
+      }
+      .tier-compare .pill.pwp {
+        background: rgba(124, 58, 237, 0.18);
+        color: #b38bff;
+      }
+
+      /* Suppressed annotation box */
+      .sup-note {
+        background: var(--card-deep);
+        border: 1px solid var(--rule);
+        border-left: 2px solid var(--sway-darkGrey);
+        padding: 10px 12px;
+        border-radius: 6px;
+        margin-top: 10px;
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        line-height: 1.5;
+      }
+
+      /* Dimension filter bar */
+      .filter-bar {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+      }
+
+      /* State gallery */
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 28px;
+      }
+      .thumb {
+        background: var(--sway-dark);
+        border: 1px solid var(--rule);
+        border-radius: 20px;
+        padding: 16px;
+        min-height: 380px;
+        position: relative;
+        overflow: hidden;
+      }
+      .thumb .state-tag {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        background: var(--chip-pill);
+        border: 1px solid var(--rule);
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 700;
+        z-index: 3;
+      }
+      .thumb h4 {
+        font-weight: 900;
+        font-size: 14px;
+        margin: 0 0 4px 0;
+      }
+      .thumb p.desc {
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+        margin: 0 0 14px 0;
+        line-height: 1.55;
+        padding-right: 56px;
+      }
+      .thumb .preview {
+        border: 1px solid var(--rule);
+        border-radius: 14px;
+        padding: 14px;
+        background: var(--card);
+      }
+      .thumb .preview .big {
+        font-weight: 900;
+        font-size: 40px;
+        letter-spacing: -0.02em;
+        line-height: 1;
+      }
+      .thumb .preview .sub {
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        margin-top: 6px;
+      }
+      .thumb .preview .sub.warn {
+        color: var(--warning);
+      }
+      .thumb .preview .sub.err {
+        color: var(--error);
+      }
+
+      .thumb.suppressed .preview {
+        border-style: dashed;
+        border-color: var(--sway-darkGrey);
+        background: var(--card-deep);
+      }
+      .thumb.suppressed .preview .big {
+        font-size: 26px;
+        color: var(--sway-darkGrey);
+        font-weight: 700;
+        font-style: italic;
+      }
+
+      /* Skeleton loading */
+      .skel {
+        background: linear-gradient(
+          90deg,
+          var(--card) 0%,
+          var(--card-alt) 50%,
+          var(--card) 100%
+        );
+        background-size: 200% 100%;
+        border-radius: 6px;
+        animation: shimmer 1.4s ease-in-out infinite;
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 100% 0;
+        }
+        100% {
+          background-position: -100% 0;
+        }
+      }
+
+      /* Animation cards */
+      .anim-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+      }
+      .anim-card {
+        background: var(--card);
+        border: 1px solid var(--rule);
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        min-height: 280px;
+      }
+      .anim-card .anim-stage {
+        flex: 1;
+        display: grid;
+        place-items: center;
+        background: var(--card-deep);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        overflow: hidden;
+      }
+      .anim-card h4 {
+        font-weight: 900;
+        font-size: 15px;
+        margin: 0 0 6px 0;
+      }
+      .anim-card p {
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+        margin: 0;
+        line-height: 1.55;
+      }
+      .anim-card .timing {
+        display: inline-block;
+        background: var(--chip-pill);
+        border: 1px solid var(--rule);
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-family: 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 10px;
+        color: var(--sway-darkGrey);
+        margin-top: 8px;
+      }
+
+      /* Animation: hero count-up */
+      .countup {
+        font-weight: 900;
+        font-size: 72px;
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+        color: var(--sway-lightGrey);
+        display: inline-flex;
+        overflow: hidden;
+        height: 72px;
+        vertical-align: bottom;
+      }
+      .countup .digit {
+        display: inline-block;
+        width: 0.58em;
+        text-align: center;
+        animation: rollUp 1.4s cubic-bezier(0.2, 0.9, 0.2, 1) 0.2s both;
+      }
+      .countup .digit.d2 {
+        animation-delay: 0.35s;
+      }
+      .countup .d-pct {
+        color: var(--sway-bright);
+        font-size: 36px;
+        margin-left: 6px;
+        align-self: flex-start;
+        opacity: 0;
+        animation: fadeIn 0.6s ease-out 0.8s forwards;
+      }
+      @keyframes rollUp {
+        0% {
+          transform: translateY(100%);
+          opacity: 0;
+        }
+        60% {
+          transform: translateY(-10%);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(0%);
+          opacity: 1;
+        }
+      }
+      @keyframes fadeIn {
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* Animation: tooltip */
+      .tooltip-stage {
+        position: relative;
+        width: 100%;
+        height: 160px;
+      }
+      .tooltip-bars {
+        position: absolute;
+        bottom: 20px;
+        left: 10%;
+        right: 10%;
+        display: flex;
+        gap: 4px;
+        align-items: flex-end;
+        height: 90px;
+      }
+      .tooltip-bars span {
+        flex: 1;
+        background: var(--sway-bright);
+        opacity: 0.5;
+        border-radius: 2px;
+        transition:
+          opacity 0.25s ease,
+          transform 0.25s ease;
+      }
+      .tooltip-bars span.active {
+        opacity: 1;
+        transform: translateY(-4px);
+      }
+      .tooltip {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--card-alt);
+        border: 1px solid var(--tint-teal-border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 11px;
+        width: 180px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        animation: tipIn 0.35s ease-out;
+      }
+      .tooltip:after {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        left: 50%;
+        transform: translateX(-50%) rotate(45deg);
+        width: 10px;
+        height: 10px;
+        background: var(--card-alt);
+        border-right: 1px solid var(--tint-teal-border);
+        border-bottom: 1px solid var(--tint-teal-border);
+      }
+      .tooltip .h {
+        font-weight: 900;
+        font-size: 12px;
+        margin-bottom: 4px;
+      }
+      .tooltip .l {
+        color: var(--sway-darkGrey);
+        font-size: 10px;
+      }
+      @keyframes tipIn {
+        from {
+          opacity: 0;
+          transform: translateX(-50%) translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+      }
+
+      /* Animation: suppressed reveal */
+      .sup-stage {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 22px;
+        font-weight: 900;
+      }
+      .sup-stage .blur {
+        filter: blur(8px);
+        color: var(--sway-lightGrey);
+        opacity: 0.35;
+        animation: unblur 2.4s ease-out infinite alternate;
+      }
+      @keyframes unblur {
+        0% {
+          filter: blur(8px);
+          opacity: 0.35;
+        }
+        45% {
+          filter: blur(8px);
+          opacity: 0.35;
+        }
+        60% {
+          filter: blur(0px);
+          opacity: 1;
+          color: var(--sway-darkGrey);
+          font-style: italic;
+        }
+        100% {
+          filter: blur(0px);
+          opacity: 1;
+          color: var(--sway-darkGrey);
+          font-style: italic;
+        }
+      }
+
+      /* Animation: drill-in */
+      .drill-stage {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .drill-card {
+        width: 100px;
+        height: 130px;
+        background: var(--card);
+        border: 1px solid var(--rule);
+        border-radius: 10px;
+        padding: 10px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .drill-card .a {
+        font-size: 9px;
+        color: var(--sway-darkGrey);
+        text-transform: uppercase;
+      }
+      .drill-card .b {
+        font-weight: 900;
+        font-size: 24px;
+        margin-top: 6px;
+      }
+      .drill-card:hover {
+        transform: scale(1.05) translateY(-4px);
+        border-color: var(--tint-teal-border);
+        box-shadow: 0 10px 30px rgba(24, 205, 186, 0.15);
+        cursor: pointer;
+      }
+      .drill-arrow {
+        color: var(--sway-darkGrey);
+        font-size: 20px;
+      }
+
+      /* Component breakdown */
+      .comp-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+      }
+      .comp-block {
+        background: var(--card);
+        border: 1px solid var(--rule);
+        border-radius: 16px;
+        padding: 24px;
+      }
+      .comp-block h4 {
+        font-weight: 900;
+        font-size: 15px;
+        margin: 0 0 4px 0;
+      }
+      .comp-block .lede {
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+        margin: 0 0 18px 0;
+      }
+      .comp-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .comp-item {
+        border-top: 1px solid var(--divider);
+        padding-top: 10px;
+      }
+      .comp-item:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+      .comp-item code {
+        font-family: 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 12px;
+        color: var(--sway-bright);
+      }
+      .comp-item .d {
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+        margin-top: 2px;
+        line-height: 1.5;
+      }
+
+      /* Rationale */
+      .rationale {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      .rationale li {
+        list-style: none;
+        background: var(--card);
+        border: 1px solid var(--rule);
+        border-left: 2px solid var(--sway-bright);
+        border-radius: 10px;
+        padding: 16px 18px;
+        font-size: 14px;
+        line-height: 1.55;
+        color: var(--sway-lightGrey);
+      }
+      .rationale ul {
+        padding: 0;
+        margin: 0;
+        display: contents;
+      }
+      .rationale li strong {
+        display: block;
+        font-weight: 900;
+        margin-bottom: 4px;
+        font-size: 13px;
+      }
+
+      .be-note {
+        margin-top: 24px;
+        background: rgba(255, 179, 0, 0.06);
+        border: 1px solid rgba(255, 179, 0, 0.25);
+        border-radius: 10px;
+        padding: 16px 18px;
+        font-size: 13px;
+        color: var(--sway-lightGrey);
+        line-height: 1.55;
+      }
+      .be-note strong {
+        color: var(--warning);
+      }
+
+      /* Role pill */
+      .role-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(124, 58, 237, 0.18);
+        border: 1px solid rgba(124, 58, 237, 0.35);
+        border-radius: 999px;
+        padding: 4px 12px;
+        font-size: 11px;
+        color: #c4a7ff;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+        }
+        .sup-stage .blur {
+          filter: blur(0px);
+          opacity: 1;
+          color: var(--sway-darkGrey);
+          font-style: italic;
+        }
+      }
+
+      /* Small screens */
+      @media (max-width: 900px) {
+        .gallery,
+        .anim-grid,
+        .comp-grid,
+        .rationale {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="deck-header">
+      <div class="eyebrow">Admin Overhaul · Angle 01 · Prototype Deck</div>
+      <h1>
+        Clinical outcomes <em>first.</em><br />Everything else is a footnote.
+      </h1>
+      <p class="philosophy">
+        An admin exists to answer one question: <em style="color: var(--sway-bright); font-style: normal"
+          >is this platform producing clinical outcomes?</em
+        >
+        This design treats recovery, reliable improvement, and reliable recovery as the hero and relegates user counts,
+        queues, and work volume to a subordinate operational strip. Suppression is not a failure state — it is a
+        statement of rigour.
+      </p>
+      <div class="meta">
+        <span>Audience · Admin role (non-clinical)</span>
+        <span>Hero endpoint · <code>GET /api/admin/overview</code></span>
+        <span>Drill-in · <code>/api/admin/programmes/:id</code></span>
+        <span>Reference priors · NHS IAPT · Epic Healthy Planet · Lyra</span>
+      </div>
+    </header>
+
+    <!-- ============================ SECTION 1 — HERO ============================ -->
+    <section class="deck-section">
+      <h2><span class="num">01</span>Hero panel</h2>
+      <p class="lede">
+        The first fold is one number at title weight: depression recovery, last 90 days, against the clinical PHQ-9
+        cutoff. Layered beneath it in typographic hierarchy are reliable improvement and reliable recovery, because IAPT
+        reporting requires all three — and showing one alone would let an admin draw the wrong conclusion.
+      </p>
+
+      <div class="panels">
+        <div class="panel-wrapper">
+          <div class="panel">
+            <div class="status-bar">
+              <span>9:41</span>
+              <span>●●●</span>
+            </div>
+
+            <div class="screen-header">
+              <div>
+                <div class="pretitle">Admin overview</div>
+                <h3>Clinical outcomes</h3>
+              </div>
+              <div class="role-pill">Admin</div>
+            </div>
+
+            <!-- Hero card -->
+            <div class="hero-card">
+              <div class="asof-row">
+                <span class="asof">Rollup · 20 Apr 2026, 04:00 UTC</span>
+                <span class="window-chip">Last 90d</span>
+              </div>
+
+              <div class="lead-label">Lead programme</div>
+              <div class="lead-programme">Depression · PHQ-9</div>
+
+              <div class="lead-figure">38<sup>%</sup></div>
+              <div class="lead-denom">Recovery · n = 45 paired assessments</div>
+
+              <div class="layered-rates">
+                <div class="rate-row">
+                  <span class="dot"></span>
+                  <span class="lab"
+                    >Recovery<small>Above cutoff → below cutoff</small></span
+                  >
+                  <span class="fig">38%<small>n=45</small></span>
+                </div>
+                <div class="rate-row imp">
+                  <span class="dot"></span>
+                  <span class="lab"
+                    >Reliable improvement<small>Δ ≥ 6 PHQ-9 points</small></span
+                  >
+                  <span class="fig">52%<small>n=58</small></span>
+                </div>
+                <div class="rate-row rel">
+                  <span class="dot"></span>
+                  <span class="lab"
+                    >Reliable recovery<small>Both criteria (strictest)</small></span
+                  >
+                  <span class="fig">31%<small>n=45</small></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Programme list -->
+            <div class="prog-list">
+              <div class="prog-row">
+                <div>
+                  <div class="pname">Generalised Anxiety</div>
+                  <div class="pinst">GAD-7 · n=22 paired</div>
+                </div>
+                <div>
+                  <div class="prate">42%</div>
+                  <div class="pn">recovery</div>
+                </div>
+                <div class="sub">
+                  <div class="tier-bar">
+                    <div class="tl">Self-help</div>
+                    <div class="tv">36%</div>
+                  </div>
+                  <div class="tier-bar">
+                    <div class="tl">CBT</div>
+                    <div class="tv">54%</div>
+                  </div>
+                  <div class="tier-bar suppressed">
+                    <div class="tl">PWP</div>
+                    <div class="tv">&lt; 5 patients</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="nonclin">
+                <div class="left">
+                  <div class="lab">Sleep Health</div>
+                  <div class="sub">No clinical instrument · non-IAPT programme</div>
+                </div>
+                <div class="right">
+                  <strong>17</strong>
+                  <span>enrolled, last 90d</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sparkline: recovery trend -->
+            <div class="spark-card">
+              <div class="head">
+                <span class="lbl">PHQ-9 recovery · 12 months</span>
+                <span class="val">↑ 6pp vs Q3</span>
+              </div>
+              <div class="spark-bars">
+                <span class="sup" style="height: 20%"></span>
+                <span class="sup" style="height: 20%"></span>
+                <span style="height: 28%"></span>
+                <span style="height: 36%"></span>
+                <span style="height: 30%"></span>
+                <span style="height: 42%"></span>
+                <span style="height: 38%"></span>
+                <span style="height: 46%"></span>
+                <span style="height: 54%"></span>
+                <span style="height: 60%"></span>
+                <span style="height: 70%"></span>
+                <span style="height: 76%"></span>
+              </div>
+              <div class="spark-x">
+                <span>May '25</span>
+                <span>Nov '25</span>
+                <span>Apr '26</span>
+              </div>
+            </div>
+
+            <!-- Ops footer -->
+            <div class="ops-footer">
+              <div class="title">Operational · below the clinical fold</div>
+              <div class="ops-grid">
+                <div class="item">
+                  <div class="k">Active · 30d</div>
+                  <div class="v">28</div>
+                  <div class="delta up">+4 vs prev</div>
+                </div>
+                <div class="item">
+                  <div class="k">Verification queue</div>
+                  <div class="v">18</div>
+                  <div class="delta">oldest: 11 Apr</div>
+                </div>
+                <div class="item warn">
+                  <div class="k">Stalled 7d+</div>
+                  <div class="v">3</div>
+                  <div class="delta">view list →</div>
+                </div>
+                <div class="item err">
+                  <div class="k">Orphaned</div>
+                  <div class="v">1</div>
+                  <div class="delta">resolve →</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- pins -->
+          <div class="pin" style="top: 160px; left: -16px">1</div>
+          <div class="pin" style="top: 300px; left: -16px">2</div>
+          <div class="pin" style="top: 470px; left: -16px">3</div>
+          <div class="pin" style="top: 640px; left: -16px">4</div>
+          <div class="pin" style="top: 930px; left: -16px">5</div>
+          <div class="pin" style="top: 1120px; left: -16px">6</div>
+
+          <div class="caption">
+            <div class="tag">Hero · admin home</div>
+            <div class="title">One question, answered first.</div>
+            <div class="body">
+              <strong style="color: var(--sway-lightGrey)">1</strong> Rollup-as-of + last-90d window — honest about data
+              freshness.
+              <strong style="color: var(--sway-lightGrey)">2</strong> Lead programme hero figure: recovery %, n visible.
+              <strong style="color: var(--sway-lightGrey)">3</strong> Layered IAPT triplet (recovery / reliable imp /
+              reliable recovery) — all three shown, not collapsed to one.
+              <strong style="color: var(--sway-lightGrey)">4</strong> Programme strip with care-tier breakdown;
+              suppressed cells read as "&lt; 5 patients", never a false 0%.
+              <strong style="color: var(--sway-lightGrey)">5</strong> 12-month trend; zero-denominator months rendered
+              as pale notches so the axis stays contiguous.
+              <strong style="color: var(--sway-lightGrey)">6</strong> Operational counts present but visually
+              subordinate.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ SECTION 2 — FLOW MAP ============================ -->
+    <section class="deck-section">
+      <h2><span class="num">02</span>Flow map</h2>
+      <p class="lede">
+        Admin lands on outcomes. They scan the hero, spot the PHQ-9 recovery rate, drill into Depression, filter by care
+        tier to compare CBT-guided vs self-help, and fall through to the time-series explorer. The operational queue
+        sits one tab away — deliberately not in the primary flow.
+      </p>
+
+      <div class="panels">
+        <!-- Panel A: entry -->
+        <div class="panel-wrapper">
+          <div class="panel">
+            <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+            <div class="screen-header">
+              <div>
+                <div class="pretitle">Admin</div>
+                <h3>Outcomes</h3>
+              </div>
+              <div class="iconbtn">⚙</div>
+            </div>
+            <div
+              style="
+                background: var(--card-deep);
+                border: 1px solid var(--rule);
+                border-radius: 999px;
+                padding: 4px;
+                display: flex;
+                margin-bottom: 16px;
+              "
+            >
+              <div
+                style="
+                  flex: 1;
+                  text-align: center;
+                  padding: 8px;
+                  background: var(--tint-teal);
+                  border-radius: 999px;
+                  color: var(--sway-bright);
+                  font-weight: 700;
+                  font-size: 12px;
+                "
+              >
+                Outcomes
+              </div>
+              <div
+                style="
+                  flex: 1;
+                  text-align: center;
+                  padding: 8px;
+                  color: var(--sway-darkGrey);
+                  font-size: 12px;
+                "
+              >
+                Operational
+              </div>
+              <div
+                style="
+                  flex: 1;
+                  text-align: center;
+                  padding: 8px;
+                  color: var(--sway-darkGrey);
+                  font-size: 12px;
+                "
+              >
+                Audit
+              </div>
+            </div>
+
+            <div class="hero-card" style="padding: 16px">
+              <div class="asof-row">
+                <span class="asof">Last 90d</span>
+                <span class="window-chip">PHQ-9</span>
+              </div>
+              <div class="lead-programme">Depression</div>
+              <div class="lead-figure" style="font-size: 56px">38<sup>%</sup></div>
+              <div class="lead-denom">Recovery · n=45</div>
+              <div style="display: flex; gap: 6px; margin-top: 12px">
+                <span
+                  style="
+                    flex: 1;
+                    background: var(--card);
+                    padding: 6px 8px;
+                    border-radius: 6px;
+                    font-size: 10px;
+                  "
+                  ><strong style="font-size: 13px; display: block">52%</strong
+                  ><span style="color: var(--sway-darkGrey)">Rel. imp.</span></span
+                >
+                <span
+                  style="
+                    flex: 1;
+                    background: var(--card);
+                    padding: 6px 8px;
+                    border-radius: 6px;
+                    font-size: 10px;
+                  "
+                  ><strong style="font-size: 13px; display: block">31%</strong
+                  ><span style="color: var(--sway-darkGrey)">Rel. rec.</span></span
+                >
+              </div>
+            </div>
+
+            <div style="color: var(--sway-darkGrey); font-size: 11px; margin-top: 20px; text-align: center">
+              tap programme to drill ↓
+            </div>
+          </div>
+          <div class="pin" style="top: 180px; right: -16px">A</div>
+          <div class="caption">
+            <div class="tag">Step A · Land</div>
+            <div class="title">Admin opens home.</div>
+            <div class="body">
+              Outcomes tab is the default. The hero is a single programme's recovery rate. Tabs are three: Outcomes,
+              Operational, Audit. No personalisation, no toggle — opinionated.
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel B: programme detail -->
+        <div class="panel-wrapper">
+          <div class="panel">
+            <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+            <div class="screen-header">
+              <div>
+                <div class="pretitle">← Overview</div>
+                <h3>Depression</h3>
+              </div>
+              <div class="iconbtn">⋯</div>
+            </div>
+
+            <div style="font-size: 12px; color: var(--sway-darkGrey); margin-bottom: 12px">
+              PHQ-9 · cutoff 10 · Δ ≥ 6 · last 90 days
+            </div>
+
+            <div class="tier-compare">
+              <div class="row head">
+                <span>Tier</span>
+                <span class="cell">Rec.</span>
+                <span class="cell">Rel. imp.</span>
+                <span class="cell">Rel. rec.</span>
+              </div>
+              <div class="row">
+                <span class="tier-name"><span class="pill sh">Self-help</span></span>
+                <span class="cell">31%<small>n=18</small></span>
+                <span class="cell">44%<small>n=22</small></span>
+                <span class="cell">24%<small>n=18</small></span>
+              </div>
+              <div class="row">
+                <span class="tier-name"><span class="pill cbt">CBT</span></span>
+                <span class="cell">54%<small>n=21</small></span>
+                <span class="cell">71%<small>n=26</small></span>
+                <span class="cell">46%<small>n=21</small></span>
+              </div>
+              <div class="row">
+                <span class="tier-name"><span class="pill pwp">PWP</span></span>
+                <span class="cell sup">&lt; 5 patients</span>
+                <span class="cell sup">&lt; 5 patients</span>
+                <span class="cell sup">&lt; 5 patients</span>
+              </div>
+            </div>
+
+            <div class="sup-note">
+              Cells with fewer than 5 patients are suppressed to protect patient privacy (k-anonymity). Enrolment is
+              visible below.
+            </div>
+
+            <div style="margin-top: 14px; display: flex; gap: 8px">
+              <div
+                style="
+                  flex: 1;
+                  background: var(--card);
+                  border: 1px solid var(--rule);
+                  border-radius: 10px;
+                  padding: 10px;
+                "
+              >
+                <div style="font-size: 10px; color: var(--sway-darkGrey); text-transform: uppercase">Enrolled</div>
+                <div style="font-weight: 900; font-size: 22px; margin-top: 4px">30</div>
+              </div>
+              <div
+                style="
+                  flex: 1;
+                  background: var(--card);
+                  border: 1px solid var(--rule);
+                  border-radius: 10px;
+                  padding: 10px;
+                "
+              >
+                <div style="font-size: 10px; color: var(--sway-darkGrey); text-transform: uppercase">Completed 7d</div>
+                <div style="font-weight: 900; font-size: 22px; margin-top: 4px">42</div>
+              </div>
+            </div>
+
+            <div
+              style="
+                margin-top: 14px;
+                text-align: center;
+                padding: 10px;
+                background: var(--tint-teal);
+                border: 1px solid var(--tint-teal-border);
+                border-radius: 8px;
+                font-size: 12px;
+                color: var(--sway-bright);
+                font-weight: 700;
+              "
+            >
+              Open time-series explorer →
+            </div>
+          </div>
+          <div class="pin" style="top: 230px; right: -16px">B</div>
+          <div class="caption">
+            <div class="tag">Step B · Drill</div>
+            <div class="title">Programme × care tier.</div>
+            <div class="body">
+              Tap Depression → this view. The IAPT triplet is now a table, tiered by care assignment. PWP row is
+              suppressed ("&lt; 5 patients"), which is itself a finding: PWP recruitment for this programme is too low
+              to report on.
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel C: time series -->
+        <div class="panel-wrapper">
+          <div class="panel">
+            <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+            <div class="screen-header">
+              <div>
+                <div class="pretitle">← Depression</div>
+                <h3>Time-series</h3>
+              </div>
+              <div class="iconbtn">⋯</div>
+            </div>
+
+            <div class="filter-bar">
+              <span class="tier-chip active">PHQ-9</span>
+              <span class="tier-chip">All tiers ▾</span>
+              <span class="tier-chip">Monthly ▾</span>
+            </div>
+
+            <div style="background: var(--card); border: 1px solid var(--rule); border-radius: 14px; padding: 14px">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 10px">
+                <span class="t-small" style="color: var(--sway-lightGrey); font-weight: 700">Recovery rate</span>
+                <span class="t-small">Jan–Apr 2026</span>
+              </div>
+              <div style="position: relative; height: 140px">
+                <svg viewBox="0 0 320 140" width="100%" height="140" aria-hidden="true">
+                  <!-- grid -->
+                  <line x1="0" y1="30" x2="320" y2="30" stroke="rgba(166,173,187,0.1)" />
+                  <line x1="0" y1="70" x2="320" y2="70" stroke="rgba(166,173,187,0.1)" />
+                  <line x1="0" y1="110" x2="320" y2="110" stroke="rgba(166,173,187,0.1)" />
+                  <!-- recovery line -->
+                  <polyline
+                    fill="none"
+                    stroke="#18cdba"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    points="10,90 50,80 90,70 130,55 170,62 210,45 250,50 290,38"
+                  />
+                  <!-- reliable recovery line -->
+                  <polyline
+                    fill="none"
+                    stroke="#18cdba"
+                    stroke-width="2.5"
+                    stroke-dasharray="4 4"
+                    opacity="0.55"
+                    points="10,105 50,100 90,95 130,85 170,88 210,76 250,78 290,62"
+                  />
+                  <!-- suppressed bucket marker -->
+                  <circle cx="170" cy="62" r="3.5" fill="#a6adbb" opacity="0.4" />
+                  <text x="172" y="50" font-size="8" fill="#a6adbb">n&lt;20</text>
+                </svg>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  font-size: 10px;
+                  color: var(--sway-darkGrey);
+                  margin-top: 4px;
+                "
+              >
+                <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span>
+              </div>
+              <div style="display: flex; gap: 12px; margin-top: 12px; font-size: 11px">
+                <span style="display: inline-flex; align-items: center; gap: 6px"
+                  ><span style="width: 14px; height: 2px; background: var(--sway-bright)"></span>Recovery</span
+                >
+                <span style="display: inline-flex; align-items: center; gap: 6px"
+                  ><span
+                    style="width: 14px; height: 2px; background: var(--sway-bright); opacity: 0.55"
+                  ></span
+                  >Reliable rec.</span
+                >
+              </div>
+            </div>
+
+            <div
+              style="
+                margin-top: 12px;
+                background: var(--card-deep);
+                border: 1px solid var(--rule);
+                border-radius: 10px;
+                padding: 12px;
+                font-size: 11px;
+                color: var(--sway-darkGrey);
+                line-height: 1.55;
+              "
+            >
+              <strong style="color: var(--sway-lightGrey)">Mar 2026 ·</strong> recovery 62% suppressed in
+              chart — only 14 paired assessments (below min-N of 20). Rendered dimmed so the axis stays honest.
+            </div>
+          </div>
+          <div class="pin" style="top: 190px; right: -16px">C</div>
+          <div class="caption">
+            <div class="tag">Step C · Explore</div>
+            <div class="title">Trend with suppression on-axis.</div>
+            <div class="body">
+              <code>GET /api/admin/outcomes?instrument=phq9&granularity=month</code>. Suppressed buckets don't
+              disappear — they render dimmed with an <code>n&lt;20</code> marker. Zero-denominator months draw as empty
+              slots.
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel D: operational -->
+        <div class="panel-wrapper">
+          <div class="panel">
+            <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+            <div class="screen-header">
+              <div>
+                <div class="pretitle">Admin</div>
+                <h3>Operational</h3>
+              </div>
+              <div class="iconbtn">⚙</div>
+            </div>
+
+            <div style="font-size: 12px; color: var(--sway-darkGrey); margin-bottom: 12px">
+              Platform health · supports clinical outcomes
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+              <div class="tier-bar">
+                <div class="tl">Users</div>
+                <div class="tv">34</div>
+              </div>
+              <div class="tier-bar">
+                <div class="tl">Therapists · verified</div>
+                <div class="tv">3</div>
+              </div>
+              <div class="tier-bar">
+                <div class="tl">Active 30d</div>
+                <div class="tv">28 <span style="color: var(--success); font-size: 10px">+4</span></div>
+              </div>
+              <div class="tier-bar">
+                <div class="tl">New 7d</div>
+                <div class="tv">5</div>
+              </div>
+            </div>
+
+            <div
+              style="
+                margin-top: 14px;
+                background: var(--card);
+                border: 1px solid var(--rule);
+                border-radius: 12px;
+                padding: 12px;
+              "
+            >
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px">
+                <span style="font-weight: 900; font-size: 13px">Verification queue</span>
+                <span style="color: var(--warning); font-size: 12px; font-weight: 700">18 pending</span>
+              </div>
+              <div
+                style="
+                  padding: 8px 0;
+                  border-top: 1px solid var(--divider);
+                  display: flex;
+                  justify-content: space-between;
+                "
+              >
+                <div>
+                  <div style="font-size: 12px; font-weight: 700">Rachel Dunn</div>
+                  <div style="font-size: 10px; color: var(--sway-darkGrey)">CBT · 11 Apr</div>
+                </div>
+                <button
+                  style="
+                    background: var(--tint-teal);
+                    border: 1px solid var(--tint-teal-border);
+                    color: var(--sway-bright);
+                    border-radius: 8px;
+                    padding: 6px 10px;
+                    font-size: 11px;
+                    font-weight: 700;
+                  "
+                >
+                  Verify
+                </button>
+              </div>
+              <div
+                style="
+                  padding: 8px 0;
+                  border-top: 1px solid var(--divider);
+                  display: flex;
+                  justify-content: space-between;
+                "
+              >
+                <div>
+                  <div style="font-size: 12px; font-weight: 700">Sam O'Connor</div>
+                  <div style="font-size: 10px; color: var(--sway-darkGrey)">PWP · 12 Apr</div>
+                </div>
+                <button
+                  style="
+                    background: var(--tint-teal);
+                    border: 1px solid var(--tint-teal-border);
+                    color: var(--sway-bright);
+                    border-radius: 8px;
+                    padding: 6px 10px;
+                    font-size: 11px;
+                    font-weight: 700;
+                  "
+                >
+                  Verify
+                </button>
+              </div>
+            </div>
+
+            <div
+              style="
+                margin-top: 12px;
+                display: flex;
+                gap: 8px;
+                font-size: 11px;
+              "
+            >
+              <div
+                style="
+                  flex: 1;
+                  background: rgba(255, 179, 0, 0.1);
+                  border: 1px solid rgba(255, 179, 0, 0.3);
+                  border-radius: 8px;
+                  padding: 8px;
+                "
+              >
+                <div style="color: var(--warning); font-weight: 700; font-size: 18px">3</div>
+                <div style="color: var(--sway-darkGrey)">Stalled 7d+</div>
+              </div>
+              <div
+                style="
+                  flex: 1;
+                  background: var(--tint-error);
+                  border: 1px solid rgba(255, 109, 94, 0.3);
+                  border-radius: 8px;
+                  padding: 8px;
+                "
+              >
+                <div style="color: var(--error); font-weight: 700; font-size: 18px">1</div>
+                <div style="color: var(--sway-darkGrey)">Orphaned</div>
+              </div>
+            </div>
+          </div>
+          <div class="pin" style="top: 210px; right: -16px">D</div>
+          <div class="caption">
+            <div class="tag">Step D · Secondary</div>
+            <div class="title">Operational queue, one tap away.</div>
+            <div class="body">
+              Verification, stalled work, orphans. Tap-targets ≥ 44pt. Destructive verification flow uses ActionMenu's
+              built-in confirmation step — tier is a required field.
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel E: audit -->
+        <div class="panel-wrapper">
+          <div class="panel">
+            <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+            <div class="screen-header">
+              <div>
+                <div class="pretitle">Admin</div>
+                <h3>Audit log</h3>
+              </div>
+              <div class="iconbtn">⌕</div>
+            </div>
+
+            <div class="filter-bar">
+              <span class="tier-chip">Action ▾</span>
+              <span class="tier-chip">Actor ▾</span>
+              <span class="tier-chip">Last 7d</span>
+            </div>
+
+            <div style="background: var(--card); border: 1px solid var(--rule); border-radius: 12px">
+              <div style="padding: 10px 12px; border-bottom: 1px solid var(--divider)">
+                <div style="display: flex; justify-content: space-between; font-size: 11px">
+                  <span style="color: var(--sway-bright); font-weight: 700">therapist.verified</span>
+                  <span style="color: var(--sway-darkGrey)">2m ago</span>
+                </div>
+                <div style="font-size: 12px; margin-top: 4px">admin@bwell.test · Rachel Dunn · tier=cbt</div>
+              </div>
+              <div style="padding: 10px 12px; border-bottom: 1px solid var(--divider)">
+                <div style="display: flex; justify-content: space-between; font-size: 11px">
+                  <span style="color: var(--sway-darkGrey); font-weight: 700">user.viewed</span>
+                  <span style="color: var(--sway-darkGrey)">18m ago</span>
+                </div>
+                <div style="font-size: 12px; margin-top: 4px">admin@bwell.test · user 6742…a1c</div>
+              </div>
+              <div style="padding: 10px 12px; border-bottom: 1px solid var(--divider)">
+                <div style="display: flex; justify-content: space-between; font-size: 11px">
+                  <span style="color: var(--sway-darkGrey); font-weight: 700">module.created</span>
+                  <span style="color: var(--sway-darkGrey)">1h ago</span>
+                </div>
+                <div style="font-size: 12px; margin-top: 4px">admin@bwell.test · PHQ-9 schedule weekly</div>
+              </div>
+              <div style="padding: 10px 12px">
+                <div style="display: flex; justify-content: space-between; font-size: 11px">
+                  <span style="color: var(--error); font-weight: 700">therapist.verified · failed</span>
+                  <span style="color: var(--sway-darkGrey)">2h ago</span>
+                </div>
+                <div style="font-size: 12px; margin-top: 4px">admin@bwell.test · missing tier</div>
+              </div>
+            </div>
+
+            <div
+              style="
+                text-align: center;
+                margin-top: 14px;
+                color: var(--sway-bright);
+                font-size: 12px;
+                font-weight: 700;
+                letter-spacing: 0.06em;
+              "
+            >
+              LOAD MORE ↓
+            </div>
+          </div>
+          <div class="pin" style="top: 200px; right: -16px">E</div>
+          <div class="caption">
+            <div class="tag">Step E · Accountability</div>
+            <div class="title">Who did what, when.</div>
+            <div class="body">
+              Audit stays available but intentionally out of the primary flow. Cursor pagination. Context is treated as
+              opaque metadata — only action / actor / resource / outcome / at render as first-class.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ SECTION 3 — STATE GALLERY ============================ -->
+    <section class="deck-section">
+      <h2><span class="num">03</span>State gallery</h2>
+      <p class="lede">
+        The canonical state for a small B2C CBT product is <em>partial rigour</em>: some programmes have outcome data,
+        some are suppressed, some are zero-denominator. Each state gets a tasteful treatment — suppression is not an
+        error, it is a statement of clinical integrity.
+      </p>
+
+      <div class="gallery">
+        <!-- Populated -->
+        <div class="thumb">
+          <span class="state-tag" style="color: var(--success); border-color: rgba(118, 171, 112, 0.4)">Populated</span>
+          <h4>Happy path · full data</h4>
+          <p class="desc">All three IAPT rates render, enrolment comfortably above min-N.</p>
+          <div class="preview">
+            <div style="font-size: 11px; color: var(--sway-darkGrey); margin-bottom: 4px">Depression · PHQ-9</div>
+            <div class="big">38%</div>
+            <div class="sub">Recovery · n=45 · rel. imp. 52% · rel. rec. 31%</div>
+          </div>
+          <div style="margin-top: 12px; display: flex; gap: 4px; align-items: flex-end; height: 30px">
+            <span style="flex: 1; background: var(--sway-bright); opacity: 0.7; height: 60%; border-radius: 2px"></span>
+            <span style="flex: 1; background: var(--sway-bright); opacity: 0.7; height: 75%; border-radius: 2px"></span>
+            <span style="flex: 1; background: var(--sway-bright); opacity: 0.7; height: 70%; border-radius: 2px"></span>
+            <span style="flex: 1; background: var(--sway-bright); opacity: 0.7; height: 85%; border-radius: 2px"></span>
+            <span style="flex: 1; background: var(--sway-bright); opacity: 0.7; height: 80%; border-radius: 2px"></span>
+            <span style="flex: 1; background: var(--sway-bright); opacity: 0.7; height: 95%; border-radius: 2px"></span>
+          </div>
+        </div>
+
+        <!-- Suppressed (must-have) -->
+        <div class="thumb suppressed">
+          <span class="state-tag" style="color: var(--sway-darkGrey); border-color: var(--sway-darkGrey)"
+            >Suppressed</span
+          >
+          <h4>&lt; 5 patients · k-anonymity</h4>
+          <p class="desc">
+            Below-k cells never display a rate. <code>n</code> is returned but the integer too — we say "fewer than
+            five" deliberately.
+          </p>
+          <div class="preview">
+            <div style="font-size: 11px; color: var(--sway-darkGrey); margin-bottom: 4px">Panic · PDSS · PWP tier</div>
+            <div class="big">Fewer than 5 patients</div>
+            <div class="sub">Suppressed · reason: below_k</div>
+          </div>
+          <div class="sup-note" style="margin-top: 12px">
+            Cells render italic grey, not red. Empty quantifier ("fewer than five") honours privacy without reading as
+            failure.
+          </div>
+        </div>
+
+        <!-- Insufficient N -->
+        <div class="thumb suppressed">
+          <span class="state-tag" style="color: var(--info); border-color: rgba(255, 209, 93, 0.4)"
+            >Insufficient N</span
+          >
+          <h4>≥ 5 but &lt; 20 · min-N</h4>
+          <p class="desc">
+            Shown as dimmed slot with visible n. Admin sees the programme exists and is growing — not hidden.
+          </p>
+          <div class="preview">
+            <div style="font-size: 11px; color: var(--sway-darkGrey); margin-bottom: 4px">GAD-7 · PWP tier</div>
+            <div class="big">— · n=12</div>
+            <div class="sub">Not yet reportable · reason: below_min_n</div>
+          </div>
+          <div class="sup-note" style="margin-top: 12px">
+            8 more paired assessments needed to produce a reportable rate. Denominator counts even when the numerator
+            can't.
+          </div>
+        </div>
+
+        <!-- Partial (mix) -->
+        <div class="thumb">
+          <span class="state-tag" style="color: var(--sway-bright); border-color: var(--tint-teal-border)">Partial</span>
+          <h4>Typical · mixed tiers</h4>
+          <p class="desc">
+            Most frequent state in a small platform. One tier populated, others suppressed. The design embraces it.
+          </p>
+          <div class="preview" style="padding: 10px">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; padding: 6px 0">
+              <span>Self-help</span><span style="font-weight: 700">31% · n=18</span>
+            </div>
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                font-size: 11px;
+                padding: 6px 0;
+                border-top: 1px solid var(--divider);
+              "
+            >
+              <span>CBT</span><span style="font-weight: 700; color: var(--sway-bright)">54% · n=21</span>
+            </div>
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                font-size: 11px;
+                padding: 6px 0;
+                border-top: 1px solid var(--divider);
+              "
+            >
+              <span>PWP</span
+              ><span style="color: var(--sway-darkGrey); font-style: italic">&lt; 5 patients</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="thumb">
+          <span class="state-tag" style="color: var(--sway-darkGrey)">Loading</span>
+          <h4>Skeleton · first paint</h4>
+          <p class="desc">Preserves the shape so layout doesn't jump when rollup arrives. 300–900ms typical.</p>
+          <div class="preview">
+            <div class="skel" style="height: 10px; width: 60%; margin-bottom: 12px"></div>
+            <div class="skel" style="height: 48px; width: 70%; margin-bottom: 10px"></div>
+            <div class="skel" style="height: 10px; width: 40%; margin-bottom: 18px"></div>
+            <div class="skel" style="height: 10px; width: 90%; margin-bottom: 8px"></div>
+            <div class="skel" style="height: 10px; width: 80%; margin-bottom: 8px"></div>
+            <div class="skel" style="height: 10px; width: 85%"></div>
+          </div>
+        </div>
+
+        <!-- Day one · no rollup -->
+        <div class="thumb">
+          <span class="state-tag" style="color: var(--info); border-color: rgba(255, 209, 93, 0.4)">Day one</span>
+          <h4>No rollup yet · <code>rollupAsOf: null</code></h4>
+          <p class="desc">
+            Before the first nightly rollup completes, the admin sees an honest placeholder — not fabricated zeros.
+          </p>
+          <div
+            class="preview"
+            style="border: 1px dashed rgba(255, 209, 93, 0.4); background: rgba(255, 209, 93, 0.04)"
+          >
+            <div style="font-size: 24px; margin-bottom: 8px">⏳</div>
+            <div style="font-weight: 900; font-size: 15px">Rollup pending</div>
+            <div class="sub">First aggregation runs at 04:00 UTC. Raw counts available below.</div>
+          </div>
+          <div
+            style="
+              margin-top: 12px;
+              background: var(--card);
+              border: 1px solid var(--rule);
+              border-radius: 8px;
+              padding: 8px;
+              font-size: 11px;
+            "
+          >
+            <span style="color: var(--sway-darkGrey)">Enrolled:</span> <strong>30</strong> &nbsp;·&nbsp;
+            <span style="color: var(--sway-darkGrey)">Completed 7d:</span> <strong>42</strong>
+          </div>
+        </div>
+
+        <!-- Error -->
+        <div class="thumb">
+          <span class="state-tag" style="color: var(--error); border-color: rgba(255, 109, 94, 0.4)">Error</span>
+          <h4>Rollup failed · stale data</h4>
+          <p class="desc">
+            When the last rollup is &gt; 25h old we surface a banner with the stale figure, not a silent cache.
+          </p>
+          <div
+            class="preview"
+            style="border-color: rgba(255, 109, 94, 0.3); background: rgba(255, 109, 94, 0.04)"
+          >
+            <div style="font-size: 11px; color: var(--error); font-weight: 700; margin-bottom: 4px">
+              ⚠ Data last updated 41h ago
+            </div>
+            <div class="big" style="opacity: 0.6">38%</div>
+            <div class="sub err">Rollup job failed · retry attempted 09:00 UTC · view system health →</div>
+          </div>
+        </div>
+
+        <!-- Dev mode -->
+        <div class="thumb">
+          <span
+            class="state-tag"
+            style="color: var(--therapist-purple); border-color: rgba(124, 58, 237, 0.4)"
+            >Dev mode</span
+          >
+          <h4><code>privacyMode: 'reduced'</code></h4>
+          <p class="desc">
+            Staging banner. Suppression thresholds are lowered so dev data shows rates — but the origin is visible.
+          </p>
+          <div class="preview">
+            <div
+              style="
+                font-size: 11px;
+                color: #c4a7ff;
+                font-weight: 700;
+                margin-bottom: 8px;
+                background: rgba(124, 58, 237, 0.18);
+                border: 1px solid rgba(124, 58, 237, 0.3);
+                padding: 4px 8px;
+                border-radius: 6px;
+                display: inline-block;
+              "
+            >
+              STAGING · reduced privacy
+            </div>
+            <div class="big">38%</div>
+            <div class="sub">Recovery · n=12 (prod would suppress)</div>
+          </div>
+        </div>
+
+        <!-- Non-clinical -->
+        <div class="thumb">
+          <span class="state-tag" style="color: var(--sway-darkGrey)">Non-clinical</span>
+          <h4>Sleep Health · no instrument</h4>
+          <p class="desc">
+            Programmes with no clinical instrument get an alternative indicator — enrolment momentum, not recovery.
+          </p>
+          <div class="preview">
+            <div style="font-size: 11px; color: var(--sway-darkGrey); margin-bottom: 4px">Sleep Health</div>
+            <div class="big" style="font-size: 28px">17<small style="font-size: 14px; color: var(--sway-darkGrey); font-weight: 400">enrolled</small></div>
+            <div class="sub">Non-IAPT · engagement 68% of assigned modules · no outcome metric</div>
+          </div>
+          <div class="sup-note" style="margin-top: 12px">
+            Deliberately visually distinct from clinical programmes. Never shows a rate figure — admins should not
+            confuse engagement with outcomes.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ SECTION 4 — ANIMATION CALLOUTS ============================ -->
+    <section class="deck-section">
+      <h2><span class="num">04</span>Animation callouts</h2>
+      <p class="lede">
+        Motion is scarce, purposeful, and gated by <code>prefers-reduced-motion</code>. These four moments are the only
+        animations on the admin surface; everything else is instantaneous.
+      </p>
+
+      <div class="anim-grid">
+        <!-- 1: Hero count up -->
+        <div class="anim-card">
+          <div class="anim-stage">
+            <div>
+              <div style="font-size: 11px; color: var(--sway-darkGrey); margin-bottom: 6px; text-align: center">
+                PHQ-9 · recovery
+              </div>
+              <div class="countup">
+                <span class="digit">3</span><span class="digit d2">8</span><span class="d-pct">%</span>
+              </div>
+            </div>
+          </div>
+          <h4>1 · Hero figure reveal</h4>
+          <p>
+            On first paint, the percent digits roll up from 0 with a slight overshoot, then the <code>%</code> glyph
+            fades in teal. Signals the number is arriving from a rollup, not static.
+          </p>
+          <span class="timing">trigger: mount · 1.4s cubic-bezier(.2,.9,.2,1) · delay 200ms</span>
+        </div>
+
+        <!-- 2: Bucket tooltip -->
+        <div class="anim-card">
+          <div class="anim-stage">
+            <div class="tooltip-stage">
+              <div class="tooltip">
+                <div class="h">Mar 2026 · PHQ-9</div>
+                <div class="l">Rate suppressed · n=14</div>
+                <div class="l">Min N = 20 · 6 short</div>
+              </div>
+              <div class="tooltip-bars">
+                <span style="height: 40%"></span>
+                <span style="height: 60%"></span>
+                <span style="height: 45%"></span>
+                <span style="height: 70%"></span>
+                <span class="active" style="height: 55%; opacity: 0.3"></span>
+                <span style="height: 80%"></span>
+                <span style="height: 75%"></span>
+              </div>
+            </div>
+          </div>
+          <h4>2 · Bucket tooltip on hover</h4>
+          <p>
+            Hover a time-series bucket — adjacent bars fade to 50%, the hovered bar lifts, a tooltip fades in above.
+            Suppressed buckets show <em>why</em> they are suppressed (<code>below_k</code> vs <code>below_min_n</code>),
+            not just that they are.
+          </p>
+          <span class="timing">trigger: :hover · 250ms ease · tooltip 350ms</span>
+        </div>
+
+        <!-- 3: Suppressed reveal -->
+        <div class="anim-card">
+          <div class="anim-stage">
+            <div class="sup-stage">
+              <div class="blur">46%</div>
+              <span style="color: var(--sway-darkGrey); font-size: 14px; font-weight: 400">→</span>
+              <div style="color: var(--sway-darkGrey); font-style: italic; font-size: 16px">&lt; 5 patients</div>
+            </div>
+          </div>
+          <h4>3 · Suppressed cell treatment</h4>
+          <p>
+            As tiles mount, suppressed cells render with a momentary blur, then resolve to the italic "&lt; 5 patients"
+            label. Gives the admin a micro-cue that something was <em>deliberately</em> withheld, not missing.
+          </p>
+          <span class="timing">trigger: mount · 800ms ease-out · reduced-motion: skip blur</span>
+        </div>
+
+        <!-- 4: Drill-in -->
+        <div class="anim-card">
+          <div class="anim-stage">
+            <div class="drill-stage">
+              <div class="drill-card">
+                <div class="a">DEPRESSION</div>
+                <div class="b">38%</div>
+              </div>
+              <div class="drill-arrow">→</div>
+              <div class="drill-card">
+                <div class="a">GAD-7</div>
+                <div class="b">42%</div>
+              </div>
+            </div>
+          </div>
+          <h4>4 · Card → programme detail</h4>
+          <p>
+            Tapping a programme row scales the card up 5% and lifts it with a soft teal halo before the push transition.
+            Conveys "drilling into" a topic rather than a generic navigation.
+          </p>
+          <span class="timing">trigger: :active → push · 400ms cubic-bezier(.4,0,.2,1)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ SECTION 5 — COMPONENTS ============================ -->
+    <section class="deck-section">
+      <h2><span class="num">05</span>Component breakdown</h2>
+      <p class="lede">
+        Reuses the existing bwell vocabulary heavily. Three new clinical-specific components are required; everything
+        else composes from the inventory in §6 of the brief.
+      </p>
+
+      <div class="comp-grid">
+        <div class="comp-block">
+          <h4>New — clinical-specific</h4>
+          <p class="lede">Specific to the admin outcomes surface.</p>
+
+          <div class="comp-list">
+            <div class="comp-item">
+              <code>&lt;OutcomeFigure /&gt;</code>
+              <div class="d">
+                The hero. Renders a single <code>OutcomeResult</code>: rate, n, suppressed reason. Handles the count-up
+                animation + blur-on-suppressed treatment. Accepts an optional <code>variant</code> for layered rates.
+              </div>
+            </div>
+            <div class="comp-item">
+              <code>&lt;IAPTTriplet /&gt;</code>
+              <div class="d">
+                Recovery / reliable improvement / reliable recovery as a layered visual. Guarantees all three are shown
+                together so an admin can never misread a single rate in isolation.
+              </div>
+            </div>
+            <div class="comp-item">
+              <code>&lt;SuppressedCell /&gt;</code>
+              <div class="d">
+                Primitive for "&lt; 5 patients" / "n=12 · not yet reportable". Italic grey, tooltip explains
+                <code>reason</code> (below_k vs below_min_n). Fundamental enough that it shows up in tables and
+                time-series.
+              </div>
+            </div>
+            <div class="comp-item">
+              <code>&lt;TierCompareTable /&gt;</code>
+              <div class="d">
+                Three rows (self_help / cbt_guided / pwp_guided), three columns (recovery / rel.imp / rel.rec). Rows
+                collapse to <code>&lt;SuppressedCell /&gt;</code> when below thresholds.
+              </div>
+            </div>
+            <div class="comp-item">
+              <code>&lt;RollupFreshnessBanner /&gt;</code>
+              <div class="d">
+                Renders <code>rollupAsOf</code> with traffic-light colouring (fresh ≤ 24h, stale &gt; 25h, missing).
+                Accepts <code>privacyMode</code> to show the dev-mode chip.
+              </div>
+            </div>
+            <div class="comp-item">
+              <code>&lt;OutcomeSeries /&gt;</code>
+              <div class="d">
+                Time-series chart that renders suppressed + zero-denominator buckets on-axis with distinct treatments.
+                Wraps <code>Sparkline</code>/<code>BarSparkline</code>; adds tooltip with suppression reason.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp-block">
+          <h4>Reused — from the inventory</h4>
+          <p class="lede">From §6 of the brief; no modification.</p>
+
+          <div class="comp-list">
+            <div class="comp-item">
+              <code>Container</code> / <code>ContentContainer</code>
+              <div class="d">Screen wrappers. Admin home uses ContentContainer with a three-tab header.</div>
+            </div>
+            <div class="comp-item">
+              <code>ThemedText</code>
+              <div class="d">Every text node. <code>title</code>/<code>subtitle</code>/<code>small</code> across.</div>
+            </div>
+            <div class="comp-item">
+              <code>StatusChip</code> / <code>Chip</code>
+              <div class="d">
+                Care-tier pills, instrument chips ("PHQ-9", "GAD-7"), rollup status. Dev-mode banner uses the therapist
+                purple tint.
+              </div>
+            </div>
+            <div class="comp-item">
+              <code>BarSparkline</code> / <code>Sparkline</code>
+              <div class="d">Hero trend line and per-programme spark rows.</div>
+            </div>
+            <div class="comp-item">
+              <code>Collapsible</code>
+              <div class="d">Operational strip at the foot of the home screen.</div>
+            </div>
+            <div class="comp-item">
+              <code>EmptyState</code>
+              <div class="d">
+                Day-one "rollup pending" and zero-enrolment programme variants. Preserves content focus on the clinical
+                surface.
+              </div>
+            </div>
+            <div class="comp-item">
+              <code>ActionMenu</code>
+              <div class="d">
+                Verification confirmation (destructive variant). Tier picker is a required field in the confirm step,
+                matching business rule §3.12.
+              </div>
+            </div>
+            <div class="comp-item">
+              <code>SelectField</code> / <code>SearchPickerDialog</code>
+              <div class="d">Dimension filters in the time-series explorer: programme, care tier, instrument.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ SECTION 6 — RATIONALE ============================ -->
+    <section class="deck-section">
+      <h2><span class="num">06</span>Rationale</h2>
+      <p class="lede">Why this design serves the "does therapy work?" angle.</p>
+
+      <div class="rationale">
+        <ul>
+          <li>
+            <strong>One question answered first.</strong>
+            Recovery rate is the first visual element in the first fold at title weight. Counts, queues, and audit —
+            the operational soup every admin dashboard leans on — are deliberately demoted. If the only thing an admin
+            ever reads is the hero, they've read the right thing.
+          </li>
+          <li>
+            <strong>All three IAPT rates, always together.</strong>
+            Showing recovery alone allows a kind regression to the mean to read as clinical success. Layering reliable
+            improvement and reliable recovery underneath — with definitions visible — makes it structurally impossible
+            for an admin to cite a single figure without its siblings.
+          </li>
+          <li>
+            <strong>Suppression is a first-class state.</strong>
+            k-anonymity and min-N are the honest bones of clinical reporting. The design treats "&lt; 5 patients" as
+            aesthetically deliberate (italic grey, a micro-blur on reveal, a tooltip explaining <em>why</em>), not as a
+            rendering failure. Every suppressed cell should feel like rigour, not absence.
+          </li>
+          <li>
+            <strong>Care-tier breakdown is the obvious drill-in.</strong>
+            If the platform is working, the interesting second question is always "which tier is producing the
+            outcome?" — self-help vs CBT-guided vs PWP-guided. The programme detail screen is one tap from the hero
+            and answers that question directly.
+          </li>
+          <li>
+            <strong>Honest about freshness.</strong>
+            <code>rollupAsOf</code> is surfaced on every outcome view. Day-one state (<code>rollupAsOf: null</code>) and
+            stale-rollup state have distinct treatments. No admin should ever be looking at cached IAPT rates and not
+            know it.
+          </li>
+          <li>
+            <strong>Non-clinical programmes are not faked.</strong>
+            Sleep Health has no instrument — so it never shows a percentage. It gets an engagement indicator in a
+            visually distinct treatment, so an admin can't accidentally conflate engagement with clinical outcomes.
+          </li>
+        </ul>
+      </div>
+
+      <div class="be-note">
+        <strong>BE assumption flag:</strong> the state gallery includes a "stale rollup" (&gt; 25h) treatment that
+        assumes the BE stamps <code>rollupAsOf</code> with the last <em>successful</em> completion — confirmed by §2.5.
+        It also assumes the FE can observe rollup job status for the error banner via
+        <code>GET /api/admin/system/health.rollupLastRun</code> — already specified. No new BE work required to
+        implement this angle. If we wanted the "8 more paired assessments needed" micro-copy in the below-min-N state
+        to be exact (rather than derived client-side from 20 − n), we'd want the BE to return <code>shortfall</code> on
+        the <code>OutcomeResult</code>.
+      </div>
+    </section>
+
+    <footer style="margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--rule); color: var(--sway-darkGrey); font-size: 12px">
+      Prototype · admin-overhaul · clinical-outcomes-first.html · 20 Apr 2026 · bwell
+    </footer>
+  </body>
+</html>
