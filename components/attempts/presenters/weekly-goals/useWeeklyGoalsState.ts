@@ -18,7 +18,7 @@ export type GoalWithId = WeeklyGoalEntry & { _uid: string };
 
 export type ReflectionKey = keyof WeeklyGoalsReflection;
 
-// Reflection prompts are clinical — preserved verbatim per the BE spec.
+// Reflection prompts are clinical, preserved verbatim per the BE spec.
 export const REFLECTION_PROMPTS: { key: ReflectionKey; prompt: string; glyph: string }[] = [
   { key: 'moodImpact', prompt: 'What activities improved or impacted your mood?', glyph: '◐' },
   { key: 'takeaway', prompt: 'What can you take away from this?', glyph: '✎' },
@@ -132,7 +132,21 @@ export const useWeeklyGoalsState = ({ attempt, mode, onSubmitSuccess }: UseWeekl
   const toggleCompleted = useCallback(
     (index: number) => {
       if (!canEdit) return;
-      setGoals((prev) => prev.map((g, i) => (i === index ? { ...g, completed: !g.completed } : g)));
+      setGoals((prev) =>
+        prev.map((g, i) => {
+          if (i !== index) return g;
+          if (!g.completed) return { ...g, completed: true };
+          // Un-completing clears the follow-up ratings/notes so stale data
+          // doesn't linger if the goal is later re-completed.
+          return {
+            ...g,
+            completed: false,
+            masteryRating: null,
+            pleasureRating: null,
+            completionNotes: null
+          };
+        })
+      );
       setIsDirty(true);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     },
