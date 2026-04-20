@@ -2,13 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { MotiView } from 'moti';
 import { ThemedText } from '@/components/ThemedText';
+import BloomBurst from '@/components/ui/BloomBurst';
 import { Colors } from '@/constants/Colors';
+import { Fonts } from '@/constants/Typography';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
-import BloomGlow from './BloomGlow';
 import type { GoalWithId } from './useWeeklyGoalsState';
 
-// Subtle colour accent rotation. Kept small — the angle is conversational, not rainbow.
+// Subtle colour accent rotation, kept small so the angle stays conversational rather than rainbow.
 const ACCENTS = [Colors.sway.bright, Colors.diary.enjoyment, Colors.diary.moodCool, Colors.diary.moodWarm] as const;
 
 const MiniRating = ({
@@ -33,7 +34,7 @@ const MiniRating = ({
         {label}
       </ThemedText>
       <ThemedText type="smallBold" style={{ color: value == null ? Colors.sway.darkGrey : accent }}>
-        {value == null ? '—' : `${value}`}
+        {value == null ? '–' : `${value}`}
         <ThemedText type="small" style={{ color: Colors.sway.darkGrey }}>
           {' / 10'}
         </ThemedText>
@@ -47,7 +48,7 @@ const MiniRating = ({
             key={n}
             disabled={disabled}
             onPress={() => onChange(value === n ? null : n)}
-            hitSlop={4}
+            hitSlop={{ top: 15, bottom: 15, left: 2, right: 2 }}
             accessibilityRole="button"
             accessibilityLabel={`${label} ${n} out of 10`}
             accessibilityState={{ selected: value === n }}
@@ -99,14 +100,23 @@ const MomentCard = ({
   const [bloomTrigger, setBloomTrigger] = useState(0);
   const prevCompletedRef = useRef(goal.completed);
 
-  // Fire the bloom only on false→true transitions so un-ticking stays silent.
+  // Expand the card on any false→true transition (including taps coming from
+  // the WeekRail), and collapse on the reverse so an un-ticked goal returns to
+  // a clean state. Bloom is fired locally by the pill's handler so it appears
+  // under the actual touch point rather than bouncing to a different surface.
   useEffect(() => {
     if (goal.completed && !prevCompletedRef.current) {
       setExpanded(true);
-      setBloomTrigger((n) => n + 1);
+    } else if (!goal.completed && prevCompletedRef.current) {
+      setExpanded(false);
     }
     prevCompletedRef.current = goal.completed;
   }, [goal.completed]);
+
+  const handleTogglePress = () => {
+    if (!goal.completed) setBloomTrigger((n) => n + 1);
+    onToggleCompleted();
+  };
 
   const showDetails = canEdit && (expanded || isActive);
 
@@ -171,7 +181,7 @@ const MomentCard = ({
           {canEdit && (
             <Pressable
               onPress={onRemove}
-              hitSlop={8}
+              hitSlop={14}
               accessibilityRole="button"
               accessibilityLabel={`Remove goal ${index + 1}`}
               className="active:opacity-60"
@@ -198,7 +208,7 @@ const MomentCard = ({
             style={{
               color: Colors.sway.lightGrey,
               fontSize: 17,
-              fontFamily: 'Lato-Regular',
+              fontFamily: Fonts.Regular,
               lineHeight: 24,
               minHeight: 24,
               paddingVertical: 2
@@ -206,7 +216,7 @@ const MomentCard = ({
             accessibilityLabel={`Goal ${index + 1} text`}
           />
         ) : (
-          <ThemedText type="default">{goal.goalText || '—'}</ThemedText>
+          <ThemedText type="default">{goal.goalText || '–'}</ThemedText>
         )}
 
         {canEdit && (
@@ -215,18 +225,18 @@ const MomentCard = ({
               pointerEvents="none"
               style={{
                 position: 'absolute',
-                left: -20,
-                top: -20,
-                right: -20,
-                bottom: -20,
-                alignItems: 'flex-start',
+                left: -40,
+                top: -40,
+                right: -40,
+                bottom: -40,
+                alignItems: 'center',
                 justifyContent: 'center'
               }}
             >
-              <BloomGlow trigger={bloomTrigger} size={96} />
+              <BloomBurst trigger={bloomTrigger} size={140} />
             </View>
             <Pressable
-              onPress={onToggleCompleted}
+              onPress={handleTogglePress}
               className="flex-row items-center gap-2 rounded-full px-3 py-1.5 active:opacity-70"
               style={{
                 backgroundColor: goal.completed ? Colors.tint.teal : Colors.chip.darkCardDeep,
@@ -289,7 +299,7 @@ const MomentCard = ({
                     How did that feel?
                   </ThemedText>
                   <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginTop: 2, fontStyle: 'italic' }}>
-                    Optional — only if it helps you notice something.
+                    Optional, only if it helps you notice something.
                   </ThemedText>
                 </View>
               </View>
@@ -336,7 +346,7 @@ const MomentCard = ({
                   padding: 10,
                   minHeight: 44,
                   fontSize: 14,
-                  fontFamily: 'Lato-Regular'
+                  fontFamily: Fonts.Regular
                 }}
               />
             </View>
@@ -368,7 +378,7 @@ const MomentCard = ({
           <Pressable
             onPress={() => setExpanded(false)}
             className="mt-3 self-start active:opacity-70"
-            hitSlop={6}
+            hitSlop={{ top: 16, bottom: 16, left: 12, right: 12 }}
             accessibilityLabel="Collapse goal details"
           >
             <ThemedText type="small" style={{ color: Colors.sway.darkGrey, letterSpacing: 1.2, fontSize: 10 }}>
@@ -380,7 +390,7 @@ const MomentCard = ({
           <Pressable
             onPress={() => setExpanded(true)}
             className="mt-3 self-start active:opacity-70"
-            hitSlop={6}
+            hitSlop={{ top: 16, bottom: 16, left: 12, right: 12 }}
             accessibilityLabel="Show goal details"
           >
             <ThemedText type="small" style={{ color: Colors.sway.darkGrey, letterSpacing: 1.2, fontSize: 10 }}>
