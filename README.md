@@ -29,7 +29,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 - Journey tab with score sparklines and progress history
 - Practice tab with active and completed practice items
 - Browse programs and modules
-- Complete assigned questionnaires, reading content, Five Areas Model (CBT hot cross bun), and general goals with re-rating check-ins
+- Complete assigned questionnaires, reading content, Five Areas Model (CBT hot cross bun), general goals with re-rating check-ins, and weekly goals with mastery/pleasure ratings and reflection prompts
 - View attempt history and detailed practice item submissions
 
 ### Therapist
@@ -48,6 +48,7 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ## Recent Milestones
 
+- **Weekly Goals module** — new presenter with moment cards, week rail, reflection thread and coach message; tap-anchored Skia bloom on goal completion; reusable `TypewriterText` and `BloomBurst` UI primitives; bloom teal colour tokens (2026-04-20)
 - **Jest test coverage expansion** — 47 new test files across components, hooks and utils, global mocks (AsyncStorage, material-design-icons) in `jest.setup.ts`, `clearMocks: true` replacing per-test reset boilerplate, shared `test-utils/` wrappers for React Query and presenter mocks (2026-04-17)
 - **Profile redesign** — role-aware dashboard layout with identity header, therapist/client relationship cards, stats strip, iOS-style grouped settings, shared initials utility and new colour tokens (2026-04-16)
 - **General Goals module** — goal rating with slider tracks, re-rating check-ins with unified timeline and trend indicators, reflection section, "Check-in" label across all views (2026-04-15)
@@ -57,7 +58,6 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 - **Therapist dashboard UX improvements** — overdue chips, relative dates, progress bars on client detail cards, reason tags on attention cards, week-scoped assignment framing (2026-04-04)
 - **Unified practice model** — merged assignments and attempts into a single practice concept, new journey/practice/review tabs, BarSparkline component, server-side client search/sort (2026-04-01)
 - **Reading module type** — replaced psychoeducation/exercise with unified reading presenter, markdown rendering, scroll progress bar, reader notes (2026-04-01)
-- **Destructive action confirmation** — ActionMenu built-in confirmation step for all destructive actions with customisable title, description, and label (2026-03-29)
 
 ## Tech Stack
 

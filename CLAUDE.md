@@ -47,7 +47,7 @@ These bias toward caution over speed. For trivial tasks, use judgement.
 - `app/` — expo-router pages (`(auth)/`, `(main)/`, `(welcome)/`)
 - `app/(main)/(tabs)/` — authenticated tab navigator: `home/`, `journey/`, `practice/`, `patients/`, `review/`, `programs/`, `all-users/`, `profile/`
 - `components/` — shared and feature-specific components
-- `components/attempts/presenters/` — module-type presenter components (questionnaires, diary, five-areas, reading, general-goals)
+- `components/attempts/presenters/` — module-type presenter components (questionnaires, diary, five-areas, reading, general-goals, weekly-goals)
 - `hooks/` — custom React hooks (data fetching, mutations)
 - `api/` — Axios instance and API helpers
 - `constants/` — Colors, shared constants

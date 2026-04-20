@@ -19,7 +19,7 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 - Feature-specific components go in `components/<feature>/` (e.g., `components/diary/`, `components/admin/`)
 - Module presenters go in `components/attempts/presenters/`
 - Shared layout wrappers: `Container` (headerless screens), `ContentContainer` (screens with visible header)
-- Always check for existing components before creating new ones — reuse `ThemedText`, `ThemedButton`, `StatusChip`, `AssignmentStatusChip`, `EmptyState`, `IconButton`, `Collapsible`, `SelectField`, `ActionMenu`, `Chip`, `DueDateField`, `RecurrenceField`, `SearchPickerDialog`, `KeyboardAvoidingWrapper`, `BarSparkline`
+- Always check for existing components before creating new ones — reuse `ThemedText`, `ThemedButton`, `StatusChip`, `AssignmentStatusChip`, `EmptyState`, `IconButton`, `Collapsible`, `SelectField`, `ActionMenu`, `Chip`, `DueDateField`, `RecurrenceField`, `SearchPickerDialog`, `KeyboardAvoidingWrapper`, `BarSparkline`, `TypewriterText`, `BloomBurst`
 
 ## Color Tokens
 
@@ -74,6 +74,9 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 | Therapist tint subtle | `Colors.therapist.tintSubtle` | `rgba(124,58,237,0.2)` |
 | Divider light | `Colors.divider.light` | `rgba(166,173,187,0.1)` |
 | Divider medium | `Colors.divider.medium` | `rgba(166,173,187,0.15)` |
+| Bloom teal core | `Colors.bloom.tealCore` | `rgba(24,205,186,0.85)` |
+| Bloom teal mid | `Colors.bloom.tealMid` | `rgba(24,205,186,0.35)` |
+| Bloom teal edge | `Colors.bloom.tealEdge` | `rgba(24,205,186,0)` |
 
 **Status chip color pairs** (background + border):
 
