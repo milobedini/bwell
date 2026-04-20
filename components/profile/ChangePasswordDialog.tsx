@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { View } from 'react-native';
 import { Button, Dialog, Portal, TextInput } from 'react-native-paper';
 import { ThemedText } from '@/components/ThemedText';
@@ -19,7 +19,11 @@ const ChangePasswordDialog = ({ visible, onDismiss }: ChangePasswordDialogProps)
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
 
-  useEffect(() => {
+  // Reset the form when the dialog opens. Adjusting during render is React's
+  // recommended alternative to a sync effect.
+  const [prevVisible, setPrevVisible] = useState(visible);
+  if (prevVisible !== visible) {
+    setPrevVisible(visible);
     if (visible) {
       setCurrentPassword('');
       setNewPassword('');
@@ -28,7 +32,7 @@ const ChangePasswordDialog = ({ visible, onDismiss }: ChangePasswordDialogProps)
       setShowCurrent(false);
       setShowNew(false);
     }
-  }, [visible]);
+  }
 
   const handleSave = useCallback(() => {
     if (!currentPassword) {

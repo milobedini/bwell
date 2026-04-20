@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSaveModuleAttempt, useSubmitAttempt } from '@/hooks/useAttempts';
@@ -70,17 +70,18 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
   );
 
   const [activeDayISO, setActiveDayISO] = useState(() => dateISO(days[0] || monday));
-  const [slots, setSlots] = useState<Record<SlotKey, SlotValue>>({});
 
-  // Seed + hydrate from diary.days
-  useEffect(() => {
+  const buildSeed = (
+    ws: Record<string, { key: SlotKey; value: SlotValue }[]>,
+    days: DiaryDetail['days']
+  ): Record<SlotKey, SlotValue> => {
     const seed: Record<SlotKey, SlotValue> = {};
-    for (const daySlots of Object.values(weekSlots)) {
+    for (const daySlots of Object.values(ws)) {
       for (const row of daySlots) {
         seed[row.key] = row.value;
       }
     }
-    for (const day of diary.days ?? []) {
+    for (const day of days ?? []) {
       for (const e of day.entries) {
         const at = new Date(e.at);
         const iso = dateISO(at);
@@ -97,8 +98,26 @@ export const useDiaryState = ({ attempt, mode }: UseDiaryStateParams) => {
         };
       }
     }
-    setSlots(seed);
-  }, [attempt._id, weekSlots, diary.days]);
+    return seed;
+  };
+
+  const [slots, setSlots] = useState<Record<SlotKey, SlotValue>>(() => buildSeed(weekSlots, diary.days));
+
+  // Re-seed when the attempt, week, or server data changes. Adjusting during
+  // render is React's recommended alternative to a sync effect.
+  const [prevSeedDeps, setPrevSeedDeps] = useState({
+    attemptId: attempt._id,
+    weekSlots,
+    days: diary.days
+  });
+  if (
+    prevSeedDeps.attemptId !== attempt._id ||
+    prevSeedDeps.weekSlots !== weekSlots ||
+    prevSeedDeps.days !== diary.days
+  ) {
+    setPrevSeedDeps({ attemptId: attempt._id, weekSlots, days: diary.days });
+    setSlots(buildSeed(weekSlots, diary.days));
+  }
 
   const allAnswered = useMemo(() => Object.values(slots).every((v) => v.activity.trim().length > 0), [slots]);
 

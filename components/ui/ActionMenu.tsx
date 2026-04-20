@@ -1,4 +1,4 @@
-import { type ComponentProps, useCallback, useEffect, useState } from 'react';
+import { type ComponentProps, useCallback, useState } from 'react';
 import { Modal, Pressable, View } from 'react-native';
 import { AnimatePresence, MotiView } from 'moti';
 import { ThemedText } from '@/components/ThemedText';
@@ -28,10 +28,13 @@ type ActionMenuProps = {
 const ActionMenu = ({ visible, onDismiss, title, subtitle, actions }: ActionMenuProps) => {
   const [pendingAction, setPendingAction] = useState<ActionMenuItem | null>(null);
 
-  // Reset pending action when menu closes
-  useEffect(() => {
+  // Reset pending action when the menu closes. Adjusting during render is
+  // React's recommended alternative to a sync effect.
+  const [prevVisible, setPrevVisible] = useState(visible);
+  if (prevVisible !== visible) {
+    setPrevVisible(visible);
     if (!visible) setPendingAction(null);
-  }, [visible]);
+  }
 
   const handleAction = useCallback(
     (onPress: () => void) => {
