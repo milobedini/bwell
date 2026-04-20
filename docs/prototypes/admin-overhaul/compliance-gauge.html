@@ -1,0 +1,2276 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>bwell · Admin · Compliance Gauge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        /* Core palette */
+        --sway-dark: #0c1527;
+        --sway-lightGrey: #e0e9f3;
+        --sway-darkGrey: #a6adbb;
+        --sway-bright: #18cdba;
+        --sway-buttonBg: rgb(43, 59, 91);
+
+        /* Status */
+        --error: #ff6d5e;
+        --success: #76ab70;
+        --warning: #ffb300;
+        --info: #ffd15d;
+
+        /* Card surfaces */
+        --card: #262e42;
+        --card-alt: #334368;
+        --card-deep: #0b1a2a;
+
+        /* Chips */
+        --chip-pill: #1e2a45;
+        --chip-pill-pressed: #253352;
+
+        /* Tints */
+        --tint-teal: rgba(24, 205, 186, 0.15);
+        --tint-teal-border: rgba(24, 205, 186, 0.3);
+        --tint-error: rgba(255, 109, 94, 0.15);
+        --tint-error-border: rgba(255, 109, 94, 0.3);
+        --tint-info: rgba(255, 209, 93, 0.15);
+        --tint-info-border: rgba(255, 209, 93, 0.3);
+        --tint-neutral: rgba(166, 173, 187, 0.12);
+        --tint-success: rgba(118, 171, 112, 0.15);
+        --tint-success-border: rgba(118, 171, 112, 0.35);
+        --tint-warning: rgba(255, 179, 0, 0.15);
+        --tint-warning-border: rgba(255, 179, 0, 0.35);
+
+        /* Other */
+        --therapist-purple: #7c3aed;
+        --overlay-medium: rgba(0, 0, 0, 0.5);
+        --divider: rgba(166, 173, 187, 0.1);
+
+        --phone-w: 375px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #05080f;
+        color: var(--sway-lightGrey);
+        font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      main {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 48px 32px 120px;
+      }
+
+      /* ============ Deck chrome ============ */
+
+      .deck-header {
+        padding: 32px 0 40px;
+        border-bottom: 1px solid var(--divider);
+        margin-bottom: 48px;
+      }
+      .deck-eyebrow {
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--sway-darkGrey);
+        margin: 0 0 12px;
+      }
+      .deck-title {
+        font-family: 'Lato', sans-serif;
+        font-weight: 900;
+        font-size: 44px;
+        line-height: 1.1;
+        margin: 0 0 12px;
+      }
+      .deck-angle {
+        font-size: 18px;
+        color: var(--sway-lightGrey);
+        max-width: 780px;
+        margin: 0 0 16px;
+      }
+      .deck-philosophy {
+        font-size: 15px;
+        color: var(--sway-darkGrey);
+        max-width: 820px;
+        margin: 0;
+      }
+      .deck-formula {
+        margin: 20px 0 0;
+        padding: 16px 20px;
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-left: 3px solid var(--sway-bright);
+        border-radius: 10px;
+        font-size: 14px;
+        color: var(--sway-lightGrey);
+        max-width: 820px;
+      }
+      .deck-formula code {
+        font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+        color: var(--sway-bright);
+        font-size: 13px;
+      }
+
+      section.deck-section {
+        margin-top: 72px;
+      }
+      h2.deck-section-title {
+        font-weight: 900;
+        font-size: 26px;
+        margin: 0 0 8px;
+      }
+      p.deck-section-lede {
+        color: var(--sway-darkGrey);
+        font-size: 15px;
+        margin: 0 0 28px;
+        max-width: 780px;
+      }
+
+      /* ============ Phone panel frame ============ */
+
+      .panel-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 32px;
+      }
+
+      .panel {
+        flex: 0 0 var(--phone-w);
+      }
+      .panel-frame {
+        width: var(--phone-w);
+        background: var(--sway-dark);
+        border: 1px solid var(--divider);
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 0 24px 40px rgba(0, 0, 0, 0.4);
+        position: relative;
+      }
+      .panel-statusbar {
+        height: 28px;
+        background: var(--sway-dark);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 18px;
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+      }
+      .panel-inner {
+        padding: 16px 16px 24px;
+        min-height: 560px;
+      }
+      .panel-caption {
+        margin-top: 16px;
+        font-size: 13px;
+        color: var(--sway-darkGrey);
+        line-height: 1.55;
+      }
+      .panel-caption strong {
+        color: var(--sway-lightGrey);
+        display: block;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .panel-callouts {
+        margin-top: 10px;
+        padding-left: 0;
+        list-style: none;
+      }
+      .panel-callouts li {
+        position: relative;
+        padding: 4px 0 4px 28px;
+        font-size: 12.5px;
+        color: var(--sway-lightGrey);
+      }
+      .panel-callouts li::before {
+        content: counter(cal);
+        counter-increment: cal;
+        position: absolute;
+        left: 0;
+        top: 5px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--tint-teal);
+        color: var(--sway-bright);
+        border: 1px solid var(--tint-teal-border);
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .panel-callouts {
+        counter-reset: cal;
+      }
+
+      /* ============ Admin header (inside phone) ============ */
+
+      .a-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4px 2px 18px;
+      }
+      .a-topbar-title {
+        font-weight: 900;
+        font-size: 22px;
+      }
+      .a-topbar-sub {
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+        margin-top: 2px;
+      }
+      .a-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--chip-pill);
+        border: 1px solid var(--divider);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: var(--sway-lightGrey);
+        font-size: 14px;
+      }
+
+      /* ============ Gauge ============ */
+
+      .gauge-card {
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 20px;
+        padding: 20px 18px 22px;
+        position: relative;
+      }
+      .gauge-card.amber {
+        border-color: var(--tint-warning-border);
+      }
+      .gauge-card.red {
+        border-color: var(--tint-error-border);
+      }
+      .gauge-card.green {
+        border-color: var(--tint-success-border);
+      }
+      .gauge-card.unknown {
+        border-color: var(--divider);
+      }
+
+      .gauge-ring {
+        width: 168px;
+        height: 168px;
+        margin: 6px auto 10px;
+        position: relative;
+      }
+      .gauge-ring svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+      .gauge-ring .track {
+        fill: none;
+        stroke: var(--chip-pill);
+        stroke-width: 10;
+      }
+      .gauge-ring .fill {
+        fill: none;
+        stroke-width: 10;
+        stroke-linecap: round;
+        transition: stroke-dashoffset 900ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .gauge-ring .fill.green {
+        stroke: var(--success);
+      }
+      .gauge-ring .fill.amber {
+        stroke: var(--warning);
+      }
+      .gauge-ring .fill.red {
+        stroke: var(--error);
+      }
+      .gauge-ring .fill.unknown {
+        stroke: var(--sway-darkGrey);
+        stroke-dasharray: 8 8;
+      }
+      .gauge-center {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+      }
+      .gauge-icon {
+        font-size: 22px;
+        line-height: 1;
+      }
+      .gauge-count {
+        font-size: 44px;
+        font-weight: 900;
+        line-height: 1;
+      }
+      .gauge-count.green {
+        color: var(--success);
+      }
+      .gauge-count.amber {
+        color: var(--warning);
+      }
+      .gauge-count.red {
+        color: var(--error);
+      }
+      .gauge-count.unknown {
+        color: var(--sway-darkGrey);
+      }
+      .gauge-unit {
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .gauge-headline {
+        text-align: center;
+        font-size: 18px;
+        font-weight: 900;
+        margin: 6px 0 2px;
+      }
+      .gauge-sub {
+        text-align: center;
+        font-size: 12.5px;
+        color: var(--sway-darkGrey);
+        margin: 0;
+      }
+
+      /* ============ Remediation list ============ */
+
+      .rem-list {
+        margin-top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .rem-item {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 12px 14px;
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 14px;
+        position: relative;
+      }
+      .rem-item.amber {
+        background: var(--tint-warning);
+        border-color: var(--tint-warning-border);
+      }
+      .rem-item.red {
+        background: var(--tint-error);
+        border-color: var(--tint-error-border);
+      }
+      .rem-item.success {
+        background: var(--tint-success);
+        border-color: var(--tint-success-border);
+      }
+      .rem-item.info {
+        background: var(--card);
+        border-color: var(--divider);
+      }
+
+      .rem-glyph {
+        flex: 0 0 28px;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: 900;
+      }
+      .rem-glyph.amber {
+        background: rgba(255, 179, 0, 0.25);
+        color: var(--warning);
+        border: 1px solid var(--tint-warning-border);
+      }
+      .rem-glyph.red {
+        background: rgba(255, 109, 94, 0.25);
+        color: var(--error);
+        border: 1px solid var(--tint-error-border);
+      }
+      .rem-glyph.success {
+        background: rgba(118, 171, 112, 0.25);
+        color: var(--success);
+        border: 1px solid var(--tint-success-border);
+      }
+      .rem-glyph.info {
+        background: var(--chip-pill);
+        color: var(--sway-darkGrey);
+        border: 1px solid var(--divider);
+      }
+
+      .rem-body {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .rem-title-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .rem-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--sway-lightGrey);
+        line-height: 1.2;
+      }
+      .rem-value {
+        font-size: 13px;
+        font-weight: 900;
+        color: var(--sway-lightGrey);
+        font-variant-numeric: tabular-nums;
+      }
+      .rem-desc {
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+        margin: 4px 0 8px;
+        line-height: 1.45;
+      }
+      .rem-cta {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--sway-bright);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .rem-cta.red {
+        color: var(--error);
+      }
+      .rem-cta.amber {
+        color: var(--warning);
+      }
+      .rem-cta.muted {
+        color: var(--sway-darkGrey);
+      }
+
+      /* ============ Secondary admin tile row ============ */
+
+      .sec-row {
+        margin-top: 16px;
+        display: flex;
+        gap: 10px;
+      }
+      .sec-tile {
+        flex: 1 1 0;
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 12px;
+        padding: 10px 10px 12px;
+      }
+      .sec-tile-label {
+        font-size: 10.5px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--sway-darkGrey);
+      }
+      .sec-tile-value {
+        font-size: 22px;
+        font-weight: 900;
+        margin-top: 2px;
+        color: var(--sway-lightGrey);
+      }
+      .sec-tile-foot {
+        margin-top: 2px;
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+      }
+
+      /* ============ Pills, meta ============ */
+
+      .pill {
+        display: inline-flex;
+        gap: 4px;
+        align-items: center;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        background: var(--chip-pill);
+        color: var(--sway-darkGrey);
+        border: 1px solid var(--divider);
+      }
+      .pill.dev {
+        background: var(--tint-info);
+        color: var(--info);
+        border-color: var(--tint-info-border);
+      }
+      .pill.live {
+        background: var(--tint-success);
+        color: var(--success);
+        border-color: var(--tint-success-border);
+      }
+      .pill.stale {
+        background: var(--tint-neutral);
+        color: var(--sway-darkGrey);
+      }
+
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+        margin-bottom: 14px;
+      }
+      .breadcrumb .chevron {
+        color: var(--sway-darkGrey);
+        opacity: 0.6;
+      }
+      .breadcrumb .crumb-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--sway-bright);
+        font-weight: 700;
+      }
+
+      /* ============ Drill-down: verification queue ============ */
+
+      .drill-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 4px;
+        margin-bottom: 14px;
+      }
+      .drill-meta .pill {
+        background: var(--tint-warning);
+        color: var(--warning);
+        border-color: var(--tint-warning-border);
+      }
+
+      .queue-header {
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--sway-darkGrey);
+        margin: 14px 0 8px;
+      }
+      .queue-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 12px;
+        margin-bottom: 8px;
+      }
+      .queue-row.oldest {
+        border-color: var(--tint-error-border);
+        background: var(--tint-error);
+      }
+      .queue-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--chip-pill);
+        border: 1px solid var(--divider);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 13px;
+      }
+      .queue-main {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .queue-name {
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .queue-sub {
+        font-size: 11.5px;
+        color: var(--sway-darkGrey);
+        margin-top: 1px;
+      }
+      .queue-age {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--error);
+      }
+      .queue-age.warn {
+        color: var(--warning);
+      }
+      .queue-age.neutral {
+        color: var(--sway-darkGrey);
+      }
+      .queue-cta {
+        background: var(--sway-bright);
+        color: var(--sway-dark);
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-size: 12px;
+        font-weight: 900;
+        border: none;
+        letter-spacing: 0.04em;
+      }
+
+      /* ============ Verify sheet (inline bottom sheet mock) ============ */
+
+      .sheet {
+        margin-top: 14px;
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 18px;
+        padding: 16px 16px 18px;
+      }
+      .sheet-handle {
+        width: 42px;
+        height: 4px;
+        background: var(--chip-pill-pressed);
+        border-radius: 4px;
+        margin: 0 auto 14px;
+      }
+      .sheet-title {
+        font-weight: 900;
+        font-size: 17px;
+        margin-bottom: 6px;
+      }
+      .sheet-desc {
+        font-size: 12.5px;
+        color: var(--sway-darkGrey);
+        margin: 0 0 14px;
+      }
+      .sheet-options {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .sheet-opt {
+        flex: 1;
+        padding: 10px;
+        border-radius: 12px;
+        border: 1px solid var(--divider);
+        background: var(--chip-pill);
+        text-align: center;
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--sway-lightGrey);
+      }
+      .sheet-opt.active {
+        border-color: var(--tint-teal-border);
+        background: var(--tint-teal);
+        color: var(--sway-bright);
+      }
+      .sheet-opt-sub {
+        font-size: 10.5px;
+        color: var(--sway-darkGrey);
+        margin-top: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .sheet-opt.active .sheet-opt-sub {
+        color: var(--sway-bright);
+      }
+      .sheet-confirm {
+        width: 100%;
+        padding: 14px;
+        background: var(--sway-bright);
+        color: var(--sway-dark);
+        font-weight: 900;
+        font-size: 15px;
+        border: none;
+        border-radius: 14px;
+        letter-spacing: 0.04em;
+      }
+
+      /* ============ Thumbnail state gallery ============ */
+
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 24px;
+      }
+      .thumb-frame {
+        background: var(--sway-dark);
+        border: 1px solid var(--divider);
+        border-radius: 20px;
+        padding: 14px;
+        min-height: 360px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      .thumb-label-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .thumb-state-pill {
+        font-size: 11px;
+        padding: 3px 9px;
+        border-radius: 999px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .thumb-state-pill.green {
+        background: var(--tint-success);
+        color: var(--success);
+        border: 1px solid var(--tint-success-border);
+      }
+      .thumb-state-pill.amber {
+        background: var(--tint-warning);
+        color: var(--warning);
+        border: 1px solid var(--tint-warning-border);
+      }
+      .thumb-state-pill.red {
+        background: var(--tint-error);
+        color: var(--error);
+        border: 1px solid var(--tint-error-border);
+      }
+      .thumb-state-pill.neutral {
+        background: var(--chip-pill);
+        color: var(--sway-darkGrey);
+        border: 1px solid var(--divider);
+      }
+      .thumb-caption {
+        margin-top: 10px;
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+        line-height: 1.5;
+      }
+
+      /* Mini gauge for gallery */
+      .mini-gauge {
+        width: 110px;
+        height: 110px;
+        margin: 6px auto 6px;
+        position: relative;
+      }
+      .mini-gauge svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+      .mini-gauge .track {
+        fill: none;
+        stroke: var(--chip-pill);
+        stroke-width: 10;
+      }
+      .mini-gauge .fill {
+        fill: none;
+        stroke-width: 10;
+        stroke-linecap: round;
+      }
+      .mini-gauge-center {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .mini-gauge-num {
+        font-size: 30px;
+        font-weight: 900;
+        line-height: 1;
+      }
+      .mini-gauge-sub {
+        font-size: 9.5px;
+        color: var(--sway-darkGrey);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-top: 3px;
+      }
+
+      .mini-rem {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .mini-rem-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: var(--card);
+        border: 1px solid var(--divider);
+        font-size: 11.5px;
+      }
+      .mini-rem-row.amber {
+        background: var(--tint-warning);
+        border-color: var(--tint-warning-border);
+      }
+      .mini-rem-row.red {
+        background: var(--tint-error);
+        border-color: var(--tint-error-border);
+      }
+      .mini-rem-row.success {
+        background: var(--tint-success);
+        border-color: var(--tint-success-border);
+      }
+      .mini-rem-glyph {
+        width: 18px;
+        height: 18px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 900;
+        flex: 0 0 18px;
+      }
+      .mini-rem-glyph.amber {
+        background: rgba(255, 179, 0, 0.25);
+        color: var(--warning);
+      }
+      .mini-rem-glyph.red {
+        background: rgba(255, 109, 94, 0.25);
+        color: var(--error);
+      }
+      .mini-rem-glyph.success {
+        background: rgba(118, 171, 112, 0.25);
+        color: var(--success);
+      }
+      .mini-rem-glyph.neutral {
+        background: var(--chip-pill);
+        color: var(--sway-darkGrey);
+      }
+      .mini-rem-label {
+        color: var(--sway-lightGrey);
+        font-weight: 700;
+      }
+      .mini-rem-meta {
+        margin-left: auto;
+        color: var(--sway-darkGrey);
+        font-size: 11px;
+      }
+
+      /* Loading skeleton */
+      .skeleton {
+        background: linear-gradient(
+          90deg,
+          var(--chip-pill) 0%,
+          var(--chip-pill-pressed) 50%,
+          var(--chip-pill) 100%
+        );
+        background-size: 200% 100%;
+        border-radius: 8px;
+        animation: shimmer 1.6s linear infinite;
+      }
+      @keyframes shimmer {
+        from {
+          background-position: 200% 0;
+        }
+        to {
+          background-position: -200% 0;
+        }
+      }
+      .skel-ring {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        border: 10px solid var(--chip-pill);
+        border-top-color: var(--chip-pill-pressed);
+        margin: 6px auto;
+        animation: spin 1.6s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Empty/unknown gauge (day 1) */
+      .gauge-unknown-hatch {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background-image: repeating-linear-gradient(
+          45deg,
+          transparent 0 4px,
+          var(--chip-pill) 4px 6px
+        );
+        opacity: 0.4;
+      }
+
+      /* ============ Animation demo strip ============ */
+
+      .anim-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+      }
+      .anim-card {
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 16px;
+        padding: 18px;
+      }
+      .anim-title {
+        font-weight: 900;
+        font-size: 15px;
+        margin-bottom: 6px;
+      }
+      .anim-timing {
+        font-size: 11px;
+        color: var(--sway-bright);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+      .anim-desc {
+        font-size: 13px;
+        color: var(--sway-darkGrey);
+        margin: 0 0 14px;
+      }
+      .anim-stage {
+        background: var(--sway-dark);
+        border: 1px dashed var(--divider);
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 140px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* sweep demo */
+      .sweep-ring {
+        width: 110px;
+        height: 110px;
+        position: relative;
+      }
+      .sweep-ring svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+      .sweep-ring .track {
+        fill: none;
+        stroke: var(--chip-pill);
+        stroke-width: 10;
+      }
+      .sweep-ring .fill {
+        fill: none;
+        stroke: var(--warning);
+        stroke-width: 10;
+        stroke-linecap: round;
+        stroke-dasharray: 314;
+        animation: sweep 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+      }
+      @keyframes sweep {
+        0% {
+          stroke-dashoffset: 314;
+        }
+        40% {
+          stroke-dashoffset: 157;
+        }
+        100% {
+          stroke-dashoffset: 157;
+        }
+      }
+
+      /* row slide demo */
+      .slide-stack {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .slide-row {
+        padding: 10px 12px;
+        background: var(--tint-warning);
+        border: 1px solid var(--tint-warning-border);
+        border-radius: 10px;
+        color: var(--sway-lightGrey);
+        font-size: 12.5px;
+        font-weight: 700;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        animation: slideOut 3.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+      }
+      .slide-row.green {
+        background: var(--tint-success);
+        border-color: var(--tint-success-border);
+        animation-delay: 0s;
+      }
+      @keyframes slideOut {
+        0% {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        20%,
+        60% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        80% {
+          opacity: 1;
+          transform: translateY(0);
+          background: var(--tint-success);
+          border-color: var(--tint-success-border);
+        }
+        95% {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+      }
+
+      /* pulse demo */
+      .pulse-chip {
+        padding: 10px 16px;
+        border-radius: 999px;
+        background: var(--tint-error);
+        border: 1px solid var(--tint-error-border);
+        color: var(--error);
+        font-weight: 900;
+        font-size: 13px;
+        letter-spacing: 0.05em;
+        animation: pulse 2.4s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(255, 109, 94, 0.35);
+        }
+        50% {
+          box-shadow: 0 0 0 14px rgba(255, 109, 94, 0);
+        }
+      }
+
+      /* count up demo */
+      .countup {
+        font-size: 46px;
+        font-weight: 900;
+        color: var(--warning);
+        animation: countTick 3.2s steps(4, end) infinite;
+      }
+      @keyframes countTick {
+        0% {
+          content: '0';
+        }
+      }
+      .countup::before {
+        content: '0';
+      }
+      .countup-num {
+        position: relative;
+        height: 52px;
+        width: 40px;
+        overflow: hidden;
+        display: inline-block;
+        vertical-align: middle;
+      }
+      .countup-col {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        animation: countRoll 3.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+      }
+      .countup-col span {
+        height: 52px;
+        font-size: 46px;
+        font-weight: 900;
+        color: var(--warning);
+        line-height: 52px;
+        text-align: center;
+      }
+      @keyframes countRoll {
+        0% {
+          transform: translateY(0);
+        }
+        30% {
+          transform: translateY(-52px);
+        }
+        50% {
+          transform: translateY(-104px);
+        }
+        70% {
+          transform: translateY(-156px);
+        }
+        100% {
+          transform: translateY(-156px);
+        }
+      }
+
+      /* ============ Components + rationale ============ */
+
+      .comp-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+      }
+      .comp-col h3 {
+        font-size: 14px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--sway-bright);
+        margin: 0 0 12px;
+      }
+      .comp-col ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .comp-col li {
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 13px;
+        color: var(--sway-lightGrey);
+      }
+      .comp-col li .comp-tag {
+        font-family: 'SF Mono', 'Menlo', monospace;
+        font-weight: 700;
+        color: var(--sway-bright);
+      }
+      .comp-col li .comp-desc {
+        display: block;
+        color: var(--sway-darkGrey);
+        font-size: 12px;
+        margin-top: 2px;
+      }
+
+      .rationale {
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-left: 3px solid var(--sway-bright);
+        border-radius: 12px;
+        padding: 24px 28px;
+      }
+      .rationale ul {
+        padding-left: 20px;
+        margin: 0;
+      }
+      .rationale li {
+        margin-bottom: 14px;
+        font-size: 14.5px;
+        line-height: 1.6;
+      }
+      .rationale li:last-child {
+        margin-bottom: 0;
+      }
+      .rationale strong {
+        color: var(--sway-lightGrey);
+      }
+
+      .bereq {
+        margin-top: 24px;
+        padding: 16px 20px;
+        background: var(--tint-info);
+        border: 1px solid var(--tint-info-border);
+        border-radius: 12px;
+        color: var(--sway-lightGrey);
+      }
+      .bereq strong {
+        color: var(--info);
+      }
+
+      /* reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+        }
+        .skel-ring {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <!-- ============ Hero ============ -->
+      <header class="deck-header">
+        <p class="deck-eyebrow">bwell · Admin overhaul · Prototype</p>
+        <h1 class="deck-title">Compliance gauge</h1>
+        <p class="deck-angle">
+          <strong>Admin as remediation, not reporting.</strong> A single composite score at the top,
+          a short list of contributing factors underneath, nothing else above the fold. Borrows
+          posture from Vanta, Linear's Projects health, Datadog's SLO banner: binary at the top,
+          nuanced only when drilled-in.
+        </p>
+        <p class="deck-philosophy">
+          The routine admin check-in should resolve in under ten seconds: "is anything broken? if
+          so, what, and what's the fix?" Every surface area answers <em>"is this OK?"</em> and
+          renders a concrete remediation path.
+        </p>
+        <div class="deck-formula">
+          <strong>Composite score — derived from <code>/api/admin/overview</code>:</strong>
+          the gauge counts four contributors, each tripped by one threshold from the existing
+          response.
+          <br />&nbsp;
+          <br />
+          <code>attention = verification.tripped + stalled.tripped + orphaned.tripped + rollup.tripped</code>
+          <br />
+          <code>verification.tripped</code> = oldest queued therapist's <code>createdAt</code> is
+          older than 7 days (from <code>verificationQueue.oldest[0].createdAt</code>)
+          <br />
+          <code>stalled.tripped</code> = <code>operational.work.stalledAttempts7d &gt; 5</code>
+          <br />
+          <code>orphaned.tripped</code> = <code>operational.work.orphanedAssignments &gt; 0</code>
+          <br />
+          <code>rollup.tripped</code> = <code>rollupAsOf</code> is null or older than 48h
+          <br />&nbsp;
+          <br />
+          <strong>Gauge band:</strong>
+          0 → green ("All clear"); 1–2 → amber ("Admin attention needed"); 3–4 → red
+          ("Escalation — review now"). Day-one uses a fifth "unknown" state when
+          <code>rollupAsOf</code> is null <em>and</em> no other item has tripped.
+        </div>
+      </header>
+
+      <!-- ============ Flow map ============ -->
+      <section class="deck-section">
+        <h2 class="deck-section-title">Flow map</h2>
+        <p class="deck-section-lede">
+          Four mobile panels. The admin lands on the gauge, reads the remediation list, and tapping
+          any item drills through to a focused resolve flow. The app closes the loop — the gauge
+          updates, the row disappears.
+        </p>
+
+        <div class="panel-row">
+          <!-- Panel 1: landing, amber -->
+          <div class="panel">
+            <div class="panel-frame">
+              <div class="panel-statusbar">
+                <span>9:41</span>
+                <span>bwell · admin</span>
+                <span>100%</span>
+              </div>
+              <div class="panel-inner">
+                <div class="a-topbar">
+                  <div>
+                    <div class="a-topbar-title">Admin</div>
+                    <div class="a-topbar-sub">admin@bwell.test</div>
+                  </div>
+                  <div class="a-avatar">MB</div>
+                </div>
+
+                <!-- Gauge card (amber) -->
+                <div class="gauge-card amber">
+                  <div class="gauge-ring" aria-label="3 items need attention">
+                    <svg viewBox="0 0 120 120" role="img">
+                      <circle class="track" cx="60" cy="60" r="50" />
+                      <!-- amber, 3 of 4 -->
+                      <circle
+                        class="fill amber"
+                        cx="60"
+                        cy="60"
+                        r="50"
+                        stroke-dasharray="314"
+                        stroke-dashoffset="78"
+                      />
+                    </svg>
+                    <div class="gauge-center">
+                      <span class="gauge-icon" aria-hidden="true">▲</span>
+                      <span class="gauge-count amber">3</span>
+                      <span class="gauge-unit">of 4 checks</span>
+                    </div>
+                  </div>
+                  <p class="gauge-headline">Admin attention needed</p>
+                  <p class="gauge-sub">Three items tripped · rolled-up 14 minutes ago</p>
+                </div>
+
+                <!-- Remediation list -->
+                <div class="rem-list">
+                  <div class="rem-item amber">
+                    <div class="rem-glyph amber" aria-hidden="true">▲</div>
+                    <div class="rem-body">
+                      <div class="rem-title-row">
+                        <span class="rem-title">Verification backlog</span>
+                        <span class="rem-value">5 waiting</span>
+                      </div>
+                      <p class="rem-desc">Oldest therapist has waited 9 days to be verified.</p>
+                      <span class="rem-cta amber">Resolve verify queue →</span>
+                    </div>
+                  </div>
+                  <div class="rem-item amber">
+                    <div class="rem-glyph amber" aria-hidden="true">◆</div>
+                    <div class="rem-body">
+                      <div class="rem-title-row">
+                        <span class="rem-title">Stalled patient work</span>
+                        <span class="rem-value">7 attempts</span>
+                      </div>
+                      <p class="rem-desc">
+                        Attempts started but not touched for 7+ days. Flag to the assigned
+                        therapist.
+                      </p>
+                      <span class="rem-cta amber">Notify therapists →</span>
+                    </div>
+                  </div>
+                  <div class="rem-item amber">
+                    <div class="rem-glyph amber" aria-hidden="true">✕</div>
+                    <div class="rem-body">
+                      <div class="rem-title-row">
+                        <span class="rem-title">Orphaned assignments</span>
+                        <span class="rem-value">1 patient</span>
+                      </div>
+                      <p class="rem-desc">
+                        An assignment is held by a therapist who is no longer verified. Reassign.
+                      </p>
+                      <span class="rem-cta amber">Reassign →</span>
+                    </div>
+                  </div>
+                  <div class="rem-item success">
+                    <div class="rem-glyph success" aria-hidden="true">✓</div>
+                    <div class="rem-body">
+                      <div class="rem-title-row">
+                        <span class="rem-title">Rollup freshness</span>
+                        <span class="rem-value">14m ago</span>
+                      </div>
+                      <p class="rem-desc">Nightly aggregates are current.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- secondary row -->
+                <div class="sec-row">
+                  <div class="sec-tile">
+                    <div class="sec-tile-label">30-day</div>
+                    <div class="sec-tile-value">124</div>
+                    <div class="sec-tile-foot">active users</div>
+                  </div>
+                  <div class="sec-tile">
+                    <div class="sec-tile-label">Audit</div>
+                    <div class="sec-tile-value">38</div>
+                    <div class="sec-tile-foot">events · 7d</div>
+                  </div>
+                  <div class="sec-tile">
+                    <div class="sec-tile-label">Programmes</div>
+                    <div class="sec-tile-value">3</div>
+                    <div class="sec-tile-foot">all enrolled</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel-caption">
+              <strong>1 · Landing — amber (default busy)</strong>
+              The admin sees one number, one sentence, one remediation list. Numbers below
+              (activity, audit, programmes) are quiet context — no deltas, no charts.
+              <ol class="panel-callouts">
+                <li>
+                  Gauge is <em>count of tripped checks</em>, not a percentage — a percentage would
+                  invite "what does 76% mean?" debates. A whole small number does not.
+                </li>
+                <li>
+                  Each remediation row pairs an icon glyph with colour (▲ amber, ✕ red, ✓ green) so
+                  the list is legible in greyscale and colour-blind settings.
+                </li>
+                <li>
+                  "14m ago" makes rollup freshness explicit — one of the four gauge contributors.
+                </li>
+                <li>Resolved rows collapse to a compact green tick, not hidden — builds trust.</li>
+              </ol>
+            </div>
+          </div>
+
+          <!-- Panel 2: drilldown verification queue -->
+          <div class="panel">
+            <div class="panel-frame">
+              <div class="panel-statusbar">
+                <span>9:41</span>
+                <span>bwell · admin</span>
+                <span>100%</span>
+              </div>
+              <div class="panel-inner">
+                <div class="breadcrumb">
+                  <span class="crumb-back">‹ Back to Admin</span>
+                  <span class="chevron">·</span>
+                  <span>Verification</span>
+                </div>
+                <div class="a-topbar">
+                  <div>
+                    <div class="a-topbar-title" style="font-size: 20px">Verification backlog</div>
+                    <div class="a-topbar-sub">5 therapists · oldest 9 days</div>
+                  </div>
+                </div>
+                <div class="drill-meta">
+                  <span class="pill">Trips amber</span>
+                  <span class="pill stale">Threshold · 7 days</span>
+                </div>
+
+                <div class="queue-header">Oldest first</div>
+
+                <div class="queue-row oldest">
+                  <div class="queue-avatar">DP</div>
+                  <div class="queue-main">
+                    <div class="queue-name">Dr Priya Sharma</div>
+                    <div class="queue-sub">priya.sharma@nhs.example · signed up 11 Apr</div>
+                  </div>
+                  <div>
+                    <div class="queue-age">9d</div>
+                  </div>
+                </div>
+                <div class="queue-row">
+                  <div class="queue-avatar">LT</div>
+                  <div class="queue-main">
+                    <div class="queue-name">Louis Tanaka</div>
+                    <div class="queue-sub">l.tanaka@bwell.test · signed up 12 Apr</div>
+                  </div>
+                  <div>
+                    <div class="queue-age warn">8d</div>
+                  </div>
+                </div>
+                <div class="queue-row">
+                  <div class="queue-avatar">NK</div>
+                  <div class="queue-main">
+                    <div class="queue-name">Nadia Khalil</div>
+                    <div class="queue-sub">nadia@swayclinic.test · signed up 15 Apr</div>
+                  </div>
+                  <div>
+                    <div class="queue-age warn">5d</div>
+                  </div>
+                </div>
+                <div class="queue-row">
+                  <div class="queue-avatar">RM</div>
+                  <div class="queue-main">
+                    <div class="queue-name">Rowan Meyer</div>
+                    <div class="queue-sub">rowan.m@bwell.test · signed up 16 Apr</div>
+                  </div>
+                  <div>
+                    <div class="queue-age neutral">4d</div>
+                  </div>
+                </div>
+                <div class="queue-row">
+                  <div class="queue-avatar">SE</div>
+                  <div class="queue-main">
+                    <div class="queue-name">Sofia Eriksson</div>
+                    <div class="queue-sub">s.eriksson@bwell.test · signed up 18 Apr</div>
+                  </div>
+                  <div>
+                    <div class="queue-age neutral">2d</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel-caption">
+              <strong>2 · Drill-down — which one trips the check?</strong>
+              Tapping "Verification backlog" enters a focused list. Only the oldest (9d) is tinted
+              red; the others are ranked but not alarming. This keeps the hierarchy honest:
+              <em>one</em> item is past threshold, not all five.
+              <ol class="panel-callouts">
+                <li>Header chip restates the threshold — "Trips amber · 7 days" — no guessing.</li>
+                <li>Age pills use colour + text. The 9d row is the one moving the gauge.</li>
+                <li>
+                  Tapping any row opens the verify half-sheet (panel 3) — admin never leaves the
+                  list.
+                </li>
+              </ol>
+            </div>
+          </div>
+
+          <!-- Panel 3: verify sheet -->
+          <div class="panel">
+            <div class="panel-frame">
+              <div class="panel-statusbar">
+                <span>9:41</span>
+                <span>bwell · admin</span>
+                <span>100%</span>
+              </div>
+              <div class="panel-inner" style="position: relative">
+                <!-- dimmed queue behind -->
+                <div style="opacity: 0.35">
+                  <div class="breadcrumb">
+                    <span class="crumb-back">‹ Back</span>
+                    <span class="chevron">·</span>
+                    <span>Verification</span>
+                  </div>
+                  <div class="queue-row">
+                    <div class="queue-avatar">DP</div>
+                    <div class="queue-main">
+                      <div class="queue-name">Dr Priya Sharma</div>
+                      <div class="queue-sub">priya.sharma@nhs.example · 9 days</div>
+                    </div>
+                  </div>
+                  <div class="queue-row">
+                    <div class="queue-avatar">LT</div>
+                    <div class="queue-main">
+                      <div class="queue-name">Louis Tanaka</div>
+                      <div class="queue-sub">l.tanaka@bwell.test · 8 days</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- half-sheet -->
+                <div class="sheet" style="margin-top: 18px">
+                  <div class="sheet-handle"></div>
+                  <div class="sheet-title">Verify Dr Priya Sharma</div>
+                  <p class="sheet-desc">
+                    Pick the therapist's tier. CBT therapists get cognitive tools (thinking traps,
+                    thought challenging). PWP therapists use the behavioural subset.
+                  </p>
+
+                  <div class="sheet-options">
+                    <div class="sheet-opt active">
+                      CBT
+                      <div class="sheet-opt-sub">Full programme</div>
+                    </div>
+                    <div class="sheet-opt">
+                      PWP
+                      <div class="sheet-opt-sub">Behavioural</div>
+                    </div>
+                  </div>
+
+                  <button class="sheet-confirm">Verify therapist</button>
+                </div>
+
+                <p
+                  style="
+                    margin-top: 16px;
+                    text-align: center;
+                    font-size: 12px;
+                    color: var(--sway-darkGrey);
+                  "
+                >
+                  Approval updates the gauge in place — one fewer tripped check.
+                </p>
+              </div>
+            </div>
+            <div class="panel-caption">
+              <strong>3 · Act — tier-picker half-sheet</strong>
+              Half-sheet over the queue. Verify-with-tier in one gesture. On confirm, the row
+              animates out, the gauge drops by 1, and the remediation row collapses to green.
+              <ol class="panel-callouts">
+                <li>Tier pick is required at verify time — matches business rule §3.12.</li>
+                <li>
+                  Destructive path (reject) would sit in the sheet's action menu with confirmation.
+                </li>
+                <li>
+                  Sheet never blocks — admin can dismiss, verify another, and come back. Work
+                  persists in the queue.
+                </li>
+              </ol>
+            </div>
+          </div>
+
+          <!-- Panel 4: after resolve, green state -->
+          <div class="panel">
+            <div class="panel-frame">
+              <div class="panel-statusbar">
+                <span>9:42</span>
+                <span>bwell · admin</span>
+                <span>100%</span>
+              </div>
+              <div class="panel-inner">
+                <div class="a-topbar">
+                  <div>
+                    <div class="a-topbar-title">Admin</div>
+                    <div class="a-topbar-sub">admin@bwell.test</div>
+                  </div>
+                  <div class="a-avatar">MB</div>
+                </div>
+
+                <div class="gauge-card green">
+                  <div class="gauge-ring" aria-label="All clear">
+                    <svg viewBox="0 0 120 120" role="img">
+                      <circle class="track" cx="60" cy="60" r="50" />
+                      <circle
+                        class="fill green"
+                        cx="60"
+                        cy="60"
+                        r="50"
+                        stroke-dasharray="314"
+                        stroke-dashoffset="0"
+                      />
+                    </svg>
+                    <div class="gauge-center">
+                      <span class="gauge-icon" aria-hidden="true">✓</span>
+                      <span class="gauge-count green">0</span>
+                      <span class="gauge-unit">of 4 checks</span>
+                    </div>
+                  </div>
+                  <p class="gauge-headline">All clear</p>
+                  <p class="gauge-sub">No admin work outstanding · rolled-up just now</p>
+                </div>
+
+                <div class="rem-list">
+                  <div class="rem-item success">
+                    <div class="rem-glyph success" aria-hidden="true">✓</div>
+                    <div class="rem-body">
+                      <div class="rem-title-row">
+                        <span class="rem-title">Verification backlog</span>
+                        <span class="rem-value">0 waiting</span>
+                      </div>
+                      <p class="rem-desc">All therapists verified within 7 days.</p>
+                    </div>
+                  </div>
+                  <div class="rem-item success">
+                    <div class="rem-glyph success" aria-hidden="true">✓</div>
+                    <div class="rem-body">
+                      <div class="rem-title-row">
+                        <span class="rem-title">Stalled patient work</span>
+                        <span class="rem-value">2 attempts</span>
+                      </div>
+                      <p class="rem-desc">Below the 5-attempt threshold.</p>
+                    </div>
+                  </div>
+                  <div class="rem-item success">
+                    <div class="rem-glyph success" aria-hidden="true">✓</div>
+                    <div class="rem-body">
+                      <div class="rem-title-row">
+                        <span class="rem-title">Orphaned assignments</span>
+                        <span class="rem-value">0</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="rem-item success">
+                    <div class="rem-glyph success" aria-hidden="true">✓</div>
+                    <div class="rem-body">
+                      <div class="rem-title-row">
+                        <span class="rem-title">Rollup freshness</span>
+                        <span class="rem-value">just now</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sec-row">
+                  <div class="sec-tile">
+                    <div class="sec-tile-label">30-day</div>
+                    <div class="sec-tile-value">126</div>
+                    <div class="sec-tile-foot">active users</div>
+                  </div>
+                  <div class="sec-tile">
+                    <div class="sec-tile-label">Audit</div>
+                    <div class="sec-tile-value">41</div>
+                    <div class="sec-tile-foot">events · 7d</div>
+                  </div>
+                  <div class="sec-tile">
+                    <div class="sec-tile-label">Programmes</div>
+                    <div class="sec-tile-value">3</div>
+                    <div class="sec-tile-foot">all enrolled</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel-caption">
+              <strong>4 · Clean — after remediation</strong>
+              The same layout, no new chrome. Resolved items stay visible as green ticks so the
+              admin trusts the gauge isn't hiding things. Context numbers (audit events, active
+              users) are the only "data" beneath the fold — available, but quiet.
+              <ol class="panel-callouts">
+                <li>Gauge number 0, icon ✓, headline "All clear" — tri-modal reinforcement.</li>
+                <li>
+                  No celebration burst by default — this is an ops tool, not a reward. Reserved for
+                  the specific moment a red item resolves.
+                </li>
+                <li>
+                  Tap-through on green rows still works — goes to the underlying list (queue, audit,
+                  assignments) for situational awareness.
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ State gallery ============ -->
+      <section class="deck-section">
+        <h2 class="deck-section-title">State gallery</h2>
+        <p class="deck-section-lede">
+          Five states the gauge + remediation list must render. Alert-fatigue control: only one
+          state (red escalation) dominates with colour. Everything else reads quietly.
+        </p>
+
+        <div class="gallery">
+          <!-- all clear -->
+          <div class="thumb-frame">
+            <div class="thumb-label-row">
+              <span class="thumb-state-pill green">Healthy · 0</span>
+              <span class="pill stale">Rolled-up 4m</span>
+            </div>
+            <div class="mini-gauge">
+              <svg viewBox="0 0 120 120">
+                <circle class="track" cx="60" cy="60" r="50" />
+                <circle
+                  class="fill"
+                  cx="60"
+                  cy="60"
+                  r="50"
+                  stroke="var(--success)"
+                  stroke-dasharray="314"
+                  stroke-dashoffset="0"
+                />
+              </svg>
+              <div class="mini-gauge-center">
+                <div class="mini-gauge-num" style="color: var(--success)">✓</div>
+                <div class="mini-gauge-sub">all clear</div>
+              </div>
+            </div>
+            <div class="mini-rem">
+              <div class="mini-rem-row success">
+                <div class="mini-rem-glyph success">✓</div>
+                <div class="mini-rem-label">Verification backlog</div>
+                <div class="mini-rem-meta">0 waiting</div>
+              </div>
+              <div class="mini-rem-row success">
+                <div class="mini-rem-glyph success">✓</div>
+                <div class="mini-rem-label">Stalled work</div>
+                <div class="mini-rem-meta">2 / 5</div>
+              </div>
+              <div class="mini-rem-row success">
+                <div class="mini-rem-glyph success">✓</div>
+                <div class="mini-rem-label">Orphaned</div>
+                <div class="mini-rem-meta">0</div>
+              </div>
+              <div class="mini-rem-row success">
+                <div class="mini-rem-glyph success">✓</div>
+                <div class="mini-rem-label">Rollup fresh</div>
+                <div class="mini-rem-meta">4m ago</div>
+              </div>
+            </div>
+            <p class="thumb-caption">
+              <strong>Healthy · 0 checks tripped.</strong> Copy: "All clear." Green is muted — the
+              absence of problems is not a celebration. No pulsing, no banners.
+            </p>
+          </div>
+
+          <!-- three amber -->
+          <div class="thumb-frame">
+            <div class="thumb-label-row">
+              <span class="thumb-state-pill amber">Attention · 3</span>
+              <span class="pill stale">Rolled-up 14m</span>
+            </div>
+            <div class="mini-gauge">
+              <svg viewBox="0 0 120 120">
+                <circle class="track" cx="60" cy="60" r="50" />
+                <circle
+                  class="fill"
+                  cx="60"
+                  cy="60"
+                  r="50"
+                  stroke="var(--warning)"
+                  stroke-dasharray="314"
+                  stroke-dashoffset="78"
+                />
+              </svg>
+              <div class="mini-gauge-center">
+                <div class="mini-gauge-num" style="color: var(--warning)">3</div>
+                <div class="mini-gauge-sub">of 4</div>
+              </div>
+            </div>
+            <div class="mini-rem">
+              <div class="mini-rem-row amber">
+                <div class="mini-rem-glyph amber">▲</div>
+                <div class="mini-rem-label">Verification backlog</div>
+                <div class="mini-rem-meta">9d oldest</div>
+              </div>
+              <div class="mini-rem-row amber">
+                <div class="mini-rem-glyph amber">◆</div>
+                <div class="mini-rem-label">Stalled work</div>
+                <div class="mini-rem-meta">7 attempts</div>
+              </div>
+              <div class="mini-rem-row amber">
+                <div class="mini-rem-glyph amber">✕</div>
+                <div class="mini-rem-label">Orphaned</div>
+                <div class="mini-rem-meta">1</div>
+              </div>
+              <div class="mini-rem-row success">
+                <div class="mini-rem-glyph success">✓</div>
+                <div class="mini-rem-label">Rollup fresh</div>
+                <div class="mini-rem-meta">14m</div>
+              </div>
+            </div>
+            <p class="thumb-caption">
+              <strong>Attention · 3 amber.</strong> Icons differ per row (▲ ◆ ✕) so the list is
+              legible in greyscale. Number + copy + icon = tri-modal.
+            </p>
+          </div>
+
+          <!-- one red escalation -->
+          <div class="thumb-frame">
+            <div class="thumb-label-row">
+              <span class="thumb-state-pill red">Escalate · 4</span>
+              <span class="pill stale">Rolled-up 2d 6h</span>
+            </div>
+            <div class="mini-gauge">
+              <svg viewBox="0 0 120 120">
+                <circle class="track" cx="60" cy="60" r="50" />
+                <circle
+                  class="fill"
+                  cx="60"
+                  cy="60"
+                  r="50"
+                  stroke="var(--error)"
+                  stroke-dasharray="314"
+                  stroke-dashoffset="0"
+                />
+              </svg>
+              <div class="mini-gauge-center">
+                <div class="mini-gauge-num" style="color: var(--error)">4</div>
+                <div class="mini-gauge-sub">of 4</div>
+              </div>
+            </div>
+            <div class="mini-rem">
+              <div class="mini-rem-row red">
+                <div class="mini-rem-glyph red">!</div>
+                <div class="mini-rem-label">Rollup stale</div>
+                <div class="mini-rem-meta">54h</div>
+              </div>
+              <div class="mini-rem-row red">
+                <div class="mini-rem-glyph red">▲</div>
+                <div class="mini-rem-label">Verification</div>
+                <div class="mini-rem-meta">11d oldest</div>
+              </div>
+              <div class="mini-rem-row red">
+                <div class="mini-rem-glyph red">◆</div>
+                <div class="mini-rem-label">Stalled</div>
+                <div class="mini-rem-meta">22</div>
+              </div>
+              <div class="mini-rem-row red">
+                <div class="mini-rem-glyph red">✕</div>
+                <div class="mini-rem-label">Orphaned</div>
+                <div class="mini-rem-meta">4</div>
+              </div>
+            </div>
+            <p class="thumb-caption">
+              <strong>Escalate · 4 red.</strong> Reserved only for the rare "all four are tripped"
+              state — genuine escalation, not info. Rollup staleness floats to the top because it
+              colours everything else: if aggregates are 2 days old, the other numbers are suspect.
+            </p>
+          </div>
+
+          <!-- Loading -->
+          <div class="thumb-frame">
+            <div class="thumb-label-row">
+              <span class="thumb-state-pill neutral">Loading</span>
+              <span class="pill stale">Fetching …</span>
+            </div>
+            <div class="skel-ring"></div>
+            <div class="mini-rem">
+              <div class="mini-rem-row">
+                <div class="skeleton" style="width: 18px; height: 18px; border-radius: 5px"></div>
+                <div class="skeleton" style="width: 110px; height: 10px"></div>
+                <div
+                  class="skeleton"
+                  style="width: 40px; height: 10px; margin-left: auto"
+                ></div>
+              </div>
+              <div class="mini-rem-row">
+                <div class="skeleton" style="width: 18px; height: 18px; border-radius: 5px"></div>
+                <div class="skeleton" style="width: 80px; height: 10px"></div>
+                <div
+                  class="skeleton"
+                  style="width: 30px; height: 10px; margin-left: auto"
+                ></div>
+              </div>
+              <div class="mini-rem-row">
+                <div class="skeleton" style="width: 18px; height: 18px; border-radius: 5px"></div>
+                <div class="skeleton" style="width: 120px; height: 10px"></div>
+                <div
+                  class="skeleton"
+                  style="width: 20px; height: 10px; margin-left: auto"
+                ></div>
+              </div>
+              <div class="mini-rem-row">
+                <div class="skeleton" style="width: 18px; height: 18px; border-radius: 5px"></div>
+                <div class="skeleton" style="width: 90px; height: 10px"></div>
+                <div
+                  class="skeleton"
+                  style="width: 50px; height: 10px; margin-left: auto"
+                ></div>
+              </div>
+            </div>
+            <p class="thumb-caption">
+              <strong>Loading.</strong> Spinning ring, shimmer rows. No colour commitment — loading
+              must never look like a signal. The structure is preserved so the final state doesn't
+              jolt the layout.
+            </p>
+          </div>
+
+          <!-- Day one / no rollup yet -->
+          <div class="thumb-frame">
+            <div class="thumb-label-row">
+              <span class="thumb-state-pill neutral">Day one</span>
+              <span class="pill dev">rollup: none</span>
+            </div>
+            <div class="mini-gauge">
+              <svg viewBox="0 0 120 120">
+                <circle class="track" cx="60" cy="60" r="50" />
+                <circle
+                  class="fill"
+                  cx="60"
+                  cy="60"
+                  r="50"
+                  stroke="var(--sway-darkGrey)"
+                  stroke-dasharray="8 8"
+                  stroke-dashoffset="0"
+                />
+              </svg>
+              <div class="mini-gauge-center">
+                <div class="mini-gauge-num" style="color: var(--sway-darkGrey); font-size: 26px">
+                  ?
+                </div>
+                <div class="mini-gauge-sub">no rollup yet</div>
+              </div>
+            </div>
+            <div class="mini-rem">
+              <div class="mini-rem-row">
+                <div class="mini-rem-glyph neutral">…</div>
+                <div class="mini-rem-label" style="color: var(--sway-darkGrey)">
+                  Waiting for first rollup
+                </div>
+                <div class="mini-rem-meta">tonight</div>
+              </div>
+              <div class="mini-rem-row">
+                <div class="mini-rem-glyph neutral">—</div>
+                <div class="mini-rem-label" style="color: var(--sway-darkGrey)">
+                  Checks unavailable
+                </div>
+                <div class="mini-rem-meta">soon</div>
+              </div>
+            </div>
+            <p class="thumb-caption">
+              <strong>Day one.</strong> <code>rollupAsOf === null</code>, no data to grade. The
+              gauge renders a dashed, neutral-grey outline with "?" — explicitly uncertain rather
+              than falsely-green. A muted copy explains when the first roll-up will land.
+            </p>
+          </div>
+
+          <!-- Single amber, 1 item -->
+          <div class="thumb-frame">
+            <div class="thumb-label-row">
+              <span class="thumb-state-pill amber">Attention · 1</span>
+              <span class="pill stale">Rolled-up 6m</span>
+            </div>
+            <div class="mini-gauge">
+              <svg viewBox="0 0 120 120">
+                <circle class="track" cx="60" cy="60" r="50" />
+                <circle
+                  class="fill"
+                  cx="60"
+                  cy="60"
+                  r="50"
+                  stroke="var(--warning)"
+                  stroke-dasharray="314"
+                  stroke-dashoffset="235"
+                />
+              </svg>
+              <div class="mini-gauge-center">
+                <div class="mini-gauge-num" style="color: var(--warning)">1</div>
+                <div class="mini-gauge-sub">of 4</div>
+              </div>
+            </div>
+            <div class="mini-rem">
+              <div class="mini-rem-row amber">
+                <div class="mini-rem-glyph amber">✕</div>
+                <div class="mini-rem-label">Orphaned</div>
+                <div class="mini-rem-meta">1 patient</div>
+              </div>
+              <div class="mini-rem-row success">
+                <div class="mini-rem-glyph success">✓</div>
+                <div class="mini-rem-label">Verification</div>
+                <div class="mini-rem-meta">clear</div>
+              </div>
+              <div class="mini-rem-row success">
+                <div class="mini-rem-glyph success">✓</div>
+                <div class="mini-rem-label">Stalled</div>
+                <div class="mini-rem-meta">2/5</div>
+              </div>
+              <div class="mini-rem-row success">
+                <div class="mini-rem-glyph success">✓</div>
+                <div class="mini-rem-label">Rollup fresh</div>
+                <div class="mini-rem-meta">6m</div>
+              </div>
+            </div>
+            <p class="thumb-caption">
+              <strong>Attention · 1.</strong> A single amber row shows the gauge still trips.
+              Amber ≠ apocalypse — one cleanly-resolvable item, one-tap CTA.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ Animation callouts ============ -->
+      <section class="deck-section">
+        <h2 class="deck-section-title">Animation callouts</h2>
+        <p class="deck-section-lede">
+          Four motion moments. All are subtle and functional — they signal system-state change, not
+          decoration. <code>prefers-reduced-motion</code> disables all four.
+        </p>
+
+        <div class="anim-row">
+          <div class="anim-card">
+            <div class="anim-title">Gauge tick sweep</div>
+            <div class="anim-timing">On first load · 900ms · ease-out-quint</div>
+            <div class="anim-desc">
+              Ring fills from 0 to its current count when the screen mounts. Anchors the gauge as a
+              <em>measurement</em>, not a static graphic.
+            </div>
+            <div class="anim-stage">
+              <div class="sweep-ring">
+                <svg viewBox="0 0 120 120">
+                  <circle class="track" cx="60" cy="60" r="50" />
+                  <circle class="fill" cx="60" cy="60" r="50" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="anim-card">
+            <div class="anim-title">Remediation row resolve</div>
+            <div class="anim-timing">On verify/resolve · 500ms in · 250ms colour-shift</div>
+            <div class="anim-desc">
+              When a contributor is remediated, the row crossfades amber → green, slides up by 6px,
+              then the gauge number ticks down by 1. No disappearance — resolved rows stay as green
+              ticks.
+            </div>
+            <div class="anim-stage">
+              <div class="slide-stack">
+                <div class="slide-row">▲ Verification backlog · 9d</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="anim-card">
+            <div class="anim-title">Escalation pulse</div>
+            <div class="anim-timing">
+              Only when state transitions to red (3+) · 2.4s loop, auto-stops after 3 cycles
+            </div>
+            <div class="anim-desc">
+              The gauge centre pulses a soft red halo <em>exactly when</em> the first red escalation
+              appears — then stops. Prevents the PagerDuty "wallpaper of red" problem.
+            </div>
+            <div class="anim-stage">
+              <div class="pulse-chip">! ESCALATE · 4 / 4</div>
+            </div>
+          </div>
+
+          <div class="anim-card">
+            <div class="anim-title">Number roll-down</div>
+            <div class="anim-timing">After a remediation succeeds · 400ms cubic-bezier</div>
+            <div class="anim-desc">
+              The central gauge number rolls from N to N−1 in a vertical slot. Gives the admin a
+              crisp, haptic-flavoured confirmation that their action moved the needle.
+            </div>
+            <div class="anim-stage">
+              <div class="countup-num">
+                <div class="countup-col">
+                  <span>3</span>
+                  <span>2</span>
+                  <span>1</span>
+                  <span>0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ Component breakdown ============ -->
+      <section class="deck-section">
+        <h2 class="deck-section-title">Component breakdown</h2>
+        <p class="deck-section-lede">
+          New primitives are minimal — the gauge and the remediation row. Everything else reuses
+          existing bwell inventory from §6 of the brief.
+        </p>
+
+        <div class="comp-grid">
+          <div class="comp-col">
+            <h3>New components</h3>
+            <ul>
+              <li>
+                <span class="comp-tag">&lt;ComplianceGauge /&gt;</span>
+                <span class="comp-desc">
+                  SVG ring with stroke-dashoffset. Props:
+                  <code>trippedCount</code>, <code>totalChecks</code>, <code>state</code> (green |
+                  amber | red | unknown | loading), <code>headline</code>, <code>subcopy</code>.
+                  State is computed upstream from the overview response, not inside the component.
+                </span>
+              </li>
+              <li>
+                <span class="comp-tag">&lt;RemediationItem /&gt;</span>
+                <span class="comp-desc">
+                  Row: glyph + title + value + description + CTA. Supports
+                  <code>severity</code> = success | info | amber | red. Glyphs bound to severity
+                  so colour-blind users see the same hierarchy.
+                </span>
+              </li>
+              <li>
+                <span class="comp-tag">&lt;RemediationList /&gt;</span>
+                <span class="comp-desc">
+                  Vertical stack of <code>RemediationItem</code>s. Owns the four contributor slots
+                  in a fixed order so the gauge position always maps to the same row index.
+                </span>
+              </li>
+              <li>
+                <span class="comp-tag">&lt;RollupFreshnessPill /&gt;</span>
+                <span class="comp-desc">
+                  Shows "rolled-up Xm ago" at the top of the gauge card and as a pill in drill-down
+                  headers. Visible reminder that the admin is looking at aggregates, not live data.
+                </span>
+              </li>
+              <li>
+                <span class="comp-tag">&lt;VerifyTierSheet /&gt;</span>
+                <span class="comp-desc">
+                  Half-sheet over the queue. Therapist preview + CBT/PWP tier picker + Confirm.
+                  Built on <code>@gorhom/bottom-sheet</code> with keyboard-safe insets.
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="comp-col">
+            <h3>Reused from §6</h3>
+            <ul>
+              <li>
+                <span class="comp-tag">ContentContainer</span>
+                <span class="comp-desc">Wraps the admin home at <code>px-4</code>.</span>
+              </li>
+              <li>
+                <span class="comp-tag">ThemedText</span>
+                <span class="comp-desc">
+                  <code>title</code> / <code>subtitle</code> / <code>smallTitle</code> /
+                  <code>small</code> / <code>smallBold</code> — only typographic primitive.
+                </span>
+              </li>
+              <li>
+                <span class="comp-tag">ThemedButton</span>
+                <span class="comp-desc">
+                  <code>default</code> for "Verify", <code>outline</code> for dismiss.
+                </span>
+              </li>
+              <li>
+                <span class="comp-tag">Chip / StatusChip</span>
+                <span class="comp-desc">
+                  Drives the "dev mode" pill when <code>privacyMode === 'reduced'</code> and the
+                  threshold pills in drill-down headers.
+                </span>
+              </li>
+              <li>
+                <span class="comp-tag">ClientCard pattern</span>
+                <span class="comp-desc">
+                  Queue rows borrow layout (avatar · name · sub · right-aligned value) from the
+                  existing therapist dashboard.
+                </span>
+              </li>
+              <li>
+                <span class="comp-tag">ActionMenu</span>
+                <span class="comp-desc">
+                  For destructive paths (reject therapist, mark orphan as resolved) with built-in
+                  confirmation.
+                </span>
+              </li>
+              <li>
+                <span class="comp-tag">EmptyState</span>
+                <span class="comp-desc">
+                  For sub-screens like an empty audit log, not the gauge itself (which has its own
+                  "all clear" state).
+                </span>
+              </li>
+              <li>
+                <span class="comp-tag">StatStrip</span>
+                <span class="comp-desc">
+                  Secondary row at the bottom: 30d active · audit events · programmes. Quiet
+                  context, never primary.
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ Rationale ============ -->
+      <section class="deck-section">
+        <h2 class="deck-section-title">Rationale</h2>
+        <p class="deck-section-lede">Five bullets on why this design serves the angle.</p>
+
+        <div class="rationale">
+          <ul>
+            <li>
+              <strong>Binary at the top, nuanced on drill-in.</strong>
+              One gauge, one number, one sentence. The admin answers "am I needed?" before they
+              scroll. If zero, done. If non-zero, they drill into exactly the item that moved the
+              count — a direct, lossless map from gauge to remediation.
+            </li>
+            <li>
+              <strong>Composite score is derivable from <code>/overview</code> today.</strong>
+              Four contributors, each a hard threshold on one field the BE already returns
+              (<code>verificationQueue.oldest[0].createdAt</code>,
+              <code>operational.work.stalledAttempts7d</code>,
+              <code>operational.work.orphanedAssignments</code>, <code>rollupAsOf</code>). No new
+              BE surface required for the landing view — which is the point of this angle.
+            </li>
+            <li>
+              <strong>Anti–alert-fatigue by construction.</strong>
+              Three colour bands (green / amber / red) but only red pulses, and only when first
+              transitioning in. Amber is calm — a count, a row, a CTA. Green is muted — absence of
+              problems shouldn't feel like a win condition. Each severity carries a distinct icon
+              glyph (✓ ▲ ◆ ✕ !) so the list reads in greyscale.
+            </li>
+            <li>
+              <strong>Remediation framing, not reporting.</strong>
+              Every row answers <em>"is this OK? what's the fix?"</em> The CTA is verb-led
+              ("Resolve verify queue", "Notify therapists", "Reassign") and the drill-down lands on
+              a surface where the admin can complete the task in one half-sheet — not three tabs
+              deep. Resolved items stay visible as green ticks so the admin trusts nothing is
+              hidden.
+            </li>
+            <li>
+              <strong>Honest about what's known.</strong>
+              The rollup-freshness pill is surfaced everywhere, not buried. A fifth "unknown" state
+              (dashed ring, "?") handles the day-one case when <code>rollupAsOf === null</code> —
+              the gauge refuses to paint itself green without evidence, preventing a
+              <em>false all-clear</em>. Privacy-mode (<code>reduced</code>) dev marker sits beside
+              the gauge so staging is never confused with production posture.
+            </li>
+          </ul>
+        </div>
+
+        <div class="bereq">
+          <strong>BE change requests:</strong> none required for the landing gauge — every
+          contributor is derivable from <code>/api/admin/overview</code>. To resolve the
+          "stalled work → notify therapists" CTA in one tap, we'd want a
+          <code>POST /api/admin/attempts/:id/nudge</code> endpoint that dispatches a therapist
+          notification and logs an audit event. Likewise, a
+          <code>POST /api/admin/assignments/:id/reassign</code> would close the orphan loop without
+          a full client-side form. Both are follow-up endpoints, not blockers for this prototype.
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
