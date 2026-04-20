@@ -325,43 +325,45 @@ const ReviewScreen = () => {
 
   return (
     <ContentContainer>
-      {!isFetching && submissions.length === 0 ? (
-        <>
-          {listHeader}
-          <EmptyState
-            icon="clipboard-check-outline"
-            title="No submissions yet"
-            subtitle="Completed work from your patients will appear here"
-          />
-        </>
-      ) : (
-        <SectionList
-          sections={sections}
-          showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item.assignmentId}
-          renderItem={renderItem}
-          renderSectionHeader={renderSectionHeader}
-          ItemSeparatorComponent={ItemSeparator}
-          stickySectionHeadersEnabled
-          ListHeaderComponent={listHeader}
-          contentContainerStyle={{ paddingBottom: 16, opacity: isFilterRefetching ? 0.5 : 1 }}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefetching && !isFetchingNextPage}
-              onRefresh={refetch}
-              tintColor={Colors.sway.bright}
-              progressBackgroundColor={Colors.chip.darkCard}
+      <SectionList
+        sections={sections}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={(item) => item.assignmentId}
+        renderItem={renderItem}
+        renderSectionHeader={renderSectionHeader}
+        ItemSeparatorComponent={ItemSeparator}
+        stickySectionHeadersEnabled
+        ListHeaderComponent={listHeader}
+        ListEmptyComponent={
+          isFilterRefetching ? null : (
+            <EmptyState
+              icon="clipboard-check-outline"
+              title="No submissions yet"
+              subtitle="Completed work from your patients will appear here"
             />
-          }
-          onEndReached={handleEndReached}
-          onEndReachedThreshold={0.3}
-          ListFooterComponent={
-            isFetchingNextPage || isFilterRefetching ? (
-              <ActivityIndicator color={Colors.sway.bright} style={{ paddingVertical: 16 }} />
-            ) : null
-          }
-        />
-      )}
+          )
+        }
+        contentContainerStyle={{
+          paddingBottom: 16,
+          flexGrow: 1,
+          opacity: isFilterRefetching ? 0.5 : 1
+        }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching && !isFetchingNextPage}
+            onRefresh={refetch}
+            tintColor={Colors.sway.bright}
+            progressBackgroundColor={Colors.chip.darkCard}
+          />
+        }
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.3}
+        ListFooterComponent={
+          isFetchingNextPage || isFilterRefetching ? (
+            <ActivityIndicator color={Colors.sway.bright} style={{ paddingVertical: 16 }} />
+          ) : null
+        }
+      />
 
       <ReviewFilterDrawer
         visible={drawerOpen}
