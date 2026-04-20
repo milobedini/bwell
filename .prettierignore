@@ -2,3 +2,4 @@ dist
 .expo
 .claude
 *.md
+docs/prototypes/**/*.html
