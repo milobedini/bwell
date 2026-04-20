@@ -7,12 +7,13 @@ import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import type { ActionMenuItem } from '@/components/ui/ActionMenu';
 import ActionMenu from '@/components/ui/ActionMenu';
+import BloomBurst from '@/components/ui/BloomBurst';
 import { Colors } from '@/constants/Colors';
+import { Fonts } from '@/constants/Typography';
 import { AttemptStatus } from '@/types/types';
 import type { AttemptDetailResponseItem } from '@milobedini/shared-types';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
-import BloomGlow from './BloomGlow';
 import CoachMessage from './CoachMessage';
 import MomentCard from './MomentCard';
 import ReflectionThread from './ReflectionThread';
@@ -103,9 +104,24 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
     setActiveGoalIndex(null);
   }, [state]);
 
+  const handleRemoveGoal = useCallback(
+    (index: number) => {
+      state.removeGoal(index);
+      // Keep activeGoalIndex in sync: clear if the removed goal was active,
+      // shift down if it was after the removed one.
+      setActiveGoalIndex((curr) => {
+        if (curr == null) return null;
+        if (curr === index) return null;
+        if (curr > index) return curr - 1;
+        return curr;
+      });
+    },
+    [state]
+  );
+
   const resetActions: ActionMenuItem[] = [
     {
-      icon: 'restart',
+      icon: 'trash-can-outline',
       label: 'Reset conversation',
       onPress: handleReset,
       variant: 'destructive',
@@ -239,7 +255,7 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
           zIndex: 20
         }}
       >
-        <BloomGlow trigger={submitBloomTrigger} size={280} />
+        <BloomBurst trigger={submitBloomTrigger} size={320} />
       </View>
 
       <ActionMenu
@@ -288,7 +304,7 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
           onPress={() => setResetMenuVisible(true)}
           accessibilityLabel="Reset conversation"
         >
-          <MaterialCommunityIcons name="restart" size={22} color={Colors.primary.error} />
+          <MaterialCommunityIcons name="trash-can-outline" size={22} color={Colors.primary.error} />
         </FloatingActionButton>
       </View>
 
@@ -337,7 +353,7 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
             onUpdateMastery={(v) => state.updateMastery(i, v)}
             onUpdatePleasure={(v) => state.updatePleasure(i, v)}
             onUpdateNotes={(t) => state.updateNotes(i, t)}
-            onRemove={() => state.removeGoal(i)}
+            onRemove={() => handleRemoveGoal(i)}
           />
         ))}
 
@@ -399,7 +415,7 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
                 style={{
                   color: Colors.sway.lightGrey,
                   fontSize: 17,
-                  fontFamily: 'Lato-Regular',
+                  fontFamily: Fonts.Regular,
                   lineHeight: 24,
                   minHeight: 24,
                   padding: 0
