@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Overhaul — KPI Dashboard (Straight Read)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      /* Core palette */
+      --sway-dark: #0c1527;
+      --sway-lightGrey: #e0e9f3;
+      --sway-darkGrey: #a6adbb;
+      --sway-bright: #18cdba;
+      --sway-buttonBg: rgb(43, 59, 91);
+
+      /* Status / signal */
+      --error: #FF6D5E;
+      --success: #76AB70;
+      --warning: #FFB300;
+      --info: #FFD15D;
+
+      /* Card surfaces */
+      --card: #262E42;
+      --card-alt: #334368;
+      --card-deep: #0B1A2A;
+
+      /* Chip / pill */
+      --chip-pill: #1E2A45;
+      --chip-pill-pressed: #253352;
+
+      /* Tints */
+      --tint-teal: rgba(24, 205, 186, 0.15);
+      --tint-teal-border: rgba(24, 205, 186, 0.3);
+      --tint-error: rgba(255, 109, 94, 0.15);
+      --tint-error-border: rgba(255, 109, 94, 0.3);
+      --tint-info: rgba(255, 209, 93, 0.15);
+      --tint-info-border: rgba(255, 209, 93, 0.3);
+      --tint-neutral: rgba(166, 173, 187, 0.12);
+
+      /* Accent */
+      --therapist-purple: #7C3AED;
+
+      /* Overlays */
+      --overlay-medium: rgba(0, 0, 0, 0.5);
+      --divider: rgba(166, 173, 187, 0.1);
+
+      /* Deck chrome */
+      --page-bg: #070d1b;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--page-bg);
+      color: var(--sway-lightGrey);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .deck {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 48px 32px 96px;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      padding: 56px 48px;
+      background: linear-gradient(135deg, var(--card-deep) 0%, var(--sway-dark) 100%);
+      border: 1px solid var(--divider);
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 48px;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -40%;
+      right: -10%;
+      width: 560px;
+      height: 560px;
+      background: radial-gradient(circle, var(--tint-teal) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: var(--tint-teal);
+      border: 1px solid var(--tint-teal-border);
+      color: var(--sway-bright);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: 44px;
+      font-weight: 900;
+      margin: 0 0 12px;
+      letter-spacing: -0.02em;
+      position: relative;
+    }
+    .hero .angle {
+      font-size: 20px;
+      color: var(--sway-darkGrey);
+      max-width: 740px;
+      margin: 0 0 24px;
+      position: relative;
+    }
+    .hero .philosophy {
+      display: inline-block;
+      font-size: 18px;
+      font-style: italic;
+      color: var(--sway-lightGrey);
+      border-left: 3px solid var(--sway-bright);
+      padding: 4px 0 4px 16px;
+      max-width: 720px;
+      position: relative;
+    }
+
+    /* ---------- Section ---------- */
+    section.block {
+      margin-top: 72px;
+    }
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--divider);
+    }
+    .section-head .num {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--sway-bright);
+      letter-spacing: 0.12em;
+    }
+    .section-head h2 {
+      font-size: 28px;
+      font-weight: 900;
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+    .section-head .hint {
+      margin-left: auto;
+      color: var(--sway-darkGrey);
+      font-size: 14px;
+      max-width: 420px;
+      text-align: right;
+    }
+
+    /* ---------- Flow map ---------- */
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(410px, 1fr));
+      gap: 32px;
+    }
+    .panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .panel-caption {
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--sway-bright);
+      font-weight: 700;
+    }
+    .panel-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0;
+    }
+    .panel-note {
+      font-size: 14px;
+      color: var(--sway-darkGrey);
+      margin: 0 0 4px;
+    }
+
+    /* Device frame ~ mobile */
+    .device {
+      width: 375px;
+      max-width: 100%;
+      min-height: 720px;
+      background: var(--sway-dark);
+      border-radius: 32px;
+      border: 1px solid var(--divider);
+      box-shadow: 0 30px 60px -30px rgba(0,0,0,0.6);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 20px 6px;
+      font-size: 12px;
+      color: var(--sway-lightGrey);
+      font-weight: 700;
+      opacity: 0.7;
+    }
+    .nav {
+      padding: 8px 20px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--divider);
+    }
+    .nav .title {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+    }
+    .nav .asof {
+      font-size: 11px;
+      color: var(--sway-darkGrey);
+      text-align: right;
+      line-height: 1.3;
+    }
+    .nav .asof strong { color: var(--sway-lightGrey); font-weight: 700; }
+
+    .screen {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+
+    /* Callout system */
+    .panel-body { position: relative; }
+    .pin {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: var(--sway-bright);
+      color: var(--sway-dark);
+      font-weight: 900;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 4px rgba(24,205,186,0.18);
+      z-index: 5;
+    }
+    .callouts {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+      padding: 12px 16px;
+      background: var(--card-deep);
+      border: 1px solid var(--divider);
+      border-radius: 12px;
+    }
+    .callout {
+      display: flex;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--sway-darkGrey);
+      line-height: 1.45;
+    }
+    .callout .num-pin {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: var(--tint-teal);
+      color: var(--sway-bright);
+      font-size: 11px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+    .callout b { color: var(--sway-lightGrey); font-weight: 700; }
+
+    /* ---------- Inner UI primitives ---------- */
+    .card-block {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 14px 16px;
+      border: 1px solid var(--divider);
+    }
+    .card-block.deep { background: var(--card-deep); }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .card-header .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--sway-darkGrey);
+      font-weight: 700;
+    }
+    .card-header .meta {
+      font-size: 11px;
+      color: var(--sway-darkGrey);
+    }
+
+    /* KPI strip */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .kpi {
+      background: var(--chip-pill);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .kpi-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--sway-darkGrey);
+      font-weight: 700;
+    }
+    .kpi-value {
+      font-size: 22px;
+      font-weight: 900;
+      margin-top: 2px;
+      letter-spacing: -0.02em;
+    }
+    .kpi-delta {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--success);
+      margin-top: 2px;
+    }
+    .kpi-delta.down { color: var(--error); }
+    .kpi-delta.flat { color: var(--sway-darkGrey); }
+
+    /* Programme row */
+    .programme {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--divider);
+    }
+    .programme:last-child { border-bottom: none; }
+    .programme .name {
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .programme .sub {
+      font-size: 11px;
+      color: var(--sway-darkGrey);
+      margin-top: 2px;
+    }
+    .rate-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--tint-teal);
+      border: 1px solid var(--tint-teal-border);
+      color: var(--sway-bright);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .rate-chip.muted {
+      background: var(--tint-neutral);
+      border-color: var(--divider);
+      color: var(--sway-darkGrey);
+    }
+    .rate-chip .n { color: var(--sway-darkGrey); font-weight: 400; font-size: 10px; }
+
+    /* Queue row */
+    .queue-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--divider);
+    }
+    .queue-row:last-child { border-bottom: none; }
+    .avatar {
+      width: 34px; height: 34px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--therapist-purple), var(--sway-bright));
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 13px;
+      flex-shrink: 0;
+    }
+    .queue-meta { flex: 1; min-width: 0; }
+    .queue-meta .name { font-size: 14px; font-weight: 700; }
+    .queue-meta .sub { font-size: 11px; color: var(--sway-darkGrey); }
+    .waiting-chip {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--tint-info);
+      color: var(--info);
+      font-weight: 700;
+      border: 1px solid var(--tint-info-border);
+    }
+    .waiting-chip.stale {
+      background: var(--tint-error);
+      color: var(--error);
+      border-color: var(--tint-error-border);
+    }
+
+    /* Signal banner */
+    .signal {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--tint-error);
+      border: 1px solid var(--tint-error-border);
+      align-items: flex-start;
+    }
+    .signal.info {
+      background: var(--tint-info);
+      border-color: var(--tint-info-border);
+    }
+    .signal-icon {
+      width: 24px; height: 24px;
+      border-radius: 999px;
+      background: var(--error);
+      color: var(--sway-dark);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 900;
+      flex-shrink: 0;
+    }
+    .signal.info .signal-icon { background: var(--info); }
+    .signal-body { flex: 1; font-size: 12px; }
+    .signal-body strong { color: var(--sway-lightGrey); display: block; font-size: 13px; margin-bottom: 2px; }
+
+    /* Audit row */
+    .audit-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--divider);
+      font-size: 12px;
+    }
+    .audit-row:last-child { border-bottom: none; }
+    .audit-dot {
+      width: 6px; height: 6px; border-radius: 999px; background: var(--success);
+    }
+    .audit-dot.fail { background: var(--error); }
+    .audit-action { font-weight: 700; }
+    .audit-actor { color: var(--sway-darkGrey); font-size: 11px; margin-top: 1px; }
+    .audit-time { color: var(--sway-darkGrey); font-size: 11px; white-space: nowrap; }
+
+    /* CTA */
+    .cta-btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--sway-bright);
+      color: var(--sway-dark);
+      font-weight: 900;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+    .cta-btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+    .cta-btn.outline {
+      background: transparent;
+      color: var(--sway-bright);
+      border: 1px solid var(--tint-teal-border);
+    }
+    .link-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 4px;
+    }
+    .link-row .link {
+      font-size: 12px;
+      color: var(--sway-bright);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Tabs inside programme card */
+    .seg-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--chip-pill);
+      padding: 3px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .seg-tabs span {
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: var(--sway-darkGrey);
+    }
+    .seg-tabs span.active {
+      background: var(--sway-dark);
+      color: var(--sway-lightGrey);
+    }
+
+    /* Work byType bar row */
+    .bar-row {
+      display: grid;
+      grid-template-columns: 90px 1fr 30px;
+      gap: 8px;
+      align-items: center;
+      font-size: 12px;
+      padding: 4px 0;
+    }
+    .bar-track {
+      height: 6px;
+      background: var(--chip-pill);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--sway-bright), rgba(24,205,186,0.5));
+      border-radius: 999px;
+    }
+    .bar-value { text-align: right; font-weight: 700; color: var(--sway-darkGrey); font-size: 11px; }
+
+    /* Tab bar (bottom nav) */
+    .tabbar {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0 18px;
+      border-top: 1px solid var(--divider);
+      background: var(--card-deep);
+      margin-top: auto;
+    }
+    .tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--sway-darkGrey);
+      font-weight: 700;
+    }
+    .tab.active { color: var(--sway-bright); }
+    .tab-icon {
+      width: 20px; height: 20px; border-radius: 6px;
+      background: var(--chip-pill);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+    }
+    .tab.active .tab-icon { background: var(--tint-teal); color: var(--sway-bright); }
+
+    /* Privacy chip */
+    .privacy-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--tint-neutral);
+      color: var(--sway-darkGrey);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .privacy-chip.reduced { background: var(--tint-info); color: var(--info); border: 1px solid var(--tint-info-border); }
+
+    /* Modal look (verify sheet) */
+    .sheet {
+      position: absolute;
+      left: 10px; right: 10px; bottom: 10px;
+      background: var(--card);
+      border-radius: 20px;
+      border: 1px solid var(--divider);
+      padding: 18px;
+      box-shadow: 0 -30px 60px -20px rgba(0,0,0,0.6);
+    }
+    .sheet .handle {
+      width: 38px; height: 4px;
+      background: var(--sway-darkGrey);
+      border-radius: 999px;
+      margin: 0 auto 12px;
+      opacity: 0.5;
+    }
+    .sheet h3 { margin: 0 0 4px; font-size: 16px; font-weight: 900; }
+    .sheet p { margin: 0 0 14px; font-size: 12px; color: var(--sway-darkGrey); }
+    .tier-picker { display: flex; gap: 8px; margin-bottom: 14px; }
+    .tier-opt {
+      flex: 1;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--divider);
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--chip-pill);
+    }
+    .tier-opt.selected {
+      background: var(--tint-teal);
+      border-color: var(--tint-teal-border);
+      color: var(--sway-bright);
+    }
+    .tier-opt .tier-sub { font-size: 10px; font-weight: 400; color: var(--sway-darkGrey); margin-top: 2px; }
+    .tier-opt.selected .tier-sub { color: var(--sway-bright); opacity: 0.8; }
+
+    /* Spark rows for overview */
+    .trend-block {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .trend-mini {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 28px;
+    }
+    .trend-mini .bar {
+      width: 5px;
+      background: var(--sway-bright);
+      border-radius: 2px;
+      opacity: 0.7;
+    }
+
+    /* ---------- State gallery ---------- */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    .thumb {
+      background: var(--sway-dark);
+      border: 1px solid var(--divider);
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 300px;
+    }
+    .thumb-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--sway-darkGrey);
+    }
+    .thumb-label::before {
+      content: '';
+      width: 6px; height: 6px; border-radius: 999px;
+      background: var(--sway-darkGrey);
+    }
+    .thumb-label.empty::before { background: var(--sway-darkGrey); }
+    .thumb-label.loading::before { background: var(--info); }
+    .thumb-label.success::before { background: var(--success); }
+    .thumb-label.error::before { background: var(--error); }
+    .thumb-label.edge::before { background: var(--therapist-purple); }
+
+    .thumb-desc {
+      font-size: 12px;
+      color: var(--sway-darkGrey);
+      line-height: 1.4;
+    }
+
+    /* Skeleton loader */
+    .skel {
+      height: 10px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--chip-pill) 0%, var(--chip-pill-pressed) 50%, var(--chip-pill) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+    }
+    .skel.tall { height: 24px; }
+    .skel.sm { width: 40%; }
+    .skel.md { width: 70%; }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Empty state */
+    .empty-vis {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-align: center;
+      padding: 24px 0;
+    }
+    .empty-icon {
+      width: 56px; height: 56px;
+      border-radius: 999px;
+      background: var(--tint-teal);
+      border: 1px solid var(--tint-teal-border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+    }
+
+    /* ---------- Animation callouts ---------- */
+    .anim-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .anim-card {
+      background: var(--card);
+      border: 1px solid var(--divider);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .anim-stage {
+      background: var(--sway-dark);
+      border-radius: 12px;
+      padding: 20px;
+      min-height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--divider);
+      overflow: hidden;
+      position: relative;
+    }
+    .anim-title {
+      font-size: 15px;
+      font-weight: 900;
+      margin: 0;
+    }
+    .anim-meta {
+      font-size: 11px;
+      color: var(--sway-darkGrey);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+    }
+    .anim-desc {
+      font-size: 13px;
+      color: var(--sway-darkGrey);
+      line-height: 1.5;
+    }
+
+    /* Animation: count-up */
+    .count-up {
+      font-size: 40px;
+      font-weight: 900;
+      color: var(--sway-bright);
+      animation: countPulse 2.4s ease-in-out infinite;
+      letter-spacing: -0.03em;
+    }
+    @keyframes countPulse {
+      0% { transform: scale(0.94); opacity: 0.6; }
+      40% { transform: scale(1.04); opacity: 1; }
+      100% { transform: scale(0.94); opacity: 0.6; }
+    }
+
+    /* Animation: pulse dot */
+    .pulse-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--tint-error);
+      border: 1px solid var(--tint-error-border);
+      padding: 10px 16px;
+      border-radius: 999px;
+      color: var(--error);
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .pulse-dot {
+      width: 10px; height: 10px; border-radius: 999px;
+      background: var(--error);
+      position: relative;
+    }
+    .pulse-dot::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 999px;
+      background: var(--error);
+      opacity: 0.4;
+      animation: pulseRing 2s ease-out infinite;
+    }
+    @keyframes pulseRing {
+      0% { transform: scale(0.8); opacity: 0.5; }
+      100% { transform: scale(2.4); opacity: 0; }
+    }
+
+    /* Animation: queue slide */
+    .queue-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 100%;
+      overflow: hidden;
+      padding: 0 10px;
+    }
+    .queue-demo .q-item {
+      height: 28px;
+      background: var(--chip-pill);
+      border-radius: 8px;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      font-size: 11px;
+      color: var(--sway-darkGrey);
+      animation: slideOut 3s ease-in-out infinite;
+    }
+    .queue-demo .q-item:nth-child(1) { animation-delay: 0s; }
+    .queue-demo .q-item:nth-child(2) { animation-delay: 0.1s; }
+    .queue-demo .q-item:nth-child(3) { animation-delay: 0.2s; }
+    @keyframes slideOut {
+      0%, 15% { transform: translateX(0); opacity: 1; }
+      25% { transform: translateX(-140%); opacity: 0; }
+      26%, 100% { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Animation: sparkline fill */
+    .spark-demo {
+      width: 90%;
+      height: 50px;
+      position: relative;
+    }
+    .spark-demo svg { width: 100%; height: 100%; overflow: visible; }
+    .spark-demo path.line {
+      fill: none;
+      stroke: var(--sway-bright);
+      stroke-width: 2;
+      stroke-dasharray: 500;
+      stroke-dashoffset: 500;
+      animation: drawLine 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+    .spark-demo path.area {
+      fill: url(#sparkGrad);
+      opacity: 0;
+      animation: fadeArea 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+    @keyframes drawLine {
+      0% { stroke-dashoffset: 500; }
+      60% { stroke-dashoffset: 0; }
+      100% { stroke-dashoffset: 0; }
+    }
+    @keyframes fadeArea {
+      0%, 50% { opacity: 0; }
+      80% { opacity: 0.35; }
+      100% { opacity: 0.35; }
+    }
+
+    /* ---------- Components list ---------- */
+    .components-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .components-block {
+      background: var(--card);
+      border: 1px solid var(--divider);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .components-block h3 {
+      font-size: 15px;
+      margin: 0 0 16px;
+      font-weight: 900;
+      color: var(--sway-bright);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .components-block ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .components-block li {
+      display: flex;
+      gap: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .components-block li code {
+      background: var(--chip-pill);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-family: 'SFMono-Regular', Consolas, monospace;
+      font-size: 12px;
+      color: var(--sway-bright);
+      white-space: nowrap;
+      align-self: flex-start;
+      flex-shrink: 0;
+    }
+    .components-block li span {
+      color: var(--sway-darkGrey);
+    }
+
+    /* ---------- Rationale ---------- */
+    .rationale {
+      background: var(--card);
+      border: 1px solid var(--divider);
+      border-radius: 20px;
+      padding: 32px;
+    }
+    .rationale ol {
+      padding-left: 0;
+      margin: 0;
+      counter-reset: ra;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .rationale li {
+      counter-increment: ra;
+      padding-left: 56px;
+      position: relative;
+      font-size: 16px;
+      line-height: 1.55;
+      color: var(--sway-lightGrey);
+    }
+    .rationale li::before {
+      content: counter(ra, decimal-leading-zero);
+      position: absolute;
+      left: 0;
+      top: -2px;
+      width: 40px;
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--sway-bright);
+      font-family: 'Lato', sans-serif;
+      letter-spacing: -0.02em;
+    }
+    .rationale li strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--sway-lightGrey);
+      font-size: 16px;
+      font-weight: 900;
+    }
+    .rationale li span {
+      color: var(--sway-darkGrey);
+      font-size: 15px;
+    }
+
+    .be-note {
+      margin-top: 32px;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px dashed var(--tint-info-border);
+      background: var(--tint-info);
+      font-size: 13px;
+      color: var(--sway-lightGrey);
+    }
+    .be-note strong { color: var(--info); }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0s !important;
+      }
+    }
+
+    /* Small screens */
+    @media (max-width: 640px) {
+      .hero { padding: 32px 24px; }
+      .hero h1 { font-size: 32px; }
+      .section-head { flex-direction: column; align-items: flex-start; }
+      .section-head .hint { margin-left: 0; text-align: left; }
+      .components-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck">
+
+    <!-- =========================================== -->
+    <!-- 1. Hero panel -->
+    <!-- =========================================== -->
+    <section class="hero">
+      <div class="hero-eyebrow">
+        <span>Prototype 01 · Straight Read</span>
+      </div>
+      <h1>KPI Dashboard</h1>
+      <p class="angle">
+        The canonical SaaS admin home — stacked cards: operational counts, programme outcome chips, verification queue, audit strip. Stripe-calm, Linear-quiet. Operational answers in a single scroll.
+      </p>
+      <div class="philosophy">
+        A bwell admin should glance, trust, and act — not browse. Numbers speak, care-safety guards them, and everything that needs a person is one tap away.
+      </div>
+    </section>
+
+    <!-- =========================================== -->
+    <!-- 2. Flow map -->
+    <!-- =========================================== -->
+    <section class="block">
+      <div class="section-head">
+        <span class="num">02 · FLOW</span>
+        <h2>Flow map</h2>
+        <span class="hint">One screen does most of the work; two sheets handle the remainder. 375pt mobile frames.</span>
+      </div>
+
+      <div class="flow">
+
+        <!-- Panel 1: Home / default -->
+        <div class="panel">
+          <span class="panel-caption">1 · Landing</span>
+          <h3 class="panel-title">Overview — the canonical home</h3>
+          <p class="panel-note">One call (`GET /api/admin/overview`) hydrates every tile on this screen. Scrolled once, finished.</p>
+          <div class="panel-body">
+            <div class="device">
+              <div class="status-bar">
+                <span>9:41</span>
+                <span>· · ·</span>
+              </div>
+              <div class="nav">
+                <div>
+                  <div class="title">Admin</div>
+                  <div style="font-size:11px;color:var(--sway-darkGrey);margin-top:2px;">admin@bwell.test</div>
+                </div>
+                <div class="asof">
+                  <span class="privacy-chip">Live</span><br/>
+                  <strong>Now</strong> · rollup 09:00
+                </div>
+              </div>
+
+              <div class="screen">
+
+                <!-- 1. Signal -->
+                <div class="signal" style="position:relative;">
+                  <div class="pin" style="top:-10px; left:-10px;">1</div>
+                  <div class="signal-icon">!</div>
+                  <div class="signal-body">
+                    <strong>18 therapists waiting to verify</strong>
+                    Oldest: 11 days. 3 stalled attempts · 1 orphaned assignment.
+                  </div>
+                </div>
+
+                <!-- 2. Operational KPIs -->
+                <div class="card-block" style="position:relative;">
+                  <div class="pin" style="top:-10px; right:-10px;">2</div>
+                  <div class="card-header">
+                    <span class="label">Operational · this week</span>
+                    <span class="meta">vs prev</span>
+                  </div>
+                  <div class="kpi-grid">
+                    <div class="kpi">
+                      <div class="kpi-label">Completed</div>
+                      <div class="kpi-value">412</div>
+                      <div class="kpi-delta">+18%</div>
+                    </div>
+                    <div class="kpi">
+                      <div class="kpi-label">Active 30d</div>
+                      <div class="kpi-value">89</div>
+                      <div class="kpi-delta">+4%</div>
+                    </div>
+                    <div class="kpi">
+                      <div class="kpi-label">Stalled 7d</div>
+                      <div class="kpi-value">3</div>
+                      <div class="kpi-delta down">+2</div>
+                    </div>
+                    <div class="kpi">
+                      <div class="kpi-label">New users</div>
+                      <div class="kpi-value">12</div>
+                      <div class="kpi-delta flat">−1</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3. Programme outcomes -->
+                <div class="card-block" style="position:relative;">
+                  <div class="pin" style="top:-10px; left:-10px;">3</div>
+                  <div class="card-header">
+                    <span class="label">Programme outcomes · 90d</span>
+                    <div class="seg-tabs"><span class="active">Recovery</span><span>Rel.Imp</span></div>
+                  </div>
+                  <div class="programme">
+                    <div>
+                      <div class="name">Depression</div>
+                      <div class="sub">PHQ-9 · 22 patients</div>
+                    </div>
+                    <div class="rate-chip">41% <span class="n">· n=22</span></div>
+                  </div>
+                  <div class="programme">
+                    <div>
+                      <div class="name">Generalised Anxiety</div>
+                      <div class="sub">GAD-7 · 18 patients</div>
+                    </div>
+                    <div class="rate-chip">36% <span class="n">· n=18</span></div>
+                  </div>
+                  <div class="programme">
+                    <div>
+                      <div class="name">Sleep Health</div>
+                      <div class="sub">No clinical instrument</div>
+                    </div>
+                    <div class="rate-chip muted">— <span class="n">· n/a</span></div>
+                  </div>
+                </div>
+
+                <!-- 4. Queue -->
+                <div class="card-block" style="position:relative;">
+                  <div class="pin" style="top:-10px; right:-10px;">4</div>
+                  <div class="card-header">
+                    <span class="label">Verification queue · 18</span>
+                    <span class="meta">oldest first</span>
+                  </div>
+                  <div class="queue-row">
+                    <div class="avatar">SM</div>
+                    <div class="queue-meta">
+                      <div class="name">Sarah M.</div>
+                      <div class="sub">sarah.m@clinic.nhs · CBT</div>
+                    </div>
+                    <span class="waiting-chip stale">11d</span>
+                  </div>
+                  <div class="queue-row">
+                    <div class="avatar" style="background:linear-gradient(135deg,var(--sway-bright),var(--info));color:var(--sway-dark);">DK</div>
+                    <div class="queue-meta">
+                      <div class="name">David K.</div>
+                      <div class="sub">david.k@mindwell · PWP</div>
+                    </div>
+                    <span class="waiting-chip">4d</span>
+                  </div>
+                  <div class="link-row">
+                    <span class="link">View all 18 →</span>
+                  </div>
+                </div>
+
+                <!-- 5. Audit strip -->
+                <div class="card-block deep" style="position:relative;">
+                  <div class="pin" style="top:-10px; left:-10px;">5</div>
+                  <div class="card-header">
+                    <span class="label">Audit · last 7d</span>
+                    <span class="meta">24 events</span>
+                  </div>
+                  <div class="audit-row">
+                    <div class="audit-dot"></div>
+                    <div>
+                      <div class="audit-action">therapist.verified</div>
+                      <div class="audit-actor">you → david.k · pwp tier</div>
+                    </div>
+                    <div class="audit-time">2h ago</div>
+                  </div>
+                  <div class="audit-row">
+                    <div class="audit-dot"></div>
+                    <div>
+                      <div class="audit-action">module.created</div>
+                      <div class="audit-actor">you → Sleep Health</div>
+                    </div>
+                    <div class="audit-time">Yest</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tabbar">
+                <div class="tab active"><div class="tab-icon">⌂</div>Home</div>
+                <div class="tab"><div class="tab-icon">◎</div>Users</div>
+                <div class="tab"><div class="tab-icon">▣</div>Audit</div>
+                <div class="tab"><div class="tab-icon">⚙</div>Profile</div>
+              </div>
+            </div>
+
+            <div class="callouts">
+              <div class="callout"><span class="num-pin">1</span><span><b>Triage banner.</b> Only shown when queue >0, stalled >0, or orphaned >0 — non-zero counts only. Quiet by default.</span></div>
+              <div class="callout"><span class="num-pin">2</span><span><b>Weekly KPIs with prev-week delta.</b> Week, not 30d — therapy has weekly cadence. Plain deltas; colour supports, doesn't carry meaning.</span></div>
+              <div class="callout"><span class="num-pin">3</span><span><b>Outcome chips per programme.</b> Chip shows rate + n. Null instrument = muted dash. Never a naked percentage without n.</span></div>
+              <div class="callout"><span class="num-pin">4</span><span><b>Queue preview (top 5 oldest).</b> Ageing chip turns red past 7d. Tap row → verify sheet. "View all" opens full list.</span></div>
+              <div class="callout"><span class="num-pin">5</span><span><b>Audit strip.</b> Last 7d compressed — tap to expand to paginated log. Green dot = success, red dot = failure.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 2: Suppressed / care-safe -->
+        <div class="panel">
+          <span class="panel-caption">2 · Care-safe state</span>
+          <h3 class="panel-title">Small-n suppression (k-anon guard)</h3>
+          <p class="panel-note">When cells fall below k=5 or min-N=20, the rate hides but the count stays visible. The admin sees the shape, not the people.</p>
+          <div class="panel-body">
+            <div class="device" style="min-height:520px;">
+              <div class="status-bar"><span>9:41</span><span>· · ·</span></div>
+              <div class="nav">
+                <div>
+                  <div class="title">Outcomes</div>
+                  <div style="font-size:11px;color:var(--sway-darkGrey);margin-top:2px;">90d window</div>
+                </div>
+                <div class="asof">
+                  <span class="privacy-chip reduced">Dev mode</span><br/>
+                  <strong>Now</strong>
+                </div>
+              </div>
+              <div class="screen">
+
+                <div class="card-block" style="position:relative;">
+                  <div class="pin" style="top:-10px; right:-10px;">A</div>
+                  <div class="card-header">
+                    <span class="label">Depression · PHQ-9</span>
+                    <span class="meta">by care tier</span>
+                  </div>
+                  <div class="programme">
+                    <div>
+                      <div class="name">CBT-guided</div>
+                      <div class="sub">Recovery</div>
+                    </div>
+                    <div class="rate-chip">44% <span class="n">· n=22</span></div>
+                  </div>
+                  <div class="programme">
+                    <div>
+                      <div class="name">Self-help</div>
+                      <div class="sub">Recovery</div>
+                    </div>
+                    <div class="rate-chip muted">Fewer than 20 <span class="n">· n=8</span></div>
+                  </div>
+                  <div class="programme">
+                    <div>
+                      <div class="name">PWP-guided</div>
+                      <div class="sub">Recovery</div>
+                    </div>
+                    <div class="rate-chip muted">Too few <span class="n">· n<5</span></div>
+                  </div>
+                </div>
+
+                <div class="signal info" style="position:relative;">
+                  <div class="pin" style="top:-10px; left:-10px;">B</div>
+                  <div class="signal-icon">i</div>
+                  <div class="signal-body">
+                    <strong>Small cells hidden</strong>
+                    Rates suppressed below 20 patients, fully hidden below 5. This is a privacy guarantee, not a bug.
+                  </div>
+                </div>
+
+                <div class="card-block deep" style="position:relative;">
+                  <div class="pin" style="top:-10px; right:-10px;">C</div>
+                  <div class="card-header">
+                    <span class="label">Aggregated total</span>
+                  </div>
+                  <div class="kpi-grid">
+                    <div class="kpi">
+                      <div class="kpi-label">Recovery</div>
+                      <div class="kpi-value">41%</div>
+                      <div class="kpi-delta flat">n=22</div>
+                    </div>
+                    <div class="kpi">
+                      <div class="kpi-label">Rel. Recovery</div>
+                      <div class="kpi-value">28%</div>
+                      <div class="kpi-delta flat">n=22</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="callouts">
+              <div class="callout"><span class="num-pin">A</span><span><b>Tier breakdown respects k.</b> "Fewer than 20" copy for `below_min_n`; "Too few" for `below_k`. Reason drives wording.</span></div>
+              <div class="callout"><span class="num-pin">B</span><span><b>Privacy explainer.</b> Visible once per session so admins don't chase "missing" rates.</span></div>
+              <div class="callout"><span class="num-pin">C</span><span><b>Dev mode chip.</b> When `privacyMode === 'reduced'`, a dev badge appears in header so staging reads aren't mistaken for prod.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 3: Verify sheet -->
+        <div class="panel">
+          <span class="panel-caption">3 · Act</span>
+          <h3 class="panel-title">Verify therapist — inline sheet</h3>
+          <p class="panel-note">Tapping a queue row opens a half-sheet. Pick tier, confirm. Optimistic UI removes the row. Audit event logged server-side.</p>
+          <div class="panel-body">
+            <div class="device" style="min-height:620px;">
+              <div class="status-bar"><span>9:41</span><span>· · ·</span></div>
+              <div class="nav">
+                <div><div class="title">Admin</div></div>
+                <div class="asof"><span class="privacy-chip">Live</span></div>
+              </div>
+              <div class="screen" style="filter:brightness(0.55) blur(0.5px);">
+                <div class="card-block">
+                  <div class="card-header"><span class="label">Verification queue · 18</span></div>
+                  <div class="queue-row">
+                    <div class="avatar">SM</div>
+                    <div class="queue-meta">
+                      <div class="name">Sarah M.</div>
+                      <div class="sub">sarah.m@clinic.nhs · CBT</div>
+                    </div>
+                    <span class="waiting-chip stale">11d</span>
+                  </div>
+                  <div class="queue-row">
+                    <div class="avatar">DK</div>
+                    <div class="queue-meta">
+                      <div class="name">David K.</div>
+                      <div class="sub">david.k@mindwell · PWP</div>
+                    </div>
+                    <span class="waiting-chip">4d</span>
+                  </div>
+                </div>
+              </div>
+              <div class="sheet">
+                <div class="handle"></div>
+                <h3>Verify Sarah M.</h3>
+                <p>sarah.m@clinic.nhs · waiting 11 days</p>
+                <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--sway-darkGrey);font-weight:700;margin-bottom:8px;">Therapist tier <span style="color:var(--error);">*</span></div>
+                <div class="tier-picker">
+                  <div class="tier-opt selected">
+                    CBT
+                    <div class="tier-sub">Full cognitive</div>
+                  </div>
+                  <div class="tier-opt">
+                    PWP
+                    <div class="tier-sub">Behavioural</div>
+                  </div>
+                </div>
+                <button class="cta-btn">Confirm verification</button>
+                <div class="link-row" style="justify-content:center;margin-top:10px;">
+                  <span class="link" style="color:var(--sway-darkGrey);">Cancel</span>
+                </div>
+              </div>
+            </div>
+            <div class="callouts">
+              <div class="callout"><span class="num-pin">α</span><span><b>Tier is mandatory.</b> No default — forces a conscious pick (matches BE invariant: `therapistTier` required at verify time).</span></div>
+              <div class="callout"><span class="num-pin">β</span><span><b>Sheet, not modal.</b> Keeps the queue visible behind — admin sees progress as rows disappear.</span></div>
+              <div class="callout"><span class="num-pin">γ</span><span><b>Optimistic row removal + BloomBurst micro-celebration</b> on success. Failure reverts + error toast.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 4: Programme detail drill -->
+        <div class="panel">
+          <span class="panel-caption">4 · Drill</span>
+          <h3 class="panel-title">Programme detail — outcomes over time</h3>
+          <p class="panel-note">Tap a programme chip → drill to a detail view. Outcome timeline, care-tier split, work mix. Reuses `/api/admin/programmes/:id` + `/api/admin/outcomes`.</p>
+          <div class="panel-body">
+            <div class="device" style="min-height:700px;">
+              <div class="status-bar"><span>9:41</span><span>· · ·</span></div>
+              <div class="nav">
+                <div>
+                  <div class="title">Depression</div>
+                  <div style="font-size:11px;color:var(--sway-darkGrey);margin-top:2px;">PHQ-9 · 22 enrolled</div>
+                </div>
+                <div class="asof"><span class="privacy-chip">Live</span></div>
+              </div>
+              <div class="screen">
+
+                <div class="card-block" style="position:relative;">
+                  <div class="pin" style="top:-10px;right:-10px;">i</div>
+                  <div class="card-header">
+                    <span class="label">Recovery · 12 months</span>
+                    <div class="seg-tabs"><span>Wk</span><span class="active">Mo</span></div>
+                  </div>
+                  <svg viewBox="0 0 340 90" style="width:100%;height:90px;">
+                    <defs>
+                      <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#18cdba" stop-opacity="0.35"/>
+                        <stop offset="100%" stop-color="#18cdba" stop-opacity="0"/>
+                      </linearGradient>
+                    </defs>
+                    <path d="M10,70 L40,65 L70,55 L100,60 L130,40 L160,45 L190,35 L220,32 L250,28 L280,30 L310,20 L330,25 L330,90 L10,90 Z" fill="url(#grad1)"/>
+                    <path d="M10,70 L40,65 L70,55 L100,60 L130,40 L160,45 L190,35 L220,32 L250,28 L280,30 L310,20 L330,25" fill="none" stroke="#18cdba" stroke-width="2"/>
+                    <circle cx="330" cy="25" r="3.5" fill="#18cdba"/>
+                  </svg>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--sway-darkGrey);margin-top:4px;">
+                    <span>Jun</span><span>Sep</span><span>Dec</span><span>Mar</span><span>Today</span>
+                  </div>
+                </div>
+
+                <div class="card-block" style="position:relative;">
+                  <div class="pin" style="top:-10px;left:-10px;">ii</div>
+                  <div class="card-header">
+                    <span class="label">By care tier</span>
+                    <span class="meta">n=22</span>
+                  </div>
+                  <div class="programme">
+                    <div><div class="name">CBT-guided</div><div class="sub">Recovery · Rel.Rec 31%</div></div>
+                    <div class="rate-chip">44% <span class="n">· n=10</span></div>
+                  </div>
+                  <div class="programme">
+                    <div><div class="name">Self-help</div><div class="sub">Recovery</div></div>
+                    <div class="rate-chip muted">Fewer than 20 <span class="n">· n=8</span></div>
+                  </div>
+                </div>
+
+                <div class="card-block" style="position:relative;">
+                  <div class="pin" style="top:-10px;right:-10px;">iii</div>
+                  <div class="card-header">
+                    <span class="label">Work this week · by type</span>
+                    <span class="meta">completed</span>
+                  </div>
+                  <div class="bar-row"><span>PHQ-9</span><div class="bar-track"><div class="bar-fill" style="width:92%;"></div></div><span class="bar-value">46</span></div>
+                  <div class="bar-row"><span>Diary</span><div class="bar-track"><div class="bar-fill" style="width:64%;"></div></div><span class="bar-value">32</span></div>
+                  <div class="bar-row"><span>5 Areas</span><div class="bar-track"><div class="bar-fill" style="width:30%;"></div></div><span class="bar-value">15</span></div>
+                  <div class="bar-row"><span>Thought C.</span><div class="bar-track"><div class="bar-fill" style="width:18%;"></div></div><span class="bar-value">9</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="callouts">
+              <div class="callout"><span class="num-pin">i</span><span><b>Timeline owns time.</b> Monthly by default (granularity=month). Week/month toggle. Zero-denominator buckets render flat — never dropped.</span></div>
+              <div class="callout"><span class="num-pin">ii</span><span><b>Care-tier split</b> respects suppression rules identically to overview.</span></div>
+              <div class="callout"><span class="num-pin">iii</span><span><b>Work-mix bars.</b> Shows which CBT tools drove activity — aggregate only, no patient-level data.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 5: Audit log drill -->
+        <div class="panel">
+          <span class="panel-caption">5 · Audit</span>
+          <h3 class="panel-title">Audit log — paginated, filterable</h3>
+          <p class="panel-note">Drill from the audit strip. Reverse-chrono, cursor-paginated, opaque context metadata collapsed under each row.</p>
+          <div class="panel-body">
+            <div class="device" style="min-height:620px;">
+              <div class="status-bar"><span>9:41</span><span>· · ·</span></div>
+              <div class="nav">
+                <div>
+                  <div class="title">Audit</div>
+                  <div style="font-size:11px;color:var(--sway-darkGrey);margin-top:2px;">24 events · last 7d</div>
+                </div>
+                <div class="asof"><span class="privacy-chip">Live</span></div>
+              </div>
+              <div class="screen">
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                  <span class="rate-chip">All</span>
+                  <span class="rate-chip muted">therapist.*</span>
+                  <span class="rate-chip muted">module.*</span>
+                  <span class="rate-chip muted">user.*</span>
+                </div>
+
+                <div class="card-block">
+                  <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--sway-darkGrey);font-weight:700;margin-bottom:8px;">Today</div>
+                  <div class="audit-row">
+                    <div class="audit-dot"></div>
+                    <div>
+                      <div class="audit-action">therapist.verified</div>
+                      <div class="audit-actor">admin → david.k · tier=pwp</div>
+                    </div>
+                    <div class="audit-time">09:12</div>
+                  </div>
+                  <div class="audit-row">
+                    <div class="audit-dot"></div>
+                    <div>
+                      <div class="audit-action">user.viewed</div>
+                      <div class="audit-actor">admin → patient profile</div>
+                    </div>
+                    <div class="audit-time">08:47</div>
+                  </div>
+                  <div class="audit-row">
+                    <div class="audit-dot fail"></div>
+                    <div>
+                      <div class="audit-action">therapist.verified</div>
+                      <div class="audit-actor">admin → missing tier (failed)</div>
+                    </div>
+                    <div class="audit-time">08:42</div>
+                  </div>
+                </div>
+
+                <div class="card-block">
+                  <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--sway-darkGrey);font-weight:700;margin-bottom:8px;">Yesterday</div>
+                  <div class="audit-row">
+                    <div class="audit-dot"></div>
+                    <div>
+                      <div class="audit-action">module.created</div>
+                      <div class="audit-actor">admin → Sleep Health</div>
+                    </div>
+                    <div class="audit-time">17:33</div>
+                  </div>
+                  <div class="audit-row">
+                    <div class="audit-dot"></div>
+                    <div>
+                      <div class="audit-action">therapist.verified</div>
+                      <div class="audit-actor">admin → maya.p · tier=cbt</div>
+                    </div>
+                    <div class="audit-time">14:10</div>
+                  </div>
+                </div>
+                <div class="cta-btn outline">Load 10 more</div>
+              </div>
+            </div>
+            <div class="callouts">
+              <div class="callout"><span class="num-pin">I</span><span><b>Chip filters.</b> Maps to `action` prefix filters on the audit endpoint — no free-text search in v1.</span></div>
+              <div class="callout"><span class="num-pin">II</span><span><b>Context is opaque.</b> Known fields (action, actor, resourceType, outcome, at) shown; raw context hidden behind "Details".</span></div>
+              <div class="callout"><span class="num-pin">III</span><span><b>Cursor pagination.</b> "Load more" uses the `nextCursor` from response — no page numbers.</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =========================================== -->
+    <!-- 3. State gallery -->
+    <!-- =========================================== -->
+    <section class="block">
+      <div class="section-head">
+        <span class="num">03 · STATES</span>
+        <h2>State gallery</h2>
+        <span class="hint">Each card handles its own state — the screen doesn't go blank because one endpoint is slow.</span>
+      </div>
+      <div class="gallery">
+
+        <div class="thumb">
+          <div class="thumb-label loading">Loading</div>
+          <div style="font-size:14px;font-weight:700;">Overview hydrating</div>
+          <div class="thumb-desc">Skeleton boxes matched to final card heights so layout doesn't jump when data lands.</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:auto;">
+            <div class="skel tall"></div>
+            <div class="skel md"></div>
+            <div class="skel sm"></div>
+            <div class="skel tall"></div>
+            <div class="skel md"></div>
+          </div>
+        </div>
+
+        <div class="thumb">
+          <div class="thumb-label empty">Empty · first run</div>
+          <div style="font-size:14px;font-weight:700;">No data yet</div>
+          <div class="thumb-desc">Pre-rollup state. `rollupAsOf` is null. Dashboard doesn't lie — it explains.</div>
+          <div class="empty-vis" style="margin-top:auto;">
+            <div class="empty-icon">⏳</div>
+            <div style="font-size:13px;font-weight:700;">Rollup pending</div>
+            <div style="font-size:11px;color:var(--sway-darkGrey);">First rollup runs at midnight.<br/>Counts appear 09:00 tomorrow.</div>
+          </div>
+        </div>
+
+        <div class="thumb">
+          <div class="thumb-label success">Success · queue cleared</div>
+          <div style="font-size:14px;font-weight:700;">Inbox zero</div>
+          <div class="thumb-desc">When verification queue hits 0, the card celebrates — modest BloomBurst on surface.</div>
+          <div class="empty-vis" style="margin-top:auto;">
+            <div class="empty-icon" style="background:var(--tint-teal);color:var(--sway-bright);">✓</div>
+            <div style="font-size:13px;font-weight:700;color:var(--sway-bright);">All verified</div>
+            <div style="font-size:11px;color:var(--sway-darkGrey);">Next review when new therapists sign up.</div>
+          </div>
+        </div>
+
+        <div class="thumb">
+          <div class="thumb-label error">Error · rollup failed</div>
+          <div style="font-size:14px;font-weight:700;">Stale data warning</div>
+          <div class="thumb-desc">`rollupLastRun.status === 'failure'`. Banner flags staleness; last-known values remain visible.</div>
+          <div class="signal" style="margin-top:auto;">
+            <div class="signal-icon">!</div>
+            <div class="signal-body">
+              <strong>Outcomes rollup failed</strong>
+              Showing values from 48h ago. Ops has been notified.
+            </div>
+          </div>
+        </div>
+
+        <div class="thumb">
+          <div class="thumb-label edge">Edge · all suppressed</div>
+          <div style="font-size:14px;font-weight:700;">Small cohort</div>
+          <div class="thumb-desc">Every tier <k. Rates hidden, n still visible. Design doesn't break — just goes quiet.</div>
+          <div class="card-block" style="margin-top:auto;padding:10px;">
+            <div class="programme" style="padding:6px 0;"><div><div class="name" style="font-size:12px;">CBT-guided</div></div><div class="rate-chip muted">Too few</div></div>
+            <div class="programme" style="padding:6px 0;"><div><div class="name" style="font-size:12px;">Self-help</div></div><div class="rate-chip muted">Too few</div></div>
+            <div class="programme" style="padding:6px 0;"><div><div class="name" style="font-size:12px;">PWP-guided</div></div><div class="rate-chip muted">Too few</div></div>
+          </div>
+        </div>
+
+        <div class="thumb">
+          <div class="thumb-label edge">Edge · dev mode</div>
+          <div style="font-size:14px;font-weight:700;">privacyMode: reduced</div>
+          <div class="thumb-desc">Staging threshold lowered. Yellow "dev mode" chip in header makes it impossible to confuse with prod.</div>
+          <div style="margin-top:auto;padding:12px;border-radius:10px;background:var(--tint-info);border:1px dashed var(--tint-info-border);font-size:12px;">
+            <span class="privacy-chip reduced" style="margin-bottom:6px;">Dev mode</span><br/>
+            Rates visible below production threshold. Do not quote these to stakeholders.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =========================================== -->
+    <!-- 4. Animation callouts -->
+    <!-- =========================================== -->
+    <section class="block">
+      <div class="section-head">
+        <span class="num">04 · MOTION</span>
+        <h2>Animation callouts</h2>
+        <span class="hint">Motion earns its place — each moment either reports a change or confirms an action. No decorative drift.</span>
+      </div>
+      <div class="anim-grid">
+
+        <div class="anim-card">
+          <div class="anim-meta">On mount · 600ms</div>
+          <h3 class="anim-title">KPI count-up</h3>
+          <div class="anim-stage">
+            <div class="count-up">412</div>
+          </div>
+          <p class="anim-desc">When a tile renders for the first time, the number eases in (scale 0.94 → 1 + opacity 0.6 → 1). Signals "fresh" without bouncing. Suppressed on refetch to avoid distracting re-reads.</p>
+        </div>
+
+        <div class="anim-card">
+          <div class="anim-meta">On queue >0 · 2s loop</div>
+          <h3 class="anim-title">Pulse — pending action</h3>
+          <div class="anim-stage">
+            <div class="pulse-wrap">
+              <div class="pulse-dot"></div>
+              18 to verify
+            </div>
+          </div>
+          <p class="anim-desc">Only the verification count pulses, and only when >0. A quiet way to say "this is the one thing waiting for you" without making the whole screen red.</p>
+        </div>
+
+        <div class="anim-card">
+          <div class="anim-meta">On verify success · 320ms</div>
+          <h3 class="anim-title">Queue row slide-out</h3>
+          <div class="anim-stage">
+            <div class="queue-demo">
+              <div class="q-item">Sarah M. · 11d</div>
+              <div class="q-item">David K. · 4d</div>
+              <div class="q-item">Maya P. · 2d</div>
+            </div>
+          </div>
+          <p class="anim-desc">Row translates left + fades as the mutation resolves. Optimistic — reverts on failure. Count decrements in the header inline. BloomBurst fires when the last row goes.</p>
+        </div>
+
+        <div class="anim-card">
+          <div class="anim-meta">On drill-in · 500ms</div>
+          <h3 class="anim-title">Timeline draw-in</h3>
+          <div class="anim-stage">
+            <div class="spark-demo">
+              <svg viewBox="0 0 340 50" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#18cdba" stop-opacity="0.4"/>
+                    <stop offset="100%" stop-color="#18cdba" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path class="area" d="M0,40 L40,35 L80,28 L120,32 L160,22 L200,20 L240,15 L280,18 L320,8 L340,12 L340,50 L0,50 Z"/>
+                <path class="line" d="M0,40 L40,35 L80,28 L120,32 L160,22 L200,20 L240,15 L280,18 L320,8 L340,12"/>
+              </svg>
+            </div>
+          </div>
+          <p class="anim-desc">When navigating to a programme detail, the outcome line strokes in left→right, then the area fill eases up. Makes the trend readable as it draws — not a static reveal.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =========================================== -->
+    <!-- 5. Component breakdown -->
+    <!-- =========================================== -->
+    <section class="block">
+      <div class="section-head">
+        <span class="num">05 · COMPONENTS</span>
+        <h2>Component breakdown</h2>
+        <span class="hint">Mostly built from the existing inventory — the design's job is to place them, not reinvent them.</span>
+      </div>
+      <div class="components-grid">
+        <div class="components-block">
+          <h3>New (Admin-scoped)</h3>
+          <ul>
+            <li><code>AdminSignalBanner</code><span>Conditional top-of-screen banner, triage-prioritised (queue → stalled → orphaned). Hidden when all zero.</span></li>
+            <li><code>KpiTile</code><span>Single metric card: label + value + prev-period delta. Renders skeleton on loading, tolerates null.</span></li>
+            <li><code>ProgrammeOutcomeChip</code><span>Rate + n, with suppression-aware rendering ("Too few" / "Fewer than 20" / muted dash).</span></li>
+            <li><code>VerifyQueueRow</code><span>Avatar + name/email + tier + ageing chip. Tappable → opens `VerifyTherapistSheet`.</span></li>
+            <li><code>VerifyTherapistSheet</code><span>Half-sheet with mandatory tier picker (cbt/pwp), confirm CTA, optimistic mutation.</span></li>
+            <li><code>AuditStrip / AuditEventRow</code><span>Compact 5-event preview (overview) + full paginated list (audit screen).</span></li>
+            <li><code>PrivacyModeBadge</code><span>Renders "Live" vs "Dev mode" chip from `privacyMode` on every admin response.</span></li>
+            <li><code>RollupStalenessBanner</code><span>Surfaces `rollupLastRun.status === 'failure'` with last-known-good timestamp.</span></li>
+          </ul>
+        </div>
+
+        <div class="components-block">
+          <h3>Reused (from §6 inventory)</h3>
+          <ul>
+            <li><code>Container</code><span>Full-bleed dark screen wrapper.</span></li>
+            <li><code>ContentContainer</code><span>For audit/programme detail screens that need headers.</span></li>
+            <li><code>ThemedText</code><span>All typography — `title`, `smallTitle`, `default`, `small`, `link`.</span></li>
+            <li><code>ThemedButton</code><span>`variant="default"` for primary verify confirm; `outline` for "Load more".</span></li>
+            <li><code>StatStrip</code><span>Base for the KPI grid — extended with a delta sub-row.</span></li>
+            <li><code>Chip / StatusChip</code><span>Underpins rate chips, ageing chips, privacy badge, filter chips.</span></li>
+            <li><code>EmptyState</code><span>Pre-rollup and inbox-zero messages.</span></li>
+            <li><code>Collapsible</code><span>Audit event details drawer (opaque context field).</span></li>
+            <li><code>BloomBurst</code><span>One-shot celebration when queue clears to 0.</span></li>
+            <li><code>BarSparkline / Sparkline</code><span>Timeline + work-mix bars on programme detail.</span></li>
+            <li><code>ActionMenu</code><span>Row long-press on audit / queue rows (e.g. "Copy event id", "Open user profile").</span></li>
+            <li><code>IconSymbol</code><span>All iconography — SF on iOS, Material fallback.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================== -->
+    <!-- 6. Rationale -->
+    <!-- =========================================== -->
+    <section class="block">
+      <div class="section-head">
+        <span class="num">06 · RATIONALE</span>
+        <h2>Why this design serves the angle</h2>
+        <span class="hint">Straight read = zero ambiguity, zero learning curve, maximum merge-ability.</span>
+      </div>
+      <div class="rationale">
+        <ol>
+          <li>
+            <strong>One endpoint, one scroll.</strong>
+            <span>The overview card stack mirrors `GET /api/admin/overview` 1:1 — signals, operational, programmes, queue, audit. No client-side joins, no N+1. A bored admin on their phone at 9am can read it in 15 seconds and leave.</span>
+          </li>
+          <li>
+            <strong>Care-safety is the first-class UX, not a footnote.</strong>
+            <span>k-anonymity suppression gets first-class visual language (muted chip + reason copy), privacy mode is always in the header, and admins never see individual scores — only aggregates, counts, and queues. The design cannot accidentally expose a patient.</span>
+          </li>
+          <li>
+            <strong>Numbers with comparators, deltas not vanity.</strong>
+            <span>Every KPI shows this-week vs prev-week (the API provides both). No naked counts. Colour supports the delta; copy carries the meaning — works for colour-blind admins.</span>
+          </li>
+          <li>
+            <strong>One thing to do, visible at a glance.</strong>
+            <span>The verify queue is the only routinely-actionable surface for a bwell admin. It gets preview-on-home + one-tap verify-in-sheet + celebration-on-zero. Everything else is informational — the hierarchy reflects that.</span>
+          </li>
+          <li>
+            <strong>Quiet by default, loud when it matters.</strong>
+            <span>Teal is accent only. Red appears only when `stalledAttempts7d > 0`, `orphanedAssignments > 0`, or queue ageing exceeds 7 days. A clean system looks clean — no sparkline wallpaper, no forced drama.</span>
+          </li>
+        </ol>
+
+        <div class="be-note">
+          <strong>BE change requests:</strong> none. This design is fully achievable with the contract documented in §2. Optional nice-to-have: `users.newLastWeek` is already present, but the overview tile's "vs prev" for `activeLast30d` uses `activeLast30dPrevious` as-is — no schema change required.
+        </div>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>
