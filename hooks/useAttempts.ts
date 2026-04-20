@@ -134,12 +134,12 @@ export const useStartModuleAttempt = () => {
       return data;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['assignments'] });
-      qc.invalidateQueries({ queryKey: ['attempts', 'mine'] });
-      qc.invalidateQueries({ queryKey: ['attempts', 'therapist'] });
-      qc.invalidateQueries({ queryKey: ['clients'] });
-      qc.invalidateQueries({ queryKey: ['practice'] });
-      qc.invalidateQueries({ queryKey: ['review'] });
+      void qc.invalidateQueries({ queryKey: ['assignments'] });
+      void qc.invalidateQueries({ queryKey: ['attempts', 'mine'] });
+      void qc.invalidateQueries({ queryKey: ['attempts', 'therapist'] });
+      void qc.invalidateQueries({ queryKey: ['clients'] });
+      void qc.invalidateQueries({ queryKey: ['practice'] });
+      void qc.invalidateQueries({ queryKey: ['review'] });
     },
     toast: { pending: 'Starting attempt...', success: 'Attempt started', error: 'Failed to start attempt' }
   });
@@ -153,10 +153,10 @@ export const useSaveModuleAttempt = (attemptId: string) => {
       return data;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['attempts', 'detail'] });
-      qc.invalidateQueries({ queryKey: ['attempts', 'mine'] });
-      qc.invalidateQueries({ queryKey: ['attempts', 'therapist', 'patient-timeline'] });
-      qc.invalidateQueries({ queryKey: ['assignments'] });
+      void qc.invalidateQueries({ queryKey: ['attempts', 'detail'] });
+      void qc.invalidateQueries({ queryKey: ['attempts', 'mine'] });
+      void qc.invalidateQueries({ queryKey: ['attempts', 'therapist', 'patient-timeline'] });
+      void qc.invalidateQueries({ queryKey: ['assignments'] });
     },
     toast: { pending: 'Saving progress...', success: 'Progress saved', error: 'Failed to save' }
   });
@@ -170,15 +170,15 @@ export const useSubmitAttempt = (attemptId: string) => {
       return data;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['assignments'] });
-      qc.invalidateQueries({ queryKey: ['attempts', 'mine'] });
-      qc.invalidateQueries({ queryKey: ['attempts', 'detail'] });
-      qc.invalidateQueries({ queryKey: ['attempts', 'therapist'] });
-      qc.invalidateQueries({ queryKey: ['clients'] });
-      qc.invalidateQueries({ queryKey: ['attempts', 'therapist', 'patient-timeline'] });
-      qc.invalidateQueries({ queryKey: ['score-trends'] });
-      qc.invalidateQueries({ queryKey: ['practice'] });
-      qc.invalidateQueries({ queryKey: ['review'] });
+      void qc.invalidateQueries({ queryKey: ['assignments'] });
+      void qc.invalidateQueries({ queryKey: ['attempts', 'mine'] });
+      void qc.invalidateQueries({ queryKey: ['attempts', 'detail'] });
+      void qc.invalidateQueries({ queryKey: ['attempts', 'therapist'] });
+      void qc.invalidateQueries({ queryKey: ['clients'] });
+      void qc.invalidateQueries({ queryKey: ['attempts', 'therapist', 'patient-timeline'] });
+      void qc.invalidateQueries({ queryKey: ['score-trends'] });
+      void qc.invalidateQueries({ queryKey: ['practice'] });
+      void qc.invalidateQueries({ queryKey: ['review'] });
     },
     toast: { pending: 'Submitting...', success: 'Submitted successfully', error: 'Submission failed' }
   });

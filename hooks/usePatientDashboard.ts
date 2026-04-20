@@ -78,8 +78,8 @@ export const usePatientDashboard = () => {
   const isRefetching = practiceQuery.isRefetching || trendsQuery.isRefetching;
 
   const refetch = useCallback(() => {
-    practiceQuery.refetch();
-    trendsQuery.refetch();
+    void practiceQuery.refetch();
+    void trendsQuery.refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [practiceQuery.refetch, trendsQuery.refetch]);
 

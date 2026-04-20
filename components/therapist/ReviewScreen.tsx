@@ -246,7 +246,7 @@ const ReviewScreen = () => {
   );
 
   const handleEndReached = useCallback(() => {
-    if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+    if (hasNextPage && !isFetchingNextPage) void fetchNextPage();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleClearFilter = useCallback((key: keyof ReviewFilterValues) => {

@@ -79,7 +79,7 @@ export const useCreateModule = () => {
     mutationFn: createModule,
     toast: { pending: 'Creating module...', success: 'Module created', error: 'Failed to create module' },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['modules'] });
+      void queryClient.invalidateQueries({ queryKey: ['modules'] });
     }
   });
 };
