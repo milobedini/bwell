@@ -1,50 +1,117 @@
-import { View } from 'react-native';
+import { useMemo } from 'react';
+import { RefreshControl, ScrollView, View } from 'react-native';
+import { Colors } from '@/constants/Colors';
+import { useAdminOverview } from '@/hooks/useAdminOverview';
 import useToggle from '@/hooks/useToggle';
-import { useAdminStats } from '@/hooks/useUsers';
+import { computeAttentionScore } from '@/utils/attentionScore';
+import type { AuthUser } from '@milobedini/shared-types';
 
 import ContentContainer from '../ContentContainer';
 import ErrorComponent, { ErrorTypes } from '../ErrorComponent';
 import { LoadingIndicator } from '../LoadingScreen';
-import { PrimaryButton } from '../ThemedButton';
 import { ThemedText } from '../ThemedText';
 import TherapistPicker from '../user/TherapistPicker';
 
+import AttentionBanner from './admin-dashboard/AttentionBanner';
+import FreshnessRow from './admin-dashboard/FreshnessRow';
+import LeadProgrammeCard from './admin-dashboard/LeadProgrammeCard';
+import OpsFooter from './admin-dashboard/OpsFooter';
+import ProgrammeRow from './admin-dashboard/ProgrammeRow';
 import { HomeScreen } from './HomeScreen';
 
 const AdminHome = () => {
-  const { data, isPending, isError } = useAdminStats();
+  const { data, isPending, isError, refetch, isRefetching } = useAdminOverview();
   const [pickerVisible, togglePickerVisible] = useToggle(false);
 
-  if (isPending) return <LoadingIndicator marginBottom={0} />;
+  const score = useMemo(() => (data ? computeAttentionScore(data) : null), [data]);
 
-  if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
-
-  if (!data && !isPending) return <ErrorComponent errorType={ErrorTypes.UNAUTHORIZED} redirectLogin />;
-
-  const content = (
-    <ContentContainer className="z-10">
-      <View className="gap-6 p-2">
-        <View className="gap-2">
-          <ThemedText type="subtitle">Total Users: {data.totalUsers}</ThemedText>
-          <ThemedText>
-            {data.totalPatients} patients & {data.totalTherapists} therapists
-          </ThemedText>
-        </View>
-        <ThemedText type="smallTitle">{data.completedAttempts} modules completed this week</ThemedText>
-        {!!data.unverifiedTherapists.length && (
-          <View className="gap-2">
-            <ThemedText type="smallTitle">
-              {data.unverifiedTherapists.length} therapist awaiting verification
-            </ThemedText>
-            <PrimaryButton title="Verify" onPress={togglePickerVisible} />
-          </View>
-        )}
-      </View>
-      <TherapistPicker visible={pickerVisible} onDismiss={togglePickerVisible} therapists={data.unverifiedTherapists} />
-    </ContentContainer>
+  // Adapt /overview's verification queue preview into AuthUser shape for the picker.
+  const unverifiedTherapists = useMemo<AuthUser[]>(
+    () =>
+      (data?.verificationQueue.oldest ?? []).map((row) => ({
+        _id: row.userId,
+        username: row.username,
+        email: row.email,
+        name: row.name,
+        roles: ['therapist'],
+        isVerifiedTherapist: false,
+        therapistTier: row.therapistTier ?? undefined
+      })),
+    [data]
   );
 
-  return <HomeScreen content={content} />;
+  if (isPending) return <HomeScreen content={<LoadingIndicator marginBottom={0} />} />;
+  if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
+  if (!data) return <ErrorComponent errorType={ErrorTypes.UNAUTHORIZED} redirectLogin />;
+
+  const leadProgramme = data.programmes.find((p) => p.outcomes !== null) ?? null;
+  const otherProgrammes = data.programmes.filter((p) => p !== leadProgramme);
+
+  const content = (
+    <ScrollView
+      className="flex-1 pb-6"
+      showsVerticalScrollIndicator={false}
+      refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={Colors.sway.bright} />}
+    >
+      <View className="py-2">
+        <ThemedText
+          type="small"
+          style={{ color: Colors.sway.darkGrey, fontSize: 11, letterSpacing: 0.8, textTransform: 'uppercase' }}
+        >
+          Admin overview
+        </ThemedText>
+        <ThemedText type="subtitle" style={{ color: Colors.sway.lightGrey, marginTop: 4 }}>
+          Clinical outcomes first
+        </ThemedText>
+        <View className="mt-3">
+          <FreshnessRow asOf={data.asOf} rollupAsOf={data.rollupAsOf} privacyMode={data.privacyMode} />
+        </View>
+      </View>
+
+      {score && (
+        <View className="mt-4">
+          <AttentionBanner score={score} onPressVerification={togglePickerVisible} />
+        </View>
+      )}
+
+      {leadProgramme && (
+        <View className="mt-5">
+          <LeadProgrammeCard programme={leadProgramme} />
+        </View>
+      )}
+
+      {otherProgrammes.length > 0 && (
+        <View className="mt-5">
+          <ThemedText
+            type="small"
+            style={{
+              color: Colors.sway.darkGrey,
+              fontSize: 11,
+              letterSpacing: 0.8,
+              textTransform: 'uppercase',
+              marginBottom: 8
+            }}
+          >
+            Other programmes
+          </ThemedText>
+          <View className="gap-2">
+            {otherProgrammes.map((p) => (
+              <ProgrammeRow key={p.programmeId} programme={p} />
+            ))}
+          </View>
+        </View>
+      )}
+
+      <View className="mt-6">
+        <OpsFooter operational={data.operational} verificationCount={data.verificationQueue.count} />
+      </View>
+
+      <View className="h-8" />
+      <TherapistPicker visible={pickerVisible} onDismiss={togglePickerVisible} therapists={unverifiedTherapists} />
+    </ScrollView>
+  );
+
+  return <HomeScreen content={<ContentContainer>{content}</ContentContainer>} />;
 };
 
 export default AdminHome;
