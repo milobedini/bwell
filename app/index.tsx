@@ -5,7 +5,7 @@ import { Colors } from '@/constants/Colors';
 import { useHasOnboarded } from '@/hooks/useOnboarding';
 import { useAuthStore } from '@/stores/authStore';
 
-SystemUI.setBackgroundColorAsync(Colors.sway.dark);
+void SystemUI.setBackgroundColorAsync(Colors.sway.dark);
 
 function IndexRedirect() {
   const rootNavigationState = useRootNavigationState();

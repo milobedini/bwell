@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
@@ -14,11 +14,14 @@ type MoodSliderProps = {
 
 const MoodSlider = memo(({ value, onChange, disabled }: MoodSliderProps) => {
   const [displayValue, setDisplayValue] = useState(value);
+  const [prevValue, setPrevValue] = useState(value);
 
-  // Sync displayValue when the prop changes (e.g. switching days)
-  useEffect(() => {
+  // Reset the local drag value when the prop changes (e.g. switching days).
+  // Adjusting during render is React's recommended alternative to a sync effect.
+  if (prevValue !== value) {
+    setPrevValue(value);
     setDisplayValue(value);
-  }, [value]);
+  }
 
   const handleValueChange = useCallback((v: number) => {
     setDisplayValue(Math.round(v));

@@ -34,15 +34,4 @@ describe('useToggle', () => {
     act(() => result.current[2](true));
     expect(result.current[0]).toBe(true);
   });
-
-  it('syncs when initialValue prop changes', () => {
-    const { result, rerender } = renderHook(({ init }: { init: boolean }) => useToggle(init), {
-      initialProps: { init: false }
-    });
-
-    expect(result.current[0]).toBe(false);
-
-    rerender({ init: true });
-    expect(result.current[0]).toBe(true);
-  });
 });

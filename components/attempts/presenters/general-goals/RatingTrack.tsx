@@ -18,7 +18,7 @@ const RatingTrack = ({ selected, onSelect, disabled, label, style }: RatingTrack
   const handleSelect = useCallback(
     (n: number) => {
       if (disabled || !onSelect) return;
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       onSelect(n);
     },
     [disabled, onSelect]

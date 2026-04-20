@@ -32,6 +32,10 @@ const PracticeItemDetail = ({ assignmentId, attemptIdParam }: PracticeItemDetail
 
   const existingAttemptId = item?.latestAttempt?.attemptId;
 
+  // Auto-start an attempt when we discover the item is `not_started`. The
+  // trigger is async data becoming available, not a user event, so this is a
+  // legitimate effect use-case even though the plugin flags it.
+  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler */
   useEffect(() => {
     if (!item || existingAttemptId || startedAttemptId || item.status !== 'not_started' || isStarting) return;
     startAttempt(
@@ -39,6 +43,7 @@ const PracticeItemDetail = ({ assignmentId, attemptIdParam }: PracticeItemDetail
       { onSuccess: (res) => setStartedAttemptId(res.attempt._id) }
     );
   }, [item, existingAttemptId, startedAttemptId, isStarting, startAttempt]);
+  /* eslint-enable react-you-might-not-need-an-effect/no-event-handler */
 
   // Use param directly (e.g. from Journey tab) or resolve from practice data
   const resolvedAttemptId = attemptIdParam ?? existingAttemptId ?? startedAttemptId ?? '';

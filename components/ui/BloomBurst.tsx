@@ -1,50 +1,66 @@
-import { memo, useEffect, useState } from 'react';
+import { memo, type Ref, useEffect, useImperativeHandle, useRef } from 'react';
 import { AccessibilityInfo, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 import { Colors } from '@/constants/Colors';
 import { Canvas, Circle, RadialGradient, vec } from '@shopify/react-native-skia';
 
-// Increment `trigger` to fire a single celebratory bloom (ease out → ease out).
-// The Skia radial gradient gives a proper soft falloff instead of hard-edged
-// circles; scale and opacity are driven by Reanimated on the native thread.
+// Call `ref.current.bloom()` to fire a single celebratory bloom (ease out →
+// ease out). The Skia radial gradient gives a proper soft falloff instead of
+// hard-edged circles; scale and opacity are driven by Reanimated on the native
+// thread.
+export type BloomBurstHandle = {
+  bloom: () => void;
+};
+
 type BloomBurstProps = {
-  trigger: number;
+  ref?: Ref<BloomBurstHandle>;
   size?: number;
   colors?: readonly [string, string, string];
 };
 
 const DEFAULT_COLORS = [Colors.bloom.tealCore, Colors.bloom.tealMid, Colors.bloom.tealEdge] as const;
 
-const BloomBurst = ({ trigger, size = 96, colors = DEFAULT_COLORS }: BloomBurstProps) => {
-  const [reduceMotion, setReduceMotion] = useState(false);
+const BloomBurst = ({ ref, size = 96, colors = DEFAULT_COLORS }: BloomBurstProps) => {
+  const reduceMotionRef = useRef(false);
 
   useEffect(() => {
     AccessibilityInfo.isReduceMotionEnabled()
-      .then(setReduceMotion)
-      .catch(() => setReduceMotion(false));
-    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
+      .then((v) => {
+        reduceMotionRef.current = v;
+      })
+      .catch(() => {
+        reduceMotionRef.current = false;
+      });
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', (v) => {
+      reduceMotionRef.current = v;
+    });
     return () => sub.remove();
   }, []);
 
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0.4);
 
-  useEffect(() => {
-    if (trigger === 0) return;
-    if (reduceMotion) {
-      opacity.value = withSequence(withTiming(0.7, { duration: 120 }), withTiming(0, { duration: 200 }));
-      scale.value = withSequence(withTiming(1, { duration: 120 }), withTiming(1.1, { duration: 200 }));
-      return;
-    }
-    opacity.value = withSequence(
-      withTiming(1, { duration: 280, easing: Easing.out(Easing.cubic) }),
-      withTiming(0, { duration: 680, easing: Easing.in(Easing.cubic) })
-    );
-    scale.value = withSequence(
-      withTiming(1.1, { duration: 520, easing: Easing.out(Easing.cubic) }),
-      withTiming(1.55, { duration: 460, easing: Easing.in(Easing.cubic) })
-    );
-  }, [trigger, reduceMotion, opacity, scale]);
+  useImperativeHandle(
+    ref,
+    () => ({
+      bloom: () => {
+        if (reduceMotionRef.current) {
+          opacity.value = withSequence(withTiming(0.7, { duration: 120 }), withTiming(0, { duration: 200 }));
+          scale.value = withSequence(withTiming(1, { duration: 120 }), withTiming(1.1, { duration: 200 }));
+          return;
+        }
+        opacity.value = withSequence(
+          withTiming(1, { duration: 280, easing: Easing.out(Easing.cubic) }),
+          withTiming(0, { duration: 680, easing: Easing.in(Easing.cubic) })
+        );
+        scale.value = withSequence(
+          withTiming(1.1, { duration: 520, easing: Easing.out(Easing.cubic) }),
+          withTiming(1.55, { duration: 460, easing: Easing.in(Easing.cubic) })
+        );
+      }
+    }),
+    [opacity, scale]
+  );
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -66,4 +82,6 @@ const BloomBurst = ({ trigger, size = 96, colors = DEFAULT_COLORS }: BloomBurstP
   );
 };
 
-export default memo(BloomBurst);
+const MemoBloomBurst = memo(BloomBurst);
+MemoBloomBurst.displayName = 'BloomBurst';
+export default MemoBloomBurst;

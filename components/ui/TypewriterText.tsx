@@ -39,7 +39,7 @@ const TypewriterText = ({
     }
 
     let cancelled = false;
-    AccessibilityInfo.isReduceMotionEnabled()
+    void AccessibilityInfo.isReduceMotionEnabled()
       .catch(() => false)
       .then((reduceMotion) => {
         if (cancelled) return;

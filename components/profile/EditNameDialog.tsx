@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Button, Dialog, Portal, TextInput } from 'react-native-paper';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
@@ -16,12 +16,16 @@ const EditNameDialog = ({ visible, onDismiss }: EditNameDialogProps) => {
   const [name, setName] = useState(user?.name ?? '');
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  // Reset the form when the dialog opens. Adjusting during render is React's
+  // recommended alternative to a sync effect.
+  const [prevVisible, setPrevVisible] = useState(visible);
+  if (prevVisible !== visible) {
+    setPrevVisible(visible);
     if (visible) {
       setName(user?.name ?? '');
       setError('');
     }
-  }, [visible, user?.name]);
+  }
 
   const handleSave = useCallback(() => {
     const trimmed = name.trim();

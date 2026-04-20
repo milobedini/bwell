@@ -22,7 +22,7 @@ export const useHasOnboarded = () => {
         setHasOnboarded(false); // fallback
       }
     };
-    loadOnboardingStatus();
+    void loadOnboardingStatus();
   }, []);
 
   return hasOnboarded;

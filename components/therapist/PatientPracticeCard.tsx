@@ -45,7 +45,7 @@ const PatientPracticeCardBase = ({ item, sparkline, patientName, onLongPress }: 
   };
 
   const handleLongPress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     onLongPress?.(item);
   };
 

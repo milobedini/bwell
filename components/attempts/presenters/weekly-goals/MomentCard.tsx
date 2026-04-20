@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { MotiView } from 'moti';
 import { ThemedText } from '@/components/ThemedText';
-import BloomBurst from '@/components/ui/BloomBurst';
+import BloomBurst, { type BloomBurstHandle } from '@/components/ui/BloomBurst';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
@@ -97,24 +97,20 @@ const MomentCard = ({
 }: MomentCardProps) => {
   const accent = ACCENTS[index % ACCENTS.length];
   const [expanded, setExpanded] = useState(isActive || goal.completed);
-  const [bloomTrigger, setBloomTrigger] = useState(0);
-  const prevCompletedRef = useRef(goal.completed);
+  const bloomRef = useRef<BloomBurstHandle>(null);
+  const [prevCompleted, setPrevCompleted] = useState(goal.completed);
 
   // Expand the card on any false→true transition (including taps coming from
   // the WeekRail), and collapse on the reverse so an un-ticked goal returns to
   // a clean state. Bloom is fired locally by the pill's handler so it appears
   // under the actual touch point rather than bouncing to a different surface.
-  useEffect(() => {
-    if (goal.completed && !prevCompletedRef.current) {
-      setExpanded(true);
-    } else if (!goal.completed && prevCompletedRef.current) {
-      setExpanded(false);
-    }
-    prevCompletedRef.current = goal.completed;
-  }, [goal.completed]);
+  if (prevCompleted !== goal.completed) {
+    setPrevCompleted(goal.completed);
+    setExpanded(goal.completed);
+  }
 
   const handleTogglePress = () => {
-    if (!goal.completed) setBloomTrigger((n) => n + 1);
+    if (!goal.completed) bloomRef.current?.bloom();
     onToggleCompleted();
   };
 
@@ -233,7 +229,7 @@ const MomentCard = ({
                 justifyContent: 'center'
               }}
             >
-              <BloomBurst trigger={bloomTrigger} size={140} />
+              <BloomBurst ref={bloomRef} size={140} />
             </View>
             <Pressable
               onPress={handleTogglePress}

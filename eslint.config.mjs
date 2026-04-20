@@ -110,7 +110,9 @@ export default defineConfig([
       // after jest.mock() factory calls (jest hoisting makes import bindings stale)
       '@typescript-eslint/no-require-imports': 'off',
       // Tests frequently spy on / restore console methods — not actual logging
-      'no-console': 'off'
+      'no-console': 'off',
+      // Mocked callbacks often have union return types that trip this rule in tests
+      '@typescript-eslint/no-floating-promises': 'off'
     }
   }
 ]);

@@ -84,9 +84,9 @@ export const useUpdateName = () => {
     onSuccess: (_data, variables) => {
       const current = useAuthStore.getState().user;
       if (current) useAuthStore.getState().setUser({ ...current, name: variables.newName });
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-      queryClient.invalidateQueries({ queryKey: ['patients'] });
-      queryClient.invalidateQueries({ queryKey: ['clients'] });
+      void queryClient.invalidateQueries({ queryKey: ['profile'] });
+      void queryClient.invalidateQueries({ queryKey: ['patients'] });
+      void queryClient.invalidateQueries({ queryKey: ['clients'] });
     },
     toast: { pending: 'Updating name...', success: 'Name updated', error: 'Update failed' }
   });

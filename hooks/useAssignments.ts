@@ -24,13 +24,13 @@ export const useCreateAssignment = () => {
     },
     toast: { pending: 'Creating assignment...', success: 'Assignment created', error: 'Failed to create assignment' },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['assignments'] });
-      queryClient.invalidateQueries({ queryKey: ['patients'] });
-      queryClient.invalidateQueries({ queryKey: ['clients'] });
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-      queryClient.invalidateQueries({ queryKey: ['modules'] });
-      queryClient.invalidateQueries({ queryKey: ['practice'] });
-      queryClient.invalidateQueries({ queryKey: ['review'] });
+      void queryClient.invalidateQueries({ queryKey: ['assignments'] });
+      void queryClient.invalidateQueries({ queryKey: ['patients'] });
+      void queryClient.invalidateQueries({ queryKey: ['clients'] });
+      void queryClient.invalidateQueries({ queryKey: ['profile'] });
+      void queryClient.invalidateQueries({ queryKey: ['modules'] });
+      void queryClient.invalidateQueries({ queryKey: ['practice'] });
+      void queryClient.invalidateQueries({ queryKey: ['review'] });
     }
   });
 };
@@ -44,11 +44,11 @@ export const useUpdateAssignmentStatus = (assignmentId: string) => {
     },
     toast: { pending: 'Updating assignment...', success: 'Assignment updated', error: 'Update failed' },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['assignments'] });
-      queryClient.invalidateQueries({ queryKey: ['clients'] });
-      queryClient.invalidateQueries({ queryKey: ['modules'] });
-      queryClient.invalidateQueries({ queryKey: ['practice'] });
-      queryClient.invalidateQueries({ queryKey: ['review'] });
+      void queryClient.invalidateQueries({ queryKey: ['assignments'] });
+      void queryClient.invalidateQueries({ queryKey: ['clients'] });
+      void queryClient.invalidateQueries({ queryKey: ['modules'] });
+      void queryClient.invalidateQueries({ queryKey: ['practice'] });
+      void queryClient.invalidateQueries({ queryKey: ['review'] });
     }
   });
 };
@@ -62,11 +62,11 @@ export const useRemoveAssignment = () => {
     },
     toast: { pending: 'Removing assignment...', success: 'Assignment removed', error: 'Failed to remove assignment' },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['assignments'] });
-      queryClient.invalidateQueries({ queryKey: ['clients'] });
-      queryClient.invalidateQueries({ queryKey: ['modules'] });
-      queryClient.invalidateQueries({ queryKey: ['practice'] });
-      queryClient.invalidateQueries({ queryKey: ['review'] });
+      void queryClient.invalidateQueries({ queryKey: ['assignments'] });
+      void queryClient.invalidateQueries({ queryKey: ['clients'] });
+      void queryClient.invalidateQueries({ queryKey: ['modules'] });
+      void queryClient.invalidateQueries({ queryKey: ['practice'] });
+      void queryClient.invalidateQueries({ queryKey: ['review'] });
     }
   });
 };
@@ -89,10 +89,10 @@ export const useUpdateAssignment = () => {
       error: 'Failed to update assignment'
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['assignments'] });
-      queryClient.invalidateQueries({ queryKey: ['clients'] });
-      queryClient.invalidateQueries({ queryKey: ['practice'] });
-      queryClient.invalidateQueries({ queryKey: ['review'] });
+      void queryClient.invalidateQueries({ queryKey: ['assignments'] });
+      void queryClient.invalidateQueries({ queryKey: ['clients'] });
+      void queryClient.invalidateQueries({ queryKey: ['practice'] });
+      void queryClient.invalidateQueries({ queryKey: ['review'] });
     }
   });
 };

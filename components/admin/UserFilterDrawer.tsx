@@ -60,9 +60,13 @@ const UserFilterDrawer = ({ visible, onDismiss, values, onApply, facets }: UserF
   const translateX = useRef(new Animated.Value(drawerWidth)).current;
   const [local, setLocal] = useState<UserFilters>(values);
 
-  useEffect(() => {
+  // Reset draft filters when the drawer opens. Adjusting during render is
+  // React's recommended alternative to a sync effect.
+  const [prevVisible, setPrevVisible] = useState(visible);
+  if (prevVisible !== visible) {
+    setPrevVisible(visible);
     if (visible) setLocal(values);
-  }, [visible, values]);
+  }
 
   useEffect(() => {
     Animated.timing(translateX, {

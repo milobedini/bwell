@@ -138,7 +138,7 @@ const AllUsersList = () => {
             contentContainerStyle={{ paddingBottom: 80 }}
             onEndReachedThreshold={0.5}
             onEndReached={() => {
-              if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+              if (hasNextPage && !isFetchingNextPage) void fetchNextPage();
             }}
             ListFooterComponent={
               isFetchingNextPage ? (
