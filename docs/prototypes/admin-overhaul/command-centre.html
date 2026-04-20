@@ -1,0 +1,3222 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>bwell Admin — Command Centre</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        /* Core palette (from brief §5) */
+        --sway-dark: #0c1527;
+        --sway-lightGrey: #e0e9f3;
+        --sway-darkGrey: #a6adbb;
+        --sway-bright: #18cdba;
+        --sway-buttonBg: rgb(43, 59, 91);
+
+        /* Status / signal */
+        --error: #ff6d5e;
+        --success: #76ab70;
+        --warning: #ffb300;
+        --info: #ffd15d;
+
+        /* Surfaces */
+        --card: #262e42;
+        --card-alt: #334368;
+        --card-deep: #0b1a2a;
+
+        /* Chip / pill */
+        --chip-pill: #1e2a45;
+        --chip-pill-pressed: #253352;
+
+        /* Tints */
+        --tint-teal: rgba(24, 205, 186, 0.15);
+        --tint-teal-border: rgba(24, 205, 186, 0.3);
+        --tint-error: rgba(255, 109, 94, 0.15);
+        --tint-info: rgba(255, 209, 93, 0.15);
+        --tint-neutral: rgba(166, 173, 187, 0.12);
+
+        --therapist-purple: #7c3aed;
+
+        --overlay-medium: rgba(0, 0, 0, 0.5);
+        --divider: rgba(166, 173, 187, 0.1);
+
+        /* Type */
+        --font: 'Lato', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        background: var(--sway-dark);
+        color: var(--sway-lightGrey);
+        font-family: var(--font);
+        font-size: 15px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a {
+        color: var(--sway-bright);
+      }
+
+      .wrap {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 64px 48px 120px;
+      }
+
+      /* ---------- Hero ---------- */
+      .hero {
+        position: relative;
+        border: 1px solid var(--divider);
+        border-radius: 20px;
+        padding: 56px 56px 52px;
+        background:
+          radial-gradient(
+            1200px 400px at 85% -10%,
+            var(--tint-teal),
+            transparent 60%
+          ),
+          linear-gradient(180deg, var(--card), var(--card-deep));
+        overflow: hidden;
+      }
+      .hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(
+              90deg,
+              transparent 0,
+              transparent calc(100% - 1px),
+              var(--divider) 100%
+            )
+            repeat-x,
+          linear-gradient(
+              0deg,
+              transparent 0,
+              transparent calc(100% - 1px),
+              var(--divider) 100%
+            )
+            repeat-y;
+        background-size: 48px 100%, 100% 48px;
+        opacity: 0.25;
+        pointer-events: none;
+      }
+      .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--tint-teal);
+        border: 1px solid var(--tint-teal-border);
+        color: var(--sway-bright);
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .hero-eyebrow::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--sway-bright);
+        box-shadow: 0 0 12px var(--sway-bright);
+      }
+      .hero h1 {
+        font-family: var(--font);
+        font-weight: 900;
+        font-size: 58px;
+        line-height: 1.02;
+        letter-spacing: -0.02em;
+        margin: 20px 0 10px;
+      }
+      .hero h1 em {
+        font-style: normal;
+        color: var(--sway-bright);
+      }
+      .hero .philosophy {
+        max-width: 820px;
+        font-size: 20px;
+        color: var(--sway-lightGrey);
+        margin: 16px 0 0;
+      }
+      .hero .sub {
+        color: var(--sway-darkGrey);
+        margin-top: 10px;
+        font-size: 15px;
+      }
+      .hero .meta-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 32px;
+      }
+      .kbd {
+        font-family: 'Lato', monospace;
+        background: var(--chip-pill);
+        border: 1px solid var(--divider);
+        border-bottom-width: 2px;
+        color: var(--sway-lightGrey);
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .hero .kbd-help {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--sway-darkGrey);
+        font-size: 13px;
+      }
+
+      /* ---------- Section shell ---------- */
+      section.block {
+        margin-top: 80px;
+      }
+      .block-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 24px;
+        border-bottom: 1px solid var(--divider);
+        padding-bottom: 16px;
+      }
+      .block-head h2 {
+        font-size: 28px;
+        font-weight: 900;
+        letter-spacing: -0.01em;
+        margin: 0;
+      }
+      .block-head .step {
+        color: var(--sway-bright);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .block-head .note {
+        color: var(--sway-darkGrey);
+        font-size: 14px;
+        max-width: 560px;
+      }
+
+      /* ---------- Panel (generic frame for wireframes) ---------- */
+      .panel {
+        background: var(--card-deep);
+        border: 1px solid var(--divider);
+        border-radius: 14px;
+        overflow: hidden;
+        position: relative;
+      }
+      .panel-caption {
+        padding: 14px 18px;
+        border-top: 1px solid var(--divider);
+        background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.25));
+        font-size: 13px;
+        color: var(--sway-darkGrey);
+      }
+      .panel-caption strong {
+        color: var(--sway-lightGrey);
+      }
+      .viewport-tag {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        background: var(--chip-pill);
+        border: 1px solid var(--divider);
+        color: var(--sway-darkGrey);
+        padding: 3px 8px;
+        border-radius: 6px;
+        z-index: 4;
+      }
+
+      /* ---------- Breakpoint banner ---------- */
+      .bp-banner {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: linear-gradient(
+          90deg,
+          var(--tint-teal),
+          transparent 70%
+        );
+        border: 1px solid var(--tint-teal-border);
+        padding: 14px 18px;
+        border-radius: 10px;
+        margin: 32px 0 20px;
+      }
+      .bp-banner .tag {
+        background: var(--sway-bright);
+        color: #002b27;
+        font-weight: 900;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        padding: 4px 8px;
+        border-radius: 4px;
+        text-transform: uppercase;
+      }
+      .bp-banner p {
+        margin: 0;
+        color: var(--sway-lightGrey);
+        font-size: 14px;
+      }
+      .bp-banner p span {
+        color: var(--sway-darkGrey);
+      }
+
+      /* ---------- Desktop flow grid ---------- */
+      .desktop-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 36px;
+      }
+
+      .desktop-panel {
+        width: 100%;
+      }
+      .desktop-frame {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      /* App shell (desktop two-pane) */
+      .app-shell {
+        display: grid;
+        grid-template-columns: 56px 380px 1fr;
+        min-height: 720px;
+        background: var(--sway-dark);
+      }
+      .rail {
+        background: var(--card-deep);
+        border-right: 1px solid var(--divider);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 12px 0;
+        gap: 10px;
+      }
+      .rail .logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, var(--sway-bright), #0aa69a);
+        color: #042420;
+        display: grid;
+        place-items: center;
+        font-weight: 900;
+      }
+      .rail .icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        color: var(--sway-darkGrey);
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .rail .icon.active {
+        background: var(--tint-teal);
+        color: var(--sway-bright);
+      }
+      .rail .spacer {
+        flex: 1;
+      }
+
+      /* top bar */
+      .topbar {
+        grid-column: 2 / 4;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 0 20px;
+        border-bottom: 1px solid var(--divider);
+        height: 48px;
+        background: var(--card-deep);
+      }
+      .app-shell.with-topbar {
+        grid-template-rows: 48px 1fr;
+      }
+      .search {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--chip-pill);
+        border: 1px solid var(--divider);
+        border-radius: 8px;
+        padding: 4px 10px;
+        color: var(--sway-darkGrey);
+        font-size: 13px;
+        max-width: 520px;
+      }
+      .search .kbd {
+        margin-left: auto;
+      }
+      .topbar .env {
+        color: var(--sway-darkGrey);
+        font-size: 12px;
+      }
+      .topbar .env strong {
+        color: var(--sway-bright);
+      }
+
+      /* Left pane: the universal list */
+      .pane-left {
+        border-right: 1px solid var(--divider);
+        background: var(--card-deep);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .pane-left .group-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px 6px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--sway-darkGrey);
+        font-weight: 700;
+        background: rgba(38, 46, 66, 0.3);
+      }
+      .pane-left .group-head .count {
+        background: var(--chip-pill);
+        color: var(--sway-lightGrey);
+        padding: 1px 7px;
+        border-radius: 999px;
+        font-size: 10px;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 28px 1fr auto;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid rgba(166, 173, 187, 0.06);
+        cursor: pointer;
+        font-size: 13px;
+        position: relative;
+      }
+      .row:hover {
+        background: rgba(38, 46, 66, 0.5);
+      }
+      .row.active {
+        background: var(--tint-teal);
+      }
+      .row.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--sway-bright);
+      }
+      .row.focused {
+        outline: 2px solid var(--sway-bright);
+        outline-offset: -2px;
+      }
+      .row .glyph {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: var(--chip-pill);
+        display: grid;
+        place-items: center;
+        color: var(--sway-lightGrey);
+        font-size: 13px;
+      }
+      .row .title {
+        color: var(--sway-lightGrey);
+        font-weight: 700;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .row .sub {
+        color: var(--sway-darkGrey);
+        font-size: 11px;
+        margin-top: 1px;
+      }
+      .row .right {
+        text-align: right;
+        color: var(--sway-darkGrey);
+        font-size: 11px;
+      }
+      .row .num {
+        font-weight: 900;
+        color: var(--sway-lightGrey);
+        font-size: 14px;
+      }
+      .row .delta-up {
+        color: var(--success);
+      }
+      .row .delta-down {
+        color: var(--error);
+      }
+      .row.urgent .title::after {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--error);
+        box-shadow: 0 0 8px var(--error);
+      }
+
+      /* right pane: detail */
+      .pane-right {
+        background: var(--sway-dark);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .detail-head {
+        padding: 20px 28px 16px;
+        border-bottom: 1px solid var(--divider);
+      }
+      .detail-crumbs {
+        color: var(--sway-darkGrey);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .detail-title {
+        font-size: 26px;
+        font-weight: 900;
+        letter-spacing: -0.01em;
+        margin: 0;
+      }
+      .detail-meta {
+        display: flex;
+        gap: 16px;
+        color: var(--sway-darkGrey);
+        font-size: 12px;
+        margin-top: 6px;
+      }
+      .detail-meta .ok {
+        color: var(--success);
+      }
+      .detail-body {
+        padding: 24px 28px;
+        overflow: auto;
+      }
+      .stat-strip {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 22px;
+      }
+      .stat {
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 12px;
+        padding: 14px 14px 12px;
+      }
+      .stat .label {
+        color: var(--sway-darkGrey);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 700;
+      }
+      .stat .value {
+        font-size: 28px;
+        font-weight: 900;
+        letter-spacing: -0.01em;
+        margin-top: 2px;
+      }
+      .stat .delta {
+        font-size: 11px;
+        margin-top: 4px;
+      }
+      .stat .up {
+        color: var(--success);
+      }
+      .stat .down {
+        color: var(--error);
+      }
+      .stat .muted {
+        color: var(--sway-darkGrey);
+      }
+      .section-sub {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin: 18px 0 10px;
+      }
+      .section-sub h3 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .section-sub .muted {
+        color: var(--sway-darkGrey);
+        font-size: 11px;
+      }
+
+      /* Bar chart row */
+      .bars {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .bar {
+        display: grid;
+        grid-template-columns: 150px 1fr 60px;
+        gap: 10px;
+        align-items: center;
+        font-size: 12px;
+      }
+      .bar .track {
+        height: 10px;
+        border-radius: 4px;
+        background: var(--chip-pill);
+        overflow: hidden;
+        position: relative;
+      }
+      .bar .fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--sway-bright), #0aa69a);
+        border-radius: 4px;
+      }
+      .bar.suppressed .fill {
+        background: repeating-linear-gradient(
+          45deg,
+          var(--sway-darkGrey) 0 4px,
+          transparent 4px 8px
+        );
+        opacity: 0.5;
+      }
+      .bar .n {
+        color: var(--sway-darkGrey);
+        text-align: right;
+        font-size: 11px;
+        font-variant-numeric: tabular-nums;
+      }
+      .bar .label {
+        color: var(--sway-lightGrey);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      /* Sparkline (inline SVG) */
+      .spark {
+        height: 64px;
+        width: 100%;
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 10px;
+        padding: 8px 12px;
+      }
+
+      /* Chips */
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 9px;
+        background: var(--chip-pill);
+        border: 1px solid var(--divider);
+        color: var(--sway-lightGrey);
+        border-radius: 999px;
+        font-size: 11px;
+      }
+      .chip.teal {
+        background: var(--tint-teal);
+        border-color: var(--tint-teal-border);
+        color: var(--sway-bright);
+      }
+      .chip.warn {
+        background: var(--tint-info);
+        border-color: rgba(255, 209, 93, 0.3);
+        color: var(--info);
+      }
+      .chip.err {
+        background: var(--tint-error);
+        border-color: rgba(255, 109, 94, 0.3);
+        color: var(--error);
+      }
+      .chip.purple {
+        background: rgba(124, 58, 237, 0.15);
+        border-color: rgba(124, 58, 237, 0.3);
+        color: #c4b5fd;
+      }
+
+      /* Callouts (pins on panels) */
+      .annot {
+        position: absolute;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        max-width: 260px;
+        font-size: 11px;
+        line-height: 1.35;
+        color: var(--sway-lightGrey);
+        z-index: 3;
+      }
+      .annot .pin {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--sway-bright);
+        color: #001210;
+        display: grid;
+        place-items: center;
+        font-weight: 900;
+        font-size: 11px;
+        flex-shrink: 0;
+        box-shadow: 0 0 0 4px rgba(24, 205, 186, 0.15);
+      }
+      .annot .note {
+        background: var(--card);
+        border: 1px solid var(--divider);
+        padding: 6px 10px;
+        border-radius: 8px;
+      }
+      .annot .note strong {
+        color: var(--sway-bright);
+      }
+
+      /* legend */
+      .legend {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-top: 18px;
+        font-size: 12px;
+      }
+      .legend .item {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .legend .num {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--sway-bright);
+        color: #00231f;
+        display: grid;
+        place-items: center;
+        font-weight: 900;
+        font-size: 11px;
+        flex-shrink: 0;
+      }
+      .legend strong {
+        color: var(--sway-lightGrey);
+      }
+      .legend p {
+        margin: 2px 0 0;
+        color: var(--sway-darkGrey);
+      }
+
+      /* ---------- Mobile panels ---------- */
+      .mobile-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 375px);
+        gap: 28px;
+        justify-content: center;
+        margin-top: 8px;
+      }
+      .mobile-frame {
+        width: 375px;
+        height: 720px;
+        background: var(--sway-dark);
+        border-radius: 28px;
+        border: 1px solid var(--divider);
+        overflow: hidden;
+        position: relative;
+      }
+      .mobile-status {
+        height: 28px;
+        background: var(--card-deep);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 16px;
+        font-size: 10px;
+        color: var(--sway-darkGrey);
+      }
+      .mobile-header {
+        padding: 16px 16px 10px;
+        border-bottom: 1px solid var(--divider);
+      }
+      .mobile-header h4 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 900;
+      }
+      .mobile-header p {
+        margin: 2px 0 0;
+        color: var(--sway-darkGrey);
+        font-size: 12px;
+      }
+      .mobile-search {
+        margin: 12px 16px 4px;
+        background: var(--chip-pill);
+        border: 1px solid var(--divider);
+        padding: 10px 12px;
+        border-radius: 10px;
+        color: var(--sway-darkGrey);
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .mobile-list {
+        overflow: auto;
+        height: calc(100% - 140px);
+      }
+      .m-row {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--divider);
+        display: grid;
+        grid-template-columns: 32px 1fr auto;
+        gap: 10px;
+        align-items: center;
+      }
+      .m-row .glyph {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: var(--chip-pill);
+        display: grid;
+        place-items: center;
+      }
+      .m-row .t {
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .m-row .s {
+        color: var(--sway-darkGrey);
+        font-size: 12px;
+        margin-top: 2px;
+      }
+      .m-row .r {
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+      }
+      .m-tab {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 54px;
+        background: var(--card-deep);
+        border-top: 1px solid var(--divider);
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+      }
+      .m-tab div {
+        display: grid;
+        place-items: center;
+        color: var(--sway-darkGrey);
+        font-size: 10px;
+      }
+      .m-tab div.on {
+        color: var(--sway-bright);
+      }
+
+      /* Mobile detail view */
+      .m-detail-head {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--divider);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .m-back {
+        color: var(--sway-bright);
+        font-weight: 700;
+        font-size: 13px;
+      }
+      .m-detail-body {
+        padding: 16px;
+        overflow: auto;
+        height: calc(100% - 110px);
+      }
+
+      /* ---------- State gallery ---------- */
+      .state-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+      }
+      .state-card {
+        background: var(--card-deep);
+        border: 1px solid var(--divider);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .state-head {
+        padding: 10px 14px;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--sway-darkGrey);
+        border-bottom: 1px solid var(--divider);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(38, 46, 66, 0.3);
+      }
+      .state-head .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--sway-bright);
+      }
+      .state-body {
+        padding: 16px;
+        min-height: 220px;
+      }
+      .empty-illus {
+        height: 80px;
+        display: grid;
+        place-items: center;
+        color: var(--sway-darkGrey);
+        font-size: 34px;
+        opacity: 0.45;
+      }
+
+      /* Skeleton loader bars */
+      .skel {
+        height: 10px;
+        border-radius: 4px;
+        background: linear-gradient(
+          90deg,
+          var(--chip-pill) 0%,
+          var(--card-alt) 50%,
+          var(--chip-pill) 100%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.6s infinite linear;
+        margin-bottom: 8px;
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      /* Focus ring demo */
+      .focus-chip {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 8px;
+        background: var(--card);
+        font-size: 12px;
+        color: var(--sway-lightGrey);
+        outline: 2px solid var(--sway-bright);
+        outline-offset: 3px;
+        box-shadow: 0 0 0 6px rgba(24, 205, 186, 0.18);
+      }
+
+      /* ---------- Animations section ---------- */
+      .anim-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+      }
+      .anim-card {
+        background: var(--card-deep);
+        border: 1px solid var(--divider);
+        border-radius: 12px;
+        overflow: hidden;
+        padding: 0 0 16px;
+      }
+      .anim-stage {
+        height: 160px;
+        background:
+          radial-gradient(
+            600px 120px at 50% -20%,
+            var(--tint-teal),
+            transparent 60%
+          ),
+          var(--card);
+        position: relative;
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+      }
+      .anim-card h4 {
+        margin: 12px 16px 2px;
+        font-size: 14px;
+        font-weight: 900;
+      }
+      .anim-card p {
+        margin: 2px 16px 0;
+        color: var(--sway-darkGrey);
+        font-size: 12px;
+      }
+      .anim-card .timing {
+        margin: 8px 16px 0;
+        font-size: 11px;
+        color: var(--sway-bright);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      /* crossfade between two detail cards */
+      .cf-card {
+        position: absolute;
+        inset: 16px;
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 10px;
+        padding: 14px;
+        animation: cf 4s infinite;
+      }
+      .cf-card:nth-child(2) {
+        animation-delay: 2s;
+      }
+      .cf-card h5 {
+        margin: 0;
+        font-size: 13px;
+      }
+      .cf-card p {
+        color: var(--sway-darkGrey);
+        font-size: 11px;
+        margin: 4px 0 0;
+      }
+      @keyframes cf {
+        0%,
+        45% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        50%,
+        95% {
+          opacity: 0;
+          transform: translateY(-6px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* k-reveal */
+      .k-reveal {
+        position: absolute;
+        background: rgba(12, 21, 39, 0.9);
+        inset: 0;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        padding: 20px;
+        align-content: center;
+        animation: kfadein 3s infinite;
+      }
+      .k-reveal .k {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+        color: var(--sway-lightGrey);
+      }
+      @keyframes kfadein {
+        0%,
+        30% {
+          opacity: 0;
+        }
+        50%,
+        80% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      /* row cursor (j/k) */
+      .jk-stage ul {
+        list-style: none;
+        margin: 0;
+        padding: 12px;
+        width: 85%;
+      }
+      .jk-stage li {
+        padding: 6px 10px;
+        border-radius: 6px;
+        color: var(--sway-darkGrey);
+        font-size: 11px;
+      }
+      .jk-stage li.cur {
+        background: var(--tint-teal);
+        color: var(--sway-lightGrey);
+        animation: jkmove 3s infinite;
+      }
+      @keyframes jkmove {
+        0% {
+          transform: translateY(0);
+        }
+        33% {
+          transform: translateY(26px);
+        }
+        66% {
+          transform: translateY(52px);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+
+      /* pulse pin */
+      .pulse-stage {
+        display: grid;
+        place-items: center;
+      }
+      .pulse {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--error);
+        position: relative;
+      }
+      .pulse::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: var(--error);
+        animation: pulse 1.8s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          opacity: 0.7;
+        }
+        100% {
+          transform: scale(3);
+          opacity: 0;
+        }
+      }
+
+      /* ---------- Components breakdown ---------- */
+      .comp-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+      .comp-card {
+        background: var(--card-deep);
+        border: 1px solid var(--divider);
+        border-radius: 12px;
+        padding: 20px;
+      }
+      .comp-card h3 {
+        margin: 0 0 12px;
+        font-size: 16px;
+        font-weight: 900;
+      }
+      .comp-card ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .comp-card li {
+        padding: 10px 0;
+        border-bottom: 1px dashed var(--divider);
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 14px;
+        font-size: 13px;
+      }
+      .comp-card li:last-child {
+        border-bottom: none;
+      }
+      .comp-card li code {
+        font-family: 'Lato', monospace;
+        color: var(--sway-bright);
+        font-weight: 700;
+        font-size: 12px;
+      }
+      .comp-card .sub {
+        color: var(--sway-darkGrey);
+        font-size: 12px;
+      }
+
+      /* ---------- Rationale ---------- */
+      .rationale {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      .rat {
+        background: var(--card-deep);
+        border: 1px solid var(--divider);
+        border-radius: 12px;
+        padding: 20px 22px;
+      }
+      .rat h3 {
+        margin: 0 0 8px;
+        font-size: 15px;
+        font-weight: 900;
+        color: var(--sway-bright);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .rat p {
+        margin: 0;
+        color: var(--sway-lightGrey);
+        font-size: 14px;
+      }
+      .be-note {
+        grid-column: 1 / -1;
+        background: var(--tint-info);
+        border: 1px solid rgba(255, 209, 93, 0.3);
+        border-radius: 12px;
+        padding: 16px 20px;
+        font-size: 13px;
+        color: var(--info);
+      }
+      .be-note strong {
+        color: var(--warning);
+      }
+
+      /* ---------- Footer ---------- */
+      footer {
+        margin-top: 80px;
+        padding-top: 20px;
+        border-top: 1px solid var(--divider);
+        color: var(--sway-darkGrey);
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        .skel,
+        .cf-card,
+        .k-reveal,
+        .jk-stage li.cur,
+        .pulse::after {
+          animation: none !important;
+        }
+        .hero-eyebrow::before {
+          box-shadow: none;
+        }
+      }
+
+      /* Shrink the desktop flow-frame on narrow viewer windows so layout still reads */
+      @media (max-width: 1300px) {
+        .desktop-frame {
+          transform: scale(0.82);
+          transform-origin: top left;
+          width: 1200px;
+        }
+        .desktop-frame-wrap {
+          height: 720px;
+          overflow: hidden;
+        }
+      }
+      @media (max-width: 900px) {
+        .mobile-grid {
+          grid-template-columns: 1fr;
+        }
+        .comp-grid,
+        .rationale {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- ================= HERO ================= -->
+      <header class="hero" aria-label="Hero">
+        <span class="hero-eyebrow">Angle 04 · Split Command Centre</span>
+        <h1>
+          bwell Admin —<br />
+          a <em>command centre</em>, not a dashboard.
+        </h1>
+        <p class="philosophy">
+          One screen. Two panes. Everything the admin can touch — metrics,
+          programmes, verification queue, stalled work, audit trail — lives in
+          the left pane as rows. The right pane is the detail for whatever is
+          highlighted. Clicks never navigate; they swap context. Keyboard-first,
+          like Linear, Superhuman, Front.
+        </p>
+        <p class="sub">
+          bwell is RN-first with a web target. This angle is deliberately
+          web-optimised: on desktop you get the full split; on mobile the two
+          panes collapse into a familiar list → detail stack.
+        </p>
+        <div class="meta-row">
+          <span class="kbd-help"
+            ><span class="kbd">/</span> jump to search</span
+          >
+          <span class="kbd-help"
+            ><span class="kbd">J</span><span class="kbd">K</span> move between
+            rows</span
+          >
+          <span class="kbd-help"
+            ><span class="kbd">Enter</span> open in right pane</span
+          >
+          <span class="kbd-help"
+            ><span class="kbd">G</span><span class="kbd">P</span> go to
+            programmes</span
+          >
+          <span class="kbd-help"
+            ><span class="kbd">G</span><span class="kbd">V</span> go to
+            verification queue</span
+          >
+          <span class="kbd-help"
+            ><span class="kbd">?</span> show all shortcuts</span
+          >
+        </div>
+      </header>
+
+      <!-- ================= FLOW MAP ================= -->
+      <section class="block" aria-label="Flow map">
+        <div class="block-head">
+          <div>
+            <div class="step">Section 02 · Flow map</div>
+            <h2>The split, animated.</h2>
+          </div>
+          <p class="note">
+            Five wireframe panels across two breakpoints. Desktop panels are
+            framed at 1200&nbsp;px to show the two-pane split at its native
+            width. Mobile panels at 375&nbsp;px show the collapsed fallback.
+          </p>
+        </div>
+
+        <!-- Breakpoint banner: DESKTOP -->
+        <div class="bp-banner" role="note">
+          <span class="tag">≥ 960&nbsp;px</span>
+          <p>
+            <strong>Desktop two-pane.</strong>
+            <span
+              >Left column is the universal list (grouped: attention, metrics,
+              programmes, queues, audit). Right column is the selected row's
+              detail. Rail on the far left; global search in the topbar.</span
+            >
+          </p>
+        </div>
+
+        <!-- ============ DESKTOP PANEL 1: Overview selected ============ -->
+        <div class="desktop-panel">
+          <div class="panel desktop-frame-wrap">
+            <span class="viewport-tag">Desktop · 1200×720</span>
+            <div class="desktop-frame">
+              <div
+                class="app-shell with-topbar"
+                style="
+                  display: grid;
+                  grid-template-columns: 56px 380px 1fr;
+                  grid-template-rows: 48px 1fr;
+                "
+              >
+                <!-- topbar spans cols 2..4 -->
+                <div class="rail" style="grid-row: 1 / 3">
+                  <div class="logo">b</div>
+                  <div class="icon active" title="Command centre">⌘</div>
+                  <div class="icon" title="Programmes">◎</div>
+                  <div class="icon" title="People">☰</div>
+                  <div class="icon" title="Audit">☷</div>
+                  <div class="icon" title="System">⚙</div>
+                  <div class="spacer"></div>
+                  <div class="icon" title="Profile">AD</div>
+                </div>
+
+                <div class="topbar">
+                  <div class="search">
+                    <span>⌕</span> Jump to… programme, user, audit action
+                    <span class="kbd">/</span>
+                  </div>
+                  <span class="env"
+                    >Env:
+                    <strong style="color: var(--info)">reduced</strong>
+                    · rollup 12&nbsp;min ago</span
+                  >
+                  <span class="kbd">?</span>
+                </div>
+
+                <!-- LEFT PANE -->
+                <div class="pane-left">
+                  <div class="group-head">
+                    Needs attention <span class="count">4</span>
+                  </div>
+                  <div class="row urgent">
+                    <div class="glyph" style="color: var(--error)">!</div>
+                    <div>
+                      <div class="title">Verification queue</div>
+                      <div class="sub">18 therapists · oldest 9 days</div>
+                    </div>
+                    <div class="right">
+                      <div class="num">18</div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph" style="color: var(--warning)">↻</div>
+                    <div>
+                      <div class="title">Stalled attempts (7d)</div>
+                      <div class="sub">3 started, untouched</div>
+                    </div>
+                    <div class="right">
+                      <div class="num">3</div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph" style="color: var(--warning)">⚠</div>
+                    <div>
+                      <div class="title">Orphaned assignments</div>
+                      <div class="sub">Therapist removed, work open</div>
+                    </div>
+                    <div class="right">
+                      <div class="num">1</div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph" style="color: var(--warning)">○</div>
+                    <div>
+                      <div class="title">Verified, zero patients</div>
+                      <div class="sub">No caseload yet</div>
+                    </div>
+                    <div class="right">
+                      <div class="num">2</div>
+                    </div>
+                  </div>
+
+                  <div class="group-head">
+                    Operational <span class="count">5</span>
+                  </div>
+                  <div class="row active">
+                    <div class="glyph" style="color: var(--sway-bright)">▦</div>
+                    <div>
+                      <div class="title">Platform overview</div>
+                      <div class="sub">Users · work · audit (last 7d)</div>
+                    </div>
+                    <div class="right"><span class="delta-up">↑ 12%</span></div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph">⚡</div>
+                    <div>
+                      <div class="title">Active users · 30d</div>
+                      <div class="sub">vs previous 30d</div>
+                    </div>
+                    <div class="right">
+                      <div class="num">216</div>
+                      <span class="delta-up">↑ 8%</span>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph">✓</div>
+                    <div>
+                      <div class="title">Completed attempts · 7d</div>
+                      <div class="sub">vs previous week</div>
+                    </div>
+                    <div class="right">
+                      <div class="num">142</div>
+                      <span class="delta-down">↓ 4%</span>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph">◐</div>
+                    <div>
+                      <div class="title">New users this week</div>
+                      <div class="sub">vs last week</div>
+                    </div>
+                    <div class="right">
+                      <div class="num">11</div>
+                      <span class="delta-up">↑ 3</span>
+                    </div>
+                  </div>
+
+                  <div class="group-head">
+                    Programmes <span class="count">3</span>
+                  </div>
+                  <div class="row">
+                    <div class="glyph" style="color: #c4b5fd">◇</div>
+                    <div>
+                      <div class="title">Depression · PHQ-9</div>
+                      <div class="sub">n=62 · recovery 40%</div>
+                    </div>
+                    <div class="right">
+                      <div class="num">40%</div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph" style="color: #c4b5fd">◇</div>
+                    <div>
+                      <div class="title">Generalised Anxiety · GAD-7</div>
+                      <div class="sub">n=48 · recovery 35%</div>
+                    </div>
+                    <div class="right">
+                      <div class="num">35%</div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph" style="color: var(--sway-darkGrey)">
+                      ◇
+                    </div>
+                    <div>
+                      <div class="title">Sleep Health</div>
+                      <div class="sub">No clinical instrument</div>
+                    </div>
+                    <div class="right"><span class="chip">—</span></div>
+                  </div>
+                </div>
+
+                <!-- RIGHT PANE (overview detail) -->
+                <div class="pane-right">
+                  <div class="detail-head">
+                    <div class="detail-crumbs">Operational · Overview</div>
+                    <h3 class="detail-title">Platform overview</h3>
+                    <div class="detail-meta">
+                      <span>as of 20 Apr 2026, 14:32 UTC</span>
+                      <span class="ok">● rollup fresh (12m)</span>
+                      <span>privacy: reduced (dev)</span>
+                    </div>
+                  </div>
+                  <div class="detail-body">
+                    <div class="stat-strip">
+                      <div class="stat">
+                        <div class="label">Users · total</div>
+                        <div class="value">303</div>
+                        <div class="delta muted">
+                          30 patients · 21 therapists · 252 visitors
+                        </div>
+                      </div>
+                      <div class="stat">
+                        <div class="label">Active · 30d</div>
+                        <div class="value">216</div>
+                        <div class="delta up">↑ 8% vs prior 30d</div>
+                      </div>
+                      <div class="stat">
+                        <div class="label">Completed · 7d</div>
+                        <div class="value">142</div>
+                        <div class="delta down">↓ 4% vs prior week</div>
+                      </div>
+                      <div class="stat">
+                        <div class="label">Audit events · 7d</div>
+                        <div class="value">87</div>
+                        <div class="delta muted">6 failures</div>
+                      </div>
+                    </div>
+
+                    <div class="section-sub">
+                      <h3>Work by module type · 7d</h3>
+                      <span class="muted">byType count</span>
+                    </div>
+                    <div class="bars">
+                      <div class="bar">
+                        <div class="label">Questionnaire</div>
+                        <div class="track">
+                          <div class="fill" style="width: 74%"></div>
+                        </div>
+                        <div class="n">52</div>
+                      </div>
+                      <div class="bar">
+                        <div class="label">Activity Diary</div>
+                        <div class="track">
+                          <div class="fill" style="width: 58%"></div>
+                        </div>
+                        <div class="n">41</div>
+                      </div>
+                      <div class="bar">
+                        <div class="label">Five Areas</div>
+                        <div class="track">
+                          <div class="fill" style="width: 31%"></div>
+                        </div>
+                        <div class="n">22</div>
+                      </div>
+                      <div class="bar">
+                        <div class="label">Reading</div>
+                        <div class="track">
+                          <div class="fill" style="width: 22%"></div>
+                        </div>
+                        <div class="n">16</div>
+                      </div>
+                      <div class="bar">
+                        <div class="label">General goals</div>
+                        <div class="track">
+                          <div class="fill" style="width: 16%"></div>
+                        </div>
+                        <div class="n">11</div>
+                      </div>
+                    </div>
+
+                    <div class="section-sub">
+                      <h3>Signals</h3>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                      <span class="chip err">18 unverified therapists</span>
+                      <span class="chip warn">3 stalled attempts</span>
+                      <span class="chip warn">1 orphaned assignment</span>
+                      <span class="chip">2 verified, no caseload</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Annotations -->
+            <div class="annot" style="top: 100px; left: 80px">
+              <span class="pin">1</span>
+              <div class="note">
+                <strong>Rail</strong> — persistent context. Never collapses on
+                desktop. Active module glows teal.
+              </div>
+            </div>
+            <div class="annot" style="top: 60px; left: 520px">
+              <span class="pin">2</span>
+              <div class="note">
+                <strong>Global search</strong> — the command bar. Invoked by
+                <span class="kbd">/</span>. Fuzzy-searches programmes, users,
+                audit actions.
+              </div>
+            </div>
+            <div class="annot" style="top: 360px; left: 80px">
+              <span class="pin">3</span>
+              <div class="note">
+                <strong>Needs-attention group</strong> bubbles up from the
+                <code>/overview</code> response — verification queue, stalled
+                attempts, orphaned assignments.
+              </div>
+            </div>
+            <div class="annot" style="top: 230px; right: 80px">
+              <span class="pin">4</span>
+              <div class="note">
+                <strong>Right pane</strong> = the detail. Mirrors StatStrip on
+                top, BarSparkline rows below. No navigation occurs.
+              </div>
+            </div>
+          </div>
+          <div class="panel-caption">
+            <strong>Panel 01 · Overview selected.</strong> Default state on
+            load. Left pane is the full universe of admin-actionable rows,
+            grouped. Right pane renders the overview (users, work-7d, signals).
+            Row selection colour + left teal edge show highlight; keyboard focus
+            ring is distinct (shown in state gallery).
+          </div>
+        </div>
+
+        <!-- ============ DESKTOP PANEL 2: Programme selected (drill-in) ============ -->
+        <div class="desktop-panel" style="margin-top: 36px">
+          <div class="panel desktop-frame-wrap">
+            <span class="viewport-tag">Desktop · 1200×720</span>
+            <div class="desktop-frame">
+              <div
+                class="app-shell with-topbar"
+                style="
+                  display: grid;
+                  grid-template-columns: 56px 380px 1fr;
+                  grid-template-rows: 48px 1fr;
+                "
+              >
+                <div class="rail" style="grid-row: 1 / 3">
+                  <div class="logo">b</div>
+                  <div class="icon active">⌘</div>
+                  <div class="icon">◎</div>
+                  <div class="icon">☰</div>
+                  <div class="icon">☷</div>
+                  <div class="icon">⚙</div>
+                  <div class="spacer"></div>
+                  <div class="icon">AD</div>
+                </div>
+
+                <div class="topbar">
+                  <div class="search">
+                    <span>⌕</span> dep<span style="color: var(--sway-bright)"
+                      >|</span
+                    >
+                    <span class="kbd">/</span>
+                  </div>
+                  <span class="env"
+                    >Env:
+                    <strong style="color: var(--info)">reduced</strong>
+                    · rollup 12&nbsp;min ago</span
+                  >
+                </div>
+
+                <div class="pane-left">
+                  <div class="group-head">
+                    Needs attention <span class="count">4</span>
+                  </div>
+                  <div class="row urgent">
+                    <div class="glyph" style="color: var(--error)">!</div>
+                    <div>
+                      <div class="title">Verification queue</div>
+                      <div class="sub">18 therapists · oldest 9 days</div>
+                    </div>
+                    <div class="right"><div class="num">18</div></div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph" style="color: var(--warning)">↻</div>
+                    <div>
+                      <div class="title">Stalled attempts (7d)</div>
+                      <div class="sub">3 started, untouched</div>
+                    </div>
+                    <div class="right"><div class="num">3</div></div>
+                  </div>
+
+                  <div class="group-head">
+                    Programmes <span class="count">3</span>
+                  </div>
+                  <div class="row active">
+                    <div class="glyph" style="color: #c4b5fd">◇</div>
+                    <div>
+                      <div class="title">Depression · PHQ-9</div>
+                      <div class="sub">n=62 · recovery 40%</div>
+                    </div>
+                    <div class="right"><div class="num">40%</div></div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph" style="color: #c4b5fd">◇</div>
+                    <div>
+                      <div class="title">Generalised Anxiety · GAD-7</div>
+                      <div class="sub">n=48 · recovery 35%</div>
+                    </div>
+                    <div class="right"><div class="num">35%</div></div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph" style="color: var(--sway-darkGrey)">
+                      ◇
+                    </div>
+                    <div>
+                      <div class="title">Sleep Health</div>
+                      <div class="sub">No clinical instrument</div>
+                    </div>
+                    <div class="right"><span class="chip">—</span></div>
+                  </div>
+
+                  <div class="group-head">
+                    Audit feed <span class="count">87</span>
+                  </div>
+                  <div class="row">
+                    <div class="glyph">⟶</div>
+                    <div>
+                      <div class="title">therapist.verified</div>
+                      <div class="sub">
+                        admin@bwell.test · Dr Ali → cbt
+                      </div>
+                    </div>
+                    <div class="right">4m ago</div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph">⟶</div>
+                    <div>
+                      <div class="title">user.viewed</div>
+                      <div class="sub">
+                        admin@bwell.test · patient/p_4812
+                      </div>
+                    </div>
+                    <div class="right">12m ago</div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph" style="color: var(--error)">✕</div>
+                    <div>
+                      <div class="title">module.created · failure</div>
+                      <div class="sub">validation error</div>
+                    </div>
+                    <div class="right">38m ago</div>
+                  </div>
+                </div>
+
+                <!-- Programme detail -->
+                <div class="pane-right">
+                  <div class="detail-head">
+                    <div class="detail-crumbs">
+                      Programmes · Depression · PHQ-9
+                    </div>
+                    <h3 class="detail-title">Depression</h3>
+                    <div class="detail-meta">
+                      <span>instrument PHQ-9 · cutoff 10 · Δ=6</span>
+                      <span>window last 90d · n = 62</span>
+                      <span class="ok">● rollup 12m</span>
+                    </div>
+                  </div>
+
+                  <div class="detail-body">
+                    <div class="stat-strip">
+                      <div class="stat">
+                        <div class="label">Recovery</div>
+                        <div class="value">
+                          40%
+                          <span
+                            style="
+                              font-size: 13px;
+                              color: var(--sway-darkGrey);
+                              font-weight: 400;
+                            "
+                            >· n=62</span
+                          >
+                        </div>
+                        <div class="delta muted">
+                          started ≥10, finished &lt;10
+                        </div>
+                      </div>
+                      <div class="stat">
+                        <div class="label">Reliable improvement</div>
+                        <div class="value">
+                          52%
+                          <span
+                            style="
+                              font-size: 13px;
+                              color: var(--sway-darkGrey);
+                              font-weight: 400;
+                            "
+                            >· n=62</span
+                          >
+                        </div>
+                        <div class="delta muted">Δ ≥ 6</div>
+                      </div>
+                      <div class="stat">
+                        <div class="label">Reliable recovery</div>
+                        <div class="value">
+                          33%
+                          <span
+                            style="
+                              font-size: 13px;
+                              color: var(--sway-darkGrey);
+                              font-weight: 400;
+                            "
+                            >· n=62</span
+                          >
+                        </div>
+                        <div class="delta muted">both above</div>
+                      </div>
+                      <div class="stat">
+                        <div class="label">Enrolled</div>
+                        <div class="value">128</div>
+                        <div class="delta muted">SH 58 · CBT 42 · PWP 28</div>
+                      </div>
+                    </div>
+
+                    <div class="section-sub">
+                      <h3>Outcome trend · PHQ-9 · weekly</h3>
+                      <span class="muted">recovery rate</span>
+                    </div>
+                    <div class="spark">
+                      <svg
+                        viewBox="0 0 600 48"
+                        preserveAspectRatio="none"
+                        width="100%"
+                        height="48"
+                      >
+                        <polyline
+                          fill="none"
+                          stroke="var(--sway-bright)"
+                          stroke-width="2"
+                          points="0,32 50,30 100,34 150,27 200,22 250,18 300,24 350,15 400,20 450,12 500,16 550,10 600,14"
+                        />
+                        <polyline
+                          fill="none"
+                          stroke="var(--sway-darkGrey)"
+                          stroke-width="1"
+                          stroke-dasharray="3,4"
+                          points="0,38 50,37 100,36 150,36 200,35 250,35 300,34 350,34 400,33 450,33 500,33 550,33 600,33"
+                        />
+                      </svg>
+                    </div>
+
+                    <div class="section-sub">
+                      <h3>By care tier</h3>
+                      <span class="muted">k-anonymity: some cells hidden</span>
+                    </div>
+                    <div class="bars">
+                      <div class="bar">
+                        <div class="label">Self-help</div>
+                        <div class="track">
+                          <div class="fill" style="width: 28%"></div>
+                        </div>
+                        <div class="n">n=24</div>
+                      </div>
+                      <div class="bar">
+                        <div class="label">
+                          CBT-guided <span class="chip teal">best</span>
+                        </div>
+                        <div class="track">
+                          <div class="fill" style="width: 55%"></div>
+                        </div>
+                        <div class="n">n=22</div>
+                      </div>
+                      <div class="bar suppressed">
+                        <div class="label">
+                          PWP-guided
+                          <span
+                            class="chip"
+                            title="fewer than 20 patients, rate suppressed"
+                            >suppressed · below min-N</span
+                          >
+                        </div>
+                        <div class="track">
+                          <div class="fill" style="width: 40%"></div>
+                        </div>
+                        <div class="n">n=16</div>
+                      </div>
+                    </div>
+
+                    <div class="section-sub">
+                      <h3>Work on this programme · 7d</h3>
+                    </div>
+                    <div
+                      style="
+                        display: grid;
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 10px;
+                      "
+                    >
+                      <div class="stat">
+                        <div class="label">Completed</div>
+                        <div class="value">58</div>
+                      </div>
+                      <div class="stat">
+                        <div class="label">Stalled</div>
+                        <div class="value">2</div>
+                      </div>
+                      <div class="stat">
+                        <div class="label">Top type</div>
+                        <div class="value" style="font-size: 16px">
+                          Questionnaire · 24
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Annotations -->
+            <div class="annot" style="top: 80px; left: 520px">
+              <span class="pin">5</span>
+              <div class="note">
+                <strong>Fuzzy type-ahead.</strong> "dep" narrows the left-pane
+                list; the row remains clickable and the right pane follows on
+                <span class="kbd">Enter</span>.
+              </div>
+            </div>
+            <div class="annot" style="top: 520px; left: 60px">
+              <span class="pin">6</span>
+              <div class="note">
+                <strong>Audit feed</strong> is part of the same list — no tab
+                switch. Admin can scrub through audit events alongside
+                programmes.
+              </div>
+            </div>
+            <div class="annot" style="top: 330px; right: 80px">
+              <span class="pin">7</span>
+              <div class="note">
+                <strong>Suppressed cell</strong> — hatched fill + explicit
+                reason (<code>below_min_n</code>). n is shown, rate is never
+                computed on FE.
+              </div>
+            </div>
+          </div>
+          <div class="panel-caption">
+            <strong>Panel 02 · Depression programme selected.</strong> Same
+            shell, new right-pane. Three IAPT metrics up top
+            (recovery/reliable-improvement/reliable-recovery), weekly trend
+            below, per-care-tier breakdown with one suppressed bar to
+            demonstrate k-anonymity. No page transition — the list on the left
+            is the persistent spine.
+          </div>
+        </div>
+
+        <!-- ============ DESKTOP PANEL 3: Verify action ============ -->
+        <div class="desktop-panel" style="margin-top: 36px">
+          <div class="panel desktop-frame-wrap">
+            <span class="viewport-tag">Desktop · 1200×720</span>
+            <div class="desktop-frame">
+              <div
+                class="app-shell with-topbar"
+                style="
+                  display: grid;
+                  grid-template-columns: 56px 380px 1fr;
+                  grid-template-rows: 48px 1fr;
+                "
+              >
+                <div class="rail" style="grid-row: 1 / 3">
+                  <div class="logo">b</div>
+                  <div class="icon active">⌘</div>
+                  <div class="icon">◎</div>
+                  <div class="icon">☰</div>
+                  <div class="icon">☷</div>
+                  <div class="icon">⚙</div>
+                  <div class="spacer"></div>
+                  <div class="icon">AD</div>
+                </div>
+
+                <div class="topbar">
+                  <div class="search">
+                    <span>⌕</span> Jump to… <span class="kbd">/</span>
+                  </div>
+                  <span class="env"
+                    >Env:
+                    <strong style="color: var(--info)">reduced</strong>
+                    · rollup 12&nbsp;min ago</span
+                  >
+                </div>
+
+                <div class="pane-left">
+                  <div class="group-head">
+                    Verification queue <span class="count">18</span>
+                  </div>
+                  <div class="row active">
+                    <div class="glyph">DA</div>
+                    <div>
+                      <div class="title">Dr Alia Khan</div>
+                      <div class="sub">applied 9d ago · dralia@bwell.test</div>
+                    </div>
+                    <div class="right"><span class="chip warn">oldest</span></div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph">SR</div>
+                    <div>
+                      <div class="title">Sam Ruiz, PWP</div>
+                      <div class="sub">applied 6d ago · samr@bwell.test</div>
+                    </div>
+                    <div class="right"></div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph">NL</div>
+                    <div>
+                      <div class="title">Dr Neave Lowe</div>
+                      <div class="sub">applied 4d ago · neavel@bwell.test</div>
+                    </div>
+                    <div class="right"></div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph">MO</div>
+                    <div>
+                      <div class="title">Mira Okonkwo</div>
+                      <div class="sub">applied 3d ago · mirao@bwell.test</div>
+                    </div>
+                    <div class="right"></div>
+                  </div>
+                  <div class="row">
+                    <div class="glyph">TK</div>
+                    <div>
+                      <div class="title">Tom Kalra, PWP</div>
+                      <div class="sub">applied 2d ago · tomk@bwell.test</div>
+                    </div>
+                    <div class="right"></div>
+                  </div>
+                  <div class="row" style="justify-content: center">
+                    <div style="grid-column: 1 / 4; text-align: center">
+                      <a href="#">View all 18 →</a>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right pane: inline verify card -->
+                <div class="pane-right">
+                  <div class="detail-head">
+                    <div class="detail-crumbs">
+                      Verification · Dr Alia Khan
+                    </div>
+                    <h3 class="detail-title">Verify therapist</h3>
+                    <div class="detail-meta">
+                      <span>applied 11 Apr 2026 · 9d in queue</span>
+                      <span>dralia@bwell.test</span>
+                    </div>
+                  </div>
+
+                  <div class="detail-body">
+                    <div
+                      style="
+                        display: grid;
+                        grid-template-columns: 180px 1fr;
+                        gap: 24px;
+                      "
+                    >
+                      <div>
+                        <div
+                          style="
+                            width: 140px;
+                            height: 140px;
+                            border-radius: 16px;
+                            background: linear-gradient(
+                              135deg,
+                              var(--card),
+                              var(--card-alt)
+                            );
+                            display: grid;
+                            place-items: center;
+                            font-size: 42px;
+                            font-weight: 900;
+                            color: var(--sway-bright);
+                          "
+                        >
+                          DA
+                        </div>
+                      </div>
+                      <div>
+                        <div style="font-size: 20px; font-weight: 900">
+                          Dr Alia Khan
+                        </div>
+                        <div
+                          style="color: var(--sway-darkGrey); font-size: 13px"
+                        >
+                          username · dr.alia · registered 11 Apr 2026
+                        </div>
+                        <div
+                          style="
+                            display: flex;
+                            gap: 8px;
+                            flex-wrap: wrap;
+                            margin-top: 12px;
+                          "
+                        >
+                          <span class="chip">role: therapist</span>
+                          <span class="chip warn">unverified</span>
+                          <span class="chip">last login 2h ago</span>
+                        </div>
+
+                        <div class="section-sub">
+                          <h3>Assign tier</h3>
+                          <span class="muted"
+                            >required at verify time</span
+                          >
+                        </div>
+                        <div
+                          style="
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 12px;
+                          "
+                        >
+                          <label
+                            style="
+                              border: 1px solid var(--sway-bright);
+                              background: var(--tint-teal);
+                              padding: 14px;
+                              border-radius: 10px;
+                              cursor: pointer;
+                            "
+                          >
+                            <div
+                              style="
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                              "
+                            >
+                              <strong>CBT therapist</strong>
+                              <span class="chip teal">selected</span>
+                            </div>
+                            <p
+                              style="
+                                color: var(--sway-darkGrey);
+                                margin: 6px 0 0;
+                                font-size: 12px;
+                              "
+                            >
+                              Full CBT programme. Access to
+                              cognitive+behavioural tools.
+                            </p>
+                          </label>
+                          <label
+                            style="
+                              border: 1px solid var(--divider);
+                              padding: 14px;
+                              border-radius: 10px;
+                              cursor: pointer;
+                            "
+                          >
+                            <div
+                              style="
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                              "
+                            >
+                              <strong>PWP therapist</strong>
+                              <span class="chip">○</span>
+                            </div>
+                            <p
+                              style="
+                                color: var(--sway-darkGrey);
+                                margin: 6px 0 0;
+                                font-size: 12px;
+                              "
+                            >
+                              Behavioural subset. No cognitive tools.
+                            </p>
+                          </label>
+                        </div>
+
+                        <div
+                          style="
+                            display: flex;
+                            gap: 12px;
+                            margin-top: 24px;
+                            align-items: center;
+                          "
+                        >
+                          <button
+                            style="
+                              background: var(--sway-bright);
+                              color: #00221e;
+                              border: none;
+                              font-weight: 900;
+                              padding: 12px 20px;
+                              border-radius: 10px;
+                              cursor: pointer;
+                              font-family: var(--font);
+                              font-size: 14px;
+                            "
+                          >
+                            Verify as CBT therapist
+                            <span
+                              class="kbd"
+                              style="margin-left: 8px; background: #00342e"
+                              >⌘↵</span
+                            >
+                          </button>
+                          <button
+                            style="
+                              background: transparent;
+                              color: var(--sway-lightGrey);
+                              border: 1px solid var(--divider);
+                              padding: 12px 16px;
+                              border-radius: 10px;
+                              cursor: pointer;
+                              font-family: var(--font);
+                              font-size: 14px;
+                            "
+                          >
+                            Skip to next
+                            <span
+                              class="kbd"
+                              style="
+                                margin-left: 8px;
+                                background: var(--chip-pill);
+                              "
+                              >␛</span
+                            >
+                          </button>
+                          <span
+                            style="
+                              color: var(--sway-darkGrey);
+                              font-size: 12px;
+                              margin-left: auto;
+                            "
+                            >Audit event will be written as
+                            <code>therapist.verified</code>.</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="annot" style="top: 120px; left: 80px">
+              <span class="pin">8</span>
+              <div class="note">
+                <strong>Queue-as-list.</strong> Verifying the top entry
+                auto-advances to the next — Superhuman-style triage.
+              </div>
+            </div>
+            <div class="annot" style="top: 340px; right: 40px">
+              <span class="pin">9</span>
+              <div class="note">
+                <strong>Tier required.</strong> Per invariant 12, the verify
+                form forces a tier pick before submit.
+              </div>
+            </div>
+          </div>
+          <div class="panel-caption">
+            <strong>Panel 03 · Inline verify flow.</strong> Verifying a
+            therapist happens in the right pane — no modal, no route change.
+            Pick tier → confirm (<span class="kbd">⌘↵</span>). List row gets
+            removed and the next candidate surfaces automatically. Keyboard
+            users never leave the keyboard.
+          </div>
+        </div>
+
+        <div class="legend" aria-label="Callout legend">
+          <div class="item">
+            <span class="num">1</span>
+            <div>
+              <strong>Rail</strong>
+              <p>Persistent module switch.</p>
+            </div>
+          </div>
+          <div class="item">
+            <span class="num">2</span>
+            <div>
+              <strong>Global search</strong>
+              <p>The command bar, <span class="kbd">/</span>.</p>
+            </div>
+          </div>
+          <div class="item">
+            <span class="num">3</span>
+            <div>
+              <strong>Attention group</strong>
+              <p>Top of the list. Red = unread urgent.</p>
+            </div>
+          </div>
+          <div class="item">
+            <span class="num">4</span>
+            <div>
+              <strong>Right-pane detail</strong>
+              <p>Changes on row select, never navigates.</p>
+            </div>
+          </div>
+          <div class="item">
+            <span class="num">5</span>
+            <div>
+              <strong>Fuzzy filter</strong>
+              <p>Narrows left pane in place.</p>
+            </div>
+          </div>
+          <div class="item">
+            <span class="num">6</span>
+            <div>
+              <strong>Unified feed</strong>
+              <p>Metrics + audit in one list.</p>
+            </div>
+          </div>
+          <div class="item">
+            <span class="num">7</span>
+            <div>
+              <strong>Suppression</strong>
+              <p>Hatched bar, stated reason, n shown.</p>
+            </div>
+          </div>
+          <div class="item">
+            <span class="num">8</span>
+            <div>
+              <strong>Inline queue action</strong>
+              <p>No modal. Auto-advance after confirm.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Breakpoint banner: MOBILE -->
+        <div class="bp-banner" style="margin-top: 56px" role="note">
+          <span class="tag">&lt; 960&nbsp;px</span>
+          <p>
+            <strong>Mobile collapsed fallback.</strong>
+            <span
+              >Two panes stack: the list becomes the primary screen, and the
+              right pane becomes a pushed route. Tab bar remains — this is RN
+              + expo-router territory.</span
+            >
+          </p>
+        </div>
+
+        <div class="mobile-grid">
+          <!-- Mobile panel 1: list -->
+          <div class="panel">
+            <span class="viewport-tag">Mobile · 375×720</span>
+            <div class="mobile-frame">
+              <div class="mobile-status">
+                <span>09:41</span>
+                <span>● ●●●</span>
+              </div>
+              <div class="mobile-header">
+                <h4>Command centre</h4>
+                <p>
+                  as of 14:32 · rollup 12m
+                  <span style="color: var(--info)">· dev</span>
+                </p>
+              </div>
+              <div class="mobile-search">
+                <span>⌕</span> Search programmes, users, audit
+              </div>
+
+              <div class="mobile-list">
+                <div class="group-head">
+                  Needs attention <span class="count">4</span>
+                </div>
+                <div class="m-row">
+                  <div class="glyph" style="color: var(--error)">!</div>
+                  <div>
+                    <div class="t">Verification queue</div>
+                    <div class="s">18 therapists · oldest 9d</div>
+                  </div>
+                  <div class="r">›</div>
+                </div>
+                <div class="m-row">
+                  <div class="glyph" style="color: var(--warning)">↻</div>
+                  <div>
+                    <div class="t">Stalled attempts</div>
+                    <div class="s">3 · untouched 7d+</div>
+                  </div>
+                  <div class="r">›</div>
+                </div>
+
+                <div class="group-head">
+                  Operational <span class="count">3</span>
+                </div>
+                <div class="m-row">
+                  <div class="glyph">▦</div>
+                  <div>
+                    <div class="t">Platform overview</div>
+                    <div class="s">216 active · 142 completed</div>
+                  </div>
+                  <div class="r">›</div>
+                </div>
+                <div class="m-row">
+                  <div class="glyph">⚡</div>
+                  <div>
+                    <div class="t">Active users · 30d</div>
+                    <div class="s">216 · ↑ 8%</div>
+                  </div>
+                  <div class="r">›</div>
+                </div>
+
+                <div class="group-head">
+                  Programmes <span class="count">3</span>
+                </div>
+                <div class="m-row">
+                  <div class="glyph" style="color: #c4b5fd">◇</div>
+                  <div>
+                    <div class="t">Depression · PHQ-9</div>
+                    <div class="s">recovery 40% · n=62</div>
+                  </div>
+                  <div class="r">›</div>
+                </div>
+                <div class="m-row">
+                  <div class="glyph" style="color: #c4b5fd">◇</div>
+                  <div>
+                    <div class="t">Generalised Anxiety</div>
+                    <div class="s">recovery 35% · n=48</div>
+                  </div>
+                  <div class="r">›</div>
+                </div>
+              </div>
+              <div class="m-tab">
+                <div class="on">⌘ Home</div>
+                <div>◎ Prog</div>
+                <div>☰ People</div>
+                <div>☷ Audit</div>
+                <div>⚙ Me</div>
+              </div>
+            </div>
+            <div class="panel-caption">
+              <strong>Mobile 01 · List-first.</strong> Same groups as desktop
+              left-pane. Row tap pushes a detail route. Search is expanded, no
+              keyboard shortcuts.
+            </div>
+          </div>
+
+          <!-- Mobile panel 2: detail -->
+          <div class="panel">
+            <span class="viewport-tag">Mobile · 375×720</span>
+            <div class="mobile-frame">
+              <div class="mobile-status">
+                <span>09:41</span>
+                <span>● ●●●</span>
+              </div>
+              <div class="m-detail-head">
+                <span class="m-back">← Back</span>
+                <div>
+                  <div style="font-weight: 900; font-size: 16px">
+                    Depression
+                  </div>
+                  <div style="color: var(--sway-darkGrey); font-size: 11px">
+                    PHQ-9 · last 90d · n=62
+                  </div>
+                </div>
+              </div>
+
+              <div class="m-detail-body">
+                <div
+                  style="
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 8px;
+                  "
+                >
+                  <div class="stat">
+                    <div class="label">Recovery</div>
+                    <div class="value" style="font-size: 24px">40%</div>
+                    <div class="delta muted">n=62</div>
+                  </div>
+                  <div class="stat">
+                    <div class="label">Rel. improv.</div>
+                    <div class="value" style="font-size: 24px">52%</div>
+                    <div class="delta muted">Δ ≥ 6</div>
+                  </div>
+                  <div class="stat">
+                    <div class="label">Rel. recovery</div>
+                    <div class="value" style="font-size: 24px">33%</div>
+                    <div class="delta muted">strictest</div>
+                  </div>
+                  <div class="stat">
+                    <div class="label">Enrolled</div>
+                    <div class="value" style="font-size: 24px">128</div>
+                    <div class="delta muted">across tiers</div>
+                  </div>
+                </div>
+
+                <div class="section-sub">
+                  <h3>By care tier</h3>
+                </div>
+                <div class="bars">
+                  <div class="bar" style="grid-template-columns: 80px 1fr 50px">
+                    <div class="label">Self-help</div>
+                    <div class="track">
+                      <div class="fill" style="width: 28%"></div>
+                    </div>
+                    <div class="n">n=24</div>
+                  </div>
+                  <div class="bar" style="grid-template-columns: 80px 1fr 50px">
+                    <div class="label">CBT</div>
+                    <div class="track">
+                      <div class="fill" style="width: 55%"></div>
+                    </div>
+                    <div class="n">n=22</div>
+                  </div>
+                  <div
+                    class="bar suppressed"
+                    style="grid-template-columns: 80px 1fr 50px"
+                  >
+                    <div class="label">PWP</div>
+                    <div class="track">
+                      <div class="fill" style="width: 40%"></div>
+                    </div>
+                    <div class="n">n=16</div>
+                  </div>
+                </div>
+              </div>
+              <div class="m-tab">
+                <div class="on">⌘</div>
+                <div>◎</div>
+                <div>☰</div>
+                <div>☷</div>
+                <div>⚙</div>
+              </div>
+            </div>
+            <div class="panel-caption">
+              <strong>Mobile 02 · Pushed detail.</strong> Swipe-back returns to
+              the list. Same stat strip + breakdown, re-flowed to a 2-column
+              grid.
+            </div>
+          </div>
+
+          <!-- Mobile panel 3: verify -->
+          <div class="panel">
+            <span class="viewport-tag">Mobile · 375×720</span>
+            <div class="mobile-frame">
+              <div class="mobile-status">
+                <span>09:41</span>
+                <span>● ●●●</span>
+              </div>
+              <div class="m-detail-head">
+                <span class="m-back">← Queue</span>
+                <div>
+                  <div style="font-weight: 900; font-size: 16px">
+                    Verify therapist
+                  </div>
+                  <div style="color: var(--sway-darkGrey); font-size: 11px">
+                    Dr Alia Khan · 9 days in queue
+                  </div>
+                </div>
+              </div>
+              <div class="m-detail-body">
+                <div
+                  style="
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 16px;
+                    background: linear-gradient(135deg, var(--card), var(--card-alt));
+                    display: grid;
+                    place-items: center;
+                    font-size: 28px;
+                    font-weight: 900;
+                    color: var(--sway-bright);
+                    margin-bottom: 14px;
+                  "
+                >
+                  DA
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    gap: 6px;
+                    flex-wrap: wrap;
+                    margin-bottom: 18px;
+                  "
+                >
+                  <span class="chip">role: therapist</span>
+                  <span class="chip warn">unverified</span>
+                </div>
+
+                <div class="section-sub"><h3>Pick tier</h3></div>
+                <label
+                  style="
+                    display: block;
+                    border: 1px solid var(--sway-bright);
+                    background: var(--tint-teal);
+                    padding: 14px;
+                    border-radius: 10px;
+                    margin-bottom: 10px;
+                  "
+                >
+                  <strong>CBT therapist</strong>
+                  <p style="margin: 4px 0 0; color: var(--sway-darkGrey); font-size: 12px">
+                    Full programme, all tools.
+                  </p>
+                </label>
+                <label
+                  style="
+                    display: block;
+                    border: 1px solid var(--divider);
+                    padding: 14px;
+                    border-radius: 10px;
+                    margin-bottom: 18px;
+                  "
+                >
+                  <strong>PWP therapist</strong>
+                  <p style="margin: 4px 0 0; color: var(--sway-darkGrey); font-size: 12px">
+                    Behavioural subset.
+                  </p>
+                </label>
+
+                <button
+                  style="
+                    width: 100%;
+                    background: var(--sway-bright);
+                    color: #00221e;
+                    border: none;
+                    font-weight: 900;
+                    padding: 14px;
+                    border-radius: 12px;
+                    font-family: var(--font);
+                    font-size: 14px;
+                  "
+                >
+                  Verify as CBT therapist
+                </button>
+              </div>
+              <div class="m-tab">
+                <div>⌘</div>
+                <div>◎</div>
+                <div class="on">☰</div>
+                <div>☷</div>
+                <div>⚙</div>
+              </div>
+            </div>
+            <div class="panel-caption">
+              <strong>Mobile 03 · Verify sheet.</strong> Same content as
+              desktop right-pane, vertical. Submit-then-advance still applies.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= STATE GALLERY ================= -->
+      <section class="block" aria-label="State gallery">
+        <div class="block-head">
+          <div>
+            <div class="step">Section 03 · States</div>
+            <h2>Every corner case has a face.</h2>
+          </div>
+          <p class="note">
+            The states admin will realistically encounter: empty list, a
+            selected item with no clinical instrument, loading the right pane
+            while the list stays cached, the error state, and — most
+            importantly — the keyboard-focus ring.
+          </p>
+        </div>
+
+        <div class="state-grid">
+          <!-- Empty list -->
+          <div class="state-card">
+            <div class="state-head">
+              <span>Empty · 0 programmes ever created</span>
+              <span class="dot"></span>
+            </div>
+            <div class="state-body">
+              <div class="empty-illus">⌘</div>
+              <div style="text-align: center; margin-top: 8px">
+                <div style="font-weight: 900; font-size: 16px">
+                  Nothing here yet
+                </div>
+                <p
+                  style="color: var(--sway-darkGrey); font-size: 12px; margin: 6px 0 12px"
+                >
+                  No programmes, no attempts, no audit events. Run the rollup
+                  job or
+                  <a href="#">create your first programme</a>.
+                </p>
+                <span class="kbd">G</span> <span class="kbd">P</span>
+                <span style="font-size: 11px; color: var(--sway-darkGrey); margin-left: 6px">
+                  new programme
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Single-item detail (no clinical instrument) -->
+          <div class="state-card">
+            <div class="state-head">
+              <span>Detail · programme without outcomes</span>
+              <span class="dot"></span>
+            </div>
+            <div class="state-body">
+              <div style="font-weight: 900; font-size: 16px">Sleep Health</div>
+              <div
+                style="color: var(--sway-darkGrey); font-size: 12px; margin-top: 4px"
+              >
+                no clinical instrument
+              </div>
+              <div
+                style="
+                  margin-top: 14px;
+                  padding: 14px;
+                  background: var(--tint-neutral);
+                  border: 1px dashed var(--divider);
+                  border-radius: 10px;
+                  font-size: 12px;
+                  color: var(--sway-darkGrey);
+                "
+              >
+                This programme has no IAPT instrument attached, so no
+                recovery/reliable-change rates are available.
+                Engagement-only.
+              </div>
+              <div style="margin-top: 14px">
+                <div class="stat">
+                  <div class="label">Enrolled</div>
+                  <div class="value">34</div>
+                  <div class="delta muted">self-help only</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading right pane / cached left -->
+          <div class="state-card">
+            <div class="state-head">
+              <span>Right-pane loading · left cached</span>
+              <span class="dot"></span>
+            </div>
+            <div class="state-body" style="padding: 0">
+              <div style="display: grid; grid-template-columns: 110px 1fr; min-height: 220px">
+                <div style="border-right: 1px solid var(--divider); padding: 10px 8px">
+                  <div style="font-size: 10px; color: var(--sway-darkGrey); margin-bottom: 6px">
+                    PROGRAMMES
+                  </div>
+                  <div style="font-size: 11px; margin-bottom: 6px">Depression</div>
+                  <div
+                    style="
+                      font-size: 11px;
+                      padding: 4px 6px;
+                      border-radius: 6px;
+                      background: var(--tint-teal);
+                      color: var(--sway-bright);
+                      margin-bottom: 6px;
+                    "
+                  >
+                    Gen. Anxiety →
+                  </div>
+                  <div style="font-size: 11px">Sleep Health</div>
+                </div>
+                <div style="padding: 14px">
+                  <div class="skel" style="width: 50%; height: 14px"></div>
+                  <div class="skel" style="width: 30%"></div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px">
+                    <div class="skel" style="height: 50px"></div>
+                    <div class="skel" style="height: 50px"></div>
+                  </div>
+                  <div class="skel" style="margin-top: 14px"></div>
+                  <div class="skel" style="width: 70%"></div>
+                  <div class="skel" style="width: 85%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error -->
+          <div class="state-card">
+            <div class="state-head">
+              <span>Error · outcomes fetch failed</span>
+              <span class="dot" style="background: var(--error)"></span>
+            </div>
+            <div class="state-body">
+              <div
+                style="
+                  border: 1px solid var(--tint-error);
+                  background: var(--tint-error);
+                  color: var(--error);
+                  padding: 14px;
+                  border-radius: 10px;
+                "
+              >
+                <div style="font-weight: 900; font-size: 14px">
+                  Couldn't load outcomes
+                </div>
+                <p style="margin: 4px 0 0; font-size: 12px">
+                  <code>GET /api/admin/outcomes</code> returned 500. The list
+                  on the left is still valid (cached rollup from 12m ago).
+                </p>
+                <div style="display: flex; gap: 8px; margin-top: 12px">
+                  <button
+                    style="
+                      background: var(--error);
+                      color: #240100;
+                      border: none;
+                      font-weight: 700;
+                      padding: 8px 12px;
+                      border-radius: 8px;
+                      font-family: var(--font);
+                      font-size: 12px;
+                    "
+                  >
+                    Retry
+                  </button>
+                  <button
+                    style="
+                      background: transparent;
+                      color: var(--sway-lightGrey);
+                      border: 1px solid var(--divider);
+                      padding: 8px 12px;
+                      border-radius: 8px;
+                      font-family: var(--font);
+                      font-size: 12px;
+                    "
+                  >
+                    Open system health
+                  </button>
+                </div>
+              </div>
+              <p style="color: var(--sway-darkGrey); font-size: 12px; margin-top: 10px">
+                The left pane and rail remain interactive — error is scoped to
+                the right pane so the admin isn't locked out.
+              </p>
+            </div>
+          </div>
+
+          <!-- Keyboard focus ring -->
+          <div class="state-card">
+            <div class="state-head">
+              <span>Keyboard focus ring visible</span>
+              <span class="dot"></span>
+            </div>
+            <div class="state-body">
+              <div style="display: flex; flex-direction: column; gap: 12px">
+                <div class="focus-chip">Row 3 · Depression · PHQ-9</div>
+                <p
+                  style="color: var(--sway-darkGrey); font-size: 12px; margin: 0"
+                >
+                  Separate from selected-state (teal fill). The focus ring is
+                  always <strong style="color: var(--sway-bright)">2 px solid teal + 6 px glow</strong>,
+                  3 px offset — visible even against busy cards. Selected +
+                  focused ≠ redundant; they coexist.
+                </p>
+                <div style="display: flex; gap: 8px; align-items: center">
+                  <span class="kbd">↑</span><span class="kbd">↓</span>
+                  <span style="font-size: 11px; color: var(--sway-darkGrey)">or</span>
+                  <span class="kbd">J</span><span class="kbd">K</span>
+                  <span style="font-size: 11px; color: var(--sway-darkGrey)">
+                    move focus (doesn't open detail)
+                  </span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center">
+                  <span class="kbd">Enter</span>
+                  <span style="font-size: 11px; color: var(--sway-darkGrey)">
+                    open focused row in right pane
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rollup stale -->
+          <div class="state-card">
+            <div class="state-head">
+              <span>Rollup stale · > 24h</span>
+              <span class="dot" style="background: var(--warning)"></span>
+            </div>
+            <div class="state-body">
+              <div
+                style="
+                  border: 1px solid rgba(255, 179, 0, 0.3);
+                  background: rgba(255, 179, 0, 0.1);
+                  color: var(--warning);
+                  padding: 12px 14px;
+                  border-radius: 10px;
+                  font-size: 12px;
+                "
+              >
+                Rollup hasn't run for 28 hours. Outcome cards show the last
+                known values with an explicit freshness chip.
+              </div>
+              <div class="stat" style="margin-top: 12px">
+                <div class="label">PHQ-9 recovery</div>
+                <div class="value">
+                  40% <span class="chip warn" style="font-size: 10px">stale 28h</span>
+                </div>
+                <div class="delta muted">rollupAsOf 19 Apr 10:04</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ANIMATIONS ================= -->
+      <section class="block" aria-label="Animation callouts">
+        <div class="block-head">
+          <div>
+            <div class="step">Section 04 · Motion</div>
+            <h2>Four motion moments — each earns its frame.</h2>
+          </div>
+          <p class="note">
+            Subtle. Keyboard-pleasing. Everything respects
+            <code>prefers-reduced-motion</code>.
+          </p>
+        </div>
+
+        <div class="anim-grid">
+          <div class="anim-card">
+            <div class="anim-stage">
+              <div class="cf-card">
+                <h5>Platform overview</h5>
+                <p>216 active · 142 completed</p>
+              </div>
+              <div class="cf-card">
+                <h5>Depression · PHQ-9</h5>
+                <p>Recovery 40% · n=62</p>
+              </div>
+            </div>
+            <h4>Right-pane crossfade</h4>
+            <p>
+              Trigger: row selected (click / <span class="kbd">Enter</span>).
+              The outgoing detail fades and drifts up 6 px while the incoming
+              detail fades in. Keeps the list spatially stable.
+            </p>
+            <div class="timing">240 ms · ease-out · crossfade</div>
+          </div>
+
+          <div class="anim-card">
+            <div class="anim-stage">
+              <div class="k-reveal">
+                <div class="k"><span class="kbd">/</span> Search</div>
+                <div class="k"><span class="kbd">J</span>/<span class="kbd">K</span> Move</div>
+                <div class="k"><span class="kbd">Enter</span> Open</div>
+                <div class="k"><span class="kbd">G</span><span class="kbd">P</span> Prog.</div>
+                <div class="k"><span class="kbd">G</span><span class="kbd">V</span> Verify</div>
+                <div class="k"><span class="kbd">?</span> Help</div>
+              </div>
+            </div>
+            <h4>Shortcut cheatsheet reveal</h4>
+            <p>
+              Trigger: <span class="kbd">?</span>. A 9-up grid of shortcuts
+              slides up over the right pane. Press <span class="kbd">Esc</span>
+              to dismiss.
+            </p>
+            <div class="timing">180 ms · ease-in-out · overlay</div>
+          </div>
+
+          <div class="anim-card">
+            <div class="anim-stage jk-stage">
+              <ul>
+                <li class="cur">● Depression · PHQ-9</li>
+                <li>Generalised Anxiety · GAD-7</li>
+                <li>Sleep Health</li>
+              </ul>
+            </div>
+            <h4>Focus cursor glide</h4>
+            <p>
+              Trigger: <span class="kbd">J</span> / <span class="kbd">K</span>.
+              The focus ring glides between rows — not the row content. Gives
+              continuity at high keypress rates.
+            </p>
+            <div class="timing">90 ms · linear · position</div>
+          </div>
+
+          <div class="anim-card">
+            <div class="anim-stage pulse-stage">
+              <div class="pulse"></div>
+            </div>
+            <h4>Attention pulse</h4>
+            <p>
+              Trigger: new entry enters the "needs attention" group (e.g. a
+              therapist registers). The row's red dot emits one ring-out. Does
+              not repeat.
+            </p>
+            <div class="timing">1.8 s once · ease-out · ring</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= COMPONENTS ================= -->
+      <section class="block" aria-label="Component breakdown">
+        <div class="block-head">
+          <div>
+            <div class="step">Section 05 · Components</div>
+            <h2>What we reuse, what we build.</h2>
+          </div>
+          <p class="note">
+            The split-command shell is new; everything that lives inside it is
+            familiar bwell vocabulary.
+          </p>
+        </div>
+
+        <div class="comp-grid">
+          <div class="comp-card">
+            <h3>New components (this angle)</h3>
+            <ul>
+              <li>
+                <code>AdminSplitShell</code>
+                <span class="sub"
+                  >The 56 / 380 / 1fr three-column grid with topbar. Web-only
+                  layout; on mobile renders as a stacked stack navigator.</span
+                >
+              </li>
+              <li>
+                <code>UniversalListPane</code>
+                <span class="sub"
+                  >The left pane. Grouped virtualised list (FlatList on RN,
+                  windowed list on web). Renders rows for metrics, programmes,
+                  queue entries, audit events.</span
+                >
+              </li>
+              <li>
+                <code>CommandRow</code>
+                <span class="sub"
+                  >Single row atom. Props: glyph, title, sub, right-slot,
+                  urgency, href. Owns focus, selected, and hover states.</span
+                >
+              </li>
+              <li>
+                <code>DetailPane</code>
+                <span class="sub"
+                  >The right pane. Switches content by selected row kind.
+                  Crossfades on change. Crashes are scoped here, not globally.</span
+                >
+              </li>
+              <li>
+                <code>CommandBar</code>
+                <span class="sub"
+                  >Topbar search + <span class="kbd">/</span> hotkey binding.
+                  Fuzzy-search over the left-pane corpus.</span
+                >
+              </li>
+              <li>
+                <code>ShortcutSheet</code>
+                <span class="sub"
+                  >The <span class="kbd">?</span> overlay. Reads from a single
+                  keymap registry.</span
+                >
+              </li>
+              <li>
+                <code>SuppressedBar</code>
+                <span class="sub"
+                  >BarSparkline variant that renders hatched fill + a reason
+                  chip when <code>suppressed === true</code>. Never computes a
+                  rate.</span
+                >
+              </li>
+              <li>
+                <code>InlineVerifyCard</code>
+                <span class="sub"
+                  >Renders inside DetailPane; picks tier, confirms, emits the
+                  audit event, auto-advances queue.</span
+                >
+              </li>
+              <li>
+                <code>FreshnessChip</code>
+                <span class="sub"
+                  >Compact rollupAsOf display; goes amber past 24h.</span
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="comp-card">
+            <h3>Existing components reused</h3>
+            <ul>
+              <li>
+                <code>ThemedText</code>
+                <span class="sub"
+                  >All typography. type=title / subtitle / smallTitle / default
+                  / small / smallBold / link.</span
+                >
+              </li>
+              <li>
+                <code>ThemedButton</code>
+                <span class="sub"
+                  >Primary / outline / error variants (verify, retry, open
+                  system health).</span
+                >
+              </li>
+              <li>
+                <code>StatStrip</code>
+                <span class="sub"
+                  >Top of every DetailPane. Four-up KPI row — exact pattern
+                  from TherapistDashboard.</span
+                >
+              </li>
+              <li>
+                <code>BarSparkline</code>
+                <span class="sub"
+                  >Module-type breakdown and care-tier bars.</span
+                >
+              </li>
+              <li>
+                <code>Sparkline</code>
+                <span class="sub">Inline outcome trend line.</span>
+              </li>
+              <li>
+                <code>Chip / StatusChip</code>
+                <span class="sub"
+                  >Care tier, freshness, suppression reason, audit outcome.</span
+                >
+              </li>
+              <li>
+                <code>EmptyState</code>
+                <span class="sub"
+                  >Used inside DetailPane for zero-programme / zero-data
+                  states.</span
+                >
+              </li>
+              <li>
+                <code>ActionMenu</code>
+                <span class="sub"
+                  >Row-level context menu (view user profile, open in audit,
+                  reject application) with destructive confirmation.</span
+                >
+              </li>
+              <li>
+                <code>Container / ContentContainer</code>
+                <span class="sub"
+                  >Mobile fallback screens.</span
+                >
+              </li>
+              <li>
+                <code>IconSymbol</code>
+                <span class="sub"
+                  >All glyphs on the rail + CommandRow.</span
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= RATIONALE ================= -->
+      <section class="block" aria-label="Rationale">
+        <div class="block-head">
+          <div>
+            <div class="step">Section 06 · Why this design</div>
+            <h2>Rationale, in five bullets.</h2>
+          </div>
+          <p class="note">
+            The brief asks for a first-class admin home. This angle commits to
+            admin-as-fluent-operator.
+          </p>
+        </div>
+
+        <div class="rationale">
+          <div class="rat">
+            <h3>01 · Context preservation beats navigation</h3>
+            <p>
+              Admin work is cross-referential — "look at Depression recovery,
+              then the two unverified PWPs, then the audit of the last
+              verification". A split layout keeps the spine of everything
+              visible while the detail swaps. Clicking a programme never
+              unloads the queue.
+            </p>
+          </div>
+          <div class="rat">
+            <h3>02 · The list is the source of truth</h3>
+            <p>
+              KPI grids hide relationships between items. A unified grouped list
+              (attention → operational → programmes → audit) reads like a
+              priority queue: urgent bubbles to the top, everything is
+              enumerable and linearly scannable. <code>/overview</code> already
+              returns all these groups in one call; the design collapses them
+              into one list instead of four tiles.
+            </p>
+          </div>
+          <div class="rat">
+            <h3>03 · Keyboard-first rewards the fluent user</h3>
+            <p>
+              bwell's admin is a small, repeat user. Their hours-per-week with
+              the app justify muscle memory. <span class="kbd">/</span> +
+              <span class="kbd">J</span>/<span class="kbd">K</span> +
+              <span class="kbd">Enter</span> makes triage 3–5x faster than
+              clicking. Superhuman / Linear / Front all earn their fans this
+              way.
+            </p>
+          </div>
+          <div class="rat">
+            <h3>04 · Suppression as a first-class visual</h3>
+            <p>
+              k-anonymity (&lt;5) and min-N (&lt;20) are not edge cases — the
+              dev environment will hit them often. Hatched bars + explicit
+              "below_min_n" chips honour invariant 4 without needing admin to
+              read docs. The FE never divides anything itself.
+            </p>
+          </div>
+          <div class="rat">
+            <h3>05 · Mobile doesn't lie about the surface</h3>
+            <p>
+              Rather than a different IA, mobile collapses the same list into a
+              stack route. Desktop-only features (keyboard hints, focus ring
+              cursor, <span class="kbd">?</span> sheet) are hidden, not
+              replaced with inferior mobile equivalents. The angle is honest
+              about its best canvas.
+            </p>
+          </div>
+
+          <div class="be-note">
+            <strong>BE assumption worth flagging.</strong> Two minor deltas vs
+            §2 we'd need before shipping: (1) the left-pane unified list reads
+            most rows from <code>/api/admin/overview</code>, but mixing audit
+            entries into the same stream would benefit from a small
+            <code>recentAudit: AdminAuditEvent[]</code> slice on
+            <code>/overview</code> — today we'd need a separate
+            <code>/audit?limit=5</code> call on load; (2) inline verify
+            auto-advance would benefit from <code>PATCH /user/:id/verify</code>
+            returning the next oldest unverified therapist in one round-trip
+            rather than two, to keep the flow snappy. Both are additive, not
+            breaking.
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <span>bwell · Admin overhaul · Angle 04 · Split command centre</span>
+        <span>2026-04-20 · dark · Lato · dev palette</span>
+      </footer>
+    </div>
+  </body>
+</html>
