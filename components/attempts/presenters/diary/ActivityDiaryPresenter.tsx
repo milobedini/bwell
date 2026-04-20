@@ -36,14 +36,21 @@ const ActivityDiaryPresenter = ({ attempt, mode, patientName }: ActivityDiaryPre
   const nav = useDiaryNavigation(state.activeDayISO);
 
   const [promptShown, setPromptShown] = useState(false);
-  const promptSlotIdx = nav.expandedSlotIdx;
 
-  // Mark prompt as shown after the first slot expansion (effect, not during render)
+  // TODO: product decision — the reflection prompt currently "flashes" for one
+  // render on the first slot expansion (render N shows prompt; effect flips
+  // promptShown; render N+1 hides it). The timing dependency is fragile. Worth
+  // deciding whether the prompt should stay visible until dismissed/interacted
+  // with, or disappear on a timer. Until then the effect is load-bearing:
+  // inlining these updates into the expand handler would batch them and the
+  // prompt would never render visible at all.
+  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler, react-you-might-not-need-an-effect/no-adjust-state-on-prop-change, react-you-might-not-need-an-effect/no-chain-state-updates */
   useEffect(() => {
-    if (promptSlotIdx !== null && !promptShown) {
+    if (nav.expandedSlotIdx !== null && !promptShown) {
       setPromptShown(true);
     }
-  }, [promptSlotIdx, promptShown]);
+  }, [nav.expandedSlotIdx, promptShown]);
+  /* eslint-enable react-you-might-not-need-an-effect/no-event-handler, react-you-might-not-need-an-effect/no-adjust-state-on-prop-change, react-you-might-not-need-an-effect/no-chain-state-updates */
 
   const handleSelectDay = useCallback(
     (iso: string) => {

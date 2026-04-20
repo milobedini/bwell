@@ -7,7 +7,7 @@ import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import type { ActionMenuItem } from '@/components/ui/ActionMenu';
 import ActionMenu from '@/components/ui/ActionMenu';
-import BloomBurst from '@/components/ui/BloomBurst';
+import BloomBurst, { type BloomBurstHandle } from '@/components/ui/BloomBurst';
 import { Colors } from '@/constants/Colors';
 import { Fonts } from '@/constants/Typography';
 import { AttemptStatus } from '@/types/types';
@@ -90,8 +90,8 @@ const FloatingActionButton = ({
 );
 
 const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresenterProps) => {
-  const [submitBloomTrigger, setSubmitBloomTrigger] = useState(0);
-  const handleSubmitSuccess = useCallback(() => setSubmitBloomTrigger((n) => n + 1), []);
+  const submitBloomRef = useRef<BloomBurstHandle>(null);
+  const handleSubmitSuccess = useCallback(() => submitBloomRef.current?.bloom(), []);
   const state = useWeeklyGoalsState({ attempt, mode, onSubmitSuccess: handleSubmitSuccess });
   const [draft, setDraft] = useState('');
   const [activeGoalIndex, setActiveGoalIndex] = useState<number | null>(null);
@@ -255,7 +255,7 @@ const WeeklyGoalsPresenter = ({ attempt, mode, patientName }: WeeklyGoalsPresent
           zIndex: 20
         }}
       >
-        <BloomBurst trigger={submitBloomTrigger} size={320} />
+        <BloomBurst ref={submitBloomRef} size={320} />
       </View>
 
       <ActionMenu

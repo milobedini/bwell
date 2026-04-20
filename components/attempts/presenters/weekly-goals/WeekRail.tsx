@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useRef } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { MotiView } from 'moti';
 import { ThemedText } from '@/components/ThemedText';
-import BloomBurst from '@/components/ui/BloomBurst';
+import BloomBurst, { type BloomBurstHandle } from '@/components/ui/BloomBurst';
 import { Colors } from '@/constants/Colors';
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
@@ -28,12 +28,12 @@ type WeekRailChipProps = {
 
 const WeekRailChip = ({ goal, index, active, canEdit, onPressGoal, onToggle }: WeekRailChipProps) => {
   const done = goal.completed;
-  const [bloomTrigger, setBloomTrigger] = useState(0);
+  const bloomRef = useRef<BloomBurstHandle>(null);
 
   const handlePress = () => {
     if (canEdit && onToggle) {
       // Bloom fires only on the false→true transition at the tapped chip.
-      if (!done) setBloomTrigger((n) => n + 1);
+      if (!done) bloomRef.current?.bloom();
       onToggle(index);
       return;
     }
@@ -60,7 +60,7 @@ const WeekRailChip = ({ goal, index, active, canEdit, onPressGoal, onToggle }: W
             zIndex: 10
           }}
         >
-          <BloomBurst trigger={bloomTrigger} size={120} />
+          <BloomBurst ref={bloomRef} size={120} />
         </View>
         <Pressable
           onPress={handlePress}
