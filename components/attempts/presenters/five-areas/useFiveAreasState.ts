@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { toast } from 'sonner-native';
@@ -41,26 +41,33 @@ export const useFiveAreasState = ({ attempt, mode }: UseFiveAreasStateParams) =>
   const { mutateSilently: saveAttemptSilently, isPending: isSaving } = useSaveModuleAttempt(attempt._id);
   const { mutate: submitAttempt, isPending: isSubmitting } = useSubmitAttempt(attempt._id);
 
-  const [fields, setFields] = useState<Partial<FiveAreasData>>({});
+  const initialFields = (): Partial<FiveAreasData> => (attempt.fiveAreas ? { ...attempt.fiveAreas } : {});
+  const initialStep = () => {
+    const serverData = attempt.fiveAreas;
+    if (!serverData) return 0;
+    if (mode !== 'edit' || attempt.status === 'submitted') return 0;
+    const firstEmpty = AREA_KEYS.findIndex((key) => !serverData[key]?.trim());
+    return firstEmpty === -1 ? AREA_KEYS.length - 1 : firstEmpty;
+  };
+
+  const [fields, setFields] = useState<Partial<FiveAreasData>>(initialFields);
   const [dirtyKeys, setDirtyKeys] = useState<Set<AreaKey>>(new Set());
-  const [currentStep, setCurrentStep] = useState(0);
-  const [highestStep, setHighestStep] = useState(0); // track furthest step reached
+  const [currentStep, setCurrentStep] = useState(initialStep);
+  const [highestStep, setHighestStep] = useState(initialStep); // track furthest step reached
   const [showReview, setShowReview] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
-  useEffect(() => {
-    const serverData = attempt.fiveAreas;
-    if (serverData) {
-      setFields({ ...serverData });
-      const canEditNow = mode === 'edit' && attempt.status !== 'submitted';
-      if (canEditNow) {
-        const firstEmpty = AREA_KEYS.findIndex((key) => !serverData[key]?.trim());
-        const resumeStep = firstEmpty === -1 ? AREA_KEYS.length - 1 : firstEmpty;
-        setCurrentStep(resumeStep);
-        setHighestStep(resumeStep);
-      }
-    }
-  }, [attempt._id, attempt.fiveAreas, attempt.status, mode]);
+  // Re-seed state when the attempt changes (e.g. navigating between attempts).
+  // Adjusting during render is React's recommended alternative to a sync effect.
+  const [prevAttemptId, setPrevAttemptId] = useState(attempt._id);
+  if (prevAttemptId !== attempt._id) {
+    setPrevAttemptId(attempt._id);
+    setFields(initialFields());
+    setDirtyKeys(new Set());
+    const step = initialStep();
+    setCurrentStep(step);
+    setHighestStep(step);
+  }
 
   const currentKey = AREA_KEYS[currentStep];
 

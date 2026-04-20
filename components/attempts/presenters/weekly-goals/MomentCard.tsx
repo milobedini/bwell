@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { MotiView } from 'moti';
 import { ThemedText } from '@/components/ThemedText';
@@ -98,20 +98,16 @@ const MomentCard = ({
   const accent = ACCENTS[index % ACCENTS.length];
   const [expanded, setExpanded] = useState(isActive || goal.completed);
   const [bloomTrigger, setBloomTrigger] = useState(0);
-  const prevCompletedRef = useRef(goal.completed);
+  const [prevCompleted, setPrevCompleted] = useState(goal.completed);
 
   // Expand the card on any false→true transition (including taps coming from
   // the WeekRail), and collapse on the reverse so an un-ticked goal returns to
   // a clean state. Bloom is fired locally by the pill's handler so it appears
   // under the actual touch point rather than bouncing to a different surface.
-  useEffect(() => {
-    if (goal.completed && !prevCompletedRef.current) {
-      setExpanded(true);
-    } else if (!goal.completed && prevCompletedRef.current) {
-      setExpanded(false);
-    }
-    prevCompletedRef.current = goal.completed;
-  }, [goal.completed]);
+  if (prevCompleted !== goal.completed) {
+    setPrevCompleted(goal.completed);
+    setExpanded(goal.completed);
+  }
 
   const handleTogglePress = () => {
     if (!goal.completed) setBloomTrigger((n) => n + 1);
