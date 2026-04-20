@@ -50,7 +50,7 @@ const MetricStepper = memo(({ label, value, color, onChange, disabled }: MetricS
     (direction: 1 | -1) => {
       if (value === undefined) {
         onChange(MIDPOINT);
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         triggerPulse();
         return;
       }
@@ -59,7 +59,7 @@ const MetricStepper = memo(({ label, value, color, onChange, disabled }: MetricS
       if (next === value) return;
 
       onChange(next);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       triggerPulse();
     },
     [value, onChange, triggerPulse]

@@ -196,7 +196,7 @@ export default function Signup() {
                         <SegmentedButtons
                           value={values.roles[0] || ''}
                           onValueChange={(role) => {
-                            setFieldValue('roles', [role]);
+                            void setFieldValue('roles', [role]);
                           }}
                           style={{ marginTop: 16 }}
                           buttons={[
