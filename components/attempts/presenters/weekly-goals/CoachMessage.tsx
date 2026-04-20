@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { MotiView } from 'moti';
 import { ThemedText } from '@/components/ThemedText';
+import TypewriterText from '@/components/ui/TypewriterText';
 import { Colors } from '@/constants/Colors';
 
 type CoachMessageProps = {
@@ -12,27 +12,6 @@ type CoachMessageProps = {
 };
 
 const CoachMessage = ({ glyph, prompt, tone = 'coach', typewriter = true }: CoachMessageProps) => {
-  const [visible, setVisible] = useState(typewriter ? 0 : prompt.length);
-
-  useEffect(() => {
-    if (!typewriter) {
-      setVisible(prompt.length);
-      return;
-    }
-    setVisible(0);
-    const id = setInterval(() => {
-      setVisible((n) => {
-        if (n >= prompt.length) {
-          clearInterval(id);
-          return n;
-        }
-        return n + 1;
-      });
-    }, 12);
-    return () => clearInterval(id);
-  }, [prompt, typewriter]);
-
-  const shown = prompt.slice(0, visible);
   const color = tone === 'muted' ? Colors.sway.darkGrey : Colors.sway.lightGrey;
 
   return (
@@ -61,14 +40,12 @@ const CoachMessage = ({ glyph, prompt, tone = 'coach', typewriter = true }: Coac
         >
           coach
         </ThemedText>
-        <ThemedText type="default" style={{ color, marginTop: 2, lineHeight: 26 }}>
-          {shown}
-          {typewriter && visible < prompt.length ? (
-            <ThemedText type="default" style={{ color: Colors.sway.bright }}>
-              {'\u258F'}
-            </ThemedText>
-          ) : null}
-        </ThemedText>
+        <TypewriterText
+          text={prompt}
+          enabled={typewriter}
+          type="default"
+          style={{ color, marginTop: 2, lineHeight: 26 }}
+        />
       </View>
     </MotiView>
   );
