@@ -2,6 +2,7 @@ import { TextInput, View } from 'react-native';
 import { MotiView } from 'moti';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
+import { Fonts } from '@/constants/Typography';
 import type { WeeklyGoalsReflection } from '@milobedini/shared-types';
 
 import CoachMessage from './CoachMessage';
@@ -87,7 +88,7 @@ const ReflectionThread = ({ reflection, canEdit, onChange }: ReflectionThreadPro
                   paddingRight: 6,
                   minHeight: 64,
                   fontSize: 17,
-                  fontFamily: 'Lato-Italic',
+                  fontFamily: Fonts.Italic,
                   lineHeight: 26
                 }}
                 accessibilityLabel={step.prompt}
