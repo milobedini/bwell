@@ -89,5 +89,10 @@ export const Colors = {
   divider: {
     light: 'rgba(166,173,187,0.1)',
     medium: 'rgba(166,173,187,0.15)'
+  },
+  bloom: {
+    tealCore: 'rgba(24,205,186,0.85)',
+    tealMid: 'rgba(24,205,186,0.35)',
+    tealEdge: 'rgba(24,205,186,0)'
   }
 };
