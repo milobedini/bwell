@@ -9,7 +9,8 @@ const MODULE_TYPE_ICONS: Record<string, MCIName> = {
   [ModuleType.ACTIVITY_DIARY]: 'calendar-week',
   [ModuleType.READING]: 'book-open-outline',
   [ModuleType.FIVE_AREAS_MODEL]: 'brain',
-  [ModuleType.GENERAL_GOALS]: 'bullseye-arrow'
+  [ModuleType.GENERAL_GOALS]: 'bullseye-arrow',
+  [ModuleType.WEEKLY_GOALS]: 'message-text-outline'
 };
 
 export const getModuleIcon = (moduleType?: string): MCIName =>

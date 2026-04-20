@@ -222,7 +222,7 @@ const GoalCard = ({
             placeholder="What would you like to achieve?"
             placeholderTextColor={Colors.sway.darkGrey}
             multiline
-            blurOnSubmit
+            submitBehavior="blurAndSubmit"
             returnKeyType="done"
             style={{
               backgroundColor: Colors.chip.darkCardDeep,

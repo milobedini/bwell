@@ -30,6 +30,11 @@ jest.mock('./reading/ReadingPresenter', () => {
   return { __esModule: true, default: () => <Text>ReadingPresenter</Text> };
 });
 
+jest.mock('./weekly-goals/WeeklyGoalsPresenter', () => {
+  const { Text } = require('react-native');
+  return { __esModule: true, default: () => <Text>WeeklyGoalsPresenter</Text> };
+});
+
 const AttemptPresenter = require('./AttemptPresenter').default;
 
 const makeAttempt = (overrides: Partial<AttemptDetailResponseItem> = {}): AttemptDetailResponseItem =>
@@ -74,6 +79,13 @@ describe('AttemptPresenter', () => {
     render(<AttemptPresenter attempt={attempt} mode="view" />);
 
     expect(screen.getByText('GeneralGoalsPresenter')).toBeTruthy();
+  });
+
+  it('renders WeeklyGoalsPresenter for weekly_goals attempts', () => {
+    const attempt = makeAttempt({ moduleType: 'weekly_goals', weeklyGoals: { goals: [] } as never });
+    render(<AttemptPresenter attempt={attempt} mode="view" />);
+
+    expect(screen.getByText('WeeklyGoalsPresenter')).toBeTruthy();
   });
 
   it('renders fallback empty state for unknown module types', () => {
