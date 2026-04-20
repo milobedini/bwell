@@ -1,6 +1,7 @@
 // eslint.config.js
 import { defineConfig } from 'eslint/config';
 import expoConfig from 'eslint-config-expo/flat.js';
+import reactYouMightNotNeedAnEffect from 'eslint-plugin-react-you-might-not-need-an-effect';
 import { configs, parser, plugin } from 'typescript-eslint'; // v7 meta package (parser + plugin + presets)
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import tailwindcss from 'eslint-plugin-tailwindcss';
@@ -12,8 +13,11 @@ export default defineConfig([
   // TypeScript recommended presets (adds sensible defaults)
   ...configs.recommended,
 
+  // React "you might not need an effect" — warns on unnecessary useEffect patterns
+  reactYouMightNotNeedAnEffect.configs.recommended,
+
   // Ignore build output and files with config.cjs
-  { ignores: ['dist/**', '.expo/**', '.worktrees/**', '**.cjs', '**.config.js'] },
+  { ignores: ['dist/**', '.expo/**', '.worktrees/**', 'coverage/**', '**.cjs', '**.config.js'] },
 
   // Jest test files — expose globals (must appear before main rules for languageOptions)
   {
@@ -43,10 +47,10 @@ export default defineConfig([
       parser: parser,
       parserOptions: {
         ecmaVersion: 'latest',
-        sourceType: 'module'
-        // If you use project-aware linting, enable the service:
-        // projectService: true,
-        // tsconfigRootDir: import.meta.dirname,
+        sourceType: 'module',
+        // Type-aware linting — required by @typescript-eslint/no-floating-promises
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname
       }
     },
     plugins: {
@@ -87,7 +91,9 @@ export default defineConfig([
       '@typescript-eslint/no-unused-vars': [
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }
-      ]
+      ],
+      // Type-aware: helps the "you might not need an effect" plugin infer async calls
+      '@typescript-eslint/no-floating-promises': 'warn'
     },
     settings: {
       tailwindcss: {
