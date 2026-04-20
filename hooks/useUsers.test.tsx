@@ -178,7 +178,7 @@ describe('useAdminVerifyTherapist', () => {
     const { result } = renderHook(() => useAdminVerifyTherapist(), { wrapper: createQueryClientWrapper() });
 
     act(() => {
-      result.current.mutate({ therapistId: 't1' });
+      result.current.mutate({ therapistId: 't1', therapistTier: 'cbt' });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
