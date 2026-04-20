@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/Colors';
 import { useAdminOverview } from '@/hooks/useAdminOverview';
 import useToggle from '@/hooks/useToggle';
@@ -22,6 +23,7 @@ import { HomeScreen } from './HomeScreen';
 const AdminHome = () => {
   const { data, isPending, isError, refetch, isRefetching } = useAdminOverview();
   const [pickerVisible, togglePickerVisible] = useToggle(false);
+  const insets = useSafeAreaInsets();
 
   const score = useMemo(() => (data ? computeAttentionScore(data) : null), [data]);
 
@@ -47,71 +49,78 @@ const AdminHome = () => {
   const leadProgramme = data.programmes.find((p) => p.outcomes !== null) ?? null;
   const otherProgrammes = data.programmes.filter((p) => p !== leadProgramme);
 
-  const content = (
-    <ScrollView
-      className="flex-1 pb-6"
-      showsVerticalScrollIndicator={false}
-      refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={Colors.sway.bright} />}
-    >
-      <View className="py-2">
-        <ThemedText
-          type="small"
-          style={{ color: Colors.sway.darkGrey, fontSize: 11, letterSpacing: 0.8, textTransform: 'uppercase' }}
-        >
-          Admin overview
-        </ThemedText>
-        <ThemedText type="subtitle" style={{ color: Colors.sway.lightGrey, marginTop: 4 }}>
-          Clinical outcomes first
-        </ThemedText>
-        <View className="mt-3">
-          <FreshnessRow asOf={data.asOf} rollupAsOf={data.rollupAsOf} privacyMode={data.privacyMode} />
-        </View>
-      </View>
-
-      {score && (
-        <View className="mt-4">
-          <AttentionBanner score={score} onPressVerification={togglePickerVisible} />
-        </View>
-      )}
-
-      {leadProgramme && (
-        <View className="mt-5">
-          <LeadProgrammeCard programme={leadProgramme} />
-        </View>
-      )}
-
-      {otherProgrammes.length > 0 && (
-        <View className="mt-5">
-          <ThemedText
-            type="small"
-            style={{
-              color: Colors.sway.darkGrey,
-              fontSize: 11,
-              letterSpacing: 0.8,
-              textTransform: 'uppercase',
-              marginBottom: 8
-            }}
-          >
-            Other programmes
-          </ThemedText>
-          <View className="gap-2">
-            {otherProgrammes.map((p) => (
-              <ProgrammeRow key={p.programmeId} programme={p} />
-            ))}
+  return (
+    <View className="flex-1 bg-sway-dark" testID="home-screen" style={{ paddingTop: insets.top }}>
+      <ScrollView
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={Colors.sway.bright} />}
+      >
+        <ContentContainer>
+          <View className="py-2">
+            <ThemedText
+              type="small"
+              style={{
+                color: Colors.sway.darkGrey,
+                fontSize: 11,
+                letterSpacing: 0.8,
+                textTransform: 'uppercase'
+              }}
+            >
+              Admin overview
+            </ThemedText>
+            <ThemedText type="subtitle" style={{ color: Colors.sway.lightGrey, marginTop: 4 }}>
+              Clinical outcomes first
+            </ThemedText>
+            <View className="mt-3">
+              <FreshnessRow asOf={data.asOf} rollupAsOf={data.rollupAsOf} privacyMode={data.privacyMode} />
+            </View>
           </View>
-        </View>
-      )}
 
-      <View className="mt-6">
-        <OpsFooter operational={data.operational} verificationCount={data.verificationQueue.count} />
-      </View>
+          {score && (
+            <View className="mt-4">
+              <AttentionBanner score={score} onPressVerification={togglePickerVisible} />
+            </View>
+          )}
 
-      <View className="h-8" />
+          {leadProgramme && (
+            <View className="mt-5">
+              <LeadProgrammeCard programme={leadProgramme} />
+            </View>
+          )}
+
+          {otherProgrammes.length > 0 && (
+            <View className="mt-5">
+              <ThemedText
+                type="small"
+                style={{
+                  color: Colors.sway.darkGrey,
+                  fontSize: 11,
+                  letterSpacing: 0.8,
+                  textTransform: 'uppercase',
+                  marginBottom: 8
+                }}
+              >
+                Other programmes
+              </ThemedText>
+              <View className="gap-2">
+                {otherProgrammes.map((p) => (
+                  <ProgrammeRow key={p.programmeId} programme={p} />
+                ))}
+              </View>
+            </View>
+          )}
+
+          <View className="mt-6">
+            <OpsFooter operational={data.operational} verificationCount={data.verificationQueue.count} />
+          </View>
+
+          <View className="h-8" />
+        </ContentContainer>
+      </ScrollView>
       <TherapistPicker visible={pickerVisible} onDismiss={togglePickerVisible} therapists={unverifiedTherapists} />
-    </ScrollView>
+    </View>
   );
-
-  return <HomeScreen content={<ContentContainer>{content}</ContentContainer>} />;
 };
 
 export default AdminHome;
