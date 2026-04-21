@@ -273,15 +273,24 @@ scoping questions that need answering before code is touched.
 
 ### 2.11 Episode-of-care concept (strict IAPT denominator)
 
-- **Motivation:** current within-bucket pairing (design spec §5.3) is a
-  simplification. IAPT-strict pairing requires an "episode" — a sequence
-  of attempts with no gap > X weeks, or explicit start/end markers.
+- **Motivation (rescoped 2026-04-21):** the trailing-90d snapshot model
+  that landed today (spec §5.3) is a major step up from the old
+  within-bucket pairing and is now the production baseline. Remaining
+  delta to IAPT-strict: the 90d window is fixed, so a patient with a
+  30-day gap in the middle of their treatment is treated as one "episode",
+  and a patient with a 6-month gap is silently split into two unrelated
+  outcomes. Episode-of-care pairing would replace the fixed window with
+  explicit or gap-detected episode boundaries.
 - **When relevant:** if we ever want to publish metrics externally or
-  benchmark against NHS figures, episodes become load-bearing.
-- **Rough scope:** new `Episode` model with `{ userId, programmeId,
-  startedAt, endedAt, endReason }`. Attempts reference their episode.
-  Rollup pipeline gets a gap-detection pass. FE needs a UI for
-  therapists/patients to mark episodes (or a rule-based auto-close).
+  benchmark against NHS figures, episodes become load-bearing. Until then
+  trailing-90d is defensible.
+- **Rough scope (smaller than before):** new `Episode` model with
+  `{ userId, programmeId, startedAt, endedAt, endReason }`. Attempts
+  reference their episode. `runRollupForBucket` swaps the
+  `completedAt ∈ (bucket.endsAt − 90d, bucket.endsAt]` filter for
+  per-episode boundaries. The rest of the pipeline is unchanged. FE needs
+  a UI for therapists/patients to mark episodes (or a rule-based
+  auto-close).
 - **Dependency:** requires a brainstorm on whether episodes are
   explicit (UI-marked) or implicit (gap-detected); the trade-off is
   fidelity vs UX weight.

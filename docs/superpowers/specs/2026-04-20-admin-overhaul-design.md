@@ -238,11 +238,11 @@ Operational queries are cheap and idempotent; analytical queries never run live.
 
 Input: all `ModuleAttempt` documents where `status === 'submitted'` and `moduleType === 'questionnaire'` and the referenced `Module.instrument !== null`.
 
-For each dimension tuple `(programmeId, careTier, instrument)` and each bucket window:
+Each bucket is a **snapshot point**, not a data window. For each dimension tuple `(programmeId, careTier, instrument)` and each bucket endpoint, we compute a **trailing-90d** patient-level pairing:
 
 **Step 1 — filter qualifying attempts.**
 
-- Attempts whose `completedAt` falls in `[bucket.startsAt, bucket.endsAt)`.
+- Attempts whose `completedAt` falls in `[bucket.endsAt − 90d, bucket.endsAt)`.
 - Module's `instrument` matches the dimension's `instrument`.
 - If `programmeId` is not null, attempts whose `programme` matches.
 - If `careTier` is not null, attempts whose derived tier matches. Derivation per attempt: no `therapist` → `self_help`; otherwise lookup current `User.therapistTier` (`'cbt' → 'cbt_guided'`, `'pwp' → 'pwp_guided'`); if therapist missing or tier null → `self_help` (fallback).
@@ -273,9 +273,18 @@ For each dimension tuple `(programmeId, careTier, instrument)` and each bucket w
 - `instrument`, `clinicalCutoff`, `reliableChangeDelta` read from the **current** Module (not the attempt's `moduleSnapshot`). Clinical definitions are stable; if ever revised, rollups follow.
 - `therapistTier` read from the **current** User. Tier churn redistributes historical rollup attribution. Tier-at-time fidelity deferred.
 
-**Within-bucket pairing trade-off**
+**Trailing-90d snapshot model (revised 2026-04-21)**
 
-Pairing happens within each bucket (baseline and endpoint are both attempts inside `[startsAt, endsAt)`). At small user-base scale with weekly granularity, most buckets will have fewer than `K_ANONYMITY_THRESHOLD` qualifying pairs and return suppressed. This is expected behaviour, not a bug. Monthly granularity is the more informative default at current scale; weekly becomes useful as enrolment grows. Proper IAPT episode-based pairing (cross-bucket with gap detection) is deferred to the future-plan doc.
+The bucket defines the *observation point*, not the data window. Each rollup row answers "what is the trailing-90d recovery rate, snapshotted at `bucket.endsAt`?" This matches how IAPT / NHS Talking Therapies publish outcomes: rates trend stably over time and a single-month arc doesn't truncate an 8-week recovery story.
+
+Consequences of this model:
+
+- `/overview` reads the most recent snapshot row per dimension (no summing across buckets, which would double-count patients that appear in multiple trailing windows).
+- `/outcomes` time-series shows the trailing-90d rate as of each bucket endpoint — a true rolling trend, not a stitched set of per-month rates.
+- Suppression thresholds apply per snapshot (denominators are larger under this model; fewer cells trip the `< K` floor).
+- Patients in long-term treatment without two attempts in any 90d window don't contribute until they log a second attempt inside the window. That is the correct clinical posture — "we report on recent activity, not stale history."
+
+**Supersedes** the earlier "within-bucket pairing trade-off" (pre-2026-04-21). That approach was designed to defer episode-of-care modelling but had the failure mode of disappearing any recovery arc that straddled bucket boundaries. Full IAPT-strict episode pairing (explicit episode boundaries with gap detection) remains deferred; the trailing-90d snapshot is the bridge between "naive within-bucket" and "full episodes".
 
 ### 5.4 Suppression wrapper (read-time)
 

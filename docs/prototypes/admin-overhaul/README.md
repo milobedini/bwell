@@ -149,13 +149,25 @@ Current `AuditedAction` values:
 Impersonation is **deferred** (full token-propagation + write-blocking is its
 own brainstorm). `impersonatorId` is reserved on `AdminAuditEvent` but always null.
 
-### 4.8 Within-bucket pairing for IAPT rollups (trade-off, not a bug)
+### 4.8 Trailing-90d snapshot rollups (revised 2026-04-21)
 
-**Why:** simpler than episode-of-care detection. At small scale with weekly
-granularity, most buckets will have < k qualifying pairs and return suppressed.
-This is expected behaviour, not a bug. Monthly is the more informative default
-at current scale. Proper IAPT episode-based pairing (cross-bucket with gap
-detection) is deferred.
+**Why:** each bucket is now a *snapshot point*, not a data window. Every
+rollup row answers "what is the trailing-90d recovery rate as of
+`bucket.endsAt`?" This matches how IAPT / NHS Talking Therapies actually
+publish outcomes and is stable against recovery arcs that straddle bucket
+boundaries.
+
+`/overview` reads the most recent snapshot row per dimension (no summing
+over buckets). `/outcomes` returns a proper rolling trend line rather than a
+stitched set of per-month rates. Suppression still applies per row;
+denominators are larger so cells trip `< K` less often.
+
+**Supersedes** the earlier within-bucket pairing trade-off. That model had
+the failure mode of hiding any 2-month recovery arc because the monthly
+bucket only saw the downstream tail (baseline below cutoff → excluded). See
+spec §5.3 for the full computation rules and the migration note. Proper
+IAPT-strict episode pairing (explicit episode boundaries + gap detection)
+remains deferred.
 
 ### 4.9 Winning FE design (Stage 9): **clinical-outcomes-first + blend from compliance-gauge**
 
