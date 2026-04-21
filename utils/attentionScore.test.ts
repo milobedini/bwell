@@ -176,6 +176,48 @@ describe('computeAttentionScore', () => {
     expect(rollup?.value).toBe('8h ago');
   });
 
+  it('reads "added today" when the oldest unverified therapist was created today', () => {
+    const s = computeAttentionScore(
+      buildOverview({
+        verificationQueue: {
+          count: 1,
+          oldest: [
+            {
+              userId: 't1',
+              username: 'tnew',
+              email: 't@test.bwell',
+              createdAt: '2026-04-20T09:30:00.000Z', // 30m before now
+              therapistTier: null
+            }
+          ]
+        }
+      }),
+      now
+    );
+    expect(s.contributors.find((c) => c.key === 'verification')?.detail).toBe('Oldest therapist was added today.');
+  });
+
+  it('uses the singular "1 day" copy when the oldest has waited exactly one day', () => {
+    const s = computeAttentionScore(
+      buildOverview({
+        verificationQueue: {
+          count: 1,
+          oldest: [
+            {
+              userId: 't1',
+              username: 'tnew',
+              email: 't@test.bwell',
+              createdAt: '2026-04-19T09:30:00.000Z',
+              therapistTier: null
+            }
+          ]
+        }
+      }),
+      now
+    );
+    expect(s.contributors.find((c) => c.key === 'verification')?.detail).toBe('Oldest therapist has waited 1 day.');
+  });
+
   it('reports "Never run" rollup value when rollupAsOf is null', () => {
     const s = computeAttentionScore(buildOverview({ rollupAsOf: null }), now);
     expect(s.contributors.find((c) => c.key === 'rollup')?.value).toBe('Never run');

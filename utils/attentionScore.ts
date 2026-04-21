@@ -48,16 +48,21 @@ export const computeAttentionScore = (data: AdminOverviewResponse, now: Date = n
   const verifyAgeDays = oldest ? ageInDays(oldest.createdAt, nowMs) : 0;
   const verifyTripped = !!oldest && verifyAgeDays > VERIFY_AGE_THRESHOLD_DAYS;
   const queueCount = data.verificationQueue.count;
+  const verifyDetail = ((): string => {
+    if (!oldest) return 'No therapists waiting to be verified.';
+    if (verifyTripped) {
+      return `Oldest therapist has waited ${verifyAgeDays} days — over the ${VERIFY_AGE_THRESHOLD_DAYS}-day threshold.`;
+    }
+    if (verifyAgeDays === 0) return 'Oldest therapist was added today.';
+    if (verifyAgeDays === 1) return 'Oldest therapist has waited 1 day.';
+    return `Oldest therapist has waited ${verifyAgeDays} days.`;
+  })();
   const verification: AttentionContributor = {
     key: 'verification',
     tripped: verifyTripped,
     label: 'Verification backlog',
     value: oldest ? `${queueCount} waiting` : 'Empty',
-    detail: oldest
-      ? verifyTripped
-        ? `Oldest therapist has waited ${verifyAgeDays} days to be verified.`
-        : `Oldest therapist has waited ${verifyAgeDays} days.`
-      : 'No therapists waiting to be verified.',
+    detail: verifyDetail,
     ctaLabel: verifyTripped ? 'Resolve verify queue →' : undefined
   };
 
