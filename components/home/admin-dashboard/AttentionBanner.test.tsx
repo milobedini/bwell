@@ -111,7 +111,7 @@ describe('AttentionBanner', () => {
     expect(onPressVerification).toHaveBeenCalledTimes(1);
   });
 
-  it('renders a cycle glyph on the rollup row when the rollup is stale', () => {
+  it('renders the sync-alert icon on the rollup row when the rollup is stale', () => {
     const score = buildScore({
       band: 'red',
       trippedCount: 3,
@@ -124,14 +124,21 @@ describe('AttentionBanner', () => {
       ]
     });
     const { getByText, queryByText } = render(<AttentionBanner score={score} />);
-    expect(getByText('⟳')).toBeTruthy();
-    // No stray fresh tick on the rollup row when it's stale.
-    expect(queryByText('✓')).toBeNull();
+    expect(getByText('sync-alert')).toBeTruthy();
+    // Fresh-state tick should not be rendered when the rollup is stale.
+    expect(queryByText('check-circle-outline')).toBeNull();
   });
 
-  it('renders a tick on the rollup row when the rollup is fresh', () => {
+  it('renders the check-circle-outline icon on the rollup row when the rollup is fresh', () => {
     const { getByText } = render(<AttentionBanner score={buildScore()} />);
-    expect(getByText('✓')).toBeTruthy();
+    expect(getByText('check-circle-outline')).toBeTruthy();
+  });
+
+  it('uses the concept-stable icons for verification, stalled and orphaned rows', () => {
+    const { getByText } = render(<AttentionBanner score={buildScore()} />);
+    expect(getByText('account-clock-outline')).toBeTruthy();
+    expect(getByText('timer-sand')).toBeTruthy();
+    expect(getByText('link-variant-off')).toBeTruthy();
   });
 
   it('does not invoke onPressVerification when verification is not tripped', () => {

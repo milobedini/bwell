@@ -1,9 +1,12 @@
-import { memo, useCallback } from 'react';
+import { type ComponentProps, memo, useCallback } from 'react';
 import { Pressable, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import type { AttentionContributor, AttentionContributorKey, AttentionScore } from '@/utils/attentionScore';
+import Icon from '@react-native-vector-icons/material-design-icons';
+
+type MdiName = ComponentProps<typeof Icon>['name'];
 
 // SVG ring geometry: r=50 → circumference ≈ 2π·50 ≈ 314.
 const RING_SIZE = 120;
@@ -44,18 +47,19 @@ const BAND_STYLES: Record<AttentionScore['band'], BandStyle> = {
   }
 };
 
-// Per-contributor glyph vocabulary — colour-blind friendly paired with colour.
-// The rollup glyph flips with state: ⟳ when stale or never run, ✓ when fresh.
-// Every other glyph stays stable because it represents the concept, not the state.
-const glyphFor = ({ key, tripped }: { key: AttentionContributorKey; tripped: boolean }): string => {
-  if (key === 'rollup') return tripped ? '⟳' : '✓';
+// Per-contributor icon vocabulary — colour-blind friendly paired with colour.
+// The rollup icon flips with state: sync-alert when stale or never run,
+// check-circle-outline when fresh. Other icons stay stable because they
+// represent the concept, not the state.
+const iconFor = ({ key, tripped }: { key: AttentionContributorKey; tripped: boolean }): MdiName => {
+  if (key === 'rollup') return tripped ? 'sync-alert' : 'check-circle-outline';
   switch (key) {
     case 'verification':
-      return '▲';
+      return 'account-clock-outline';
     case 'stalled':
-      return '◆';
+      return 'timer-sand';
     case 'orphaned':
-      return '✕';
+      return 'link-variant-off';
   }
 };
 
@@ -130,9 +134,7 @@ const ContributorRow = memo(({ contributor, accent, onPress }: ContributorRowPro
   const content = (
     <View className="flex-row items-start gap-3 px-4 py-3">
       <View className="size-8 items-center justify-center rounded-full" style={{ backgroundColor: glyphBg }}>
-        <ThemedText type="smallBold" style={{ color: glyphColour, fontSize: 14, lineHeight: 16 }}>
-          {glyphFor({ key: contributor.key, tripped: contributor.tripped })}
-        </ThemedText>
+        <Icon name={iconFor({ key: contributor.key, tripped: contributor.tripped })} size={16} color={glyphColour} />
       </View>
       <View className="flex-1">
         <View className="flex-row items-center justify-between gap-2">
