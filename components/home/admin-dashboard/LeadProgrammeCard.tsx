@@ -2,8 +2,10 @@ import { memo } from 'react';
 import { View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
+import { useAdminOutcomes } from '@/hooks/useAdminOutcomes';
 import type { AdminOverviewResponse } from '@milobedini/shared-types';
 
+import OutcomesSparkline from './OutcomesSparkline';
 import OutcomeTriplet from './OutcomeTriplet';
 
 type ProgrammeSummary = AdminOverviewResponse['programmes'][number];
@@ -37,9 +39,18 @@ type Props = {
 
 const LeadProgrammeCard = memo(({ programme }: Props) => {
   const outcomes = programme.outcomes;
-  if (!outcomes) return null;
+  const instrumentLabel = outcomes
+    ? (INSTRUMENT_LABEL[outcomes.instrument] ?? outcomes.instrument.toUpperCase())
+    : null;
+  const { data: trend } = useAdminOutcomes({
+    instrument: outcomes?.instrument ?? 'phq9',
+    programmeId: programme.programmeId,
+    granularity: 'month',
+    enabled: !!outcomes
+  });
 
-  const instrumentLabel = INSTRUMENT_LABEL[outcomes.instrument] ?? outcomes.instrument.toUpperCase();
+  if (!outcomes || !instrumentLabel) return null;
+
   const cutoffLabel = INSTRUMENT_CUTOFF[outcomes.instrument] ?? `${instrumentLabel} cutoff`;
   const deltaLabel = INSTRUMENT_DELTA[outcomes.instrument];
   const lead = outcomes.recovery;
@@ -90,6 +101,10 @@ const LeadProgrammeCard = memo(({ programme }: Props) => {
           reliableChangeDeltaLabel={deltaLabel}
         />
       </View>
+
+      {trend && trend.series.length > 0 && (
+        <OutcomesSparkline series={trend.series} instrumentLabel={instrumentLabel} />
+      )}
     </View>
   );
 });
