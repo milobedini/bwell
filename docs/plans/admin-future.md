@@ -1,6 +1,6 @@
 # Admin — Future Plan
 
-**Last updated:** 2026-04-21
+**Last updated:** 2026-04-21 (evening refinement pass — §1.1, §1.2, §1.3 shipped on `feat/admin-overhaul`)
 **Companion to:** [`docs/superpowers/specs/2026-04-20-admin-overhaul-design.md`](../superpowers/specs/2026-04-20-admin-overhaul-design.md) and [`docs/prototypes/admin-overhaul/README.md`](../prototypes/admin-overhaul/README.md)
 
 This document catalogues everything deliberately **not** shipped in the
@@ -25,70 +25,37 @@ sections:
 These are pending work items from the current admin overhaul. The BE
 contract supports each of them already. Pick any order.
 
-### 1.1 Programme detail screen (FE)
+> **Shipped 2026-04-21 (evening pass, all on `feat/admin-overhaul`):**
+>
+> - Programme detail screen (was §1.1) — route `home/programmes/[id]`,
+>   `useAdminProgrammeDetail` hook, `ProgrammeDetailScreen` composing
+>   `FreshnessRow` + enrolment stat cards + per-instrument `OutcomeTriplet` +
+>   refactored `CareTierBreakdown` as a tier × triplet table + work section.
+>   `LeadProgrammeCard` and `ProgrammeRow` now navigate on press.
+> - Lead programme hero when suppressed (was §1.2) — `LeadProgrammeCard` drops
+>   the 56pt `—` and shows a header-weight "Awaiting data · needs N+ paired
+>   assessments" line. Populated rendering unchanged.
+> - Audit log list view (was §1.3) — route `home/audit`, `useAdminAudit`
+>   infinite-query hook (cursor pagination), `AuditRow` with outcome-aware
+>   colour + expand-in-place context JSON, `AuditFilterDrawer` with action +
+>   actor chips, and an entry link-row on `AdminHome` below the ops footer.
+>   **Sort / filter / facet convention audit:** during this pass we noticed
+>   the FE was deriving actor filter options from loaded pages (violates the
+>   "BE does sorting/filtering/faceting" rule) and corrected it — the BE now
+>   returns `facets.actors` on `/admin/audit` with counts, keyed off the
+>   current non-actor filter. Shared-types published as `1.0.102`.
 
-- **Status:** BE endpoint shipped (`GET /api/admin/programmes/:id`). No FE route.
-- **Blocker from the home:** tapping a programme card today goes nowhere.
-- **Scope:** new expo-router route under `/admin/programmes/:id` (or add it to
-  the main admin tab). Uses the existing response shape
-  `AdminProgrammeDetailResponse` — per-instrument and per-care-tier outcome
-  breakdowns, enrolment counts, work stats.
-- **Component reuse:** `CareTierBreakdown` is already built and unused —
-  wire it in here. `OutcomeTriplet` composes naturally inside an
-  `outcomesByInstrument` map.
-- **Navigation:** update `ProgrammeRow` + `LeadProgrammeCard` to accept
-  `onPress`; on tap, navigate to the detail screen.
-- **Deliberate deferral (2026-04-21):** the winning deck also showed a
-  nested 3-row care-tier breakdown inline inside each IAPT programme row on
-  the home. We decided against porting that to mobile — the row layout is
-  already compact, and the breakdown has more room on this detail screen.
-  The overview response carries only the programme-level triplet; no BE
-  change is required for this screen.
-- **Effort:** small (~1 day). Mostly composition of existing atoms.
-
-### 1.2 Lead programme hero duplicates suppressed state
-
-- **Status:** visible on the shipped dashboard whenever the lead programme
-  has `recovery.suppressed`.
-- **Problem:** `LeadProgrammeCard` renders a 56pt recovery % at the top
-  *and* repeats the same figure as the first row of the `OutcomeTriplet`
-  below. When recovery is suppressed the hero falls back to a faint
-  italic `—` and the triplet row reads `< 5 patients`, so the whole card
-  reads near-empty despite containing real structure.
-- **Scope options:**
-  - (a) Drop the big hero when `recovery.suppressed` and promote the
-    triplet; show a header-weight "Awaiting data" line instead.
-  - (b) Keep the hero and render suppressed state as explicit
-    "< N patients" in the big type (not italic dash).
-- **Recommendation:** (a) — the triplet is the canonical answer anyway,
-  and collapsing to it cleanly is truthful to the IAPT "show all three"
-  posture.
-- **Effort:** trivial (~1 hr).
-
-### 1.3 Audit log list view (FE)
-
-- **Status:** BE endpoint shipped (`GET /api/admin/audit`, paginated, filterable
-  by `actorId`/`action`/`resourceType`/`resourceId`). No FE route.
-- **Scope:** a screen that lists recent `AdminAuditEvent` rows reverse-chrono
-  with filter chips. Minimum filter set: by action. Nice-to-have: by actor,
-  by resource. Use infinite scroll via `useInfiniteQuery`
-  (pattern: `useAllUsers`).
-- **Important:** `AdminAuditEvent.context` is opaque — do not assume a schema.
-  Render known top-level fields (`action`, `actor`, `resourceType`, `at`,
-  `outcome`) and treat `context` as metadata (pretty-printed JSON block or
-  not rendered at all).
-- **Effort:** medium (~1.5 days).
-
-### 1.4 System health view (FE)
+### 1.1 System health view (FE)
 
 - **Status:** BE endpoint shipped (`GET /api/admin/system/health`). No FE route.
 - **Scope:** small ops-oriented panel — last rollup run (`startedAt`,
   `completedAt`, `status`, `rowsWritten`), total audit events.
 - **Placement:** low priority for day-one admin; maybe a "System"
-  sub-section within the admin tab. Not required on the home.
+  sub-section within the admin tab. Not required on the home. Natural
+  destination for the banner's `rollup` contributor drill-in (see §1.2).
 - **Effort:** trivial (~0.5 day).
 
-### 1.5 Attention-banner drill-ins
+### 1.2 Attention-banner drill-ins
 
 - **Status:** banner contributors for `stalled`, `orphaned`, `rollup` are
   informational only. Only `verification` has an action (opens `TherapistPicker`).
@@ -98,12 +65,12 @@ contract supports each of them already. Pick any order.
   - `orphaned` → a list of orphaned assignments (same — new endpoint or
     extension).
   - `rollup` stale → either a manual-trigger button (runs the CLI equivalent)
-    or a link to the System Health view.
-- **Dependencies:** first two need BE additions; third doesn't.
+    or a link to the System Health view (§1.1).
+- **Dependencies:** first two need BE additions; third doesn't (once §1.1 ships).
 - **Effort:** small each, but need BE scoping first for the first two. Treat
   as a mini-brainstorm (see §2 — could graduate).
 
-### 1.6 Archive non-winning prototype decks
+### 1.3 Archive non-winning prototype decks
 
 - **Status:** all 6 HTML decks still live in
   `docs/prototypes/admin-overhaul/`. mb-development Stage 9 cleanup guidance
