@@ -56,20 +56,25 @@ const buildEvent = (overrides: Partial<AdminAuditEvent> = {}): AdminAuditEvent =
   ...overrides
 });
 
-const buildResult = (events: AdminAuditEvent[] = [], overrides: Partial<ReturnType<typeof useAdminAudit>> = {}) => ({
-  data: {
-    pages: [{ success: true, events, nextCursor: null } satisfies AdminAuditResponse],
-    pageParams: [null]
-  },
-  isLoading: false,
-  isError: false,
-  isRefetching: false,
-  isFetchingNextPage: false,
-  hasNextPage: false,
-  refetch: jest.fn(),
-  fetchNextPage: jest.fn(),
-  ...overrides
-});
+const buildResult = (events: AdminAuditEvent[] = [], overrides: Partial<ReturnType<typeof useAdminAudit>> = {}) => {
+  const actors = Array.from(
+    new Map(events.map((e) => [e.actorId, { _id: e.actorId, username: e.actor.username, name: e.actor.name }])).values()
+  ).map((a, i) => ({ ...a, count: events.filter((e) => e.actorId === a._id).length || 1 + i }));
+  return {
+    data: {
+      pages: [{ success: true, events, nextCursor: null, facets: { actors } } satisfies AdminAuditResponse],
+      pageParams: [null]
+    },
+    isLoading: false,
+    isError: false,
+    isRefetching: false,
+    isFetchingNextPage: false,
+    hasNextPage: false,
+    refetch: jest.fn(),
+    fetchNextPage: jest.fn(),
+    ...overrides
+  };
+};
 
 describe('AdminAuditScreen', () => {
   it('renders the loading indicator on the first load', () => {
