@@ -551,8 +551,14 @@ cd /Users/milobedini/Documents/git/cbt
 # dropped the DB. If you do drop: `npm run seed:all` (runs baseline +
 # clinical-metadata + admin-dev as a fail-fast chain).
 
-# Compute rollups so outcome cards have data (otherwise all will be day-one suppressed).
-npm run rollup-metrics
+# Compute rollups so outcome cards have data. Pick one:
+#   - `npm run rollup-metrics` — today's snapshot only (fast). The hero
+#     figures and current cards populate; the 12-month sparkline stays
+#     "Not enough data" until future cron runs accumulate history.
+#   - `npm run rollup-metrics:backfill` — walks back 12 months of monthly +
+#     12 weeks of weekly snapshots. Required after a fresh `seed:all` for
+#     the sparkline to render a full trend line.
+npm run rollup-metrics:backfill
 
 # Optional: see populated percentages in dev by lowering thresholds.
 echo "K_ANONYMITY_THRESHOLD=1" >> .env
