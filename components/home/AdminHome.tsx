@@ -1,11 +1,13 @@
 import { useMemo } from 'react';
-import { RefreshControl, ScrollView, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { useAdminOverview } from '@/hooks/useAdminOverview';
 import useToggle from '@/hooks/useToggle';
 import { computeAttentionScore } from '@/utils/attentionScore';
 import type { AuthUser } from '@milobedini/shared-types';
+import Icon from '@react-native-vector-icons/material-design-icons';
 
 import ContentContainer from '../ContentContainer';
 import ErrorComponent, { ErrorTypes } from '../ErrorComponent';
@@ -114,6 +116,26 @@ const AdminHome = () => {
           <View className="mt-6">
             <OpsFooter operational={data.operational} verificationCount={data.verificationQueue.count} />
           </View>
+
+          <Pressable
+            onPress={() => router.push('/(main)/(tabs)/home/audit')}
+            className="mt-6 flex-row items-center justify-between rounded-xl bg-chip-darkCardDeep px-4 py-3 active:opacity-80"
+            accessibilityRole="button"
+            accessibilityLabel="View audit log"
+          >
+            <View className="flex-row items-center gap-3">
+              <Icon name="clipboard-list-outline" size={18} color={Colors.sway.darkGrey} />
+              <View>
+                <ThemedText type="smallBold" style={{ color: Colors.sway.lightGrey }}>
+                  Audit log
+                </ThemedText>
+                <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginTop: 2, fontSize: 11 }}>
+                  {data.operational.audit.eventsLast7d} events in the last 7 days
+                </ThemedText>
+              </View>
+            </View>
+            <Icon name="chevron-right" size={20} color={Colors.sway.darkGrey} />
+          </Pressable>
 
           <View className="h-8" />
         </ContentContainer>
