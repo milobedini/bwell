@@ -38,20 +38,30 @@ const computeDelta = (series: AdminOutcomesResponse['series']): DeltaSummary => 
 type Props = {
   series: AdminOutcomesResponse['series'];
   instrumentLabel: string;
+  maxBuckets?: number;
 };
 
-const OutcomesSparkline = memo(({ series, instrumentLabel }: Props) => {
-  const delta = useMemo(() => computeDelta(series), [series]);
+const DEFAULT_MAX_BUCKETS = 12;
 
-  if (series.length === 0) return null;
+const OutcomesSparkline = memo(({ series, instrumentLabel, maxBuckets = DEFAULT_MAX_BUCKETS }: Props) => {
+  // BE's month enumerator is inclusive on both ends, so a rolling 12-month
+  // request can return 13 buckets mid-month. Cap to the most recent N so
+  // the "N months" label remains truthful.
+  const visible = useMemo(
+    () => (series.length > maxBuckets ? series.slice(-maxBuckets) : series),
+    [series, maxBuckets]
+  );
+  const delta = useMemo(() => computeDelta(visible), [visible]);
+
+  if (visible.length === 0) return null;
 
   const deltaColour =
     delta.tone === 'up' ? Colors.sway.bright : delta.tone === 'down' ? Colors.primary.error : Colors.sway.darkGrey;
 
-  const firstLabel = formatBucketLabel(series[0].bucket.startsAt);
-  const lastLabel = formatBucketLabel(series[series.length - 1].bucket.startsAt);
-  const midIdx = Math.floor((series.length - 1) / 2);
-  const midLabel = formatBucketLabel(series[midIdx].bucket.startsAt);
+  const firstLabel = formatBucketLabel(visible[0].bucket.startsAt);
+  const lastLabel = formatBucketLabel(visible[visible.length - 1].bucket.startsAt);
+  const midIdx = Math.floor((visible.length - 1) / 2);
+  const midLabel = formatBucketLabel(visible[midIdx].bucket.startsAt);
 
   return (
     <View
@@ -63,7 +73,7 @@ const OutcomesSparkline = memo(({ series, instrumentLabel }: Props) => {
           type="small"
           style={{ color: Colors.sway.darkGrey, fontSize: 11, letterSpacing: 0.6, textTransform: 'uppercase' }}
         >
-          {instrumentLabel} recovery · {series.length} months
+          {instrumentLabel} recovery · {visible.length} months
         </ThemedText>
         <ThemedText type="small" style={{ color: deltaColour, fontSize: 12 }}>
           {delta.label}
@@ -71,7 +81,7 @@ const OutcomesSparkline = memo(({ series, instrumentLabel }: Props) => {
       </View>
 
       <View className="mt-3 flex-row items-end gap-1" style={{ height: CHART_HEIGHT }}>
-        {series.map((bucket, idx) => {
+        {visible.map((bucket, idx) => {
           const { recovery } = bucket;
           const isSuppressed = recovery.suppressed || recovery.rate === null;
           const ratio = isSuppressed ? SUPPRESSED_NOTCH_RATIO : Math.min(1, Math.max(0, recovery.rate ?? 0));
