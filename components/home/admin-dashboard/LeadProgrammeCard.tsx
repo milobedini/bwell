@@ -1,5 +1,6 @@
 import { memo } from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { router } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { useAdminOutcomes } from '@/hooks/useAdminOutcomes';
@@ -55,10 +56,20 @@ const LeadProgrammeCard = memo(({ programme }: Props) => {
   const deltaLabel = INSTRUMENT_DELTA[outcomes.instrument];
   const lead = outcomes.recovery;
 
+  const handlePress = () => {
+    router.push({
+      pathname: '/(main)/(tabs)/home/programmes/[id]',
+      params: { id: programme.programmeId, headerTitle: programme.title }
+    });
+  };
+
   return (
-    <View
-      className="rounded-2xl border p-4"
+    <Pressable
+      onPress={handlePress}
+      className="rounded-2xl border p-4 active:opacity-80"
       style={{ backgroundColor: Colors.chip.darkCard, borderColor: Colors.tint.tealBorder }}
+      accessibilityRole="button"
+      accessibilityLabel={`Open ${programme.title} detail`}
     >
       <ThemedText
         type="small"
@@ -105,7 +116,7 @@ const LeadProgrammeCard = memo(({ programme }: Props) => {
       {trend && trend.series.length > 0 && (
         <OutcomesSparkline series={trend.series} instrumentLabel={instrumentLabel} />
       )}
-    </View>
+    </Pressable>
   );
 });
 
