@@ -28,7 +28,7 @@ const ACTION_OPTIONS: AuditedAction[] = [
 export const countActiveAuditFilters = (f: UseAdminAuditFilters): number =>
   [f.action, f.actorId, f.resourceType, f.resourceId].filter(Boolean).length;
 
-export type ActorOption = { _id: string; username: string; name?: string };
+export type ActorOption = { _id: string; username: string; name?: string; count?: number };
 
 type Props = {
   visible: boolean;
@@ -124,7 +124,8 @@ const AuditFilterDrawer = ({ visible, onDismiss, values, onApply, actorOptions }
                   <View style={styles.rowWrap}>
                     {actorOptions.map((actor) => {
                       const selected = local.actorId === actor._id;
-                      const label = actor.name ?? actor.username;
+                      const base = actor.name ?? actor.username;
+                      const label = actor.count !== undefined ? `${base} (${actor.count})` : base;
                       return (
                         <Chip
                           key={actor._id}
