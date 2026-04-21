@@ -289,7 +289,7 @@ floor, the default is forced and a warning is logged.
 
 ### 5.8 Seeds
 
-- `src/seeds/seedAll.ts` — updated: GAD-7 moved from the Depression programme
+- `src/seeds/seedBaseline.ts` — updated: GAD-7 moved from the Depression programme
   into its own new "Generalised Anxiety" programme.
 - `src/seeds/seedClinicalMetadata.ts` — backfill for PHQ-9 (cutoff 10, Δ 6),
   GAD-7 (cutoff 8, Δ 4), PDSS (cutoff 8, Δ null = reliable-improvement
@@ -548,8 +548,8 @@ dependencies the current BE already satisfies.
 cd /Users/milobedini/Documents/git/cbt
 
 # Seeds are already populated in the dev DB — do NOT re-run unless you've
-# dropped the DB. If you do drop: npm run seed-all → npm run seed:clinical-metadata
-# → npm run seed:admin-dev.
+# dropped the DB. If you do drop: `npm run seed:all` (runs baseline +
+# clinical-metadata + admin-dev as a fail-fast chain).
 
 # Compute rollups so outcome cards have data (otherwise all will be day-one suppressed).
 npm run rollup-metrics
