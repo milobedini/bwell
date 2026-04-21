@@ -1,8 +1,11 @@
-import { memo, useMemo } from 'react';
+import { type ComponentProps, memo, useMemo } from 'react';
 import { View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import type { AdminOutcomesResponse } from '@milobedini/shared-types';
+import Icon from '@react-native-vector-icons/material-design-icons';
+
+type MdiName = ComponentProps<typeof Icon>['name'];
 
 const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const CHART_HEIGHT = 48;
@@ -30,9 +33,16 @@ const computeDelta = (series: AdminOutcomesResponse['series']): DeltaSummary => 
   const first = resolved[0];
   const last = resolved[resolved.length - 1];
   const deltaPp = Math.round((last - first) * 100);
-  if (deltaPp === 0) return { tone: 'flat', label: '→ flat vs start' };
-  if (deltaPp > 0) return { tone: 'up', label: `↑ ${deltaPp}pp vs start` };
-  return { tone: 'down', label: `↓ ${Math.abs(deltaPp)}pp vs start` };
+  if (deltaPp === 0) return { tone: 'flat', label: 'flat vs start' };
+  if (deltaPp > 0) return { tone: 'up', label: `${deltaPp}pp vs start` };
+  return { tone: 'down', label: `${Math.abs(deltaPp)}pp vs start` };
+};
+
+const DELTA_ICON: Record<DeltaTone, MdiName | null> = {
+  up: 'trending-up',
+  down: 'trending-down',
+  flat: 'trending-neutral',
+  none: null
 };
 
 type Props = {
@@ -75,9 +85,12 @@ const OutcomesSparkline = memo(({ series, instrumentLabel, maxBuckets = DEFAULT_
         >
           {instrumentLabel} recovery · {visible.length} months
         </ThemedText>
-        <ThemedText type="small" style={{ color: deltaColour, fontSize: 12 }}>
-          {delta.label}
-        </ThemedText>
+        <View className="flex-row items-center gap-1">
+          {DELTA_ICON[delta.tone] && <Icon name={DELTA_ICON[delta.tone]!} size={14} color={deltaColour} />}
+          <ThemedText type="small" style={{ color: deltaColour, fontSize: 12 }}>
+            {delta.label}
+          </ThemedText>
+        </View>
       </View>
 
       <View className="mt-3 flex-row items-end gap-1" style={{ height: CHART_HEIGHT }}>

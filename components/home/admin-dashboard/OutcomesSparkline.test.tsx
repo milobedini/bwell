@@ -29,7 +29,8 @@ describe('OutcomesSparkline', () => {
     ];
     const { getByText } = render(<OutcomesSparkline series={series} instrumentLabel="PHQ-9" />);
     expect(getByText('PHQ-9 recovery · 3 months')).toBeTruthy();
-    expect(getByText('↑ 26pp vs start')).toBeTruthy();
+    expect(getByText('26pp vs start')).toBeTruthy();
+    expect(getByText('trending-up')).toBeTruthy();
   });
 
   it('shows a down delta when rates decline', () => {
@@ -38,7 +39,8 @@ describe('OutcomesSparkline', () => {
       bucket('2026-04-01T00:00:00.000Z', outcome({ rate: 0.4 }))
     ];
     const { getByText } = render(<OutcomesSparkline series={series} instrumentLabel="PHQ-9" />);
-    expect(getByText('↓ 20pp vs start')).toBeTruthy();
+    expect(getByText('20pp vs start')).toBeTruthy();
+    expect(getByText('trending-down')).toBeTruthy();
   });
 
   it('says "Not enough data" when fewer than two resolved buckets exist', () => {
