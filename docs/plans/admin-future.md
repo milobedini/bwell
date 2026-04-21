@@ -1,6 +1,6 @@
 # Admin — Future Plan
 
-**Last updated:** 2026-04-20
+**Last updated:** 2026-04-21
 **Companion to:** [`docs/superpowers/specs/2026-04-20-admin-overhaul-design.md`](../superpowers/specs/2026-04-20-admin-overhaul-design.md) and [`docs/prototypes/admin-overhaul/README.md`](../prototypes/admin-overhaul/README.md)
 
 This document catalogues everything deliberately **not** shipped in the
@@ -38,20 +38,32 @@ contract supports each of them already. Pick any order.
   `outcomesByInstrument` map.
 - **Navigation:** update `ProgrammeRow` + `LeadProgrammeCard` to accept
   `onPress`; on tap, navigate to the detail screen.
+- **Deliberate deferral (2026-04-21):** the winning deck also showed a
+  nested 3-row care-tier breakdown inline inside each IAPT programme row on
+  the home. We decided against porting that to mobile — the row layout is
+  already compact, and the breakdown has more room on this detail screen.
+  The overview response carries only the programme-level triplet; no BE
+  change is required for this screen.
 - **Effort:** small (~1 day). Mostly composition of existing atoms.
 
-### 1.2 Outcomes time-series on home
+### 1.2 Lead programme hero duplicates suppressed state
 
-- **Status:** BE endpoint shipped (`GET /api/admin/outcomes`). No FE component.
-- **Where:** inside `LeadProgrammeCard`, below the triplet. Defaults to the
-  programme's primary instrument, `granularity=month`, 12 buckets back.
-- **Scope:** small time-series chart (reuse `BarSparkline` with adapted
-  styling; or new SVG). Each bucket renders the recovery rate with visible
-  suppression treatment for zero-denominator cells.
-- **Key invariant to respect:** every bucket is in the response even when
-  suppressed. Do not filter them out — render them as pale notches so the
-  axis stays contiguous.
-- **Effort:** small (~1 day).
+- **Status:** visible on the shipped dashboard whenever the lead programme
+  has `recovery.suppressed`.
+- **Problem:** `LeadProgrammeCard` renders a 56pt recovery % at the top
+  *and* repeats the same figure as the first row of the `OutcomeTriplet`
+  below. When recovery is suppressed the hero falls back to a faint
+  italic `—` and the triplet row reads `< 5 patients`, so the whole card
+  reads near-empty despite containing real structure.
+- **Scope options:**
+  - (a) Drop the big hero when `recovery.suppressed` and promote the
+    triplet; show a header-weight "Awaiting data" line instead.
+  - (b) Keep the hero and render suppressed state as explicit
+    "< N patients" in the big type (not italic dash).
+- **Recommendation:** (a) — the triplet is the canonical answer anyway,
+  and collapsing to it cleanly is truthful to the IAPT "show all three"
+  posture.
+- **Effort:** trivial (~1 hr).
 
 ### 1.3 Audit log list view (FE)
 
@@ -282,6 +294,13 @@ scoping questions that need answering before code is touched.
   admin signals but would be wrong if we ever need historical-fidelity
   tier reporting (e.g. "what was our CBT recovery rate in Q1?" should not
   retroactively move attempts out).
+- **Now slightly more visible (2026-04-21):** the scheduler catch-up
+  (`src/jobs/scheduler.ts::catchUpIfMissed`) replays every missed 02:00
+  slot whenever the BE boots after downtime. Each replay re-reads current
+  tier, so a tier change plus any subsequent wake causes historical
+  reattribution across the cap of 60 replayed days. Not a new risk — same
+  "current tier drives all history" design — just triggered more often
+  now that Render wakes are enough to fire a replay.
 - **Rough scope:** denormalise `therapistTier` onto `ModuleAttempt`
   (similar to the existing `therapist` denormalisation), migrate history,
   rollup reads attempt's tier instead of user's tier.
@@ -322,7 +341,35 @@ scoping questions that need answering before code is touched.
 - **Scope:** same work item as §2.13 but specifically for
   `AdminAuditEvent`.
 
-### 2.16 Additional clinical instruments
+### 2.16 Proper scheduler runtime (off free-tier web service)
+
+- **Motivation:** the nightly rollup lives inside the BE web process via
+  `node-cron`. The on-boot catch-up (shipped 2026-04-21 in
+  `src/jobs/scheduler.ts`) hides the free-tier spin-down by replaying
+  missed slots whenever Render wakes, capped at 60 days. This is adequate
+  for semi-prod / Expo Go testing but has two structural issues once the
+  product has real users:
+  - Rollups run inline on the wake-up request path. If Mongo is slow and
+    60 slots are being replayed, the first user request competes with the
+    backfill (it's fire-and-forget async, but the DB is the same).
+  - A truly ≥60-day outage silently drops older history.
+- **Options to promote:**
+  - **(a)** Render Cron Jobs — a separate service type that runs on a
+    guaranteed schedule regardless of web-service traffic. Extra small
+    paid service, own deploy pipeline, runs `npm run rollup-metrics`.
+  - **(b)** Extract the rollup job into a Render Background Worker —
+    dedicated always-on process, shares the codebase and Mongo connection,
+    no web-service coupling.
+  - **(c)** Hosted queue + worker (BullMQ + Redis, or similar). Overkill
+    for a single nightly job but would scale to more scheduled jobs.
+- **Rough scope:** pick one; move `startScheduler()` out of `src/index.ts`
+  into a separate entrypoint; keep the catch-up logic as a belt-and-braces
+  fallback.
+- **When to revisit:** once the BE moves off the Render free tier, or
+  once rollup compute starts to compete meaningfully with request
+  throughput.
+
+### 2.17 Additional clinical instruments
 
 - **Motivation:** the app positions programmes for OCD, Health Anxiety,
   Phobias, PTSD, Agoraphobia, Social Anxiety — none of which yet have their
