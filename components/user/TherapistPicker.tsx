@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useAdminVerifyTherapist } from '@/hooks/useUsers';
-import type { AuthUser } from '@milobedini/shared-types';
+import type { AuthUser, TherapistTier } from '@milobedini/shared-types';
 
+import ActionMenu from '../ui/ActionMenu';
 import SearchPickerDialog from '../ui/SearchPickerDialog';
 
 type TherapistPickerProps = {
@@ -11,6 +13,7 @@ type TherapistPickerProps = {
 
 const TherapistPicker = ({ visible, onDismiss, therapists }: TherapistPickerProps) => {
   const verifyTherapist = useAdminVerifyTherapist();
+  const [pending, setPending] = useState<AuthUser | null>(null);
 
   const items = therapists.map((t) => ({
     ...t,
@@ -20,20 +23,48 @@ const TherapistPicker = ({ visible, onDismiss, therapists }: TherapistPickerProp
   }));
 
   const handleSelect = (item: (typeof items)[number]) => {
-    verifyTherapist.mutate({ therapistId: item._id });
+    const original = therapists.find((t) => t._id === item._id);
+    if (original) setPending(original);
+  };
+
+  const verifyAs = (tier: TherapistTier) => {
+    if (!pending) return;
+    verifyTherapist.mutate({ therapistId: pending._id, therapistTier: tier });
+    setPending(null);
+    onDismiss();
   };
 
   return (
-    <SearchPickerDialog
-      visible={visible}
-      onDismiss={onDismiss}
-      items={items}
-      isPending={verifyTherapist.isPending}
-      isError={verifyTherapist.isError}
-      title="Verify therapist"
-      onSelect={handleSelect}
-      rightIcon={() => 'account-plus'}
-    />
+    <>
+      <SearchPickerDialog
+        visible={visible && pending === null}
+        onDismiss={onDismiss}
+        items={items}
+        isPending={verifyTherapist.isPending}
+        isError={verifyTherapist.isError}
+        title="Verify therapist"
+        onSelect={handleSelect}
+        rightIcon={() => 'account-plus'}
+      />
+      <ActionMenu
+        visible={pending !== null}
+        onDismiss={() => setPending(null)}
+        title={pending ? `Verify ${pending.name || pending.username}` : 'Verify therapist'}
+        subtitle="Choose their tier — governs which programmes they may deliver"
+        actions={[
+          {
+            icon: 'brain',
+            label: 'Verify as CBT therapist',
+            onPress: () => verifyAs('cbt')
+          },
+          {
+            icon: 'clipboard-pulse-outline',
+            label: 'Verify as PWP practitioner',
+            onPress: () => verifyAs('pwp')
+          }
+        ]}
+      />
+    </>
   );
 };
 

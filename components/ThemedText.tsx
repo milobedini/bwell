@@ -13,7 +13,10 @@ type TextType =
   | 'smallTitle'
   | 'button'
   | 'error'
-  | 'profileButtonText';
+  | 'profileButtonText'
+  | 'eyebrow'
+  | 'caption'
+  | 'captionBold';
 
 export type ThemedTextProps = TextProps & {
   type?: TextType;
@@ -93,5 +96,27 @@ const styleMap: Record<TextType, TextStyle> = StyleSheet.create({
     fontSize: 20,
     color: Colors.sway.white,
     marginVertical: 10
+  },
+  // Compact uppercase eyebrow for section headers in dense surfaces (admin dashboard, audit log).
+  eyebrow: {
+    fontSize: Platform.select({ ios: 12, android: 12, default: 12 }),
+    lineHeight: Platform.select({ ios: 16, android: 16, default: 16 }),
+    fontFamily: Fonts.Regular,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    color: Colors.sway.white
+  },
+  // Compact body text for dense list rows and secondary lines (audit rows, sub-captions).
+  caption: {
+    fontSize: Platform.select({ ios: 12, android: 12, default: 12 }),
+    lineHeight: Platform.select({ ios: 16, android: 16, default: 18 }),
+    fontFamily: Fonts.Regular,
+    color: Colors.sway.white
+  },
+  captionBold: {
+    fontSize: Platform.select({ ios: 12, android: 12, default: 12 }),
+    lineHeight: Platform.select({ ios: 16, android: 16, default: 18 }),
+    fontFamily: Fonts.Bold,
+    color: Colors.sway.white
   }
 });

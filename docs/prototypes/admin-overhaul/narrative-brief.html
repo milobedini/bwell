@@ -1,0 +1,1877 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <title>bwell Admin — Narrative Weekly Brief (prototype)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        /* Core palette */
+        --sway-dark: #0c1527;
+        --sway-lightGrey: #e0e9f3;
+        --sway-darkGrey: #a6adbb;
+        --sway-bright: #18cdba;
+        --sway-buttonBg: rgb(43, 59, 91);
+
+        /* Status */
+        --error: #ff6d5e;
+        --success: #76ab70;
+        --warning: #ffb300;
+        --info: #ffd15d;
+
+        /* Cards */
+        --card: #262e42;
+        --card-alt: #334368;
+        --card-deep: #0b1a2a;
+
+        /* Pills */
+        --chip-pill: #1e2a45;
+        --chip-pill-pressed: #253352;
+
+        /* Tints */
+        --tint-teal: rgba(24, 205, 186, 0.15);
+        --tint-teal-border: rgba(24, 205, 186, 0.3);
+        --tint-error: rgba(255, 109, 94, 0.15);
+        --tint-info: rgba(255, 209, 93, 0.15);
+        --tint-neutral: rgba(166, 173, 187, 0.12);
+
+        --therapist-purple: #7c3aed;
+        --overlay-medium: rgba(0, 0, 0, 0.5);
+        --divider: rgba(166, 173, 187, 0.1);
+
+        /* Deck-only helpers */
+        --serif-pair: 'Lato', Georgia, 'Times New Roman', serif;
+        --panel-w: 375px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #05080f;
+        color: var(--sway-lightGrey);
+        font-family: 'Lato', system-ui, -apple-system, Segoe UI, sans-serif;
+        font-weight: 400;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a {
+        color: var(--sway-bright);
+      }
+
+      main {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 64px 32px 128px;
+      }
+
+      /* ============================================
+         Section structure
+         ============================================ */
+      section {
+        margin-bottom: 96px;
+      }
+
+      .section-kicker {
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--sway-darkGrey);
+        margin-bottom: 12px;
+      }
+
+      h1 {
+        font-family: 'Lato', sans-serif;
+        font-weight: 900;
+        font-size: 44px;
+        line-height: 1.1;
+        margin: 0 0 16px;
+        letter-spacing: -0.01em;
+      }
+
+      h2 {
+        font-family: 'Lato', sans-serif;
+        font-weight: 900;
+        font-size: 28px;
+        margin: 0 0 24px;
+      }
+
+      h3 {
+        font-family: 'Lato', sans-serif;
+        font-weight: 700;
+        font-size: 20px;
+        margin: 0 0 12px;
+      }
+
+      p {
+        margin: 0 0 16px;
+      }
+
+      .lede {
+        font-size: 18px;
+        color: var(--sway-darkGrey);
+        max-width: 680px;
+      }
+
+      /* ============================================
+         HERO
+         ============================================ */
+      .hero {
+        border: 1px solid var(--divider);
+        border-radius: 20px;
+        background:
+          radial-gradient(
+            circle at 85% 0%,
+            rgba(24, 205, 186, 0.08),
+            transparent 60%
+          ),
+          linear-gradient(180deg, #0e1a31 0%, #0a1122 100%);
+        padding: 56px 48px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-tag {
+        display: inline-block;
+        font-size: 12px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--sway-bright);
+        background: var(--tint-teal);
+        border: 1px solid var(--tint-teal-border);
+        padding: 6px 12px;
+        border-radius: 999px;
+        margin-bottom: 24px;
+      }
+
+      .hero-philosophy {
+        font-size: 22px;
+        line-height: 1.5;
+        max-width: 760px;
+        color: var(--sway-lightGrey);
+        font-weight: 300;
+      }
+
+      .hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 32px;
+        margin-top: 32px;
+        color: var(--sway-darkGrey);
+        font-size: 14px;
+      }
+
+      .hero-meta b {
+        color: var(--sway-lightGrey);
+        font-weight: 700;
+      }
+
+      /* ============================================
+         Panel grid (flow map + gallery)
+         ============================================ */
+      .panel-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(375px, 1fr));
+        gap: 32px;
+        align-items: start;
+      }
+
+      .panel {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .panel-caption {
+        font-size: 14px;
+        color: var(--sway-darkGrey);
+      }
+
+      .panel-caption b {
+        color: var(--sway-lightGrey);
+        font-weight: 700;
+      }
+
+      .phone {
+        width: var(--panel-w);
+        min-height: 720px;
+        background: var(--sway-dark);
+        border-radius: 36px;
+        border: 1px solid var(--divider);
+        padding: 28px 20px 32px;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.04) inset,
+          0 40px 80px rgba(0, 0, 0, 0.5);
+      }
+
+      .phone.small {
+        min-height: auto;
+        padding: 20px 16px 24px;
+      }
+
+      .notch {
+        width: 86px;
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        margin: 0 auto 18px;
+      }
+
+      .status-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        margin-bottom: 18px;
+      }
+
+      .screen-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 6px;
+      }
+
+      .screen-title {
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--sway-darkGrey);
+      }
+
+      .screen-subtitle {
+        font-family: 'Lato', serif;
+        font-weight: 300;
+        font-size: 26px;
+        line-height: 1.2;
+        margin: 0 0 22px;
+        color: var(--sway-lightGrey);
+      }
+
+      /* Callouts / pins */
+      .pin {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 999px;
+        background: var(--sway-bright);
+        color: #04221e;
+        font-weight: 900;
+        font-size: 12px;
+        font-family: 'Lato', sans-serif;
+        vertical-align: middle;
+      }
+
+      .pin-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 10px;
+      }
+
+      .pin-list li {
+        display: grid;
+        grid-template-columns: 28px 1fr;
+        gap: 10px;
+        align-items: start;
+        font-size: 13px;
+        color: var(--sway-darkGrey);
+        line-height: 1.5;
+      }
+
+      .pin-list li b {
+        color: var(--sway-lightGrey);
+        font-weight: 700;
+      }
+
+      /* ============================================
+         The brief prose block
+         ============================================ */
+      .prose-block {
+        background: var(--card-deep);
+        border: 1px solid var(--divider);
+        border-radius: 16px;
+        padding: 20px 18px;
+        margin-bottom: 16px;
+      }
+
+      .prose-block .dateline {
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--sway-darkGrey);
+        margin-bottom: 10px;
+      }
+
+      .prose-block p {
+        font-family: 'Lato', serif;
+        font-weight: 300;
+        font-size: 17px;
+        line-height: 1.55;
+        color: var(--sway-lightGrey);
+        margin: 0 0 10px;
+        letter-spacing: 0.005em;
+      }
+
+      .prose-block p:last-of-type {
+        margin-bottom: 0;
+      }
+
+      .prose-block em {
+        color: var(--sway-bright);
+        font-style: normal;
+        border-bottom: 1px dotted var(--tint-teal-border);
+        padding-bottom: 1px;
+        cursor: pointer;
+      }
+
+      .prose-block .warn {
+        color: var(--warning);
+        border-bottom-color: rgba(255, 179, 0, 0.4);
+      }
+
+      /* Caret cursor for typewriter moment (panel 1 only) */
+      .prose-block.typewriter p:last-of-type::after {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 18px;
+        background: var(--sway-bright);
+        vertical-align: -2px;
+        margin-left: 2px;
+        animation: caret 1.05s steps(2) infinite;
+      }
+
+      @keyframes caret {
+        0%,
+        55% {
+          opacity: 1;
+        }
+        56%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      /* ============================================
+         Evidence strips / quiet numbers
+         ============================================ */
+      .evidence-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--divider);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 14px;
+      }
+
+      .evidence-row .cell {
+        background: var(--card);
+        padding: 12px 10px;
+      }
+
+      .evidence-row .label {
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--sway-darkGrey);
+        margin-bottom: 4px;
+      }
+
+      .evidence-row .value {
+        font-family: 'Lato', sans-serif;
+        font-weight: 900;
+        font-size: 22px;
+        color: var(--sway-lightGrey);
+      }
+
+      .evidence-row .delta {
+        font-size: 11px;
+        color: var(--success);
+        margin-top: 2px;
+      }
+
+      .evidence-row .delta.down {
+        color: var(--error);
+      }
+
+      .evidence-row .delta.flat {
+        color: var(--sway-darkGrey);
+      }
+
+      /* Inline expansion: chart under paragraph */
+      .inline-chart {
+        margin: 10px 0 6px;
+        padding: 12px;
+        border: 1px dashed var(--tint-teal-border);
+        border-radius: 10px;
+        background: rgba(24, 205, 186, 0.04);
+      }
+
+      .inline-chart .chart-caption {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        margin-bottom: 8px;
+        letter-spacing: 0.04em;
+      }
+
+      .bars {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 3px;
+        align-items: end;
+        height: 56px;
+      }
+
+      .bars span {
+        background: var(--sway-bright);
+        border-radius: 2px 2px 0 0;
+        opacity: 0.85;
+        display: block;
+        width: 100%;
+      }
+
+      .bars span.suppressed {
+        background: repeating-linear-gradient(
+          135deg,
+          rgba(166, 173, 187, 0.25),
+          rgba(166, 173, 187, 0.25) 3px,
+          transparent 3px,
+          transparent 6px
+        );
+        opacity: 1;
+      }
+
+      .chart-axis {
+        display: flex;
+        justify-content: space-between;
+        font-size: 9px;
+        color: var(--sway-darkGrey);
+        margin-top: 4px;
+        letter-spacing: 0.04em;
+      }
+
+      /* Footer row in prose panel */
+      .brief-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid var(--divider);
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        letter-spacing: 0.04em;
+      }
+
+      .brief-footer .pill {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        background: var(--chip-pill);
+        border: 1px solid var(--divider);
+        padding: 4px 10px;
+        border-radius: 999px;
+        color: var(--sway-lightGrey);
+      }
+
+      .brief-footer .pill.warn {
+        background: var(--tint-info);
+        border-color: rgba(255, 209, 93, 0.3);
+        color: var(--info);
+      }
+
+      /* Queue rows */
+      .queue-title {
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--sway-darkGrey);
+        margin: 20px 0 8px;
+      }
+
+      .queue-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 10px 12px;
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 10px;
+        margin-bottom: 6px;
+      }
+
+      .queue-row .name {
+        font-size: 14px;
+        color: var(--sway-lightGrey);
+      }
+
+      .queue-row .sub {
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        margin-top: 2px;
+      }
+
+      .queue-row.age-7 .sub {
+        color: var(--warning);
+      }
+
+      .queue-row .btn {
+        font-size: 12px;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: var(--tint-teal);
+        border: 1px solid var(--tint-teal-border);
+        color: var(--sway-bright);
+      }
+
+      /* Big archive teaser row */
+      .archive-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        padding: 12px 14px;
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 10px;
+        margin-bottom: 8px;
+        font-size: 13px;
+      }
+
+      .archive-row .w-title {
+        color: var(--sway-lightGrey);
+        font-weight: 700;
+      }
+
+      .archive-row .w-sub {
+        color: var(--sway-darkGrey);
+        font-size: 11px;
+        margin-top: 3px;
+      }
+
+      .archive-row .chev {
+        color: var(--sway-darkGrey);
+        font-size: 18px;
+      }
+
+      /* Empty / error / cold states */
+      .empty-block {
+        padding: 32px 16px;
+        text-align: center;
+        background: var(--card-deep);
+        border: 1px dashed var(--divider);
+        border-radius: 16px;
+        color: var(--sway-darkGrey);
+      }
+
+      .empty-block .icon {
+        font-size: 28px;
+        margin-bottom: 12px;
+      }
+
+      .empty-block p {
+        margin: 0 0 6px;
+      }
+
+      .empty-block .primary {
+        color: var(--sway-lightGrey);
+        font-family: 'Lato', serif;
+        font-weight: 300;
+        font-size: 17px;
+        line-height: 1.55;
+      }
+
+      /* ============================================
+         Animation callouts
+         ============================================ */
+      .motion-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+      }
+
+      .motion-card {
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 16px;
+        padding: 20px;
+      }
+
+      .motion-card h3 {
+        font-size: 16px;
+        margin-bottom: 6px;
+      }
+
+      .motion-card .meta {
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--sway-darkGrey);
+        margin-bottom: 14px;
+      }
+
+      .motion-card p {
+        font-size: 13px;
+        color: var(--sway-darkGrey);
+        margin: 0 0 14px;
+        line-height: 1.55;
+      }
+
+      .motion-demo {
+        background: var(--card-deep);
+        border-radius: 10px;
+        padding: 16px;
+        min-height: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        overflow: hidden;
+        border: 1px solid var(--divider);
+      }
+
+      /* Type-in */
+      .typewriter-demo span {
+        display: inline-block;
+        overflow: hidden;
+        white-space: nowrap;
+        border-right: 2px solid var(--sway-bright);
+        animation:
+          type 3.4s steps(48, end) infinite,
+          caret 1s steps(2) infinite;
+        width: 0;
+        font-family: 'Lato', serif;
+        font-weight: 300;
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--sway-lightGrey);
+      }
+
+      @keyframes type {
+        0% {
+          width: 0;
+        }
+        50%,
+        95% {
+          width: 100%;
+        }
+        100% {
+          width: 0;
+        }
+      }
+
+      /* Reveal-underneath */
+      .reveal-demo {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      .reveal-demo .para {
+        font-family: 'Lato', serif;
+        font-weight: 300;
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--sway-lightGrey);
+      }
+
+      .reveal-demo .chart-wrap {
+        overflow: hidden;
+        animation: reveal 3s ease-in-out infinite;
+      }
+
+      @keyframes reveal {
+        0%,
+        20% {
+          max-height: 0;
+          opacity: 0;
+        }
+        35%,
+        80% {
+          max-height: 80px;
+          opacity: 1;
+        }
+        95%,
+        100% {
+          max-height: 0;
+          opacity: 0;
+        }
+      }
+
+      /* Fade-up evidence numbers */
+      .fade-demo .cell {
+        opacity: 0;
+        transform: translateY(4px);
+        animation: fadeUp 2.8s ease-out infinite;
+      }
+
+      .fade-demo .cell:nth-child(1) {
+        animation-delay: 0s;
+      }
+
+      .fade-demo .cell:nth-child(2) {
+        animation-delay: 0.25s;
+      }
+
+      .fade-demo .cell:nth-child(3) {
+        animation-delay: 0.5s;
+      }
+
+      @keyframes fadeUp {
+        0%,
+        10% {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        35%,
+        80% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        95%,
+        100% {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+      }
+
+      /* Page-turn tear */
+      .tear-demo {
+        justify-content: center;
+      }
+
+      .tear-demo .page {
+        width: 60%;
+        height: 60px;
+        background: var(--sway-lightGrey);
+        border-radius: 4px;
+        transform-origin: top left;
+        animation: tear 3s ease-in-out infinite;
+      }
+
+      @keyframes tear {
+        0%,
+        20% {
+          transform: rotate(0deg);
+          opacity: 1;
+        }
+        80%,
+        100% {
+          transform: rotate(-8deg) translate(-12px, 4px);
+          opacity: 0.2;
+        }
+      }
+
+      /* ============================================
+         Component + rationale tables
+         ============================================ */
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+      }
+
+      @media (max-width: 900px) {
+        .two-col {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .comp-card {
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 16px;
+        padding: 24px;
+      }
+
+      .comp-card h3 {
+        font-size: 18px;
+        margin-bottom: 14px;
+      }
+
+      .comp-card ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      .comp-card li {
+        font-size: 14px;
+        color: var(--sway-darkGrey);
+        margin-bottom: 10px;
+        line-height: 1.5;
+      }
+
+      .comp-card li b {
+        color: var(--sway-lightGrey);
+        font-weight: 700;
+      }
+
+      .comp-card li code {
+        font-family: 'SFMono-Regular', Menlo, monospace;
+        font-size: 12px;
+        background: var(--chip-pill);
+        padding: 1px 6px;
+        border-radius: 4px;
+        color: var(--sway-lightGrey);
+      }
+
+      .rationale ol {
+        counter-reset: r;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 20px;
+      }
+
+      .rationale ol li {
+        counter-increment: r;
+        padding: 20px 24px 20px 64px;
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 14px;
+        position: relative;
+        font-size: 15px;
+        color: var(--sway-darkGrey);
+        line-height: 1.55;
+      }
+
+      .rationale ol li::before {
+        content: counter(r);
+        position: absolute;
+        left: 20px;
+        top: 18px;
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        background: var(--tint-teal);
+        border: 1px solid var(--tint-teal-border);
+        color: var(--sway-bright);
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+      }
+
+      .rationale ol li b {
+        color: var(--sway-lightGrey);
+        font-weight: 700;
+      }
+
+      .be-note {
+        background: linear-gradient(
+          180deg,
+          rgba(124, 58, 237, 0.1),
+          rgba(124, 58, 237, 0.02)
+        );
+        border: 1px solid rgba(124, 58, 237, 0.35);
+        border-radius: 14px;
+        padding: 24px 28px;
+        margin-top: 24px;
+      }
+
+      .be-note .tag {
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--therapist-purple);
+        margin-bottom: 10px;
+      }
+
+      .be-note h3 {
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+
+      .be-note p {
+        font-size: 14px;
+        color: var(--sway-darkGrey);
+        line-height: 1.6;
+        margin: 0 0 8px;
+      }
+
+      .be-note code {
+        font-family: 'SFMono-Regular', Menlo, monospace;
+        font-size: 12px;
+        background: var(--chip-pill);
+        padding: 1px 6px;
+        border-radius: 4px;
+        color: var(--sway-lightGrey);
+      }
+
+      /* ============================================
+         Reduced motion
+         ============================================ */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+        .prose-block.typewriter p:last-of-type::after {
+          display: none;
+        }
+        .typewriter-demo span {
+          width: 100%;
+          border-right: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <!-- ============================================================
+           HERO
+           ============================================================ -->
+      <section class="hero" aria-labelledby="hero-title">
+        <span class="hero-tag">Angle · Narrative / Weekly Brief</span>
+        <h1 id="hero-title">bwell Admin — a paragraph, not a dashboard.</h1>
+        <p class="hero-philosophy">
+          The admin home opens with a short written brief of the service this
+          week. Numbers appear underneath as evidence, not as the main surface.
+          The admin reads once, sees what moved, sees what needs a hand, and
+          closes the tab. Pace is slow and ritualistic; the tone is a measured
+          clinical newsletter, not an ops console.
+        </p>
+        <div class="hero-meta">
+          <div><b>Feature</b> · admin-overhaul</div>
+          <div><b>Role</b> · Admin (non-clinical)</div>
+          <div><b>Data source</b> · <code>GET /api/admin/overview</code></div>
+          <div><b>Width</b> · mobile-first (~375px)</div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           FLOW MAP
+           ============================================================ -->
+      <section aria-labelledby="flow-title">
+        <div class="section-kicker">Section 02 · Flow map</div>
+        <h2 id="flow-title">The Monday-morning read</h2>
+        <p class="lede">
+          Five stops, Monday to Monday. The admin lands on the brief, taps a
+          highlighted phrase to reveal the evidence, handles the queue it
+          surfaces, then files the page to the archive.
+        </p>
+
+        <div class="panel-grid" style="margin-top: 40px">
+          <!-- PANEL 1: The brief (typewriter in) -->
+          <div class="panel">
+            <div class="phone" aria-label="Admin home — weekly brief">
+              <div class="notch"></div>
+              <div class="status-row">
+                <span>9:41</span>
+                <span>admin@bwell.test</span>
+              </div>
+              <div class="screen-header">
+                <span class="screen-title">Week 16 · Apr 13–20</span>
+                <span class="screen-title" style="color: var(--sway-bright)"
+                  >● LIVE</span
+                >
+              </div>
+              <h3 class="screen-subtitle">This week at bwell</h3>
+
+              <div class="prose-block typewriter">
+                <div class="dateline">
+                  Brief · generated 09:00 · rollup 07:14
+                </div>
+                <p>
+                  Forty-two completed attempts across three programmes this
+                  week, up from thirty-one the week before.
+                  <em>Depression recovery</em> sits at 38% (n=45) — steady
+                  against the ninety-day baseline.
+                </p>
+                <p>
+                  <em>Two therapists have been waiting over seven days</em> for
+                  verification. No new stalled attempts since Monday.
+                </p>
+              </div>
+
+              <div class="brief-footer">
+                <span>Rollup ran 07:14 BST</span>
+                <span class="pill">View the numbers ↓</span>
+              </div>
+            </div>
+            <p class="panel-caption">
+              <b>1. The brief.</b> The page opens as prose. Each underlined
+              phrase is tappable — it reveals the evidence beneath it. The
+              caret ticks for ~2s, signalling the brief has just landed.
+            </p>
+            <ul class="pin-list">
+              <li>
+                <span class="pin">1</span>
+                <span
+                  ><b>Dateline</b> — reminds the admin this is a rollup, not
+                  real-time. From <code>rollupAsOf</code>.</span
+                >
+              </li>
+              <li>
+                <span class="pin">2</span>
+                <span
+                  ><b>Underlined phrases</b> — not links. They expand inline
+                  into a chart or a queue. Dotted teal underline = drillable.</span
+                >
+              </li>
+              <li>
+                <span class="pin">3</span>
+                <span
+                  ><b>No hero number.</b> No KPI tiles. The paragraph is the
+                  surface.</span
+                >
+              </li>
+            </ul>
+          </div>
+
+          <!-- PANEL 2: Inline expansion of "Depression recovery" -->
+          <div class="panel">
+            <div
+              class="phone"
+              aria-label="Admin home — evidence expanded under paragraph"
+            >
+              <div class="notch"></div>
+              <div class="status-row">
+                <span>9:41</span>
+                <span>admin@bwell.test</span>
+              </div>
+              <div class="screen-header">
+                <span class="screen-title">Week 16 · Apr 13–20</span>
+                <span class="screen-title" style="color: var(--sway-bright)"
+                  >● LIVE</span
+                >
+              </div>
+              <h3 class="screen-subtitle">This week at bwell</h3>
+
+              <div class="prose-block">
+                <p>
+                  Forty-two completed attempts across three programmes this
+                  week, up from thirty-one the week before.
+                  <em>Depression recovery</em> sits at 38% (n=45) — steady
+                  against the ninety-day baseline.
+                </p>
+
+                <!-- Inline reveal: appears under the expanded phrase -->
+                <div class="inline-chart" aria-label="Recovery chart expanded">
+                  <div class="chart-caption">
+                    <span>PHQ-9 · Depression · last 12 weeks</span>
+                    <span style="color: var(--sway-bright)">38% · n=45</span>
+                  </div>
+                  <div class="bars" aria-hidden="true">
+                    <span style="height: 48%"></span>
+                    <span style="height: 42%"></span>
+                    <span style="height: 55%"></span>
+                    <span class="suppressed" style="height: 20%"></span>
+                    <span style="height: 61%"></span>
+                    <span style="height: 64%"></span>
+                    <span style="height: 58%"></span>
+                    <span style="height: 72%"></span>
+                    <span style="height: 69%"></span>
+                    <span style="height: 74%"></span>
+                    <span style="height: 78%"></span>
+                    <span style="height: 82%"></span>
+                  </div>
+                  <div class="chart-axis">
+                    <span>W 5</span><span>W 10</span><span>W 16</span>
+                  </div>
+                </div>
+
+                <p>
+                  <em>Two therapists have been waiting over seven days</em> for
+                  verification. No new stalled attempts since Monday.
+                </p>
+              </div>
+
+              <div class="brief-footer">
+                <span>Tap again to collapse</span>
+                <span class="pill" style="color: var(--sway-bright)"
+                  >− hide chart</span
+                >
+              </div>
+            </div>
+            <p class="panel-caption">
+              <b>2. Drill-in, in place.</b> Tapping
+              <em>Depression recovery</em> slides a twelve-week chart in
+              underneath the sentence. Suppressed buckets (n&lt;5) render as a
+              hatched bar — the <em>n</em> is still shown, the rate is not.
+            </p>
+            <ul class="pin-list">
+              <li>
+                <span class="pin">4</span>
+                <span
+                  ><b>Rendered from <code>AdminOutcomesResponse</code></b> —
+                  one request per instrument, cached with the overview.</span
+                >
+              </li>
+              <li>
+                <span class="pin">5</span>
+                <span
+                  ><b>Hatched bar</b> = suppressed cell (<code
+                    >rate: null, suppressed: true</code
+                  >). The axis stays populated even when most cells are
+                  empty.</span
+                >
+              </li>
+            </ul>
+          </div>
+
+          <!-- PANEL 3: Evidence strip (numbers) below the prose -->
+          <div class="panel">
+            <div
+              class="phone"
+              aria-label="Admin home — evidence strip scrolled into view"
+            >
+              <div class="notch"></div>
+              <div class="status-row">
+                <span>9:41</span>
+                <span>admin@bwell.test</span>
+              </div>
+              <div class="screen-header">
+                <span class="screen-title">Evidence</span>
+                <span class="screen-title">as of Mon 09:00</span>
+              </div>
+              <h3 class="screen-subtitle">The numbers, underneath.</h3>
+
+              <div class="evidence-row">
+                <div class="cell">
+                  <div class="label">Completed · 7d</div>
+                  <div class="value">42</div>
+                  <div class="delta">+11 vs prev wk</div>
+                </div>
+                <div class="cell">
+                  <div class="label">Active · 30d</div>
+                  <div class="value">28</div>
+                  <div class="delta">+3</div>
+                </div>
+                <div class="cell">
+                  <div class="label">New users · 7d</div>
+                  <div class="value">6</div>
+                  <div class="delta flat">flat</div>
+                </div>
+              </div>
+
+              <div class="evidence-row">
+                <div class="cell">
+                  <div class="label">Stalled · 7d+</div>
+                  <div class="value" style="color: var(--warning)">3</div>
+                  <div class="delta flat">no change</div>
+                </div>
+                <div class="cell">
+                  <div class="label">Orphaned</div>
+                  <div class="value" style="color: var(--error)">1</div>
+                  <div class="delta down">up 1</div>
+                </div>
+                <div class="cell">
+                  <div class="label">Zero-patient T.</div>
+                  <div class="value">2</div>
+                  <div class="delta flat">flat</div>
+                </div>
+              </div>
+
+              <div class="evidence-row">
+                <div class="cell">
+                  <div class="label">PHQ-9 recovery</div>
+                  <div class="value">38%</div>
+                  <div class="delta flat">n=45</div>
+                </div>
+                <div class="cell">
+                  <div class="label">GAD-7 recovery</div>
+                  <div class="value">35%</div>
+                  <div class="delta flat">n=22</div>
+                </div>
+                <div class="cell">
+                  <div class="label">Sleep recovery</div>
+                  <div class="value" style="color: var(--sway-darkGrey)">—</div>
+                  <div class="delta flat">no instrument</div>
+                </div>
+              </div>
+
+              <p
+                class="screen-title"
+                style="
+                  color: var(--sway-darkGrey);
+                  margin-top: 18px;
+                  text-transform: none;
+                  letter-spacing: 0.02em;
+                "
+              >
+                Numbers never appear alone. Every row traces back to a sentence
+                above.
+              </p>
+            </div>
+            <p class="panel-caption">
+              <b>3. The evidence strip.</b> Scroll past the brief and the full
+              numeric picture is here — quiet, unranked, no hero card. Deltas
+              point to last week; Sleep Health shows <b>—</b> for rate since
+              there is no clinical instrument.
+            </p>
+          </div>
+
+          <!-- PANEL 4: Verification queue surfaced by the brief -->
+          <div class="panel">
+            <div class="phone" aria-label="Admin home — verification queue">
+              <div class="notch"></div>
+              <div class="status-row">
+                <span>9:41</span>
+                <span>admin@bwell.test</span>
+              </div>
+              <div class="screen-header">
+                <span class="screen-title">Queues</span>
+                <span class="screen-title">3 items</span>
+              </div>
+              <h3 class="screen-subtitle">Do this on Monday.</h3>
+
+              <div class="prose-block">
+                <p style="font-size: 15px">
+                  <em class="warn">Two therapists waiting &gt; 7 days.</em>
+                  The oldest has been in the queue for eleven. Pick a tier,
+                  confirm, move on.
+                </p>
+              </div>
+
+              <div class="queue-title">Verification queue · oldest first</div>
+              <div class="queue-row age-7">
+                <div>
+                  <div class="name">Dr E. Okafor</div>
+                  <div class="sub">
+                    elena.okafor@nhs.net · waiting 11 days
+                  </div>
+                </div>
+                <span class="btn">Verify</span>
+              </div>
+              <div class="queue-row age-7">
+                <div>
+                  <div class="name">S. Patel</div>
+                  <div class="sub">sanjay.p@locum.co · waiting 8 days</div>
+                </div>
+                <span class="btn">Verify</span>
+              </div>
+              <div class="queue-row">
+                <div>
+                  <div class="name">R. Daniels</div>
+                  <div class="sub">rdaniels@bwell.test · waiting 2 days</div>
+                </div>
+                <span class="btn">Verify</span>
+              </div>
+
+              <div class="queue-title">Stalled attempts · 7d+</div>
+              <div class="queue-row">
+                <div>
+                  <div class="name">3 attempts unchanged</div>
+                  <div class="sub">
+                    Depression · Thinking Traps · Activity Diary
+                  </div>
+                </div>
+                <span class="btn">Review</span>
+              </div>
+
+              <div class="brief-footer">
+                <span>All queues · View full lists →</span>
+                <span class="pill warn">2 overdue</span>
+              </div>
+            </div>
+            <p class="panel-caption">
+              <b>4. The queue.</b> Prose surfaces what to <em>do</em>, not just
+              what to <em>know</em>. Amber-sentence + amber pill = two items
+              overdue against the &gt;7d SLA. Verify is one tap → tier picker →
+              confirm.
+            </p>
+            <ul class="pin-list">
+              <li>
+                <span class="pin">6</span>
+                <span
+                  ><b>Warning tint</b> reserved for sentences in the brief and
+                  items in the queue that reference a breached SLA. Never used
+                  decoratively.</span
+                >
+              </li>
+              <li>
+                <span class="pin">7</span>
+                <span
+                  ><b>Therapist tier</b> is chosen inside the Verify flow, not
+                  shown here (rule 12).</span
+                >
+              </li>
+            </ul>
+          </div>
+
+          <!-- PANEL 5: Archive / previous weeks -->
+          <div class="panel">
+            <div class="phone" aria-label="Admin home — archive of weekly briefs">
+              <div class="notch"></div>
+              <div class="status-row">
+                <span>9:41</span>
+                <span>admin@bwell.test</span>
+              </div>
+              <div class="screen-header">
+                <span class="screen-title">Previous weeks</span>
+                <span class="screen-title">archive</span>
+              </div>
+              <h3 class="screen-subtitle">Filed briefs.</h3>
+
+              <div class="archive-row">
+                <div>
+                  <div class="w-title">Week 15 · Apr 6–13</div>
+                  <div class="w-sub">
+                    31 completed · Depression 36% · 1 therapist verified
+                  </div>
+                </div>
+                <span class="chev">›</span>
+              </div>
+              <div class="archive-row">
+                <div>
+                  <div class="w-title">Week 14 · Mar 30–Apr 6</div>
+                  <div class="w-sub">
+                    28 completed · Depression 34% · 2 therapists verified
+                  </div>
+                </div>
+                <span class="chev">›</span>
+              </div>
+              <div class="archive-row">
+                <div>
+                  <div class="w-title">Week 13 · Mar 23–30</div>
+                  <div class="w-sub">
+                    24 completed · Depression 33% · GAD-7 suppressed (n&lt;20)
+                  </div>
+                </div>
+                <span class="chev">›</span>
+              </div>
+              <div class="archive-row">
+                <div>
+                  <div class="w-title">Week 12 · Mar 16–23</div>
+                  <div class="w-sub">
+                    22 completed · first week GAD-7 above k-threshold
+                  </div>
+                </div>
+                <span class="chev">›</span>
+              </div>
+
+              <p
+                class="screen-title"
+                style="
+                  color: var(--sway-darkGrey);
+                  margin-top: 20px;
+                  letter-spacing: 0.04em;
+                  text-transform: none;
+                "
+              >
+                Tap any week to reopen that Monday's brief exactly as it was
+                written.
+              </p>
+            </div>
+            <p class="panel-caption">
+              <b>5. The archive.</b> Every Monday's brief is filed. Opening an
+              older week re-renders that week's prose and numbers — useful when
+              a trustee asks <em>"what did we know on Apr 6?"</em>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           STATE GALLERY
+           ============================================================ -->
+      <section aria-labelledby="states-title">
+        <div class="section-kicker">Section 03 · State gallery</div>
+        <h2 id="states-title">Five states the brief has to handle</h2>
+        <p class="lede">
+          The prose shape is the same in every state. What changes is the
+          content of the sentences. Suppressed cells never leak a rate — they
+          become an honest English phrase.
+        </p>
+
+        <div class="panel-grid" style="margin-top: 40px">
+          <!-- Rich-data week -->
+          <div class="panel">
+            <div class="phone small">
+              <div class="notch"></div>
+              <div class="screen-header">
+                <span class="screen-title">Rich-data week</span>
+              </div>
+              <div class="prose-block">
+                <div class="dateline">Apr 13–20 · rollup 07:14</div>
+                <p>
+                  Forty-two completed attempts, up 35% week on week.
+                  <em>Depression recovery</em> 38% (n=45),
+                  <em>Anxiety recovery</em> 35% (n=22). Two therapists overdue
+                  on verification.
+                </p>
+              </div>
+              <div class="evidence-row">
+                <div class="cell">
+                  <div class="label">Completed</div>
+                  <div class="value">42</div>
+                </div>
+                <div class="cell">
+                  <div class="label">Active 30d</div>
+                  <div class="value">28</div>
+                </div>
+                <div class="cell">
+                  <div class="label">Queue</div>
+                  <div class="value">2</div>
+                </div>
+              </div>
+            </div>
+            <p class="panel-caption">
+              <b>A. Rich data.</b> Default state. Evidence matches prose.
+            </p>
+          </div>
+
+          <!-- Sparse first week -->
+          <div class="panel">
+            <div class="phone small">
+              <div class="notch"></div>
+              <div class="screen-header">
+                <span class="screen-title">First week of life</span>
+              </div>
+              <div class="prose-block">
+                <div class="dateline">Week 1 · rollup 07:02</div>
+                <p>
+                  Four patients enrolled this week across Depression and
+                  Generalised Anxiety. No clinical outcomes yet — we need
+                  twenty patients per instrument before we can report a
+                  recovery rate.
+                </p>
+                <p>
+                  One therapist is awaiting verification.
+                </p>
+              </div>
+              <div class="evidence-row">
+                <div class="cell">
+                  <div class="label">Enrolled</div>
+                  <div class="value">4</div>
+                </div>
+                <div class="cell">
+                  <div class="label">Recovery</div>
+                  <div class="value" style="color: var(--sway-darkGrey)">—</div>
+                </div>
+                <div class="cell">
+                  <div class="label">Queue</div>
+                  <div class="value">1</div>
+                </div>
+              </div>
+            </div>
+            <p class="panel-caption">
+              <b>B. Sparse.</b> Real n but below k. Prose explains the
+              threshold in English — never just "—".
+            </p>
+          </div>
+
+          <!-- All-suppressed cold start -->
+          <div class="panel">
+            <div class="phone small">
+              <div class="notch"></div>
+              <div class="screen-header">
+                <span class="screen-title">Cold start</span>
+              </div>
+              <div class="empty-block">
+                <div class="icon" aria-hidden="true">◷</div>
+                <p class="primary">
+                  No completed work yet this week.
+                </p>
+                <p style="font-size: 13px">
+                  The first brief will be written on Monday 27 April at 07:00,
+                  once the rollup has data to summarise.
+                </p>
+              </div>
+            </div>
+            <p class="panel-caption">
+              <b>C. Cold start.</b> No prose invented from nothing. A calendar
+              promise instead — the brief will come.
+            </p>
+          </div>
+
+          <!-- Error -->
+          <div class="panel">
+            <div class="phone small">
+              <div class="notch"></div>
+              <div class="screen-header">
+                <span class="screen-title" style="color: var(--error)"
+                  >Rollup failed</span
+                >
+              </div>
+              <div
+                class="empty-block"
+                style="
+                  border-color: rgba(255, 109, 94, 0.4);
+                  background: rgba(255, 109, 94, 0.05);
+                "
+              >
+                <div class="icon" aria-hidden="true" style="color: var(--error)">
+                  ⚠
+                </div>
+                <p class="primary">
+                  The Monday rollup didn't complete. The brief you are reading
+                  is last Monday's.
+                </p>
+                <p style="font-size: 13px">
+                  <b>Last success:</b> Apr 13 07:14 · status <code>failure</code>,
+                  rows written 0.
+                </p>
+                <p style="font-size: 13px; margin-top: 10px">
+                  <span
+                    style="
+                      color: var(--sway-bright);
+                      border-bottom: 1px dotted var(--tint-teal-border);
+                      padding-bottom: 1px;
+                    "
+                    >Open system health →</span
+                  >
+                </p>
+              </div>
+            </div>
+            <p class="panel-caption">
+              <b>D. Error.</b> Prose stays honest — it labels itself as stale
+              and points to <code>/admin/system/health</code>. Never shows a
+              "live" number while the rollup is dead.
+            </p>
+          </div>
+
+          <!-- Previous weeks archive -->
+          <div class="panel">
+            <div class="phone small">
+              <div class="notch"></div>
+              <div class="screen-header">
+                <span class="screen-title">Archive · March</span>
+              </div>
+              <div class="archive-row">
+                <div>
+                  <div class="w-title">Week 13 · Mar 23–30</div>
+                  <div class="w-sub">
+                    24 completed · GAD-7 suppressed (n&lt;20)
+                  </div>
+                </div>
+                <span class="chev">›</span>
+              </div>
+              <div class="archive-row">
+                <div>
+                  <div class="w-title">Week 12 · Mar 16–23</div>
+                  <div class="w-sub">22 completed · first week above k</div>
+                </div>
+                <span class="chev">›</span>
+              </div>
+              <div class="archive-row">
+                <div>
+                  <div class="w-title">Week 11 · Mar 9–16</div>
+                  <div class="w-sub">Rollup partial · prose truncated</div>
+                </div>
+                <span class="chev">›</span>
+              </div>
+            </div>
+            <p class="panel-caption">
+              <b>E. Archive.</b> Briefs aren't re-written when new data
+              arrives. They are what the admin saw <em>at that time</em> — a
+              defensible record.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           ANIMATION CALLOUTS
+           ============================================================ -->
+      <section aria-labelledby="motion-title">
+        <div class="section-kicker">Section 04 · Animation callouts</div>
+        <h2 id="motion-title">Motion, used once</h2>
+        <p class="lede">
+          The brief should feel like it is being written for you, not served
+          to you. One animation per moment. Everything respects
+          <code>prefers-reduced-motion</code>.
+        </p>
+
+        <div class="motion-grid" style="margin-top: 40px">
+          <div class="motion-card">
+            <div class="meta">Trigger · screen enter</div>
+            <h3>Typewriter reveal of the weekly sentence</h3>
+            <p>
+              First paragraph of the brief types in at ~24 chars/sec, using
+              the bwell <code>TypewriterText</code> component. Caret blinks for
+              2s after the last word lands, then fades. Subsequent paragraphs
+              fade in (no type), so the screen doesn't feel laborious on
+              re-visit.
+            </p>
+            <div class="motion-demo typewriter-demo">
+              <span
+                >Forty-two completed attempts across three programmes this
+                week…</span
+              >
+            </div>
+          </div>
+
+          <div class="motion-card">
+            <div class="meta">Trigger · tap underlined phrase</div>
+            <h3>Chart unfolds under the paragraph</h3>
+            <p>
+              Max-height ease-in-out, 280ms. Chart mounts invisible, grows
+              down. Suppressed bars cross-fade from hatched → hatched (no
+              numeric reveal mid-animation — the rate is never briefly
+              visible).
+            </p>
+            <div class="motion-demo reveal-demo">
+              <div class="para">
+                <em
+                  style="
+                    color: var(--sway-bright);
+                    border-bottom: 1px dotted var(--tint-teal-border);
+                  "
+                  >Depression recovery</em
+                >
+                sits at 38% (n=45).
+              </div>
+              <div class="chart-wrap">
+                <div class="bars" aria-hidden="true">
+                  <span style="height: 48%"></span>
+                  <span style="height: 42%"></span>
+                  <span style="height: 58%"></span>
+                  <span class="suppressed" style="height: 20%"></span>
+                  <span style="height: 64%"></span>
+                  <span style="height: 70%"></span>
+                  <span style="height: 72%"></span>
+                  <span style="height: 80%"></span>
+                  <span style="height: 76%"></span>
+                  <span style="height: 82%"></span>
+                  <span style="height: 78%"></span>
+                  <span style="height: 82%"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="motion-card">
+            <div class="meta">Trigger · scroll past brief</div>
+            <h3>Evidence numbers fade up, in order</h3>
+            <p>
+              Below-the-fold evidence cells do a staggered 4px fade-up
+              (0s → 0.25s → 0.5s). Never more than 3 at a time — no grid
+              shimmer. Keeps the numbers quiet; they feel like the admin is
+              finding them, not being pitched.
+            </p>
+            <div class="motion-demo fade-demo">
+              <div class="evidence-row" style="margin-bottom: 0">
+                <div class="cell">
+                  <div class="label">Completed</div>
+                  <div class="value">42</div>
+                </div>
+                <div class="cell">
+                  <div class="label">Active 30d</div>
+                  <div class="value">28</div>
+                </div>
+                <div class="cell">
+                  <div class="label">Queue</div>
+                  <div class="value">2</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="motion-card">
+            <div class="meta">Trigger · open archived week</div>
+            <h3>Page-turn / tear</h3>
+            <p>
+              When an archived brief is opened, the current brief peels up and
+              off-screen (rotate -8deg, translate, fade) while the older
+              brief's prose types in beneath it. Leans on the newsletter
+              metaphor without getting cute.
+            </p>
+            <div class="motion-demo tear-demo">
+              <div class="page"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           COMPONENTS
+           ============================================================ -->
+      <section aria-labelledby="comp-title">
+        <div class="section-kicker">Section 05 · Component breakdown</div>
+        <h2 id="comp-title">What it's made of</h2>
+
+        <div class="two-col">
+          <div class="comp-card">
+            <h3>New components this design introduces</h3>
+            <ul>
+              <li>
+                <b>WeeklyBrief</b> — the prose block. Accepts an ordered array
+                of paragraph spans, each either plain text or a
+                <code>DrilldownPhrase</code>. Handles the typewriter on first
+                mount only.
+              </li>
+              <li>
+                <b>DrilldownPhrase</b> — a pressable span with a dotted teal
+                underline. Bound to a type union
+                (<code>{ kind: 'outcome', instrument }</code>,
+                <code>{ kind: 'queue' }</code>, etc.) so the inline-expansion
+                target is typed at compile time.
+              </li>
+              <li>
+                <b>InlineChart</b> — 12-bucket bar chart sized to fit under a
+                paragraph. Accepts an <code>OutcomeResult[]</code>; renders
+                suppressed buckets as a hatched bar. No tooltip — the sentence
+                above is the caption.
+              </li>
+              <li>
+                <b>EvidenceStrip</b> — three-cell numeric row. Each cell
+                renders value, label, and optional delta vs prior-period. A
+                thin wrapper around the existing <code>StatStrip</code>.
+              </li>
+              <li>
+                <b>BriefArchiveRow</b> — archive list row. Title + two-clause
+                summary + chevron. Tap reopens that week's prose.
+              </li>
+              <li>
+                <b>StaleBriefBanner</b> — the error state. Shows the brief
+                timestamp + links to <code>/admin/system/health</code>.
+              </li>
+            </ul>
+          </div>
+
+          <div class="comp-card">
+            <h3>Existing bwell components reused</h3>
+            <ul>
+              <li>
+                <b>ContentContainer</b> — screen wrapper with header, for the
+                <code>/admin/home</code> route.
+              </li>
+              <li>
+                <b>ThemedText</b> — all typography. <code>type="title"</code>
+                for "This week at bwell", <code>type="default"</code> for the
+                prose paragraphs, <code>type="small"</code> for deltas &amp;
+                datelines.
+              </li>
+              <li>
+                <b>TypewriterText</b> — drives the first-paragraph reveal. Its
+                imperative-handle API is a natural fit for the "wait, then
+                start" cue from <code>useAdminOverview</code>.
+              </li>
+              <li>
+                <b>StatStrip</b> — underpins <code>EvidenceStrip</code>. No
+                styling change; data is just three cells instead of four.
+              </li>
+              <li>
+                <b>Collapsible</b> — the inline chart expansion uses the same
+                expand/collapse mechanics as existing sections.
+              </li>
+              <li>
+                <b>ActionMenu</b> — the queue row's "Verify" button opens it,
+                with tier pick (cbt / pwp) and a confirmation step
+                (<code>variant: 'destructive'</code> is not used — verify is
+                constructive — but the confirm step is).
+              </li>
+              <li>
+                <b>EmptyState</b> — cold-start and error-state panels.
+              </li>
+              <li>
+                <b>Chip</b> / <b>StatusChip</b> — dateline pills, "2 overdue"
+                pill, "LIVE / STALE" markers.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="be-note" role="note" aria-label="Back-end note">
+          <div class="tag">Back-end request</div>
+          <h3>This design requires one new BE endpoint.</h3>
+          <p>
+            <b>Option (a) chosen.</b> Client-side templating from the existing
+            <code>AdminOverviewResponse</code> would work for the trivial
+            sentences (totals, deltas), but breaks on the <em>interesting</em>
+            cases: conditional clauses ("<em>no new stalled attempts since Monday</em>"
+            needs week-over-week delta <em>of a count</em>, which the current
+            response doesn't carry), honest suppression phrasing
+            ("<em>we need twenty patients per instrument before we can report
+            a rate</em>"), and the archive ("reopening that Monday's brief
+            exactly as it was written" requires the sentence to be persisted,
+            not regenerated from today's data).
+          </p>
+          <p>
+            <b>Ask:</b> a new endpoint
+            <code>GET /api/admin/brief?week=&lt;ISO-week&gt;</code> that
+            returns the AdminOverviewResponse <em>plus</em> a
+            <code>brief: { paragraphs: Array&lt;Array&lt;Span&gt;&gt;;
+              generatedAt: string; model: 'template-v1' | 'llm-gpt-…'; }</code>
+            field. Sentence assembly is a template pass on the BE by default;
+            an LLM variant is opt-in behind a flag. The brief row is persisted
+            at rollup time so the archive is a read, not a regeneration.
+          </p>
+          <p>
+            <b>Why not just templating?</b> Tried it in the design — the fourth
+            sentence always reads like Mad Libs. Prose tone is load-bearing for
+            this angle; it deserves a first-class BE surface.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           RATIONALE
+           ============================================================ -->
+      <section class="rationale" aria-labelledby="rationale-title">
+        <div class="section-kicker">Section 06 · Rationale</div>
+        <h2 id="rationale-title">Why prose serves this admin</h2>
+
+        <ol>
+          <li>
+            <b>The admin is non-clinical and non-continuous.</b> They come in
+            on Monday morning, they want to know what moved and what's stuck,
+            and then they leave. A paragraph is a better interface for that
+            cadence than a grid of twelve tiles — the admin <em>reads</em> the
+            state of the service once instead of scanning for anomalies.
+          </li>
+          <li>
+            <b>Suppression is easier to explain in English than in a cell.</b>
+            "—" with a tooltip is hostile. "<em>we need twenty patients per
+            instrument before we can report a rate</em>" is not. Because every
+            <code>OutcomeResult</code> ships with <code>n</code> and
+            <code>reason</code>, the BE can compose that sentence exactly —
+            the FE never has to guess the threshold.
+          </li>
+          <li>
+            <b>Evidence sits below, not above.</b> Numbers appear after the
+            prose, never as the first thing — this deliberately avoids the
+            Stripe / Mixpanel reflex of "big number → panic reaction". The
+            sentence frames the number before the number is seen, which means
+            the admin reads proportion, not magnitude.
+          </li>
+          <li>
+            <b>Queues surface via sentences, not red pills.</b> "<em>Two
+              therapists have been waiting over seven days for
+              verification</em>" is how you'd tell a colleague. It avoids
+            alert-fatigue (rule §4 anti-patterns) while still letting the
+            amber tint + the <em>verify</em> button sit inline. The queue is
+            an imperative verb in prose, not a status light.
+          </li>
+          <li>
+            <b>The archive is the killer feature.</b> Briefs are persisted at
+            rollup time. A trustee asks "what did we know on April 6th?" and
+            the answer is a tap — opening week 14 shows <em>exactly</em> the
+            sentence and numbers the admin saw that morning, even if the data
+            has since shifted. This is hard to do with a reactive dashboard
+            and cheap to do with persisted prose rows. It's also the only way
+            this design is defensible against the "dashboard-as-export-trigger"
+            anti-pattern — the brief <em>is</em> the export.
+          </li>
+        </ol>
+      </section>
+    </main>
+  </body>
+</html>

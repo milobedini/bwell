@@ -1,0 +1,120 @@
+import { memo } from 'react';
+import { Pressable, View } from 'react-native';
+import { router } from 'expo-router';
+import { ThemedText } from '@/components/ThemedText';
+import { Colors } from '@/constants/Colors';
+import { useAdminOutcomes } from '@/hooks/useAdminOutcomes';
+import { INSTRUMENT_CUTOFF, INSTRUMENT_DELTA, INSTRUMENT_LABEL } from '@/utils/adminLabels';
+import type { AdminOverviewResponse } from '@milobedini/shared-types';
+
+import OutcomesSparkline from './OutcomesSparkline';
+import OutcomeTriplet from './OutcomeTriplet';
+
+type ProgrammeSummary = AdminOverviewResponse['programmes'][number];
+
+const formatLeadRate = (rate: number | null): string => `${Math.round((rate ?? 0) * 100)}`;
+
+const awaitingDataCopy = (reason: 'below_k' | 'below_min_n' | null): string =>
+  reason === 'below_min_n'
+    ? 'Awaiting data · needs 20+ paired assessments'
+    : 'Awaiting data · needs 5+ paired assessments';
+
+type Props = {
+  programme: ProgrammeSummary;
+};
+
+const LeadProgrammeCard = memo(({ programme }: Props) => {
+  const outcomes = programme.outcomes;
+  const instrumentLabel = outcomes
+    ? (INSTRUMENT_LABEL[outcomes.instrument] ?? outcomes.instrument.toUpperCase())
+    : null;
+  const { data: trend } = useAdminOutcomes({
+    instrument: outcomes?.instrument ?? 'phq9',
+    programmeId: programme.programmeId,
+    granularity: 'month',
+    enabled: !!outcomes
+  });
+
+  if (!outcomes || !instrumentLabel) return null;
+
+  const cutoffLabel = INSTRUMENT_CUTOFF[outcomes.instrument] ?? `${instrumentLabel} cutoff`;
+  const deltaLabel = INSTRUMENT_DELTA[outcomes.instrument];
+  const lead = outcomes.recovery;
+
+  const handlePress = () => {
+    router.push({
+      pathname: '/(main)/(tabs)/home/programmes/[id]',
+      params: { id: programme.programmeId, headerTitle: programme.title }
+    });
+  };
+
+  return (
+    <Pressable
+      onPress={handlePress}
+      className="rounded-2xl border p-4 active:opacity-80"
+      style={{ backgroundColor: Colors.chip.darkCard, borderColor: Colors.tint.tealBorder }}
+      accessibilityRole="button"
+      accessibilityLabel={`Open ${programme.title} detail`}
+    >
+      <ThemedText
+        type="small"
+        style={{ color: Colors.sway.darkGrey, fontSize: 11, letterSpacing: 0.8, textTransform: 'uppercase' }}
+      >
+        Lead programme
+      </ThemedText>
+      <ThemedText type="smallBold" style={{ color: Colors.sway.lightGrey, marginTop: 2 }}>
+        {programme.title} · {instrumentLabel}
+      </ThemedText>
+
+      {lead.suppressed ? (
+        <View className="mt-3">
+          <ThemedText type="smallTitle" style={{ color: Colors.sway.lightGrey }}>
+            {awaitingDataCopy(lead.reason)}
+          </ThemedText>
+          <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginTop: 2 }}>
+            Currently {lead.n} paired · last 90 days
+          </ThemedText>
+        </View>
+      ) : (
+        <>
+          <View className="mt-3 flex-row items-baseline gap-2">
+            <ThemedText
+              type="title"
+              style={{
+                color: Colors.sway.bright,
+                fontSize: 56,
+                lineHeight: 60
+              }}
+            >
+              {formatLeadRate(lead.rate)}
+            </ThemedText>
+            <ThemedText type="subtitle" style={{ color: Colors.sway.bright, lineHeight: 28 }}>
+              %
+            </ThemedText>
+          </View>
+          <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginTop: -2 }}>
+            Recovery · n = {lead.n} paired assessments · last 90 days
+          </ThemedText>
+        </>
+      )}
+
+      <View className="mt-4">
+        <OutcomeTriplet
+          recovery={outcomes.recovery}
+          reliableImprovement={outcomes.reliableImprovement}
+          reliableRecovery={outcomes.reliableRecovery}
+          cutoffLabel={cutoffLabel}
+          reliableChangeDeltaLabel={deltaLabel}
+        />
+      </View>
+
+      {trend && trend.series.length > 0 && (
+        <OutcomesSparkline series={trend.series} instrumentLabel={instrumentLabel} />
+      )}
+    </Pressable>
+  );
+});
+
+LeadProgrammeCard.displayName = 'LeadProgrammeCard';
+
+export default LeadProgrammeCard;

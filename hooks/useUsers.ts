@@ -11,6 +11,8 @@ import type {
   GetUsersResponse,
   PatientsResponse,
   ProfileResponse,
+  UnverifyTherapistInput,
+  UnverifyTherapistResponse,
   UserRole,
   VerifyTherapistInput,
   VerifyTherapistResponse
@@ -207,8 +209,8 @@ export const useAdminVerifyTherapist = () => {
   const queryClient = useQueryClient();
 
   return useMutationWithToast<VerifyTherapistResponse, AxiosError, VerifyTherapistInput>({
-    mutationFn: async (therapistId): Promise<VerifyTherapistResponse> => {
-      const { data } = await api.post<VerifyTherapistResponse>('/user/verify', therapistId);
+    mutationFn: async (input): Promise<VerifyTherapistResponse> => {
+      const { data } = await api.post<VerifyTherapistResponse>('/user/verify', input);
       return data;
     },
     toast: {
@@ -219,6 +221,28 @@ export const useAdminVerifyTherapist = () => {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['profile'] });
       void queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'overview'] });
+    }
+  });
+};
+
+export const useAdminUnverifyTherapist = () => {
+  const queryClient = useQueryClient();
+
+  return useMutationWithToast<UnverifyTherapistResponse, AxiosError, UnverifyTherapistInput>({
+    mutationFn: async (input): Promise<UnverifyTherapistResponse> => {
+      const { data } = await api.post<UnverifyTherapistResponse>('/user/unverify', input);
+      return data;
+    },
+    toast: {
+      pending: 'Unverifying therapist...',
+      success: 'Therapist unverified',
+      error: 'Unverify failed'
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['profile'] });
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'overview'] });
     }
   });
 };

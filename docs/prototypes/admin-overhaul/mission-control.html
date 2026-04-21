@@ -1,0 +1,2338 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>bwell Admin Overhaul — Mission Control</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        /* Core palette */
+        --sway-dark: #0c1527;
+        --sway-lightGrey: #e0e9f3;
+        --sway-darkGrey: #a6adbb;
+        --sway-bright: #18cdba;
+        --sway-buttonBg: rgb(43, 59, 91);
+
+        /* Status / signal */
+        --error: #ff6d5e;
+        --success: #76ab70;
+        --warning: #ffb300;
+        --info: #ffd15d;
+
+        /* Card surfaces */
+        --card: #262e42;
+        --card-alt: #334368;
+        --card-deep: #0b1a2a;
+
+        /* Chip / pill */
+        --chip-pill: #1e2a45;
+        --chip-pill-pressed: #253352;
+        --chip-dot-inactive: #3a496b;
+
+        /* Tints */
+        --tint-teal: rgba(24, 205, 186, 0.15);
+        --tint-teal-border: rgba(24, 205, 186, 0.3);
+        --tint-error: rgba(255, 109, 94, 0.15);
+        --tint-error-border: rgba(255, 109, 94, 0.3);
+        --tint-info: rgba(255, 209, 93, 0.15);
+        --tint-info-border: rgba(255, 209, 93, 0.3);
+        --tint-warning-border: rgba(255, 179, 0, 0.35);
+        --tint-neutral: rgba(166, 173, 187, 0.12);
+        --therapist-purple: #7c3aed;
+
+        --overlay-medium: rgba(0, 0, 0, 0.5);
+        --divider: rgba(166, 173, 187, 0.1);
+
+        /* Deck scaffolding */
+        --panel-w: 375px;
+        --deck-bg: #06101e;
+        --deck-text: var(--sway-lightGrey);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--deck-bg);
+        color: var(--deck-text);
+        font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-weight: 400;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      main {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 56px 48px 96px;
+      }
+
+      /* ---------- Typography helpers ---------- */
+      .eyebrow {
+        font-size: 13px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--sway-darkGrey);
+        font-weight: 700;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: 'Lato', sans-serif;
+        margin: 0;
+        color: var(--sway-lightGrey);
+      }
+      h1 {
+        font-size: 44px;
+        font-weight: 900;
+        letter-spacing: -0.01em;
+        line-height: 1.05;
+      }
+      h2 {
+        font-size: 28px;
+        font-weight: 900;
+        letter-spacing: -0.005em;
+      }
+      h3 {
+        font-size: 20px;
+        font-weight: 700;
+      }
+      p {
+        margin: 0;
+        color: var(--sway-darkGrey);
+        font-size: 16px;
+      }
+
+      /* ---------- Section scaffolding ---------- */
+      section.deck-section {
+        margin-top: 72px;
+      }
+      section.deck-section > header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 24px;
+        border-bottom: 1px solid var(--divider);
+        padding-bottom: 16px;
+      }
+      section.deck-section > header .title-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      section.deck-section > header .section-idx {
+        font-size: 12px;
+        letter-spacing: 0.2em;
+        color: var(--sway-bright);
+        font-weight: 700;
+      }
+
+      /* ---------- Hero ---------- */
+      .hero {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr;
+        gap: 48px;
+        align-items: center;
+        padding: 48px;
+        border-radius: 24px;
+        background:
+          radial-gradient(
+            1200px 400px at 0% 0%,
+            rgba(24, 205, 186, 0.12),
+            transparent 60%
+          ),
+          linear-gradient(180deg, #101c34, #0b1527);
+        border: 1px solid var(--divider);
+      }
+      .hero .label {
+        color: var(--sway-bright);
+        font-size: 13px;
+        letter-spacing: 0.22em;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      .hero h1 {
+        font-size: 56px;
+        margin-top: 12px;
+        margin-bottom: 20px;
+      }
+      .hero .angle {
+        font-size: 18px;
+        color: var(--sway-lightGrey);
+        max-width: 60ch;
+      }
+      .hero .angle strong {
+        color: var(--sway-bright);
+        font-weight: 700;
+      }
+      .hero .meta {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 24px;
+      }
+      .hero .meta .pill {
+        border: 1px solid var(--divider);
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        color: var(--sway-darkGrey);
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .hero .queue-preview {
+        background: var(--sway-dark);
+        border-radius: 20px;
+        padding: 18px;
+        border: 1px solid var(--divider);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+      }
+      .hero .queue-preview .preview-head {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--sway-darkGrey);
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+      .hero .queue-preview .preview-head .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--success);
+        margin-right: 8px;
+        vertical-align: middle;
+        box-shadow: 0 0 0 4px rgba(118, 171, 112, 0.18);
+      }
+      .ticket {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 12px 12px 14px;
+        border-radius: 12px;
+        border: 1px solid var(--divider);
+        background: var(--card);
+        margin-bottom: 8px;
+        position: relative;
+      }
+      .ticket .severity {
+        width: 4px;
+        align-self: stretch;
+        border-radius: 3px;
+      }
+      .ticket .sev-high {
+        background: var(--error);
+      }
+      .ticket .sev-med {
+        background: var(--warning);
+      }
+      .ticket .sev-low {
+        background: var(--sway-darkGrey);
+      }
+      .ticket .title-row {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .ticket .title-row .t1 {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--sway-lightGrey);
+      }
+      .ticket .title-row .t2 {
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+      }
+      .ticket .age {
+        font-family: 'Lato', monospace;
+        font-variant-numeric: tabular-nums;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        color: var(--sway-darkGrey);
+      }
+      .ticket .age.hot {
+        color: var(--error);
+      }
+
+      /* ---------- Phone panel scaffolding ---------- */
+      .panel-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(var(--panel-w), 1fr));
+        gap: 56px 56px;
+        align-items: start;
+      }
+      .panel {
+        position: relative;
+        width: var(--panel-w);
+        justify-self: center;
+      }
+      .phone {
+        width: var(--panel-w);
+        background: var(--sway-dark);
+        border: 1px solid var(--divider);
+        border-radius: 40px;
+        overflow: hidden;
+        box-shadow:
+          0 40px 80px rgba(0, 0, 0, 0.45),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+      }
+      .phone .status-bar {
+        height: 44px;
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--sway-lightGrey);
+      }
+      .phone .status-bar .clock {
+        font-variant-numeric: tabular-nums;
+      }
+      .phone .status-bar .glyphs {
+        display: flex;
+        gap: 6px;
+        color: var(--sway-darkGrey);
+        font-size: 11px;
+      }
+      .phone .app {
+        padding: 8px 16px 28px;
+        min-height: 680px;
+      }
+      .phone .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 4px 6px;
+      }
+      .phone .topbar .greet {
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+      .phone .topbar .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--card-alt);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--sway-lightGrey);
+      }
+      .phone h-title {
+        display: block;
+      }
+      .phone .h-title {
+        font-size: 26px;
+        font-weight: 900;
+        color: var(--sway-lightGrey);
+        letter-spacing: -0.01em;
+        margin: 2px 0 2px;
+      }
+      .phone .h-sub {
+        font-size: 13px;
+        color: var(--sway-darkGrey);
+        margin-bottom: 12px;
+      }
+      .phone .h-sub strong {
+        color: var(--sway-lightGrey);
+      }
+
+      /* ---------- Queue card primary ---------- */
+      .queue-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 4px 2px 8px;
+      }
+      .queue-header .lhs {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .queue-header .lhs .lbl {
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--sway-lightGrey);
+      }
+      .queue-header .counter {
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        letter-spacing: 0.1em;
+        font-variant-numeric: tabular-nums;
+      }
+      .queue-header .pulse {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--sway-bright);
+        box-shadow: 0 0 0 4px rgba(24, 205, 186, 0.15);
+        animation: pulse 2.4s ease-in-out infinite;
+      }
+      .queue-header .pulse.warn {
+        background: var(--warning);
+        box-shadow: 0 0 0 4px rgba(255, 179, 0, 0.2);
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 4px rgba(24, 205, 186, 0.15);
+        }
+        50% {
+          box-shadow: 0 0 0 6px rgba(24, 205, 186, 0);
+        }
+      }
+
+      .tickets {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .t {
+        display: grid;
+        grid-template-columns: 4px auto 1fr auto;
+        gap: 10px;
+        align-items: center;
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 14px;
+        padding: 12px;
+        transition:
+          transform 160ms ease-out,
+          opacity 220ms ease-out;
+      }
+      .t .sev {
+        align-self: stretch;
+        border-radius: 3px;
+      }
+      .t.hi .sev {
+        background: var(--error);
+      }
+      .t.md .sev {
+        background: var(--warning);
+      }
+      .t.lo .sev {
+        background: var(--sway-darkGrey);
+      }
+      .t .icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        background: var(--tint-neutral);
+      }
+      .t.hi .icon {
+        background: var(--tint-error);
+        color: var(--error);
+      }
+      .t.md .icon {
+        background: var(--tint-info);
+        color: var(--warning);
+      }
+      .t.lo .icon {
+        background: var(--tint-neutral);
+        color: var(--sway-darkGrey);
+      }
+      .t .body .head {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--sway-lightGrey);
+        line-height: 1.3;
+      }
+      .t .body .sub {
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+        margin-top: 2px;
+      }
+      .t .age {
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+      }
+      .t .age .hot {
+        color: var(--error);
+        font-weight: 700;
+      }
+
+      .kbd {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 16px;
+        height: 16px;
+        padding: 0 4px;
+        background: var(--chip-pill);
+        border: 1px solid var(--chip-dot-inactive);
+        border-radius: 4px;
+        font-size: 10px;
+        color: var(--sway-darkGrey);
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* ---------- KPI row (below queue, subservient) ---------- */
+      .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        margin-top: 20px;
+        padding: 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.015);
+        border: 1px solid var(--divider);
+      }
+      .kpi {
+        text-align: center;
+      }
+      .kpi .n {
+        font-size: 18px;
+        font-weight: 900;
+        color: var(--sway-lightGrey);
+        font-variant-numeric: tabular-nums;
+      }
+      .kpi .l {
+        font-size: 9.5px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--sway-darkGrey);
+        font-weight: 700;
+        margin-top: 2px;
+      }
+
+      .minor-row {
+        margin-top: 16px;
+        padding: 12px 14px;
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .minor-row .lhs {
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+      }
+      .minor-row .lhs strong {
+        color: var(--sway-lightGrey);
+      }
+      .minor-row .cta {
+        font-size: 12px;
+        color: var(--sway-bright);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+
+      /* ---------- Callouts ---------- */
+      .panel .caption {
+        margin-top: 20px;
+        font-size: 13px;
+        color: var(--sway-darkGrey);
+      }
+      .panel .caption strong {
+        color: var(--sway-lightGrey);
+      }
+      .pin {
+        position: absolute;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        max-width: 220px;
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+        line-height: 1.35;
+      }
+      .pin .num {
+        flex: 0 0 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--sway-bright);
+        color: #04110c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 900;
+      }
+      .pin-inline {
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--sway-bright);
+        color: #04110c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 900;
+        box-shadow: 0 4px 12px rgba(24, 205, 186, 0.35);
+      }
+      .pin .text strong {
+        color: var(--sway-lightGrey);
+      }
+
+      /* ---------- State gallery ---------- */
+      .state-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 24px;
+      }
+      .state {
+        background: var(--sway-dark);
+        border: 1px solid var(--divider);
+        border-radius: 20px;
+        overflow: hidden;
+      }
+      .state .mini {
+        padding: 14px;
+        min-height: 320px;
+        display: flex;
+        flex-direction: column;
+      }
+      .state .label {
+        padding: 12px 14px;
+        border-top: 1px solid var(--divider);
+        background: rgba(0, 0, 0, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .state .label .name {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--sway-lightGrey);
+        letter-spacing: 0.06em;
+      }
+      .state .label .tag {
+        font-size: 10px;
+        color: var(--sway-darkGrey);
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+      }
+      .state .mini .mini-title {
+        font-size: 13px;
+        font-weight: 900;
+        color: var(--sway-lightGrey);
+        margin-bottom: 8px;
+      }
+      .state .mini .mini-sub {
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+      }
+      .state .mini .mini-ticket {
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 10px;
+        padding: 8px 10px;
+        margin-top: 8px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-size: 11px;
+      }
+      .state .mini .mini-ticket .dot {
+        width: 4px;
+        height: 24px;
+        border-radius: 2px;
+      }
+      .state .mini .mini-ticket .dot.hi {
+        background: var(--error);
+      }
+      .state .mini .mini-ticket .dot.md {
+        background: var(--warning);
+      }
+      .state .mini .mini-ticket .dot.lo {
+        background: var(--sway-darkGrey);
+      }
+      .state .mini .mini-ticket .mt {
+        display: flex;
+        flex-direction: column;
+      }
+      .state .mini .mini-ticket .mt strong {
+        font-size: 11.5px;
+        color: var(--sway-lightGrey);
+        font-weight: 700;
+      }
+      .state .mini .mini-ticket .mt span {
+        color: var(--sway-darkGrey);
+        font-size: 10.5px;
+      }
+
+      /* Caught-up state */
+      .state.caught .mini {
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 10px;
+      }
+      .glyph-caught {
+        width: 68px;
+        height: 68px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 50% 50%,
+          rgba(24, 205, 186, 0.85) 0%,
+          rgba(24, 205, 186, 0.25) 50%,
+          rgba(24, 205, 186, 0) 75%
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        color: #04110c;
+        animation: breath 5s ease-in-out infinite;
+      }
+      @keyframes breath {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.06);
+          opacity: 0.92;
+        }
+      }
+
+      /* Loading state — skeletons */
+      .skel {
+        height: 14px;
+        background: linear-gradient(
+          90deg,
+          var(--card) 0%,
+          var(--card-alt) 50%,
+          var(--card) 100%
+        );
+        background-size: 200% 100%;
+        border-radius: 6px;
+        animation: shimmer 1.6s linear infinite;
+      }
+      .skel.wide {
+        height: 44px;
+        border-radius: 12px;
+      }
+      .skel.line {
+        height: 10px;
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      /* Error state */
+      .state.error .mini {
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+      }
+      .err-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: var(--tint-error);
+        border: 1px solid var(--tint-error-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: var(--error);
+      }
+      .btn-outline {
+        padding: 8px 14px;
+        border: 1px solid var(--sway-bright);
+        color: var(--sway-bright);
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        background: transparent;
+        cursor: pointer;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: var(--tint-error);
+        border: 1px solid var(--tint-error-border);
+        color: var(--error);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .badge.ok {
+        background: var(--tint-teal);
+        border-color: var(--tint-teal-border);
+        color: var(--sway-bright);
+      }
+      .badge.warn {
+        background: var(--tint-info);
+        border-color: var(--tint-info-border);
+        color: var(--warning);
+      }
+
+      .overflow-banner {
+        margin-top: 10px;
+        background: var(--tint-info);
+        border: 1px solid var(--tint-warning-border);
+        border-radius: 10px;
+        padding: 8px 10px;
+        font-size: 11px;
+        color: var(--info);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* ---------- Animation callouts ---------- */
+      .anim-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+      }
+      .anim {
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .anim h3 {
+        font-size: 17px;
+      }
+      .anim .stage {
+        height: 140px;
+        background: var(--sway-dark);
+        border: 1px solid var(--divider);
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .anim .meta {
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+        line-height: 1.5;
+      }
+      .anim .meta strong {
+        color: var(--sway-lightGrey);
+      }
+
+      /* Anim 1 — resolve-and-collapse */
+      .demo-ticket {
+        width: 260px;
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 10px;
+        padding: 10px 12px;
+        display: grid;
+        grid-template-columns: 4px 1fr auto;
+        gap: 10px;
+        align-items: center;
+        animation: resolve 3.6s ease-in-out infinite;
+      }
+      .demo-ticket .sev {
+        width: 4px;
+        align-self: stretch;
+        background: var(--warning);
+        border-radius: 3px;
+        animation: sevShift 3.6s ease-in-out infinite;
+      }
+      .demo-ticket .lbl {
+        font-size: 12px;
+        color: var(--sway-lightGrey);
+        font-weight: 700;
+      }
+      .demo-ticket .chk {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 1.5px solid var(--sway-darkGrey);
+        animation: tick 3.6s ease-in-out infinite;
+      }
+      @keyframes resolve {
+        0%,
+        40% {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        55% {
+          transform: translateX(-16px);
+          opacity: 1;
+        }
+        70%,
+        100% {
+          transform: translateX(40px);
+          opacity: 0;
+        }
+      }
+      @keyframes sevShift {
+        0%,
+        40% {
+          background: var(--warning);
+        }
+        55%,
+        100% {
+          background: var(--success);
+        }
+      }
+      @keyframes tick {
+        0%,
+        45% {
+          background: transparent;
+          border-color: var(--sway-darkGrey);
+        }
+        55%,
+        100% {
+          background: var(--success);
+          border-color: var(--success);
+        }
+      }
+
+      /* Anim 2 — bloom caught-up */
+      .bloom-stage {
+        position: relative;
+      }
+      .bloom {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 50% 50%,
+          rgba(24, 205, 186, 0.9) 0%,
+          rgba(24, 205, 186, 0.4) 40%,
+          rgba(24, 205, 186, 0) 70%
+        );
+        position: relative;
+        animation: bloom 4s ease-out infinite;
+      }
+      .bloom::after {
+        content: '';
+        position: absolute;
+        inset: -30px;
+        border-radius: 50%;
+        border: 1px solid rgba(24, 205, 186, 0.3);
+        animation: ring 4s ease-out infinite;
+      }
+      .bloom::before {
+        content: '';
+        position: absolute;
+        inset: -60px;
+        border-radius: 50%;
+        border: 1px solid rgba(24, 205, 186, 0.15);
+        animation: ring 4s ease-out infinite;
+        animation-delay: 0.4s;
+      }
+      @keyframes bloom {
+        0% {
+          transform: scale(0.6);
+          opacity: 0;
+        }
+        25%,
+        70% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1.05);
+          opacity: 0;
+        }
+      }
+      @keyframes ring {
+        0% {
+          transform: scale(0.5);
+          opacity: 0;
+        }
+        30% {
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(1.8);
+          opacity: 0;
+        }
+      }
+
+      /* Anim 3 — triage keyboard pulse */
+      .kbd-stage {
+        gap: 6px;
+        display: flex;
+      }
+      .kbd-stage .kk {
+        padding: 6px 10px;
+        border-radius: 6px;
+        background: var(--chip-pill);
+        border: 1px solid var(--chip-dot-inactive);
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        font-variant-numeric: tabular-nums;
+        animation: kpress 2.4s ease-in-out infinite;
+      }
+      .kbd-stage .kk:nth-child(2) {
+        animation-delay: 0.3s;
+      }
+      .kbd-stage .kk:nth-child(3) {
+        animation-delay: 0.6s;
+      }
+      .kbd-stage .kk:nth-child(4) {
+        animation-delay: 0.9s;
+      }
+      @keyframes kpress {
+        0%,
+        60%,
+        100% {
+          transform: translateY(0);
+          background: var(--chip-pill);
+          color: var(--sway-darkGrey);
+        }
+        70% {
+          transform: translateY(2px);
+          background: var(--sway-bright);
+          color: #04110c;
+          border-color: var(--sway-bright);
+        }
+      }
+
+      /* Anim 4 — severity re-sort (FLIP) */
+      .sort-stage {
+        flex-direction: column;
+        gap: 6px;
+        padding: 12px;
+        justify-content: flex-start;
+        align-items: stretch;
+      }
+      .sort-row {
+        height: 22px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+        gap: 6px;
+        font-size: 10px;
+        color: var(--sway-lightGrey);
+      }
+      .sort-row.hi {
+        background: var(--tint-error);
+        border: 1px solid var(--tint-error-border);
+        animation: jumpUp 3s ease-in-out infinite;
+      }
+      .sort-row.md {
+        background: var(--tint-info);
+        border: 1px solid var(--tint-info-border);
+      }
+      .sort-row.lo {
+        background: var(--tint-neutral);
+        border: 1px solid var(--divider);
+      }
+      @keyframes jumpUp {
+        0%,
+        40% {
+          transform: translateY(0);
+        }
+        60% {
+          transform: translateY(-52px);
+        }
+        100% {
+          transform: translateY(-52px);
+        }
+      }
+
+      /* ---------- Tables ---------- */
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+      }
+      table.inv {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      table.inv th {
+        text-align: left;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--sway-darkGrey);
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--divider);
+        font-weight: 700;
+      }
+      table.inv td {
+        padding: 14px 12px;
+        border-bottom: 1px solid var(--divider);
+        color: var(--sway-lightGrey);
+        vertical-align: top;
+      }
+      table.inv td .tag {
+        font-size: 11px;
+        color: var(--sway-darkGrey);
+        display: block;
+        margin-top: 3px;
+      }
+
+      /* ---------- Rationale ---------- */
+      .rationale {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+      }
+      .rationale .r {
+        background: var(--card);
+        border: 1px solid var(--divider);
+        border-radius: 16px;
+        padding: 22px;
+      }
+      .rationale .r .n {
+        color: var(--sway-bright);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        margin-bottom: 8px;
+      }
+      .rationale .r h3 {
+        font-size: 17px;
+        margin-bottom: 8px;
+      }
+      .rationale .r p {
+        font-size: 14px;
+        line-height: 1.55;
+      }
+
+      .footnote {
+        margin-top: 56px;
+        padding-top: 24px;
+        border-top: 1px solid var(--divider);
+        font-size: 12px;
+        color: var(--sway-darkGrey);
+        line-height: 1.7;
+      }
+      .footnote strong {
+        color: var(--sway-lightGrey);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <!-- ============================================================== -->
+      <!-- HERO                                                             -->
+      <!-- ============================================================== -->
+      <section class="hero" aria-labelledby="hero-title">
+        <div>
+          <span class="label">bwell · Admin Overhaul · Prototype 01</span>
+          <h1 id="hero-title">Mission Control.</h1>
+          <p class="angle">
+            <strong>Ops-queue first.</strong> Admin lands on <em>what needs them</em>, not
+            <em>how the platform is doing</em>. The home screen is a prioritised action
+            list; every other metric sits politely below it. Quiet like a calm SRE console,
+            not loud like a PagerDuty siren.
+          </p>
+          <div class="meta">
+            <span class="pill">Dark-only · Lato</span>
+            <span class="pill">375px mobile canvas</span>
+            <span class="pill">Role: Admin (non-clinical)</span>
+            <span class="pill">Backed by <code>GET /api/admin/overview</code></span>
+          </div>
+        </div>
+
+        <aside class="queue-preview" aria-label="Queue preview">
+          <div class="preview-head">
+            <span><span class="dot"></span>Queue · 6 open</span>
+            <span>Updated 12s ago</span>
+          </div>
+          <div class="ticket">
+            <span class="severity sev-high"></span>
+            <div class="title-row">
+              <span class="t1">3 therapists awaiting verification &gt; 7d</span>
+              <span class="t2">Oldest · Dr A. Mehta · 9d · CBT tier</span>
+            </div>
+            <span class="age hot">9d</span>
+          </div>
+          <div class="ticket">
+            <span class="severity sev-med"></span>
+            <div class="title-row">
+              <span class="t1">12 stalled attempts</span>
+              <span class="t2">Unchanged for 7+ days · 4 programmes</span>
+            </div>
+            <span class="age">7d+</span>
+          </div>
+          <div class="ticket">
+            <span class="severity sev-med"></span>
+            <div class="title-row">
+              <span class="t1">2 orphaned assignments</span>
+              <span class="t2">Assigned to a therapist since unverified</span>
+            </div>
+            <span class="age">—</span>
+          </div>
+        </aside>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- 2 · FLOW MAP                                                     -->
+      <!-- ============================================================== -->
+      <section class="deck-section" aria-labelledby="flow-title">
+        <header>
+          <div class="title-stack">
+            <span class="section-idx">02 · FLOW MAP</span>
+            <h2 id="flow-title">A day as the bwell admin</h2>
+            <p>
+              Five mobile panels (375px) narrate the core loop: arrive → triage → resolve →
+              verify → empty. Numbered pins highlight the behavioural details.
+            </p>
+          </div>
+        </header>
+
+        <div class="panel-grid">
+          <!-- PANEL 01 · Arrival -->
+          <div class="panel">
+            <article class="phone" aria-label="Panel 1 — Arrival">
+              <div class="status-bar">
+                <span class="clock">09:41</span>
+                <span class="glyphs">5G · 100%</span>
+              </div>
+              <div class="app">
+                <div class="topbar">
+                  <span class="greet">Tuesday · 23 Apr</span>
+                  <span class="avatar">MB</span>
+                </div>
+
+                <div class="h-title">Mission Control</div>
+                <div class="h-sub"><strong>6</strong> items need you · 2 high priority</div>
+
+                <div class="queue-header">
+                  <span class="lhs">
+                    <span class="pulse warn"></span>
+                    <span class="lbl">Action queue</span>
+                  </span>
+                  <span class="counter">6 · sorted by age</span>
+                </div>
+
+                <div class="tickets">
+                  <div class="t hi">
+                    <span class="sev"></span>
+                    <span class="icon">⚠</span>
+                    <div class="body">
+                      <div class="head">3 therapists awaiting verification</div>
+                      <div class="sub">Oldest: 9d · CBT tier</div>
+                    </div>
+                    <div class="age"><span class="hot">9d</span></div>
+                  </div>
+                  <div class="t md">
+                    <span class="sev"></span>
+                    <span class="icon">◔</span>
+                    <div class="body">
+                      <div class="head">12 stalled attempts</div>
+                      <div class="sub">7+ days silent · 4 programmes</div>
+                    </div>
+                    <div class="age">7d+</div>
+                  </div>
+                  <div class="t md">
+                    <span class="sev"></span>
+                    <span class="icon">⛓</span>
+                    <div class="body">
+                      <div class="head">2 orphaned assignments</div>
+                      <div class="sub">Therapist unverified after assign</div>
+                    </div>
+                    <div class="age">—</div>
+                  </div>
+                  <div class="t lo">
+                    <span class="sev"></span>
+                    <span class="icon">●</span>
+                    <div class="body">
+                      <div class="head">2 verified therapists · 0 patients</div>
+                      <div class="sub">Possibly stranded</div>
+                    </div>
+                    <div class="age">—</div>
+                  </div>
+                </div>
+
+                <div class="kpi-row" aria-label="Secondary metrics">
+                  <div class="kpi"><div class="n">30</div><div class="l">Patients</div></div>
+                  <div class="kpi"><div class="n">21</div><div class="l">Therapists</div></div>
+                  <div class="kpi"><div class="n">+4</div><div class="l">New 7d</div></div>
+                  <div class="kpi"><div class="n">18</div><div class="l">Active 30d</div></div>
+                </div>
+
+                <div class="minor-row">
+                  <span class="lhs">Outcomes · last 90d</span>
+                  <span class="cta">Open →</span>
+                </div>
+              </div>
+            </article>
+
+            <!-- Pins anchored to this panel -->
+            <div class="pin-inline" style="top: 168px; left: -36px">1</div>
+            <div class="pin-inline" style="top: 252px; left: -36px">2</div>
+            <div class="pin-inline" style="top: 548px; left: -36px">3</div>
+
+            <p class="caption">
+              <strong>Panel 01 · Arrival.</strong> The queue is the hero. KPIs live below
+              it, deliberately compressed. No chart above the fold.
+            </p>
+          </div>
+
+          <!-- PANEL 02 · Triage -->
+          <div class="panel">
+            <article class="phone" aria-label="Panel 2 — Triage">
+              <div class="status-bar">
+                <span class="clock">09:41</span>
+                <span class="glyphs">5G · 100%</span>
+              </div>
+              <div class="app">
+                <div class="topbar">
+                  <span class="greet">Item 1 of 6</span>
+                  <span class="avatar">MB</span>
+                </div>
+                <div class="h-title">Verify therapists</div>
+                <div class="h-sub"><strong>3</strong> awaiting verification · oldest 9d</div>
+
+                <div
+                  class="t hi"
+                  style="flex-direction: column; align-items: stretch; padding: 14px; display: flex"
+                >
+                  <div style="display: flex; justify-content: space-between; align-items: center">
+                    <div style="font-weight: 900; font-size: 16px; color: var(--sway-lightGrey)">
+                      Dr Aneesha Mehta
+                    </div>
+                    <span class="badge">9 DAYS</span>
+                  </div>
+                  <div style="font-size: 12px; color: var(--sway-darkGrey); margin-top: 4px">
+                    aneesha.mehta@bwell.test · registered 14 Apr
+                  </div>
+                  <div style="display: flex; gap: 6px; margin-top: 12px">
+                    <button
+                      class="btn-outline"
+                      style="flex: 1; background: var(--sway-bright); color: #04110c; border: none"
+                    >
+                      Verify · CBT
+                    </button>
+                    <button class="btn-outline" style="flex: 1">Verify · PWP</button>
+                  </div>
+                  <div style="display: flex; gap: 6px; margin-top: 6px">
+                    <button
+                      class="btn-outline"
+                      style="flex: 1; border-color: var(--divider); color: var(--sway-darkGrey)"
+                    >
+                      Skip for now
+                    </button>
+                    <button
+                      class="btn-outline"
+                      style="flex: 1; border-color: var(--tint-error-border); color: var(--error)"
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  style="
+                    margin-top: 10px;
+                    font-size: 11px;
+                    color: var(--sway-darkGrey);
+                    letter-spacing: 0.1em;
+                    text-transform: uppercase;
+                    font-weight: 700;
+                  "
+                >
+                  Next in queue
+                </div>
+                <div class="tickets" style="margin-top: 8px">
+                  <div class="t md">
+                    <span class="sev"></span>
+                    <span class="icon">🧑</span>
+                    <div class="body">
+                      <div class="head">Dr Omari Nwosu</div>
+                      <div class="sub">5d waiting · no tier selected</div>
+                    </div>
+                    <div class="age">5d</div>
+                  </div>
+                  <div class="t lo">
+                    <span class="sev"></span>
+                    <span class="icon">🧑</span>
+                    <div class="body">
+                      <div class="head">Dr Priya Shah</div>
+                      <div class="sub">2d waiting · requested PWP</div>
+                    </div>
+                    <div class="age">2d</div>
+                  </div>
+                </div>
+
+                <div class="minor-row" style="margin-top: 16px">
+                  <span class="lhs">
+                    Keyboard: <span class="kbd">C</span> CBT · <span class="kbd">P</span> PWP ·
+                    <span class="kbd">J</span>/<span class="kbd">K</span>
+                  </span>
+                </div>
+              </div>
+            </article>
+
+            <div class="pin-inline" style="top: 200px; left: -36px">4</div>
+            <div class="pin-inline" style="top: 452px; left: -36px">5</div>
+
+            <p class="caption">
+              <strong>Panel 02 · Triage.</strong> Tap a queue item — it expands inline into
+              a focused action view. Two-tap verify; never a dead click-through to another
+              screen.
+            </p>
+          </div>
+
+          <!-- PANEL 03 · Resolve -->
+          <div class="panel">
+            <article class="phone" aria-label="Panel 3 — Resolve">
+              <div class="status-bar">
+                <span class="clock">09:43</span>
+                <span class="glyphs">5G · 100%</span>
+              </div>
+              <div class="app">
+                <div class="topbar">
+                  <span class="greet">Item 1 · just resolved</span>
+                  <span class="avatar">MB</span>
+                </div>
+                <div class="h-title">Mission Control</div>
+                <div class="h-sub"><strong>5</strong> items need you · 1 high priority</div>
+
+                <div class="queue-header">
+                  <span class="lhs">
+                    <span class="pulse"></span>
+                    <span class="lbl">Action queue</span>
+                  </span>
+                  <span class="counter">5 · sorted by age</span>
+                </div>
+
+                <div
+                  style="
+                    background: var(--tint-teal);
+                    border: 1px solid var(--tint-teal-border);
+                    border-radius: 12px;
+                    padding: 10px 12px;
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 12px;
+                    color: var(--sway-bright);
+                    font-weight: 700;
+                    margin-bottom: 8px;
+                  "
+                >
+                  <span>✓ Verified · Dr Mehta · CBT</span>
+                  <span style="color: var(--sway-darkGrey); font-weight: 400">Undo · 8s</span>
+                </div>
+
+                <div class="tickets">
+                  <div class="t hi">
+                    <span class="sev"></span>
+                    <span class="icon">⚠</span>
+                    <div class="body">
+                      <div class="head">2 therapists awaiting verification</div>
+                      <div class="sub">Oldest: 5d</div>
+                    </div>
+                    <div class="age">5d</div>
+                  </div>
+                  <div class="t md">
+                    <span class="sev"></span>
+                    <span class="icon">◔</span>
+                    <div class="body">
+                      <div class="head">12 stalled attempts</div>
+                      <div class="sub">7+ days silent · 4 programmes</div>
+                    </div>
+                    <div class="age">7d+</div>
+                  </div>
+                  <div class="t md">
+                    <span class="sev"></span>
+                    <span class="icon">⛓</span>
+                    <div class="body">
+                      <div class="head">2 orphaned assignments</div>
+                      <div class="sub">Therapist unverified after assign</div>
+                    </div>
+                    <div class="age">—</div>
+                  </div>
+                  <div class="t lo">
+                    <span class="sev"></span>
+                    <span class="icon">●</span>
+                    <div class="body">
+                      <div class="head">2 verified therapists · 0 patients</div>
+                      <div class="sub">Possibly stranded</div>
+                    </div>
+                    <div class="age">—</div>
+                  </div>
+                </div>
+
+                <div class="kpi-row">
+                  <div class="kpi"><div class="n">30</div><div class="l">Patients</div></div>
+                  <div class="kpi"><div class="n">22</div><div class="l">Therapists</div></div>
+                  <div class="kpi"><div class="n">+4</div><div class="l">New 7d</div></div>
+                  <div class="kpi"><div class="n">18</div><div class="l">Active 30d</div></div>
+                </div>
+              </div>
+            </article>
+
+            <div class="pin-inline" style="top: 232px; left: -36px">6</div>
+            <div class="pin-inline" style="top: 288px; left: -36px">7</div>
+
+            <p class="caption">
+              <strong>Panel 03 · Resolve.</strong> Queue drops from 6 → 5. A transient
+              success slab with <em>Undo</em> buys back accidental clicks; the therapist
+              count on the KPI row auto-increments.
+            </p>
+          </div>
+
+          <!-- PANEL 04 · Drill -->
+          <div class="panel">
+            <article class="phone" aria-label="Panel 4 — Drill into stalled">
+              <div class="status-bar">
+                <span class="clock">09:46</span>
+                <span class="glyphs">5G · 100%</span>
+              </div>
+              <div class="app">
+                <div class="topbar">
+                  <span class="greet">← Queue</span>
+                  <span class="avatar">MB</span>
+                </div>
+
+                <div class="h-title">Stalled attempts</div>
+                <div class="h-sub"><strong>12</strong> attempts · no activity for 7+ days</div>
+
+                <div
+                  style="
+                    display: flex;
+                    gap: 6px;
+                    flex-wrap: wrap;
+                    margin-bottom: 12px;
+                  "
+                >
+                  <span
+                    style="
+                      padding: 6px 10px;
+                      background: var(--chip-pill);
+                      border: 1px solid var(--sway-bright);
+                      border-radius: 999px;
+                      font-size: 11px;
+                      color: var(--sway-bright);
+                    "
+                    >All (12)</span
+                  >
+                  <span
+                    style="
+                      padding: 6px 10px;
+                      background: var(--chip-pill);
+                      border: 1px solid var(--chip-dot-inactive);
+                      border-radius: 999px;
+                      font-size: 11px;
+                      color: var(--sway-darkGrey);
+                    "
+                    >Depression (6)</span
+                  >
+                  <span
+                    style="
+                      padding: 6px 10px;
+                      background: var(--chip-pill);
+                      border: 1px solid var(--chip-dot-inactive);
+                      border-radius: 999px;
+                      font-size: 11px;
+                      color: var(--sway-darkGrey);
+                    "
+                    >GAD (4)</span
+                  >
+                  <span
+                    style="
+                      padding: 6px 10px;
+                      background: var(--chip-pill);
+                      border: 1px solid var(--chip-dot-inactive);
+                      border-radius: 999px;
+                      font-size: 11px;
+                      color: var(--sway-darkGrey);
+                    "
+                    >Sleep (2)</span
+                  >
+                </div>
+
+                <div class="tickets">
+                  <div class="t lo">
+                    <span class="sev"></span>
+                    <span class="icon">📝</span>
+                    <div class="body">
+                      <div class="head">Thought record · id 4f…</div>
+                      <div class="sub">Patient #00142 · Depression · opened 13 Apr</div>
+                    </div>
+                    <div class="age">10d</div>
+                  </div>
+                  <div class="t lo">
+                    <span class="sev"></span>
+                    <span class="icon">📓</span>
+                    <div class="body">
+                      <div class="head">Activity diary · id 71…</div>
+                      <div class="sub">Patient #00087 · CBT-guided · opened 14 Apr</div>
+                    </div>
+                    <div class="age">9d</div>
+                  </div>
+                  <div class="t lo">
+                    <span class="sev"></span>
+                    <span class="icon">📊</span>
+                    <div class="body">
+                      <div class="head">PHQ-9 · id 82…</div>
+                      <div class="sub">Patient #00121 · self-help · opened 15 Apr</div>
+                    </div>
+                    <div class="age">8d</div>
+                  </div>
+                </div>
+
+                <div class="minor-row" style="margin-top: 14px">
+                  <span class="lhs"><strong>Note · non-clinical view.</strong> Content hidden.</span>
+                  <span class="cta">Nudge all →</span>
+                </div>
+              </div>
+            </article>
+
+            <div class="pin-inline" style="top: 260px; left: -36px">8</div>
+            <div class="pin-inline" style="top: 592px; left: -36px">9</div>
+
+            <p class="caption">
+              <strong>Panel 04 · Drill.</strong> Tapping a stalled-attempt queue item
+              opens a filterable non-clinical roster. Admin never sees answers — only
+              identifiers, programme, care tier, age.
+            </p>
+          </div>
+
+          <!-- PANEL 05 · All caught up -->
+          <div class="panel">
+            <article class="phone" aria-label="Panel 5 — All caught up">
+              <div class="status-bar">
+                <span class="clock">17:12</span>
+                <span class="glyphs">5G · 88%</span>
+              </div>
+              <div class="app">
+                <div class="topbar">
+                  <span class="greet">Tuesday · 23 Apr</span>
+                  <span class="avatar">MB</span>
+                </div>
+                <div class="h-title">Mission Control</div>
+                <div class="h-sub">All clear · nothing needs you right now.</div>
+
+                <div
+                  style="
+                    margin-top: 40px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 16px;
+                    text-align: center;
+                  "
+                >
+                  <div class="glyph-caught">✓</div>
+                  <div
+                    style="
+                      font-size: 22px;
+                      font-weight: 900;
+                      color: var(--sway-lightGrey);
+                      letter-spacing: -0.01em;
+                    "
+                  >
+                    All caught up.
+                  </div>
+                  <div style="font-size: 13px; color: var(--sway-darkGrey); max-width: 240px">
+                    Queue is empty. Next rollup in 47 min. Last verified 09:43.
+                  </div>
+                </div>
+
+                <div
+                  style="
+                    margin-top: 48px;
+                    padding: 14px 16px;
+                    background: rgba(255, 255, 255, 0.015);
+                    border: 1px solid var(--divider);
+                    border-radius: 14px;
+                  "
+                >
+                  <div
+                    style="
+                      font-size: 11px;
+                      color: var(--sway-darkGrey);
+                      letter-spacing: 0.18em;
+                      text-transform: uppercase;
+                      font-weight: 700;
+                      margin-bottom: 10px;
+                    "
+                  >
+                    If you want to peek
+                  </div>
+                  <div class="minor-row" style="margin: 0 0 6px 0">
+                    <span class="lhs">Platform health</span>
+                    <span class="cta">Open →</span>
+                  </div>
+                  <div class="minor-row" style="margin: 0 0 6px 0">
+                    <span class="lhs">Outcomes · 90d</span>
+                    <span class="cta">Open →</span>
+                  </div>
+                  <div class="minor-row" style="margin: 0">
+                    <span class="lhs">Audit log</span>
+                    <span class="cta">Open →</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <div class="pin-inline" style="top: 260px; left: -36px">10</div>
+            <div class="pin-inline" style="top: 512px; left: -36px">11</div>
+
+            <p class="caption">
+              <strong>Panel 05 · Zero state.</strong> Empty-inbox celebration (Superhuman
+              lineage). Secondary surfaces move into a quiet <em>If you want to peek</em>
+              list — the home does not repopulate itself with make-work.
+            </p>
+          </div>
+        </div>
+
+        <!-- Numbered pin legend, below the grid -->
+        <div
+          style="
+            margin-top: 40px;
+            padding: 24px;
+            background: var(--card);
+            border: 1px solid var(--divider);
+            border-radius: 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px 28px;
+          "
+        >
+          <div class="pin" style="position: static">
+            <span class="num">1</span>
+            <span class="text"><strong>Headline is queue-shaped.</strong> "N items need you" — not "N active users". Admin's identity is the thing needing them.</span>
+          </div>
+          <div class="pin" style="position: static">
+            <span class="num">2</span>
+            <span class="text"><strong>Severity rail.</strong> 4px left edge: red/amber/grey. Colour-blind-safe pairing (colour + icon + copy).</span>
+          </div>
+          <div class="pin" style="position: static">
+            <span class="num">3</span>
+            <span class="text"><strong>KPIs demoted.</strong> Total counts live in a compressed row below — present, but not the entrée.</span>
+          </div>
+          <div class="pin" style="position: static">
+            <span class="num">4</span>
+            <span class="text"><strong>Two-tap verify.</strong> Tier picker inline (<code>C</code> or <code>P</code>). No modal round-trip.</span>
+          </div>
+          <div class="pin" style="position: static">
+            <span class="num">5</span>
+            <span class="text"><strong>Keyboard-first hinting.</strong> J/K to move, C/P to verify. Web admin feels like a terminal.</span>
+          </div>
+          <div class="pin" style="position: static">
+            <span class="num">6</span>
+            <span class="text"><strong>Toast-slab with Undo.</strong> 8-second window to reverse destructive or irreversible verifies.</span>
+          </div>
+          <div class="pin" style="position: static">
+            <span class="num">7</span>
+            <span class="text"><strong>Pulse dot.</strong> Teal = healthy rollup; amber = queue aging; never red for merely "data exists".</span>
+          </div>
+          <div class="pin" style="position: static">
+            <span class="num">8</span>
+            <span class="text"><strong>Programme filter chips.</strong> Backed by <code>overview.work.byType</code> — zero FE sorting.</span>
+          </div>
+          <div class="pin" style="position: static">
+            <span class="num">9</span>
+            <span class="text"><strong>"Non-clinical view" footer.</strong> Reminds admin (and a future auditor) the content body is never displayed.</span>
+          </div>
+          <div class="pin" style="position: static">
+            <span class="num">10</span>
+            <span class="text"><strong>Bloom glyph.</strong> Radial teal gradient + breath. Acknowledges clean state instead of inventing work.</span>
+          </div>
+          <div class="pin" style="position: static">
+            <span class="num">11</span>
+            <span class="text"><strong>Peek-list.</strong> The ways in to charts/audit/health — downranked, not hidden.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- 3 · STATE GALLERY                                                -->
+      <!-- ============================================================== -->
+      <section class="deck-section" aria-labelledby="states-title">
+        <header>
+          <div class="title-stack">
+            <span class="section-idx">03 · STATE GALLERY</span>
+            <h2 id="states-title">Every queue is a story about its own size</h2>
+            <p>
+              Queue empty, queue overflowing, queue loading, queue errored, queue
+              almost-done. Each state has its own tone of voice.
+            </p>
+          </div>
+        </header>
+
+        <div class="state-grid">
+          <!-- Empty / caught up -->
+          <div class="state caught" aria-label="Caught-up state">
+            <div class="mini">
+              <div class="glyph-caught" style="width: 56px; height: 56px; font-size: 24px">✓</div>
+              <div class="mini-title">All caught up.</div>
+              <div class="mini-sub" style="max-width: 180px">
+                Queue empty. Last verified 09:43. Next rollup in 47 min.
+              </div>
+            </div>
+            <div class="label">
+              <span class="name">EMPTY · all caught up</span>
+              <span class="tag">CELEBRATED</span>
+            </div>
+          </div>
+
+          <!-- One item left -->
+          <div class="state" aria-label="One item remaining">
+            <div class="mini">
+              <div class="mini-title">Almost there.</div>
+              <div class="mini-sub">1 item left in queue.</div>
+              <div class="mini-ticket">
+                <span class="dot hi"></span>
+                <span class="mt"
+                  ><strong>Verify Dr Priya Shah</strong><span>2d · PWP tier</span></span
+                >
+              </div>
+              <div style="margin-top: auto; font-size: 11px; color: var(--sway-darkGrey)">
+                Inline progress bar under ticket fills from <strong>5/6 resolved</strong>.
+              </div>
+              <div
+                style="
+                  margin-top: 8px;
+                  height: 4px;
+                  background: var(--chip-pill);
+                  border-radius: 3px;
+                  overflow: hidden;
+                "
+              >
+                <div
+                  style="
+                    width: 83%;
+                    height: 100%;
+                    background: var(--sway-bright);
+                  "
+                ></div>
+              </div>
+            </div>
+            <div class="label">
+              <span class="name">PENULTIMATE · 1 to go</span>
+              <span class="tag">MOMENTUM</span>
+            </div>
+          </div>
+
+          <!-- Overflowing -->
+          <div class="state" aria-label="Queue overflowing">
+            <div class="mini">
+              <div class="mini-title">47 items in queue</div>
+              <div class="mini-sub">Oldest is 21 days — this is unusual.</div>
+              <div class="overflow-banner">
+                <span>⚠ 18 items &gt; 7 days · aging</span>
+                <span style="color: var(--sway-lightGrey); font-weight: 700">Escalate</span>
+              </div>
+              <div class="mini-ticket">
+                <span class="dot hi"></span>
+                <span class="mt"
+                  ><strong>Therapists awaiting verify</strong><span>14 items · oldest 21d</span></span
+                >
+              </div>
+              <div class="mini-ticket">
+                <span class="dot md"></span>
+                <span class="mt"
+                  ><strong>Stalled attempts</strong><span>26 items</span></span
+                >
+              </div>
+              <div class="mini-ticket">
+                <span class="dot lo"></span>
+                <span class="mt"
+                  ><strong>Orphaned assignments</strong><span>7 items</span></span
+                >
+              </div>
+              <div style="margin-top: 8px; font-size: 11px; color: var(--sway-darkGrey)">
+                Items collapse into <strong>grouped rows</strong> when &gt; 20 total. One
+                tap opens the drill roster.
+              </div>
+            </div>
+            <div class="label">
+              <span class="name">OVERFLOW · 20+ items</span>
+              <span class="tag">GROUPED</span>
+            </div>
+          </div>
+
+          <!-- Loading -->
+          <div class="state" aria-label="Loading skeleton">
+            <div class="mini">
+              <div class="skel" style="width: 50%; margin-bottom: 14px"></div>
+              <div class="skel line" style="width: 72%; margin-bottom: 24px"></div>
+              <div class="skel wide" style="margin-bottom: 8px"></div>
+              <div class="skel wide" style="margin-bottom: 8px"></div>
+              <div class="skel wide" style="margin-bottom: 8px; opacity: 0.55"></div>
+              <div class="skel wide" style="opacity: 0.3"></div>
+              <div style="margin-top: auto; font-size: 10px; color: var(--sway-darkGrey)">
+                Skeleton mirrors the queue's row height exactly — no layout jump on arrival.
+              </div>
+            </div>
+            <div class="label">
+              <span class="name">LOADING · shimmer</span>
+              <span class="tag">≤ 600ms</span>
+            </div>
+          </div>
+
+          <!-- Error -->
+          <div class="state error" aria-label="Error state">
+            <div class="mini">
+              <div class="err-icon">⚠</div>
+              <div class="mini-title">Couldn't load overview</div>
+              <div class="mini-sub" style="max-width: 200px">
+                <code>GET /api/admin/overview</code> failed. Your session is still valid.
+              </div>
+              <button class="btn-outline">Retry</button>
+              <div
+                style="
+                  margin-top: 6px;
+                  font-size: 10px;
+                  color: var(--sway-darkGrey);
+                  letter-spacing: 0.1em;
+                  text-transform: uppercase;
+                  font-weight: 700;
+                "
+              >
+                TRACE · req 4f21a · 503
+              </div>
+            </div>
+            <div class="label">
+              <span class="name">ERROR · network</span>
+              <span class="tag">RETRYABLE</span>
+            </div>
+          </div>
+
+          <!-- Dev / reduced privacy mode -->
+          <div class="state" aria-label="Reduced privacy mode">
+            <div class="mini">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  margin-bottom: 8px;
+                "
+              >
+                <span class="badge warn">DEV · REDUCED</span>
+                <span style="font-size: 10px; color: var(--sway-darkGrey)"
+                  >k-anonymity threshold lowered</span
+                >
+              </div>
+              <div class="mini-title">3 items need you</div>
+              <div class="mini-sub">Queue is live on staging data.</div>
+              <div class="mini-ticket">
+                <span class="dot md"></span>
+                <span class="mt"
+                  ><strong>1 stalled attempt</strong
+                  ><span>Would normally be suppressed · n&lt;5</span></span
+                >
+              </div>
+              <div style="margin-top: auto; font-size: 10px; color: var(--sway-darkGrey)">
+                Visible <strong>privacyMode: "reduced"</strong> marker so dev work can't
+                leak into production screenshots.
+              </div>
+            </div>
+            <div class="label">
+              <span class="name">DEV · reduced privacy</span>
+              <span class="tag">STAGING</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- 4 · ANIMATION CALLOUTS                                           -->
+      <!-- ============================================================== -->
+      <section class="deck-section" aria-labelledby="anim-title">
+        <header>
+          <div class="title-stack">
+            <span class="section-idx">04 · MOTION</span>
+            <h2 id="anim-title">Four motion moments</h2>
+            <p>
+              Motion here is a <em>confirmation language</em>, not decoration. All
+              animations gated behind <code>prefers-reduced-motion</code>.
+            </p>
+          </div>
+        </header>
+
+        <div class="anim-grid">
+          <!-- A1 · Resolve -->
+          <div class="anim">
+            <h3>1 · Ticket → resolved</h3>
+            <div class="stage">
+              <div class="demo-ticket">
+                <span class="sev"></span>
+                <span class="lbl">3 therapists awaiting verify</span>
+                <span class="chk"></span>
+              </div>
+            </div>
+            <div class="meta">
+              <strong>Trigger:</strong> admin confirms an action. <strong>Motion:</strong>
+              severity rail colour-shifts amber → green, tick fills, row slides right and
+              fades over <strong>320ms ease-out</strong>. Siblings collapse up via FLIP
+              (<strong>200ms ease-in-out</strong>). <strong>Haptic:</strong> light success
+              on iOS.
+            </div>
+          </div>
+
+          <!-- A2 · Bloom -->
+          <div class="anim">
+            <h3>2 · "All caught up" reveal</h3>
+            <div class="stage bloom-stage">
+              <div class="bloom"></div>
+            </div>
+            <div class="meta">
+              <strong>Trigger:</strong> last queue item dismissed (counter reaches 0).
+              <strong>Motion:</strong> teal bloom scales 0.6 → 1.0 over
+              <strong>420ms</strong>, two outward rings fan out at 30% opacity over
+              <strong>800ms</strong>. Reuses existing <code>BloomBurst</code> primitive.
+              <strong>Copy:</strong> typewriter reveal of "All caught up." via
+              <code>TypewriterText</code>.
+            </div>
+          </div>
+
+          <!-- A3 · Keyboard pulse -->
+          <div class="anim">
+            <h3>3 · Keyboard focus</h3>
+            <div class="stage kbd-stage">
+              <span class="kk">J</span>
+              <span class="kk">K</span>
+              <span class="kk">C</span>
+              <span class="kk">P</span>
+            </div>
+            <div class="meta">
+              <strong>Trigger:</strong> admin hovers a queue row on web.
+              <strong>Motion:</strong> relevant key hints pulse to teal for
+              <strong>180ms</strong>, then return. Staggered 300ms between J/K/C/P on first
+              arrival only. Re-surfacing the affordance without a permanent cheat-sheet.
+            </div>
+          </div>
+
+          <!-- A4 · Severity re-sort -->
+          <div class="anim">
+            <h3>4 · Severity re-sort (FLIP)</h3>
+            <div class="stage sort-stage">
+              <div class="sort-row lo">· low 1</div>
+              <div class="sort-row md">· med 1</div>
+              <div class="sort-row hi">· new critical ↑</div>
+              <div class="sort-row lo">· low 2</div>
+            </div>
+            <div class="meta">
+              <strong>Trigger:</strong> a new critical item enters the queue (e.g. a
+              verification ages past 14 days during a session).
+              <strong>Motion:</strong> FLIP animation — the affected row translates up
+              over <strong>260ms ease-in-out</strong>. No flash, no toast; the ranking
+              itself is the notification.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- 5 · COMPONENT BREAKDOWN                                          -->
+      <!-- ============================================================== -->
+      <section class="deck-section" aria-labelledby="comp-title">
+        <header>
+          <div class="title-stack">
+            <span class="section-idx">05 · COMPONENTS</span>
+            <h2 id="comp-title">What we reuse, what we add</h2>
+            <p>
+              The surface is ~85% existing primitives. Only the queue itself needs a new
+              abstraction.
+            </p>
+          </div>
+        </header>
+
+        <div class="two-col">
+          <div>
+            <h3 style="margin-bottom: 12px">Reuses (existing)</h3>
+            <table class="inv">
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Used for</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>ContentContainer</code
+                    ><span class="tag">Layout wrapper</span>
+                  </td>
+                  <td>Mission Control screen frame</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>ThemedText</code
+                    ><span class="tag">title / subtitle / small / smallBold</span>
+                  </td>
+                  <td>Queue headline, ticket body, KPI labels</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>StatusChip</code
+                    ><span class="tag">Severity dot + age pill</span>
+                  </td>
+                  <td>Warning / error / info tints on each ticket</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>TriageBucket</code
+                    ><span class="tag">From TherapistDashboard</span>
+                  </td>
+                  <td>Overflow-grouped rows when queue &gt; 20</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>EmptyState</code
+                    ><span class="tag">icon + message</span>
+                  </td>
+                  <td>"Couldn't load overview" error panel</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>BloomBurst</code
+                    ><span class="tag">Imperative celebratory burst</span>
+                  </td>
+                  <td>Reveal moment on <strong>0 items</strong></td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>TypewriterText</code
+                    ><span class="tag">Animated reveal</span>
+                  </td>
+                  <td>"All caught up." copy</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>ActionMenu</code
+                    ><span class="tag">With destructive confirm</span>
+                  </td>
+                  <td>Reject therapist flow (confirm step)</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>ThemedButton</code><span class="tag">default / outline / error</span>
+                  </td>
+                  <td>Verify · CBT / Verify · PWP / Reject</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div>
+            <h3 style="margin-bottom: 12px">New primitives</h3>
+            <table class="inv">
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Why it earns its keep</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>ActionQueue</code
+                    ><span class="tag">&lt;FlatList&gt; container with severity + age sort</span>
+                  </td>
+                  <td>
+                    The organising atom of the screen. Takes rows derived from
+                    <code>verificationQueue</code>, <code>work.stalledAttempts7d</code>,
+                    <code>work.orphanedAssignments</code>, and
+                    <code>users.therapists.zeroPatients</code>. Sort + sev colour are
+                    applied server-side.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>QueueRow</code><span class="tag">Severity rail + icon + body + age</span>
+                  </td>
+                  <td>
+                    Row primitive: 4px severity bar (colour-blind-safe — always paired
+                    with icon + copy), 36px tinted icon, two-line body, monospace age.
+                    Tappable across its whole surface.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>KpiRow</code><span class="tag">Demoted numeric row</span>
+                  </td>
+                  <td>
+                    A compressed variant of <code>StatStrip</code> — four numbers,
+                    smaller text, below the fold on purpose. Same data shape as today.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>UndoToast</code><span class="tag">8-second slab</span>
+                  </td>
+                  <td>
+                    Local component above the queue after a destructive resolve. Reuses
+                    <code>sonner-native</code> if we extend the existing toast options.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>CaughtUpPanel</code><span class="tag">Zero-state layout</span>
+                  </td>
+                  <td>
+                    Assembly of <code>BloomBurst</code> + <code>TypewriterText</code> +
+                    a "If you want to peek" list routing into outcomes / audit /
+                    health.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>PrivacyModeBadge</code><span class="tag">Dev-only</span>
+                  </td>
+                  <td>
+                    Small amber badge visible only when
+                    <code>privacyMode === 'reduced'</code>. Fulfils §3.5 of the brief.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- 6 · RATIONALE                                                    -->
+      <!-- ============================================================== -->
+      <section class="deck-section" aria-labelledby="rat-title">
+        <header>
+          <div class="title-stack">
+            <span class="section-idx">06 · RATIONALE</span>
+            <h2 id="rat-title">Why this serves the angle</h2>
+            <p>
+              Five reasons this design commits to ops-queue-first instead of hedging
+              toward a KPI grid.
+            </p>
+          </div>
+        </header>
+
+        <div class="rationale">
+          <div class="r">
+            <div class="n">01</div>
+            <h3>Identity = "what needs me"</h3>
+            <p>
+              The headline says <em>"6 items need you"</em>, not <em>"30 patients"</em>.
+              The admin's role is oversight and unblocking, not browsing. The dashboard's
+              first sentence should echo the first question they ask.
+            </p>
+          </div>
+          <div class="r">
+            <div class="n">02</div>
+            <h3>KPIs are a footnote, not a hero</h3>
+            <p>
+              Totals live in a compressed four-cell row <em>below</em> the queue.
+              They're present for context (a glance answers "is the platform roughly
+              healthy?") but never distract from the action list. Anti-pattern avoided:
+              metric soup at the top.
+            </p>
+          </div>
+          <div class="r">
+            <div class="n">03</div>
+            <h3>Calm, not loud</h3>
+            <p>
+              Severity lives on a 4px rail, not a neon banner. Only true
+              verifications-aging past 7 days get red; everything else is amber or grey.
+              PagerDuty energy, Linear tone.
+            </p>
+          </div>
+          <div class="r">
+            <div class="n">04</div>
+            <h3>Empty state = celebration, not refill</h3>
+            <p>
+              When the queue reaches zero we reveal a single bloom + "All caught up.",
+              then downrank secondary surfaces into a quiet "If you want to peek" list.
+              We borrow directly from Superhuman's clean-inbox moment. The screen refuses
+              to invent work.
+            </p>
+          </div>
+          <div class="r">
+            <div class="n">05</div>
+            <h3>Non-clinical by construction</h3>
+            <p>
+              Drill-in roster shows identifiers, programme, care tier, age — never
+              content. A visible "non-clinical view" footer reminds the admin (and any
+              future auditor) of the invariant from §3.8 of the brief.
+            </p>
+          </div>
+          <div class="r" style="background: var(--card-deep); border-style: dashed">
+            <div class="n" style="color: var(--warning)">BE · ASK</div>
+            <h3>What this design asks of the BE</h3>
+            <p>
+              This deck assumes <code>GET /api/admin/overview</code> returns enough
+              already — it does. <strong>But</strong> to drive the queue sort server-side
+              and avoid FE triage logic (see project rule: sort/filter on BE), we'd want
+              either: (a) a new
+              <code>overview.actionQueue: Array&lt;{ type, severity, age, count, deepLink }&gt;</code>
+              pre-sorted field, or (b) an explicit
+              <code>oldestUnverifiedAgeDays</code> so the client doesn't compute aging
+              itself. Neither is blocking; both would tighten the contract.
+            </p>
+          </div>
+        </div>
+
+        <div class="footnote">
+          <strong>Data-contract compliance notes.</strong> All numbers shown are derived
+          from <code>AdminOverviewResponse</code> fields named in §2 of the brief:
+          <code>verificationQueue.count</code>, <code>work.stalledAttempts7d</code>,
+          <code>work.orphanedAssignments</code>,
+          <code>users.therapists.zeroPatients</code>, <code>users.total</code>,
+          <code>users.therapists.total</code>, <code>users.newThisWeek</code>,
+          <code>users.activeLast30d</code>. No <code>OutcomeResult</code> rates are
+          displayed on the home surface, so k-anonymity suppression (§3.3–3.4) is not
+          triggered — rates appear only on the "Outcomes · 90d" drill-in, which lives
+          outside this deck.
+          <br /><br />
+          <strong>Accessibility.</strong> Severity is always encoded with colour + icon
+          + copy. Lato contrast against <code>#0c1527</code> is AAA for body copy and AA
+          for 11–12px pill labels. All decorative motion wraps in
+          <code>@media (prefers-reduced-motion: reduce)</code>.
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
