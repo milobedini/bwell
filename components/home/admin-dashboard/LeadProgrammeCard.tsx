@@ -29,10 +29,12 @@ const INSTRUMENT_DELTA: Record<string, string | undefined> = {
   pdss: undefined
 };
 
-const formatLeadRate = (rate: number | null, suppressed: boolean): string => {
-  if (suppressed) return '—';
-  return `${Math.round((rate ?? 0) * 100)}`;
-};
+const formatLeadRate = (rate: number | null): string => `${Math.round((rate ?? 0) * 100)}`;
+
+const awaitingDataCopy = (reason: 'below_k' | 'below_min_n' | null): string =>
+  reason === 'below_min_n'
+    ? 'Awaiting data · needs 20+ paired assessments'
+    : 'Awaiting data · needs 5+ paired assessments';
 
 type Props = {
   programme: ProgrammeSummary;
@@ -81,27 +83,37 @@ const LeadProgrammeCard = memo(({ programme }: Props) => {
         {programme.title} · {instrumentLabel}
       </ThemedText>
 
-      <View className="mt-3 flex-row items-baseline gap-2">
-        <ThemedText
-          type="title"
-          style={{
-            color: lead.suppressed ? Colors.sway.darkGrey : Colors.sway.bright,
-            fontSize: 56,
-            lineHeight: 60,
-            fontStyle: lead.suppressed ? 'italic' : 'normal'
-          }}
-        >
-          {formatLeadRate(lead.rate, lead.suppressed)}
-        </ThemedText>
-        {!lead.suppressed && (
-          <ThemedText type="subtitle" style={{ color: Colors.sway.bright, lineHeight: 28 }}>
-            %
+      {lead.suppressed ? (
+        <View className="mt-3">
+          <ThemedText type="smallTitle" style={{ color: Colors.sway.lightGrey }}>
+            {awaitingDataCopy(lead.reason)}
           </ThemedText>
-        )}
-      </View>
-      <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginTop: -2 }}>
-        Recovery · n = {lead.n} paired assessments · last 90 days
-      </ThemedText>
+          <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginTop: 2 }}>
+            Currently {lead.n} paired · last 90 days
+          </ThemedText>
+        </View>
+      ) : (
+        <>
+          <View className="mt-3 flex-row items-baseline gap-2">
+            <ThemedText
+              type="title"
+              style={{
+                color: Colors.sway.bright,
+                fontSize: 56,
+                lineHeight: 60
+              }}
+            >
+              {formatLeadRate(lead.rate)}
+            </ThemedText>
+            <ThemedText type="subtitle" style={{ color: Colors.sway.bright, lineHeight: 28 }}>
+              %
+            </ThemedText>
+          </View>
+          <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginTop: -2 }}>
+            Recovery · n = {lead.n} paired assessments · last 90 days
+          </ThemedText>
+        </>
+      )}
 
       <View className="mt-4">
         <OutcomeTriplet
