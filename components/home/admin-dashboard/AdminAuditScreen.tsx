@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, View } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { FlatList, type ListRenderItem, Pressable, RefreshControl, View } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { useAdminAudit, type UseAdminAuditFilters } from '@/hooks/useAdminAudit';
 import useToggle from '@/hooks/useToggle';
@@ -13,6 +13,41 @@ import { ThemedText } from '../../ThemedText';
 
 import AuditFilterDrawer, { type ActorOption, countActiveAuditFilters } from './AuditFilterDrawer';
 import AuditRow from './AuditRow';
+
+const BASE_ROW_STYLE = {
+  backgroundColor: Colors.chip.darkCard,
+  borderLeftWidth: 1,
+  borderRightWidth: 1,
+  borderColor: Colors.divider.medium
+} as const;
+
+const FIRST_ROW_STYLE = {
+  ...BASE_ROW_STYLE,
+  borderTopWidth: 1,
+  borderTopLeftRadius: 16,
+  borderTopRightRadius: 16
+} as const;
+
+const LAST_ROW_STYLE = {
+  ...BASE_ROW_STYLE,
+  borderBottomWidth: 1,
+  borderBottomLeftRadius: 16,
+  borderBottomRightRadius: 16
+} as const;
+
+const FIRST_AND_LAST_ROW_STYLE = {
+  ...FIRST_ROW_STYLE,
+  borderBottomWidth: 1,
+  borderBottomLeftRadius: 16,
+  borderBottomRightRadius: 16
+} as const;
+
+const pickRowStyle = (isFirst: boolean, isLast: boolean) => {
+  if (isFirst && isLast) return FIRST_AND_LAST_ROW_STYLE;
+  if (isFirst) return FIRST_ROW_STYLE;
+  if (isLast) return LAST_ROW_STYLE;
+  return BASE_ROW_STYLE;
+};
 
 const AdminAuditScreen = () => {
   const [filters, setFilters] = useState<UseAdminAuditFilters>({});
@@ -38,6 +73,22 @@ const AdminAuditScreen = () => {
   );
 
   const activeFilterCount = countActiveAuditFilters(filters);
+
+  const renderItem = useCallback<ListRenderItem<AdminAuditEvent>>(
+    ({ item, index }) => {
+      const isLast = index === events.length - 1;
+      return (
+        <View className="mx-4 overflow-hidden" style={pickRowStyle(index === 0, isLast)}>
+          <AuditRow event={item} isLast={isLast} />
+        </View>
+      );
+    },
+    [events.length]
+  );
+
+  const handleEndReached = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) void fetchNextPage();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (isLoading) {
     return (
@@ -101,31 +152,11 @@ const AdminAuditScreen = () => {
       <FlatList
         data={events}
         keyExtractor={(event) => event._id}
-        renderItem={({ item, index }) => (
-          <View
-            className="mx-4 overflow-hidden"
-            style={{
-              backgroundColor: Colors.chip.darkCard,
-              borderLeftWidth: 1,
-              borderRightWidth: 1,
-              borderColor: Colors.divider.medium,
-              borderTopWidth: index === 0 ? 1 : 0,
-              borderTopLeftRadius: index === 0 ? 16 : 0,
-              borderTopRightRadius: index === 0 ? 16 : 0,
-              borderBottomWidth: index === events.length - 1 ? 1 : 0,
-              borderBottomLeftRadius: index === events.length - 1 ? 16 : 0,
-              borderBottomRightRadius: index === events.length - 1 ? 16 : 0
-            }}
-          >
-            <AuditRow event={item} isLast={index === events.length - 1} />
-          </View>
-        )}
+        renderItem={renderItem}
         contentContainerStyle={{ paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={Colors.sway.bright} />}
-        onEndReached={() => {
-          if (hasNextPage && !isFetchingNextPage) void fetchNextPage();
-        }}
+        onEndReached={handleEndReached}
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
           !isRefetching ? (

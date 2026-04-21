@@ -51,7 +51,6 @@ export const useAdminOutcomes = ({
       });
       return data;
     },
-    enabled: isLoggedIn && enabled,
-    staleTime: 5 * 60 * 1000
+    enabled: isLoggedIn && enabled
   });
 };

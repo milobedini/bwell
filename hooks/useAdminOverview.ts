@@ -14,7 +14,6 @@ export const useAdminOverview = (enabled = true) => {
       const { data } = await api.get<AdminOverviewResponse>('/admin/overview');
       return data;
     },
-    enabled: isLoggedIn && enabled,
-    staleTime: 5 * 60 * 1000
+    enabled: isLoggedIn && enabled
   });
 };

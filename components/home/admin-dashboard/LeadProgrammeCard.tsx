@@ -4,30 +4,13 @@ import { router } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { useAdminOutcomes } from '@/hooks/useAdminOutcomes';
+import { INSTRUMENT_CUTOFF, INSTRUMENT_DELTA, INSTRUMENT_LABEL } from '@/utils/adminLabels';
 import type { AdminOverviewResponse } from '@milobedini/shared-types';
 
 import OutcomesSparkline from './OutcomesSparkline';
 import OutcomeTriplet from './OutcomeTriplet';
 
 type ProgrammeSummary = AdminOverviewResponse['programmes'][number];
-
-const INSTRUMENT_LABEL: Record<string, string> = {
-  phq9: 'PHQ-9',
-  gad7: 'GAD-7',
-  pdss: 'PDSS'
-};
-
-const INSTRUMENT_CUTOFF: Record<string, string> = {
-  phq9: 'PHQ-9 ≥ 10',
-  gad7: 'GAD-7 ≥ 8',
-  pdss: 'PDSS ≥ 8'
-};
-
-const INSTRUMENT_DELTA: Record<string, string | undefined> = {
-  phq9: 'Δ ≥ 6 PHQ-9 points',
-  gad7: 'Δ ≥ 4 GAD-7 points',
-  pdss: undefined
-};
 
 const formatLeadRate = (rate: number | null): string => `${Math.round((rate ?? 0) * 100)}`;
 

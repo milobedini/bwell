@@ -44,12 +44,15 @@ const AdminHome = () => {
     [data]
   );
 
+  const leadProgramme = useMemo(() => data?.programmes.find((p) => p.outcomes !== null) ?? null, [data]);
+  const otherProgrammes = useMemo(
+    () => data?.programmes.filter((p) => p.programmeId !== leadProgramme?.programmeId) ?? [],
+    [data, leadProgramme]
+  );
+
   if (isPending) return <HomeScreen content={<LoadingIndicator marginBottom={0} />} />;
   if (isError) return <ErrorComponent errorType={ErrorTypes.GENERAL_ERROR} />;
   if (!data) return <ErrorComponent errorType={ErrorTypes.UNAUTHORIZED} redirectLogin />;
-
-  const leadProgramme = data.programmes.find((p) => p.outcomes !== null) ?? null;
-  const otherProgrammes = data.programmes.filter((p) => p !== leadProgramme);
 
   return (
     <View className="flex-1 bg-sway-dark" testID="home-screen" style={{ paddingTop: insets.top }}>

@@ -6,8 +6,15 @@ import { LoadingIndicator } from '@/components/LoadingScreen';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { useAdminProgrammeDetail } from '@/hooks/useAdminProgrammeDetail';
+import { ModuleType } from '@/types/types';
+import {
+  INSTRUMENT_CUTOFF as INSTRUMENT_CUTOFF_COPY,
+  INSTRUMENT_DELTA as INSTRUMENT_DELTA_COPY,
+  INSTRUMENT_LABEL,
+  TIER_LABEL
+} from '@/utils/adminLabels';
 import { getModuleIcon } from '@/utils/moduleIcons';
-import type { AdminProgrammeDetailResponse, CareTier, Instrument, ModuleType } from '@milobedini/shared-types';
+import type { AdminProgrammeDetailResponse, ModuleType as ModuleTypeUnion } from '@milobedini/shared-types';
 import Icon from '@react-native-vector-icons/material-design-icons';
 
 import CareTierBreakdown from './CareTierBreakdown';
@@ -16,37 +23,13 @@ import OutcomeTriplet from './OutcomeTriplet';
 
 type Instruments = AdminProgrammeDetailResponse['outcomesByInstrument'][number];
 
-const INSTRUMENT_LABEL: Record<Instrument, string> = {
-  phq9: 'PHQ-9',
-  gad7: 'GAD-7',
-  pdss: 'PDSS'
-};
-
-const INSTRUMENT_CUTOFF_COPY: Record<Instrument, string> = {
-  phq9: 'PHQ-9 ≥ 10',
-  gad7: 'GAD-7 ≥ 8',
-  pdss: 'PDSS ≥ 8'
-};
-
-const INSTRUMENT_DELTA_COPY: Record<Instrument, string | undefined> = {
-  phq9: 'Δ ≥ 6 PHQ-9 points',
-  gad7: 'Δ ≥ 4 GAD-7 points',
-  pdss: undefined
-};
-
-const TIER_LABEL: Record<CareTier, string> = {
-  self_help: 'Self-help',
-  cbt_guided: 'CBT',
-  pwp_guided: 'PWP'
-};
-
-const MODULE_TYPE_LABEL: Record<ModuleType, string> = {
-  questionnaire: 'Questionnaire',
-  reading: 'Reading',
-  activity_diary: 'Activity diary',
-  five_areas_model: 'Five areas',
-  general_goals: 'General goals',
-  weekly_goals: 'Weekly goals'
+const MODULE_TYPE_LABEL: Record<ModuleTypeUnion, string> = {
+  [ModuleType.QUESTIONNAIRE]: 'Questionnaire',
+  [ModuleType.READING]: 'Reading',
+  [ModuleType.ACTIVITY_DIARY]: 'Activity diary',
+  [ModuleType.FIVE_AREAS_MODEL]: 'Five areas',
+  [ModuleType.GENERAL_GOALS]: 'General goals',
+  [ModuleType.WEEKLY_GOALS]: 'Weekly goals'
 };
 
 const anySuppressed = (instrument: Instruments): boolean => {

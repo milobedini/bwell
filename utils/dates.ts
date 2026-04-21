@@ -90,6 +90,20 @@ export const formatShortDate = (isoDate: string): string => {
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 };
 
+/** Compact, lowercase relative time for dense admin chips (e.g. "just now", "2m ago", "3d ago"). */
+export const formatCompactTimeAgo = (isoDate: string, now: Date = new Date()): string => {
+  const date = new Date(isoDate);
+  if (isNaN(date.getTime())) return '';
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.max(0, Math.round(diffMs / 60_000));
+  if (diffMin < 1) return 'just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.round(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  const diffDay = Math.round(diffHr / 24);
+  return `${diffDay}d ago`;
+};
+
 /** Compact relative time for dashboard cards (e.g. "2h ago", "3d ago") */
 export const formatRelativeTime = (isoDate: string): string => {
   const date = new Date(isoDate);

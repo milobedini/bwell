@@ -3,20 +3,12 @@ import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
+import { INSTRUMENT_LABEL } from '@/utils/adminLabels';
 import type { AdminOverviewResponse, OutcomeResult } from '@milobedini/shared-types';
 
 type ProgrammeSummary = AdminOverviewResponse['programmes'][number];
 
-const INSTRUMENT_LABEL: Record<string, string> = {
-  phq9: 'PHQ-9',
-  gad7: 'GAD-7',
-  pdss: 'PDSS'
-};
-
-const formatRate = (r: OutcomeResult): string => {
-  if (r.suppressed) return r.reason === 'below_k' ? '—' : '—';
-  return `${Math.round((r.rate ?? 0) * 100)}%`;
-};
+const formatRate = (r: OutcomeResult): string => `${Math.round((r.rate ?? 0) * 100)}%`;
 
 type Props = {
   programme: ProgrammeSummary;

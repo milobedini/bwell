@@ -14,6 +14,7 @@ import Constants from 'expo-constants';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import type { UseAdminAuditFilters } from '@/hooks/useAdminAudit';
+import { filterChipStyle, filterChipTextStyle } from '@/utils/chipStyles';
 import type { AuditedAction } from '@milobedini/shared-types';
 
 const ACTION_OPTIONS: AuditedAction[] = [
@@ -51,11 +52,13 @@ const AuditFilterDrawer = ({ visible, onDismiss, values, onApply, actorOptions }
   }
 
   useEffect(() => {
-    Animated.timing(translateX, {
+    const animation = Animated.timing(translateX, {
       toValue: visible ? 0 : drawerWidth,
       duration: 220,
       useNativeDriver: true
-    }).start();
+    });
+    animation.start();
+    return () => animation.stop();
   }, [visible, translateX, drawerWidth]);
 
   const toggleAction = (action: AuditedAction) => {
@@ -106,8 +109,8 @@ const AuditFilterDrawer = ({ visible, onDismiss, values, onApply, actorOptions }
                         key={action}
                         selected={selected}
                         onPress={() => toggleAction(action)}
-                        style={[styles.chip, selected && styles.chipSelected]}
-                        textStyle={selected ? { color: Colors.sway.bright } : undefined}
+                        style={filterChipStyle(selected)}
+                        textStyle={filterChipTextStyle(selected)}
                       >
                         {action}
                       </Chip>
@@ -131,8 +134,8 @@ const AuditFilterDrawer = ({ visible, onDismiss, values, onApply, actorOptions }
                           key={actor._id}
                           selected={selected}
                           onPress={() => toggleActor(actor._id)}
-                          style={[styles.chip, selected && styles.chipSelected]}
-                          textStyle={selected ? { color: Colors.sway.bright } : undefined}
+                          style={filterChipStyle(selected)}
+                          textStyle={filterChipTextStyle(selected)}
                         >
                           {label}
                         </Chip>
@@ -195,14 +198,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8
-  },
-  chip: {
-    borderWidth: 1,
-    borderColor: Colors.sway.buttonBackgroundSolid
-  },
-  chipSelected: {
-    borderColor: Colors.sway.bright,
-    backgroundColor: 'rgba(24, 205, 186, 0.12)'
   },
   footer: {
     flexDirection: 'row',

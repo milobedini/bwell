@@ -2,13 +2,8 @@ import { memo } from 'react';
 import { View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
+import { TIER_LABEL } from '@/utils/adminLabels';
 import type { CareTier, OutcomeResult } from '@milobedini/shared-types';
-
-const TIER_LABEL: Record<CareTier, string> = {
-  self_help: 'Self-help',
-  cbt_guided: 'CBT',
-  pwp_guided: 'PWP'
-};
 
 const TIER_PILL: Record<CareTier, { background: string; color: string }> = {
   self_help: { background: Colors.tint.neutral, color: Colors.sway.darkGrey },

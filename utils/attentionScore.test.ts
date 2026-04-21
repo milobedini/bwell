@@ -163,7 +163,7 @@ describe('computeAttentionScore', () => {
       }),
       now
     );
-    expect(tripped.contributors.find((c) => c.key === 'verification')?.ctaLabel).toBe('Resolve verify queue →');
+    expect(tripped.contributors.find((c) => c.key === 'verification')?.ctaLabel).toBe('Resolve verify queue');
 
     const clear = computeAttentionScore(buildOverview(), now);
     expect(clear.contributors.find((c) => c.key === 'verification')?.ctaLabel).toBeUndefined();

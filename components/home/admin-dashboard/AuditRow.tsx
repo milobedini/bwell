@@ -1,34 +1,15 @@
-import { memo, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
+import { formatCompactTimeAgo } from '@/utils/dates';
 import type { AdminAuditEvent, AuditedAction } from '@milobedini/shared-types';
-
-const ACTION_LABEL: Record<AuditedAction, string> = {
-  'therapist.verified': 'therapist.verified',
-  'therapist.unverified': 'therapist.unverified',
-  'user.viewed': 'user.viewed',
-  'patient.attemptsViewed': 'patient.attemptsViewed',
-  'module.created': 'module.created',
-  'admin.loggedIn': 'admin.loggedIn'
-};
 
 const HIGH_SALIENCE_ACTIONS: Set<AuditedAction> = new Set([
   'therapist.verified',
   'therapist.unverified',
   'module.created'
 ]);
-
-const formatTimeAgo = (iso: string, now: Date = new Date()): string => {
-  const diffMs = now.getTime() - new Date(iso).getTime();
-  const diffMin = Math.max(0, Math.round(diffMs / 60_000));
-  if (diffMin < 1) return 'just now';
-  if (diffMin < 60) return `${diffMin}m ago`;
-  const diffHr = Math.round(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
-  const diffDay = Math.round(diffHr / 24);
-  return `${diffDay}d ago`;
-};
 
 const shortenId = (id: string): string => (id.length > 10 ? `${id.slice(0, 4)}…${id.slice(-3)}` : id);
 
@@ -80,10 +61,8 @@ const actionColor = (event: AdminAuditEvent): string => {
   return Colors.sway.darkGrey;
 };
 
-const actionLabel = (event: AdminAuditEvent): string => {
-  const base = ACTION_LABEL[event.action] ?? event.action;
-  return event.outcome === 'failure' ? `${base} · failed` : base;
-};
+const actionLabel = (event: AdminAuditEvent): string =>
+  event.outcome === 'failure' ? `${event.action} · failed` : event.action;
 
 type Props = {
   event: AdminAuditEvent;
@@ -94,9 +73,11 @@ const AuditRow = memo(({ event, isLast }: Props) => {
   const [expanded, setExpanded] = useState(false);
   const hasContext = !!event.context && Object.keys(event.context).length > 0;
 
+  const handleToggle = useCallback(() => setExpanded((prev) => !prev), []);
+
   return (
     <Pressable
-      onPress={() => hasContext && setExpanded((prev) => !prev)}
+      onPress={hasContext ? handleToggle : undefined}
       className="px-4 py-3 active:opacity-80"
       style={{
         borderBottomWidth: isLast ? 0 : 1,
@@ -110,7 +91,7 @@ const AuditRow = memo(({ event, isLast }: Props) => {
           {actionLabel(event)}
         </ThemedText>
         <ThemedText type="small" style={{ color: Colors.sway.darkGrey, fontSize: 11 }}>
-          {formatTimeAgo(event.at)}
+          {formatCompactTimeAgo(event.at)}
         </ThemedText>
       </View>
       <ThemedText type="small" style={{ color: Colors.sway.lightGrey, marginTop: 4, fontSize: 12 }}>

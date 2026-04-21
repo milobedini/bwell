@@ -14,7 +14,6 @@ export const useAdminProgrammeDetail = (programmeId: string | undefined, enabled
       const { data } = await api.get<AdminProgrammeDetailResponse>(`/admin/programmes/${programmeId}`);
       return data;
     },
-    enabled: isLoggedIn && enabled && !!programmeId,
-    staleTime: 5 * 60 * 1000
+    enabled: isLoggedIn && enabled && !!programmeId
   });
 };

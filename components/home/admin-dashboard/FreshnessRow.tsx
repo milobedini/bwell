@@ -2,19 +2,9 @@ import { memo } from 'react';
 import { View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
+import { formatCompactTimeAgo } from '@/utils/dates';
 import type { PrivacyMode } from '@milobedini/shared-types';
 import Icon from '@react-native-vector-icons/material-design-icons';
-
-const formatTimeAgo = (iso: string, now: Date = new Date()): string => {
-  const diffMs = now.getTime() - new Date(iso).getTime();
-  const diffMin = Math.max(0, Math.round(diffMs / 60_000));
-  if (diffMin < 1) return 'just now';
-  if (diffMin < 60) return `${diffMin}m ago`;
-  const diffHr = Math.round(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
-  const diffDay = Math.round(diffHr / 24);
-  return `${diffDay}d ago`;
-};
 
 type Props = {
   asOf: string;
@@ -24,14 +14,14 @@ type Props = {
 
 const FreshnessRow = memo(({ asOf, rollupAsOf, privacyMode }: Props) => {
   const isDev = privacyMode === 'reduced';
-  const rollupLabel = rollupAsOf ? `Rollup · ${formatTimeAgo(rollupAsOf)}` : 'Rollup · never run';
+  const rollupLabel = rollupAsOf ? `Rollup · ${formatCompactTimeAgo(rollupAsOf)}` : 'Rollup · never run';
 
   return (
     <View className="flex-row flex-wrap items-center gap-2">
       <View className="flex-row items-center gap-1.5 rounded-full bg-chip-pill px-2.5 py-1">
         <Icon name="clock-outline" size={12} color={Colors.sway.darkGrey} />
         <ThemedText type="small" style={{ color: Colors.sway.darkGrey, fontSize: 11 }}>
-          Live · {formatTimeAgo(asOf)}
+          Live · {formatCompactTimeAgo(asOf)}
         </ThemedText>
       </View>
       <View className="flex-row items-center gap-1.5 rounded-full bg-chip-pill px-2.5 py-1">

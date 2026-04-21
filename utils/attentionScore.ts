@@ -1,5 +1,7 @@
 import type { AdminOverviewResponse } from '@milobedini/shared-types';
 
+import { formatCompactTimeAgo } from './dates';
+
 export type AttentionBand = 'green' | 'amber' | 'red' | 'unknown';
 
 export type AttentionContributorKey = 'verification' | 'stalled' | 'orphaned' | 'rollup';
@@ -26,19 +28,11 @@ export type AttentionScore = {
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const HOUR_MS = 60 * 60 * 1000;
-const MINUTE_MS = 60 * 1000;
 const VERIFY_AGE_THRESHOLD_DAYS = 7;
 const STALLED_THRESHOLD = 5;
 const ROLLUP_STALENESS_MS = 48 * HOUR_MS;
 
 const ageInDays = (iso: string, now: number): number => Math.floor((now - new Date(iso).getTime()) / DAY_MS);
-
-const formatRelativeAge = (iso: string, now: number): string => {
-  const diff = now - new Date(iso).getTime();
-  if (diff < HOUR_MS) return `${Math.max(1, Math.floor(diff / MINUTE_MS))}m ago`;
-  if (diff < DAY_MS) return `${Math.floor(diff / HOUR_MS)}h ago`;
-  return `${Math.floor(diff / DAY_MS)}d ago`;
-};
 
 export const computeAttentionScore = (data: AdminOverviewResponse, now: Date = new Date()): AttentionScore => {
   const nowMs = now.getTime();
@@ -63,7 +57,7 @@ export const computeAttentionScore = (data: AdminOverviewResponse, now: Date = n
     label: 'Verification backlog',
     value: oldest ? `${queueCount} waiting` : 'Empty',
     detail: verifyDetail,
-    ctaLabel: verifyTripped ? 'Resolve verify queue →' : undefined
+    ctaLabel: verifyTripped ? 'Resolve verify queue' : undefined
   };
 
   // Stalled attempts above threshold.
@@ -100,7 +94,7 @@ export const computeAttentionScore = (data: AdminOverviewResponse, now: Date = n
     key: 'rollup',
     tripped: rollupStale,
     label: 'Clinical rollup',
-    value: rollupUnknown ? 'Never run' : formatRelativeAge(data.rollupAsOf!, nowMs),
+    value: rollupUnknown ? 'Never run' : formatCompactTimeAgo(data.rollupAsOf!, now),
     detail: rollupUnknown
       ? 'The nightly rollup has not completed yet.'
       : rollupStale
