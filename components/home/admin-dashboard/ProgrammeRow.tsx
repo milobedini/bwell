@@ -1,5 +1,6 @@
 import { memo } from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { router } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import type { AdminOverviewResponse, OutcomeResult } from '@milobedini/shared-types';
@@ -24,9 +25,23 @@ type Props = {
 const ProgrammeRow = memo(({ programme }: Props) => {
   const outcomes = programme.outcomes;
 
+  const handlePress = () => {
+    router.push({
+      pathname: '/(main)/(tabs)/home/programmes/[id]',
+      params: { id: programme.programmeId, headerTitle: programme.title }
+    });
+  };
+
+  const accessibilityLabel = `Open ${programme.title} detail`;
+
   if (!outcomes) {
     return (
-      <View className="flex-row items-center justify-between rounded-xl bg-chip-darkCardDeep px-4 py-3">
+      <Pressable
+        onPress={handlePress}
+        className="flex-row items-center justify-between rounded-xl bg-chip-darkCardDeep px-4 py-3 active:opacity-80"
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
+      >
         <View className="flex-1 pr-2">
           <ThemedText type="smallBold" style={{ color: Colors.sway.lightGrey }}>
             {programme.title}
@@ -43,7 +58,7 @@ const ProgrammeRow = memo(({ programme }: Props) => {
             enrolled
           </ThemedText>
         </View>
-      </View>
+      </Pressable>
     );
   }
 
@@ -51,7 +66,12 @@ const ProgrammeRow = memo(({ programme }: Props) => {
   const instrumentLabel = INSTRUMENT_LABEL[outcomes.instrument] ?? outcomes.instrument.toUpperCase();
 
   return (
-    <View className="rounded-xl bg-chip-pill px-4 py-3">
+    <Pressable
+      onPress={handlePress}
+      className="rounded-xl bg-chip-pill px-4 py-3 active:opacity-80"
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+    >
       <View className="flex-row items-center justify-between">
         <View className="flex-1 pr-2">
           <ThemedText type="smallBold" style={{ color: Colors.sway.lightGrey }}>
@@ -77,7 +97,7 @@ const ProgrammeRow = memo(({ programme }: Props) => {
           </ThemedText>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 });
 
