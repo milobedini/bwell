@@ -1,11 +1,15 @@
 # Admin Overhaul — Session Handoff
 
-**Last updated:** 2026-04-21
+**Last updated:** 2026-04-21 (evening pass)
 **Branch (FE):** `feat/admin-overhaul`
 **Branch (BE):** `main` (BE commits land direct-to-main per project convention)
-**Status:** Stages 1–9 complete, plus a substantial 2026-04-21 refinement pass
-covering visual fidelity, the data-pairing model, scheduler resilience, and
-seed realism. Stages 10 (test audit) + 11 (finalise PR) still pending.
+**Status:** Stages 1–9 complete, plus two 2026-04-21 refinement passes. The
+morning pass covered visual fidelity, the data-pairing model, scheduler
+resilience, and seed realism. The evening pass worked through the first three
+near-term items from `docs/plans/admin-future.md` (programme detail screen,
+suppressed-hero collapse, audit log list view) and corrected a sort/filter/facet
+convention slip that surfaced during the audit work. Stages 10 (test audit) +
+11 (finalise PR) still pending.
 
 This document is a self-contained handoff. A future session can pick up from here
 without any of the conversational context. Everything material lives in the
@@ -52,10 +56,10 @@ picker). After this work, admin has:
 
 Deliverable alongside the workflow:
 
-| | Future-plan notes doc | ✅ `docs/plans/admin-future.md` |
+| | Future-plan notes doc | ✅ `docs/plans/admin-future.md` — shipped §1.1 / §1.2 / §1.3 on 2026-04-21 evening, renumbered remaining items |
 
-A second refinement pass on 2026-04-21 landed on top of stage 9 (not a
-separate stage). It covered four areas:
+A second refinement pass on 2026-04-21 (morning) landed on top of stage 9
+(not a separate stage). It covered four areas:
 
 1. **Visual fidelity** — the `AttentionBanner` was rebuilt as an SVG
    ring-gauge with per-contributor MDI icons and inline CTAs, and a
@@ -75,6 +79,55 @@ separate stage). It covered four areas:
    stable / dropout), so the trailing-90d sparkline renders a realistic
    trend line. Seed commands renamed into a consistent `seed:*` namespace
    with a new `seed:all` orchestrator.
+
+A third refinement pass on 2026-04-21 (evening) walked through the first
+three near-term items from `admin-future.md` and corrected an FE sort/filter/facet
+convention slip that surfaced along the way:
+
+1. **Programme detail screen (was `admin-future.md §1.1`)** — new route
+   `home/programmes/[id]` (thin wrapper) + `ProgrammeDetailScreen` component
+   composing `FreshnessRow`, per-tier enrolment stat cards, one per-instrument
+   block containing the overall `OutcomeTriplet` and a refactored
+   `CareTierBreakdown` (now a 3-col tier × triplet table matching the
+   winning deck's Panel B), a conditional k-anonymity suppression note, and
+   a work section with completed/stalled cards + by-module-type rows.
+   `LeadProgrammeCard` and `ProgrammeRow` now wrap in `Pressable` with
+   `router.push` to the detail route. Non-clinical programmes (empty
+   `outcomesByInstrument`) fall back to a "No clinical instrument attached"
+   card and skip the clinical outcomes section. `useAdminProgrammeDetail`
+   hook added, 5-min staleTime, key `['admin', 'programme', id]`.
+2. **Lead hero suppressed state (was `admin-future.md §1.2`)** — when
+   `outcomes.recovery.suppressed` is true, `LeadProgrammeCard` now drops the
+   56pt italic `—` hero + `%` glyph + "Recovery · n = ..." caption entirely.
+   In their place: a header-weight "Awaiting data · needs 5+ paired
+   assessments" line (or "20+" for `below_min_n`) plus a small "Currently N
+   paired · last 90 days" caption. The triplet below is the canonical source
+   of truth. Populated rendering is unchanged.
+3. **Audit log list view (was `admin-future.md §1.3`)** — new route
+   `home/audit` + `AdminAuditScreen` with header, filters pill showing active
+   count, `FlatList` of bordered-card rows, `onEndReached` infinite scroll,
+   refresh control, filter-aware empty-state copy. `AuditRow` renders the
+   action name with outcome-aware colour (teal for high-salience success like
+   `therapist.verified` / `module.created`, grey for read actions like
+   `user.viewed`, red for `failure`), a relative timestamp, a one-line summary
+   built from `actor.username + resource + context.tier`, and expands on tap
+   to show the opaque `context` JSON in a dark-deep box. `AuditFilterDrawer`
+   slides in from the right (matches `UserFilterDrawer`) with action chips
+   (single-select, 6 enum values) and actor chips (with counts). Entry
+   link-row on `AdminHome` under the ops footer shows the last-7d event total
+   and navigates to the screen. `useAdminAudit` infinite-query hook uses
+   cursor pagination (`nextCursor`) and `keepPreviousData`.
+4. **Sort/filter/facet convention correction** — during the audit log work,
+   the FE was initially deriving actor filter options from loaded pages
+   client-side (incomplete as you scroll, collapses when you select an
+   actor, empty when the filter returns zero rows). This violates the
+   project convention that the BE owns sorting/filtering/faceting. Corrected:
+   `GET /admin/audit` now returns `facets: { actors: [{ _id, username, name?,
+   count }] }` keyed off the current non-actor filter, so the list stays
+   stable across scroll and doesn't collapse when one actor is selected.
+   `AdminAuditActorFacet` + `AdminAuditFacets` types added to shared-types.
+   FE swapped to reading `data.pages[0].facets.actors`. Matches the
+   `UsersFacets` precedent on `/user/users`.
 
 ---
 
@@ -331,6 +384,31 @@ Full workflow for a fresh dev DB: `npm run seed:all && npm run
 rollup-metrics:backfill`. Documented in
 `../cbt/src/seeds/CLAUDE.md`.
 
+### 4.15 BE owns sorting, filtering, and faceting (2026-04-21 evening)
+
+**Why:** during the audit-log build the FE initially derived actor filter
+options by walking loaded `useInfiniteQuery` pages — which made the list
+incomplete (actors on unfetched pages were invisible), unstable (the list
+grew as you scrolled), and self-collapsing (selecting an actor left only
+themselves in the options). The project convention is that the BE computes
+sorting, filtering, and faceting and the FE just passes query params and
+renders results. Matches the `UsersFacets` precedent on `/user/users`.
+
+Rule: whenever a new admin list surface needs filter options, the BE
+returns them. Two good patterns:
+
+- **Inline facets on the same response** (preferred when the facet set is
+  small — admins, actors, action enums). Used by `/admin/audit`.
+- **Separate `/facets` endpoint** (if the facet set is large or expensive
+  to compute per request). Not used today; candidate for future list
+  surfaces with heavy facet computation.
+
+Facet filter should mirror the page filter **minus the cursor** (so
+pagination doesn't reshuffle options) and **minus the facet key itself**
+(so selecting one value doesn't collapse the options to just that value).
+
+Enshrined in memory: `feedback_sort_filter_on_be.md`.
+
 ---
 
 ## 5. What exists on disk — BE (`/Users/milobedini/Documents/git/cbt`)
@@ -404,7 +482,10 @@ Mounted at `/api/admin/*` behind `authenticateUser + authorizeAdmin`.
 - `GET /api/admin/programmes/:id` — single-programme detail with per-instrument
   per-tier breakdowns.
 - `GET /api/admin/audit` — paginated audit log, filterable by actorId / action /
-  resourceType / resourceId.
+  resourceType / resourceId. **2026-04-21 evening:** response now carries
+  `facets: { actors: [{ _id, username, name?, count }] }` keyed off the
+  current non-actor filter (matches `UsersFacets` precedent). Cursor pagination
+  via `nextCursor`.
 - `GET /api/admin/system/health` — ops-facing; returns last-rollup summary
   (without the full failures list) + audit total.
 
@@ -457,7 +538,7 @@ See `../cbt/src/seeds/CLAUDE.md` for the full table. Short summary:
 
 ### 5.9 Shared-types (`@milobedini/shared-types` on npm)
 
-Three publishes today:
+Four publishes to date:
 
 - **v1.0.99** — admin primitives: `Instrument`, `CareTier`, `TherapistTier`,
   `AuditedAction`, `MetricName`, `PrivacyMode`, `Granularity`, `OutcomeResult`;
@@ -467,6 +548,10 @@ Three publishes today:
   `AdminAuditResponse`, `AdminSystemHealthResponse`.
 - **v1.0.101** — `VerifyTherapistInput` now requires `therapistTier`;
   `UnverifyTherapistInput` + `UnverifyTherapistResponse` added.
+- **v1.0.102** (2026-04-21 evening) — `AdminAuditActorFacet` +
+  `AdminAuditFacets` types; `AdminAuditResponse.facets` added so the FE
+  filter drawer can read actor options with counts from the BE rather
+  than deriving them from loaded pages.
 
 Publish script: `npm run publish` from `/Users/milobedini/Documents/git/cbt`
 root. It auto-bumps patch + publishes. After publishing, FE runs
@@ -475,14 +560,17 @@ root. It auto-bumps patch + publishes. After publishing, FE runs
 ### 5.10 Tests (BE)
 
 Jest + ts-jest + `mongodb-memory-server` + supertest (all new to the BE
-repo this feature). Run via `npm test`. Current total: **13 suites, 51
-tests, all green** — up from 37 at initial build after the 2026-04-21
-refinement pass added coverage for the scheduler catch-up + slot list
-(`scheduler.test.ts`), cross-bucket pairing + 90d-window exclusion
-(`rollupMetrics.test.ts`), and `/overview` latest-snapshot reading
-(`adminController.test.ts`).
+repo this feature). Run via `npm test`. Current total: **13 suites, 53
+tests, all green** — up from 37 at initial build. Morning pass added
+coverage for scheduler catch-up + slot list (`scheduler.test.ts`),
+cross-bucket pairing + 90d-window exclusion (`rollupMetrics.test.ts`),
+and `/overview` latest-snapshot reading (`adminController.test.ts`).
+Evening pass added 2 tests in `adminAuditController.test.ts` for actor
+facet computation across actor + action filters.
 
 ### 5.11 Controllers — 2026-04-21 changes
+
+Morning pass:
 
 - `src/controllers/adminController.ts` — `/overview` programme outcomes
   now read the **most recent snapshot row per metric** (via a `$sort` +
@@ -492,6 +580,16 @@ refinement pass added coverage for the scheduler catch-up + slot list
   breakdowns. Each metric × tier combo is one `findOne` sorted by
   `bucket.endsAt` desc.
 
+Evening pass:
+
+- `src/controllers/adminAuditController.ts` — `/audit` now runs a parallel
+  aggregation for actor facets alongside the event query. The facet filter
+  mirrors the page filter **minus the cursor** (so facets stay stable across
+  scroll) and **minus the actor filter itself** (so selecting an actor
+  doesn't collapse the list to one option). Counts per `actorId`, sorted
+  desc, capped at 50. User lookup is reused between event and facet rows to
+  avoid a second `User.find`. See §4.15 below.
+
 ---
 
 ## 6. What exists on disk — FE (`/Users/milobedini/Documents/git/bwell`)
@@ -500,11 +598,18 @@ refinement pass added coverage for the scheduler catch-up + slot list
 
 - `hooks/useAdminOverview.ts` — single React Query hook for the landing
   dashboard. `queryKey: ['admin', 'overview']`, `staleTime: 5min`.
-- `hooks/useAdminOutcomes.ts` (2026-04-21) — wraps
+- `hooks/useAdminOutcomes.ts` (2026-04-21 morning) — wraps
   `GET /admin/outcomes`, accepts `{ instrument, programmeId, careTier?,
   granularity?, from?, to?, enabled? }` and defaults to monthly granularity
   over the BE's default 12-month window. Drives the sparkline on
   `LeadProgrammeCard`. 5-min staleTime.
+- `hooks/useAdminProgrammeDetail.ts` (2026-04-21 evening) — wraps
+  `GET /admin/programmes/:id`. `queryKey: ['admin', 'programme', id]`,
+  5-min staleTime. Drives `ProgrammeDetailScreen`.
+- `hooks/useAdminAudit.ts` (2026-04-21 evening) — `useInfiniteQuery` over
+  `GET /admin/audit`. Cursor pagination via `nextCursor`. Filters:
+  `{ action?, actorId?, resourceType?, resourceId? }`. 1-min staleTime,
+  `keepPreviousData` for smooth filter transitions. 50 events per page.
 
 ### 6.2 Hooks (changed)
 
@@ -540,29 +645,66 @@ refinement pass added coverage for the scheduler catch-up + slot list
   `trending-down` / `trending-neutral` MDI icons). Caps at 12 buckets via
   `maxBuckets` prop so mid-month 13-bucket BE responses render truthfully.
   Suppressed cells are drawn as pale notches so the axis stays contiguous.
-- `CareTierBreakdown.tsx` — per-tier rows (self-help / CBT / PWP) for a
-  programme. Currently a pure component; not yet wired into the home (a
-  programme-detail screen would use it — see `admin-future.md §1.1`). The
-  2026-04-21 session explicitly ratified this deferral (compact mobile
-  rows lose the visual coherence of the deck's inline breakdown).
+- `CareTierBreakdown.tsx` — **rebuilt 2026-04-21 evening** as a 3-col
+  tier × triplet table (matches the winning deck's Panel B). Props now
+  `rows: { careTier, recovery, reliableImprovement, reliableRecovery }[]`.
+  Wired into `ProgrammeDetailScreen`. Header row shows `Tier / Rec. /
+  Rel. imp. / Rel. rec.`; body rows show tier pill (Self-help neutral, CBT
+  teal, PWP purple tints) + three rate cells with inline `n=N` subscripts.
+  Suppressed cells render `< 5 patients` / `insufficient` in italic grey.
 - `ProgrammeRow.tsx` — compact row for non-lead programmes; handles
   non-clinical programmes (no instrument → enrolment shown, no %).
+  **2026-04-21 evening:** wrapped in `Pressable` + `router.push` to
+  `home/programmes/[id]`.
 - `OpsFooter.tsx` — bottom grid of 4 operational metrics (active 30d /
   verification queue count / stalled 7d+ / orphaned assignments).
+- `ProgrammeDetailScreen.tsx` (2026-04-21 evening) — full screen
+  composed of `FreshnessRow` + enrolment stat-card row (total + per-tier
+  counts) + per-instrument block (`OutcomeTriplet` for overall +
+  `CareTierBreakdown` for tier slice + conditional k-anonymity suppression
+  note) + work section (`StatCard` for completed/stalled + module-type
+  list with icons from `getModuleIcon`). Fallback "No clinical instrument
+  attached" block when `outcomesByInstrument` is empty.
+- `AuditRow.tsx` (2026-04-21 evening) — one row per `AdminAuditEvent`.
+  Top line: action name (teal for high-salience success:
+  `therapist.verified`/`therapist.unverified`/`module.created`, grey for
+  read actions: `user.viewed`/`patient.attemptsViewed`/`admin.loggedIn`,
+  red for `outcome === 'failure'`) + relative `at` timestamp. Bottom
+  line: summary built from `actor.username + resource + context.tier`.
+  Tap-to-expand reveals opaque `context` JSON in a dark-deep box when
+  present.
+- `AuditFilterDrawer.tsx` (2026-04-21 evening) — slide-in drawer matching
+  `UserFilterDrawer` pattern. Action chips (single-select from the 6
+  `AuditedAction` values) + actor chips sourced from BE facets with
+  counts. Reset / Cancel / Apply footer. Portal + `Animated.View`.
+- `AdminAuditScreen.tsx` (2026-04-21 evening) — header (`Admin` eyebrow +
+  "Audit log" title) + filters pill showing active count + `FlatList` of
+  bordered-card rows + infinite scroll via `onEndReached` + refresh
+  control + filter-aware empty-state copy.
 
 ### 6.5 Components (changed)
 
 - `components/home/AdminHome.tsx` — rebuilt as a clinical-outcomes dashboard.
   Full-screen (no `HomeScreen` canvas wrapper — mirrors the pattern in
-  `VerifiedTherapistHome` + populated `PatientHome`).
+  `VerifiedTherapistHome` + populated `PatientHome`). **2026-04-21 evening:**
+  added a link-row below the ops footer with `clipboard-list-outline` icon,
+  "Audit log" title, "{eventsLast7d} events in the last 7 days" subcaption,
+  chevron right. `router.push` → `/(main)/(tabs)/home/audit`.
+- `components/home/admin-dashboard/LeadProgrammeCard.tsx` — **2026-04-21
+  evening:** wrapped in `Pressable` + `router.push` to the detail route.
+  When `recovery.suppressed`, the 56pt `—` hero + `%` glyph + "Recovery ·
+  n = ..." caption are dropped in favour of a smallTitle-weight "Awaiting
+  data · needs N+ paired assessments" line and a small "Currently N paired
+  · last 90 days" caption. The triplet below remains the canonical answer.
+  Populated rendering unchanged.
 - `components/user/TherapistPicker.tsx` — added a tier-selection step using
   `ActionMenu`. After the admin picks a therapist, a two-button action menu
   offers "Verify as CBT therapist" or "Verify as PWP practitioner".
 
 ### 6.6 Test coverage (FE)
 
-**868 tests, 104 suites, all green** after the 2026-04-21 refinement pass.
-New suites added by the admin work:
+**895 tests, 109 suites, all green** after the 2026-04-21 evening pass.
+Suites added across the admin work:
 
 - `utils/attentionScore.test.ts` — 12 tests (7 original + 5 added for the
   new `value`, `detail`, `ctaLabel` shape + day-zero / one-day copy + relative
@@ -574,6 +716,22 @@ New suites added by the admin work:
 - `components/home/admin-dashboard/OutcomesSparkline.test.tsx` — 6 tests
   (delta chip direction + axis labels + suppressed → "Not enough data" path
   + 12-bucket cap against BE returning 13).
+- `components/home/admin-dashboard/CareTierBreakdown.test.tsx` (evening) —
+  4 tests: 3×3 table rendering, below-k and below-min-n suppressed labels,
+  header row.
+- `components/home/admin-dashboard/ProgrammeDetailScreen.test.tsx` (evening) —
+  9 tests: loading + error + title + freshness chips + enrolment counts +
+  overall triplet + tier breakdown table + suppression note + non-IAPT
+  fallback + no-suppression note omission.
+- `components/home/admin-dashboard/LeadProgrammeCard.test.tsx` (evening) —
+  4 tests: populated hero + suppressed below-k collapse + suppressed
+  below-min-n collapse + triplet always present.
+- `components/home/admin-dashboard/AuditRow.test.tsx` (evening) — 5 tests:
+  formatting + failure styling + context expand + empty-context guard +
+  resource-id shortening.
+- `components/home/admin-dashboard/AdminAuditScreen.test.tsx` (evening) —
+  5 tests: loading + error + flattened page rendering + empty state +
+  filter drawer open.
 
 No top-level `AdminHome.test.tsx` — follows the existing pattern where tests
 live on the atomic components, not the screen wrapper.
@@ -592,7 +750,33 @@ All commits on `feat/admin-overhaul` (FE) — run `git log --oneline main..feat/
 Key anchors, most-recent first:
 
 ```
-# 2026-04-21 refinement pass
+# 2026-04-21 evening pass — admin-future §1.1–§1.3 + facet fix
+aff86c7 test(admin): extend AdminAuditScreen mock response with BE-shaped facets
+41095ce refactor(admin): read audit actor facets from BE response instead of deriving client-side
+512e088 feat(admin): show counts on audit actor chips
+e854f60 chore(deps): bump @milobedini/shared-types to 1.0.102
+b592df8 feat(admin): add audit log entry-row to AdminHome below ops footer
+63c557f feat(admin): register audit screen in home stack with titled header
+973cdb9 feat(admin): add home/audit route
+a0f9f15 test(admin): cover AdminAuditScreen loading, error, empty and filter-open paths
+59c4d6f feat(admin): add AdminAuditScreen with infinite scroll and filter drawer
+c2d96db feat(admin): add AuditFilterDrawer with action and actor chips
+6c93b4d test(admin): cover AuditRow summary, failure state and context expand
+cb589ae feat(admin): add AuditRow with outcome-aware colour and expand-in-place context
+7cb149c feat(admin): add useAdminAudit cursor-paginated query hook
+868355e test(admin): cover LeadProgrammeCard suppressed-hero branches
+d5de438 fix(admin): collapse lead hero to 'Awaiting data' when recovery suppressed
+704c116 feat(admin): make ProgrammeRow press navigate to detail screen
+ea769df feat(admin): make LeadProgrammeCard press navigate to detail screen
+7b19bd6 feat(admin): register programmes/[id] screen in home stack
+9e719d4 feat(admin): add programmes/[id] route under home tab
+33b15d7 test(admin): cover ProgrammeDetailScreen happy, empty and suppressed paths
+773fc46 feat(admin): add programme detail screen composing IAPT triplet, tier table, enrolment and work
+b66562e test(admin): cover CareTierBreakdown tier x triplet rendering
+98bb8b1 refactor(admin): rebuild CareTierBreakdown as tier x triplet table
+12b5dc5 feat(admin): add useAdminProgrammeDetail query hook
+
+# 2026-04-21 morning pass
 f106fb7 docs(admin): recommend rollup-metrics:backfill after seed:all
 06b5d7e docs(admin): update seed references for baseline/all rename
 498d9d1 docs(admin): adopt trailing-90d snapshot pairing across spec + plans
@@ -641,7 +825,12 @@ fbd6c34 docs(brief): prototype brief for admin overhaul
 BE recent anchors (on `main`):
 
 ```
-# 2026-04-21 refinement pass
+# 2026-04-21 evening pass
+f6d0439 test(admin): cover audit actor facets across actor + action filters
+57a99af feat(admin): compute audit actor facets per current non-actor filter
+713d929 feat(shared-types): add audit actor facets to AdminAuditResponse
+
+# 2026-04-21 morning pass
 91e0cf7 docs(claude): document rollup jobs, admin metrics, current seeds
 032cb33 feat(rollup): add backfill CLI for historical snapshot rebuild
 e14ace4 feat(seed): extend admin-dev to 12 months with staggered lifecycles
@@ -709,30 +898,26 @@ Captured here so they're not lost:
 ## 9. Known limitations / what's deliberately out of scope
 
 Everything in the spec's §2.2 Deferred list is out of scope for this feature.
-The biggest MVP gaps worth calling out:
+After the 2026-04-21 evening pass, the biggest remaining gaps are:
 
-- **Programme detail screen** — the BE endpoint `GET /api/admin/programmes/:id`
-  exists but there's no FE route. Tapping a programme on the home doesn't
-  navigate anywhere today. See `admin-future.md §1.1`.
-- **Audit log list view** — the BE endpoint exists; no FE route.
-  See `admin-future.md §1.3`.
 - **System health view** — the BE endpoint exists; not surfaced in the UI.
-  See `admin-future.md §1.4`.
+  See `admin-future.md §1.1` (was §1.4 before the 2026-04-21 evening
+  renumber).
 - **Navigation from banner contributors** — `AttentionBanner` wires
   verification → `TherapistPicker`. Other contributors (stalled, orphaned,
-  rollup staleness) are informational only. See `admin-future.md §1.5`.
-- **`CareTierBreakdown` is built but unused** — lives in the
-  `admin-dashboard/` folder; reserved for the programme-detail screen.
-  Inline-on-home was explicitly deferred on 2026-04-21. See
-  `admin-future.md §1.1`.
-- **Lead hero "—" when suppressed** — when `recovery.suppressed === true`,
-  `LeadProgrammeCard` renders a faint italic `—` above the triplet which
-  already says "< 5 patients", making the card feel empty. See
-  `admin-future.md §1.2`.
+  rollup staleness) are informational only. See `admin-future.md §1.2`
+  (was §1.5). The audit log now exists as a natural destination for the
+  rollup-stale contributor; the system-health view (§1.1) is the other
+  natural target once it ships.
 - **Prototype decks still in-tree** — all 6 HTML decks are in this folder.
   The user explicitly had not decided whether to archive non-winners to
   `.archive/` or delete them. Either is fine per mb-development Stage 9
-  cleanup guidance.
+  cleanup guidance. See `admin-future.md §1.3` (was §1.6).
+- **No time-range filter on audit log** — the winning prototype showed a
+  `Last 7d` chip; the BE endpoint accepts `cursor` but not `from`/`to`,
+  and the `admin-future.md §1.3` "minimum filter set" explicitly didn't
+  list time range. Can be added later with a small BE change (`from`/`to`
+  params) + one more chip in `AuditFilterDrawer`.
 
 ---
 
