@@ -2,11 +2,18 @@ import type { AdminOverviewResponse } from '@milobedini/shared-types';
 
 export type AttentionBand = 'green' | 'amber' | 'red' | 'unknown';
 
+export type AttentionContributorKey = 'verification' | 'stalled' | 'orphaned' | 'rollup';
+
 export type AttentionContributor = {
-  key: 'verification' | 'stalled' | 'orphaned' | 'rollup';
+  key: AttentionContributorKey;
   tripped: boolean;
   label: string;
+  // Short numeric / status chip shown on the right of the row (e.g. "5 waiting", "Empty").
+  value: string;
+  // Longer sentence describing the contributor's current state.
   detail: string;
+  // Optional call-to-action text rendered under the detail when the row has a destination.
+  ctaLabel?: string;
 };
 
 export type AttentionScore = {
@@ -18,11 +25,20 @@ export type AttentionScore = {
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+const HOUR_MS = 60 * 60 * 1000;
+const MINUTE_MS = 60 * 1000;
 const VERIFY_AGE_THRESHOLD_DAYS = 7;
 const STALLED_THRESHOLD = 5;
-const ROLLUP_STALENESS_MS = 48 * 60 * 60 * 1000;
+const ROLLUP_STALENESS_MS = 48 * HOUR_MS;
 
 const ageInDays = (iso: string, now: number): number => Math.floor((now - new Date(iso).getTime()) / DAY_MS);
+
+const formatRelativeAge = (iso: string, now: number): string => {
+  const diff = now - new Date(iso).getTime();
+  if (diff < HOUR_MS) return `${Math.max(1, Math.floor(diff / MINUTE_MS))}m ago`;
+  if (diff < DAY_MS) return `${Math.floor(diff / HOUR_MS)}h ago`;
+  return `${Math.floor(diff / DAY_MS)}d ago`;
+};
 
 export const computeAttentionScore = (data: AdminOverviewResponse, now: Date = new Date()): AttentionScore => {
   const nowMs = now.getTime();
@@ -31,15 +47,18 @@ export const computeAttentionScore = (data: AdminOverviewResponse, now: Date = n
   const oldest = data.verificationQueue.oldest[0];
   const verifyAgeDays = oldest ? ageInDays(oldest.createdAt, nowMs) : 0;
   const verifyTripped = !!oldest && verifyAgeDays > VERIFY_AGE_THRESHOLD_DAYS;
+  const queueCount = data.verificationQueue.count;
   const verification: AttentionContributor = {
     key: 'verification',
     tripped: verifyTripped,
-    label: `Verification queue`,
+    label: 'Verification backlog',
+    value: oldest ? `${queueCount} waiting` : 'Empty',
     detail: oldest
       ? verifyTripped
-        ? `Oldest waiting ${verifyAgeDays}d — over ${VERIFY_AGE_THRESHOLD_DAYS}d threshold`
-        : `Oldest waiting ${verifyAgeDays}d`
-      : 'Empty'
+        ? `Oldest therapist has waited ${verifyAgeDays} days to be verified.`
+        : `Oldest therapist has waited ${verifyAgeDays} days.`
+      : 'No therapists waiting to be verified.',
+    ctaLabel: verifyTripped ? 'Resolve verify queue →' : undefined
   };
 
   // Stalled attempts above threshold.
@@ -48,8 +67,11 @@ export const computeAttentionScore = (data: AdminOverviewResponse, now: Date = n
   const stalled: AttentionContributor = {
     key: 'stalled',
     tripped: stalledTripped,
-    label: 'Stalled attempts',
-    detail: stalledTripped ? `${stalledCount} stalled — over ${STALLED_THRESHOLD} threshold` : `${stalledCount} stalled`
+    label: 'Stalled patient work',
+    value: `${stalledCount} stalled`,
+    detail: stalledTripped
+      ? `${stalledCount} attempts untouched for 7+ days — over ${STALLED_THRESHOLD} threshold.`
+      : 'Attempts started but not touched for 7+ days.'
   };
 
   // Any orphaned assignments (zero tolerance).
@@ -59,7 +81,11 @@ export const computeAttentionScore = (data: AdminOverviewResponse, now: Date = n
     key: 'orphaned',
     tripped: orphanedTripped,
     label: 'Orphaned assignments',
-    detail: orphanedCount === 0 ? 'None' : `${orphanedCount} assignment${orphanedCount === 1 ? '' : 's'}`
+    value: orphanedCount === 0 ? 'None' : `${orphanedCount} assignment${orphanedCount === 1 ? '' : 's'}`,
+    detail:
+      orphanedCount === 0
+        ? 'Every assignment is held by a verified therapist.'
+        : 'An assignment is held by a therapist who is no longer verified.'
   };
 
   // Rollup staleness: null or older than threshold.
@@ -69,7 +95,12 @@ export const computeAttentionScore = (data: AdminOverviewResponse, now: Date = n
     key: 'rollup',
     tripped: rollupStale,
     label: 'Clinical rollup',
-    detail: rollupUnknown ? 'Never run' : rollupStale ? 'Over 48h stale' : 'Fresh'
+    value: rollupUnknown ? 'Never run' : formatRelativeAge(data.rollupAsOf!, nowMs),
+    detail: rollupUnknown
+      ? 'The nightly rollup has not completed yet.'
+      : rollupStale
+        ? 'Nightly aggregates are more than 48 hours old.'
+        : 'Nightly aggregates are current.'
   };
 
   const contributors: AttentionContributor[] = [verification, stalled, orphaned, rollup];

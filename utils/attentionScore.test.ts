@@ -136,11 +136,48 @@ describe('computeAttentionScore', () => {
     expect(s.band).toBe('green');
   });
 
-  it('includes both the label and detail for each contributor', () => {
+  it('includes label, value and detail for each contributor', () => {
     const s = computeAttentionScore(buildOverview(), now);
     for (const c of s.contributors) {
       expect(c.label).toBeTruthy();
+      expect(c.value).toBeTruthy();
       expect(c.detail).toBeTruthy();
     }
+  });
+
+  it('attaches a CTA label only when verification is tripped', () => {
+    const tripped = computeAttentionScore(
+      buildOverview({
+        verificationQueue: {
+          count: 2,
+          oldest: [
+            {
+              userId: 't1',
+              username: 'tnew',
+              email: 't@test.bwell',
+              createdAt: '2026-04-10T00:00:00.000Z',
+              therapistTier: null
+            }
+          ]
+        }
+      }),
+      now
+    );
+    expect(tripped.contributors.find((c) => c.key === 'verification')?.ctaLabel).toBe('Resolve verify queue →');
+
+    const clear = computeAttentionScore(buildOverview(), now);
+    expect(clear.contributors.find((c) => c.key === 'verification')?.ctaLabel).toBeUndefined();
+  });
+
+  it('formats rollup value as relative age when fresh', () => {
+    const s = computeAttentionScore(buildOverview(), now);
+    const rollup = s.contributors.find((c) => c.key === 'rollup');
+    // 10:00 now, rollup at 02:00 same day → 8h ago
+    expect(rollup?.value).toBe('8h ago');
+  });
+
+  it('reports "Never run" rollup value when rollupAsOf is null', () => {
+    const s = computeAttentionScore(buildOverview({ rollupAsOf: null }), now);
+    expect(s.contributors.find((c) => c.key === 'rollup')?.value).toBe('Never run');
   });
 });
