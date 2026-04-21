@@ -53,8 +53,17 @@ const AdminAuditScreen = () => {
   const [filters, setFilters] = useState<UseAdminAuditFilters>({});
   const [drawerVisible, toggleDrawerVisible] = useToggle(false);
 
-  const { data, isLoading, isError, refetch, isRefetching, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useAdminAudit(filters);
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch,
+    isRefetching,
+    isFetching,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useAdminAudit(filters);
 
   const events: AdminAuditEvent[] = useMemo(() => data?.pages.flatMap((p) => p.events) ?? [], [data]);
 
@@ -105,15 +114,7 @@ const AdminAuditScreen = () => {
       <ContentContainer>
         <View className="flex-row items-center justify-between py-3">
           <View>
-            <ThemedText
-              type="small"
-              style={{
-                color: Colors.sway.darkGrey,
-                fontSize: 11,
-                letterSpacing: 0.8,
-                textTransform: 'uppercase'
-              }}
-            >
+            <ThemedText type="eyebrow" style={{ color: Colors.sway.darkGrey }}>
               Admin
             </ThemedText>
             <ThemedText type="subtitle" style={{ color: Colors.sway.lightGrey, marginTop: 2 }}>
@@ -137,11 +138,8 @@ const AdminAuditScreen = () => {
               color={activeFilterCount > 0 ? Colors.sway.bright : Colors.sway.darkGrey}
             />
             <ThemedText
-              type="small"
-              style={{
-                color: activeFilterCount > 0 ? Colors.sway.bright : Colors.sway.darkGrey,
-                fontSize: 12
-              }}
+              type="caption"
+              style={{ color: activeFilterCount > 0 ? Colors.sway.bright : Colors.sway.darkGrey }}
             >
               Filters{activeFilterCount > 0 ? ` · ${activeFilterCount}` : ''}
             </ThemedText>
@@ -159,7 +157,9 @@ const AdminAuditScreen = () => {
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
-          !isRefetching ? (
+          // Use isFetching (not isRefetching) so the empty state doesn't flash when
+          // filters change with `keepPreviousData` and the new filter set isn't cached.
+          !isFetching && events.length === 0 ? (
             <View
               className="mx-4 mt-2 rounded-xl border px-4 py-6"
               style={{ backgroundColor: Colors.chip.darkCardDeep, borderColor: Colors.divider.light }}

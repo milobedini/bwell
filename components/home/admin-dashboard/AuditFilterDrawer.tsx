@@ -10,7 +10,7 @@ import {
   View
 } from 'react-native';
 import { Button, Chip, Divider, IconButton, Portal, Surface } from 'react-native-paper';
-import Constants from 'expo-constants';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import type { UseAdminAuditFilters } from '@/hooks/useAdminAudit';
@@ -41,6 +41,7 @@ type Props = {
 
 const AuditFilterDrawer = ({ visible, onDismiss, values, onApply, actorOptions }: Props) => {
   const { width: screenWidth } = useWindowDimensions();
+  const { top: safeTop } = useSafeAreaInsets();
   const drawerWidth = Math.min(420, Math.floor(screenWidth * 0.9));
   const translateX = useRef(new Animated.Value(drawerWidth)).current;
   const [local, setLocal] = useState<UseAdminAuditFilters>(values);
@@ -88,7 +89,7 @@ const AuditFilterDrawer = ({ visible, onDismiss, values, onApply, actorOptions }
           style={[styles.drawerContainer, { width: drawerWidth, transform: [{ translateX }] }]}
           pointerEvents={visible ? 'auto' : 'none'}
         >
-          <Surface elevation={3} style={styles.surface}>
+          <Surface elevation={3} style={[styles.surface, { paddingTop: safeTop }]}>
             <View style={styles.header}>
               <ThemedText type="subtitle">Audit filters</ThemedText>
               <IconButton icon="close" onPress={onDismiss} />
@@ -180,8 +181,7 @@ const styles = StyleSheet.create({
   surface: {
     flex: 1,
     padding: 16,
-    backgroundColor: Colors.sway.dark,
-    paddingTop: Constants.statusBarHeight
+    backgroundColor: Colors.sway.dark
   },
   header: {
     flexDirection: 'row',

@@ -25,8 +25,10 @@ const buildSummary = (event: AdminAuditEvent): string => {
   switch (event.action) {
     case 'therapist.verified':
     case 'therapist.unverified': {
-      const who = event.actor.name ?? shortenId(event.resourceId ?? event.actorId);
-      parts.push(who);
+      // resourceId is the therapist being (un)verified — actor is the admin doing it.
+      // Don't fall back to actor.name here, which would render the row as the admin
+      // (un)verifying themselves.
+      if (event.resourceId) parts.push(`therapist ${shortenId(event.resourceId)}`);
       if (contextTier) parts.push(`tier=${contextTier}`);
       break;
     }
@@ -87,14 +89,14 @@ const AuditRow = memo(({ event, isLast }: Props) => {
       accessibilityLabel={`Audit event ${event.action} at ${event.at}`}
     >
       <View className="flex-row items-center justify-between">
-        <ThemedText type="smallBold" style={{ color: actionColor(event), fontSize: 12, letterSpacing: 0.2 }}>
+        <ThemedText type="captionBold" style={{ color: actionColor(event), letterSpacing: 0.2 }}>
           {actionLabel(event)}
         </ThemedText>
-        <ThemedText type="small" style={{ color: Colors.sway.darkGrey, fontSize: 11 }}>
+        <ThemedText type="caption" style={{ color: Colors.sway.darkGrey }}>
           {formatCompactTimeAgo(event.at)}
         </ThemedText>
       </View>
-      <ThemedText type="small" style={{ color: Colors.sway.lightGrey, marginTop: 4, fontSize: 12 }}>
+      <ThemedText type="caption" style={{ color: Colors.sway.lightGrey, marginTop: 4 }}>
         {buildSummary(event)}
       </ThemedText>
       {expanded && hasContext && (
@@ -102,16 +104,10 @@ const AuditRow = memo(({ event, isLast }: Props) => {
           className="mt-2 rounded-lg px-3 py-2"
           style={{ backgroundColor: Colors.chip.darkCardDeep, borderWidth: 1, borderColor: Colors.divider.light }}
         >
-          <ThemedText
-            type="small"
-            style={{ color: Colors.sway.darkGrey, fontSize: 10, letterSpacing: 0.6, textTransform: 'uppercase' }}
-          >
+          <ThemedText type="eyebrow" style={{ color: Colors.sway.darkGrey }}>
             Context
           </ThemedText>
-          <ThemedText
-            type="small"
-            style={{ color: Colors.sway.lightGrey, fontSize: 11, marginTop: 4, fontFamily: 'Lato-Regular' }}
-          >
+          <ThemedText type="caption" style={{ color: Colors.sway.lightGrey, marginTop: 4 }}>
             {JSON.stringify(event.context, null, 2)}
           </ThemedText>
         </View>

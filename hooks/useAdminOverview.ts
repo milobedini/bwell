@@ -14,6 +14,9 @@ export const useAdminOverview = (enabled = true) => {
       const { data } = await api.get<AdminOverviewResponse>('/admin/overview');
       return data;
     },
-    enabled: isLoggedIn && enabled
+    enabled: isLoggedIn && enabled,
+    // Operational signals (verification queue age, stalled, orphaned, rollup freshness) —
+    // override the global 1h default so a focused admin sees fresh counts on re-entry.
+    staleTime: 60 * 1000
   });
 };

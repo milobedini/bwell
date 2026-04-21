@@ -105,6 +105,9 @@ Rules for translating Figma designs into production-ready code for the bwell Exp
 | `small` | Lato-Regular | 14 | Secondary/caption text |
 | `smallBold` | Lato-Bold | 14 | Emphasized small text |
 | `link` | Lato-Regular (uppercase) | 13 (web: 14) | Navigation links |
+| `eyebrow` | Lato-Regular (uppercase, letter-spacing 0.8) | 12 | Compact section eyebrow above a title (admin dashboard, audit log) |
+| `caption` | Lato-Regular | 12 | Compact body text for dense list rows / secondary lines |
+| `captionBold` | Lato-Bold | 12 | Compact bold label for dense list rows |
 | `italic` | Lato-Italic | 18 | Emphasized body |
 | `error` | Lato-Italic (error color) | 14 (web: 16) | Error messages |
 | `profileButtonText` | Lato-Bold | 20 | Profile/settings buttons |

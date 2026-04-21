@@ -34,7 +34,7 @@ const OutcomeTriplet = memo(
       {
         key: 'recovery',
         label: 'Recovery',
-        definition: `Above cutoff → below (${cutoffLabel})`,
+        definition: `Crossed cutoff (above to below, ${cutoffLabel})`,
         accent: Colors.sway.bright,
         result: recovery
       },

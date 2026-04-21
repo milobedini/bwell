@@ -63,15 +63,7 @@ const AdminHome = () => {
       >
         <ContentContainer>
           <View className="py-2">
-            <ThemedText
-              type="small"
-              style={{
-                color: Colors.sway.darkGrey,
-                fontSize: 11,
-                letterSpacing: 0.8,
-                textTransform: 'uppercase'
-              }}
-            >
+            <ThemedText type="eyebrow" style={{ color: Colors.sway.darkGrey }}>
               Admin overview
             </ThemedText>
             <ThemedText type="subtitle" style={{ color: Colors.sway.lightGrey, marginTop: 4 }}>
@@ -96,16 +88,7 @@ const AdminHome = () => {
 
           {otherProgrammes.length > 0 && (
             <View className="mt-5">
-              <ThemedText
-                type="small"
-                style={{
-                  color: Colors.sway.darkGrey,
-                  fontSize: 11,
-                  letterSpacing: 0.8,
-                  textTransform: 'uppercase',
-                  marginBottom: 8
-                }}
-              >
+              <ThemedText type="eyebrow" style={{ color: Colors.sway.darkGrey, marginBottom: 8 }}>
                 Other programmes
               </ThemedText>
               <View className="gap-2">
@@ -132,7 +115,7 @@ const AdminHome = () => {
                 <ThemedText type="smallBold" style={{ color: Colors.sway.lightGrey }}>
                   Audit log
                 </ThemedText>
-                <ThemedText type="small" style={{ color: Colors.sway.darkGrey, marginTop: 2, fontSize: 11 }}>
+                <ThemedText type="caption" style={{ color: Colors.sway.darkGrey, marginTop: 2 }}>
                   {data.operational.audit.eventsLast7d} events in the last 7 days
                 </ThemedText>
               </View>

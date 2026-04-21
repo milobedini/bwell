@@ -56,6 +56,24 @@ describe('AuditRow', () => {
     expect(queryByText('Context')).toBeNull();
   });
 
+  it('shows the therapist resourceId, not the admin name, on therapist.verified', () => {
+    // Regression: previously the actor.name fallback ran first, so when the admin had
+    // a display name the row read "{adminUsername} · {adminName} · tier=cbt" — making
+    // it look like the admin verified themselves.
+    const { getByText, queryByText } = render(
+      <AuditRow
+        event={buildEvent({
+          action: 'therapist.unverified',
+          actor: { _id: 'a1', username: 'admin@bwell.test', name: 'Admin Display' },
+          resourceId: '6742aabbccdd112233ff44a1c'
+        })}
+      />
+    );
+    expect(getByText(/admin@bwell\.test/)).toBeTruthy();
+    expect(getByText(/therapist 6742…a1c/)).toBeTruthy();
+    expect(queryByText(/Admin Display/)).toBeNull();
+  });
+
   it('shortens long resource ids in the summary for read actions', () => {
     const { getByText } = render(
       <AuditRow

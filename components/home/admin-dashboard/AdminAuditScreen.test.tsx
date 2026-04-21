@@ -1,7 +1,11 @@
+import type { ReactNode } from 'react';
 import type { AdminAuditEvent, AdminAuditResponse } from '@milobedini/shared-types';
 import { fireEvent, render } from '@testing-library/react-native';
 
 import AdminAuditScreen from './AdminAuditScreen';
+
+type WithChildren = { children?: ReactNode };
+type WithChildrenAndPress = WithChildren & { onPress?: () => void };
 
 jest.mock('@/hooks/useAdminAudit', () => ({
   useAdminAudit: jest.fn(),
@@ -11,8 +15,8 @@ jest.mock('react-native-safe-area-context', () => {
   const { View } = require('react-native');
   return {
     useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
-    SafeAreaView: (props: { children: unknown }) => <View>{props.children as never}</View>,
-    SafeAreaProvider: (props: { children: unknown }) => <>{props.children as never}</>
+    SafeAreaView: ({ children }: WithChildren) => <View>{children}</View>,
+    SafeAreaProvider: ({ children }: WithChildren) => <>{children}</>
   };
 });
 jest.mock('@/components/LoadingScreen', () => {
@@ -22,16 +26,16 @@ jest.mock('@/components/LoadingScreen', () => {
 jest.mock('react-native-paper', () => {
   const { View, Text, Pressable } = require('react-native');
   return {
-    Portal: (props: { children: unknown }) => <View>{props.children as never}</View>,
-    Surface: (props: { children: unknown }) => <View>{props.children as never}</View>,
-    Button: (props: { children: unknown; onPress?: () => void }) => (
-      <Pressable onPress={props.onPress}>
-        <Text>{props.children as never}</Text>
+    Portal: ({ children }: WithChildren) => <View>{children}</View>,
+    Surface: ({ children }: WithChildren) => <View>{children}</View>,
+    Button: ({ children, onPress }: WithChildrenAndPress) => (
+      <Pressable onPress={onPress}>
+        <Text>{children}</Text>
       </Pressable>
     ),
-    Chip: (props: { children: unknown; onPress?: () => void }) => (
-      <Pressable onPress={props.onPress}>
-        <Text>{props.children as never}</Text>
+    Chip: ({ children, onPress }: WithChildrenAndPress) => (
+      <Pressable onPress={onPress}>
+        <Text>{children}</Text>
       </Pressable>
     ),
     Divider: () => <View />,
