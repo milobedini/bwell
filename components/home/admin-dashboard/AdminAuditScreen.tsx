@@ -23,15 +23,19 @@ const AdminAuditScreen = () => {
 
   const events: AdminAuditEvent[] = useMemo(() => data?.pages.flatMap((p) => p.events) ?? [], [data]);
 
-  const actorOptions: ActorOption[] = useMemo(() => {
-    const byId = new Map<string, ActorOption>();
-    for (const e of events) {
-      if (!byId.has(e.actorId)) {
-        byId.set(e.actorId, { _id: e.actorId, username: e.actor.username, name: e.actor.name });
-      }
-    }
-    return Array.from(byId.values());
-  }, [events]);
+  // Actor facets come from the BE — keyed off the currently-active non-actor filter,
+  // so they remain stable across scroll and don't collapse when an actor is selected.
+  // The first page carries the authoritative facet snapshot for the current filter set.
+  const actorOptions: ActorOption[] = useMemo(
+    () =>
+      data?.pages[0]?.facets.actors.map((a) => ({
+        _id: a._id,
+        username: a.username,
+        name: a.name,
+        count: a.count
+      })) ?? [],
+    [data]
+  );
 
   const activeFilterCount = countActiveAuditFilters(filters);
 
