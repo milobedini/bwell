@@ -1,13 +1,19 @@
 # Admin Overhaul — Session Handoff
 
-**Last updated:** 2026-04-20
+**Last updated:** 2026-04-21
 **Branch (FE):** `feat/admin-overhaul`
 **Branch (BE):** `main` (BE commits land direct-to-main per project convention)
-**Status:** Stages 1–9 complete. Stages 10 (test audit) + 11 (finalise PR) pending.
+**Status:** Stages 1–9 complete, plus a substantial 2026-04-21 refinement pass
+covering visual fidelity, the data-pairing model, scheduler resilience, and
+seed realism. Stages 10 (test audit) + 11 (finalise PR) still pending.
 
 This document is a self-contained handoff. A future session can pick up from here
-without any of today's conversational context. Everything material lives in the
+without any of the conversational context. Everything material lives in the
 spec, the plan, the prototype brief, and the commits — this README is the map.
+
+If the handoff conflicts with what you see in code, **trust the code** and
+update this file. Authoritative order when specs disagree: spec → plan →
+brief → this README.
 
 ---
 
@@ -44,9 +50,31 @@ picker). After this work, admin has:
 | 10 | Test audit | ⏸ optional; not started |
 | 11 | Finalise PR(s) | ⏸ not started |
 
-Plus a deliverable flagged alongside the workflow:
+Deliverable alongside the workflow:
 
-| | Future-plan notes doc | ⏸ `docs/plans/admin-future.md` — not written |
+| | Future-plan notes doc | ✅ `docs/plans/admin-future.md` |
+
+A second refinement pass on 2026-04-21 landed on top of stage 9 (not a
+separate stage). It covered four areas:
+
+1. **Visual fidelity** — the `AttentionBanner` was rebuilt as an SVG
+   ring-gauge with per-contributor MDI icons and inline CTAs, and a
+   12-month recovery sparkline was added to `LeadProgrammeCard`. Icon
+   vocabulary ported from the `compliance-gauge` blend source. Icons rather
+   than unicode glyphs are now the project rule.
+2. **Data-pairing model** — the rollup switched from within-bucket pairing
+   to trailing-90d patient-level pairing snapshotted at each bucket
+   endpoint (§4.8). Restores correct recovery rates for arcs that span
+   more than one month.
+3. **Scheduler resilience** — on-boot catch-up replays every missed 02:00
+   slot (cap 60), plus a new `rollup-metrics:backfill` CLI for populating
+   historical snapshots. Render free-tier spin-down no longer silently
+   drops nightly rollups.
+4. **Seed realism** — `seed:admin-dev` now produces ~12 months of
+   staggered cohorts with four lifecycle archetypes (active / recovered /
+   stable / dropout), so the trailing-90d sparkline renders a realistic
+   trend line. Seed commands renamed into a consistent `seed:*` namespace
+   with a new `seed:all` orchestrator.
 
 ---
 
@@ -197,6 +225,112 @@ The blend:
   definition hedges — no sharp opinion. We took its suppression-first-class
   language via osmosis but not its layout.
 
+### 4.10 Icons, not unicode glyphs (2026-04-21)
+
+**Why:** the first FE build used unicode glyphs (▲ ◆ ✕ ✓ ⟳) inside the
+attention banner rows. Rendering is inconsistent across iOS / Android /
+web font stacks, there is no control over stroke weight, and baselines
+drift. The `compliance-gauge` deck itself used glyphs because it was
+HTML, but the production app should use real icons.
+
+All admin-dashboard icons now come from
+`@react-native-vector-icons/material-design-icons` (MDI):
+
+- verification → `account-clock-outline`
+- stalled → `timer-sand`
+- orphaned → `link-variant-off`
+- rollup (fresh) → `check-circle-outline`
+- rollup (stale) → `sync-alert`
+- sparkline delta → `trending-up` / `trending-down` / `trending-neutral`
+
+The rollup icon flips on state via `iconFor({ key, tripped })`; other
+icons stay stable because they represent the *concept* regardless of
+state. The ring-gauge centre ("0" / "?" / numeric) stays as text because
+it's a figure, not iconography.
+
+Enshrined as a project-wide convention in `CLAUDE.md` (FE).
+
+### 4.11 Trailing-90d snapshot pairing replaces within-bucket (2026-04-21)
+
+**Why:** the original within-bucket model treated each `(granularity,
+startsAt, endsAt)` as a data window and paired attempts that landed
+inside it. A patient whose baseline was in February and endpoint in April
+would have both attempts excluded from the April monthly bucket (only
+the April tail was in the window, baseline below cutoff). With 8-week
+seed arcs, this produced **0% recovery** on a dataset that was supposed
+to show ~40%.
+
+The new model makes each bucket a **snapshot point**:
+`completedAt ∈ [bucket.endsAt − 90d, bucket.endsAt)`. This matches IAPT /
+NHS Talking Therapies' published reporting and is stable against arcs
+that span multiple calendar months. `/overview` reads the most recent
+snapshot row per dimension rather than summing buckets; the sparkline
+shows trailing-90d rates at each bucket endpoint for a smooth rolling
+trend. Full details in spec §5.3.
+
+**Migration:** pre-2026-04-21 rollup rows are semantically stale the
+moment this ships. Either wait for the on-boot catch-up (§4.12) or
+`npm run rollup-metrics:backfill` in the BE repo to rewrite them. The
+`upsertRollup` key is unchanged, so replay overwrites cleanly.
+
+### 4.12 Scheduler catch-up on boot + explicit backfill (2026-04-21)
+
+**Why:** `node-cron` is in-process. On free-tier Render web services
+(where the BE currently lives), the container spins down after 15 min of
+no HTTP traffic — if nothing pings it in the 02:00 London window, the
+nightly rollup silently fails to fire. This was observable on Atlas:
+zero `JobRun` rows across multiple nights.
+
+`startScheduler()` now calls `catchUpIfMissed()` after wiring the cron.
+Catch-up walks back every missed 02:00 slot since the last successful
+`JobRun.completedAt` (or just the most recent slot on first boot),
+capped at **60 slots** to guard against a months-long outage creating a
+stampede at wake. Each slot runs `runNightlyRollup(slot)`, which writes
+its own `JobRun` and upserts the week + month buckets for that date.
+
+For rebuilds beyond the 60-slot cap (or for a fresh DB after `seed:all`
+wants 12 months of sparkline history), the BE exposes
+`npm run rollup-metrics:backfill [months] [weeks]` (defaults 12/12) —
+explicit rather than inferring from JobRun state. Idempotent via the
+same upsert.
+
+### 4.13 Seed realism: staggered cohorts + four lifecycles (2026-04-21)
+
+**Why:** the original `seed:admin-dev` gave every patient a uniform
+8-week trajectory with a single `willRecover` flag. Combined with the
+now-deprecated within-bucket pairing, this produced dashboards reading
+0% recovery. Combined with the new trailing-90d pairing, it produced a
+single populated monthly bucket (April) with no historical signal for
+the sparkline.
+
+The seed now models 30 patients with `startWeeksAgo ∈ [4, 52]` and a
+lifecycle distribution (`LIFECYCLE_WEIGHTS` constant):
+
+- `active` (45%) — joined in the last 4 months, still submitting.
+- `recovered` (25%) — completed a full descent, stopped submitting.
+- `stable` (20%) — long-term in-treatment, flat-ish.
+- `dropout` (10%) — brief engagement then silence.
+
+Combined with `npm run rollup-metrics:backfill` after seeding, the
+sparkline renders a realistic rising trend as cohorts mature. Tuning
+knobs live at the top of `../cbt/src/seeds/seedAdminDev.ts`.
+
+### 4.14 Seed command layout: consistent `seed:*` namespace (2026-04-21)
+
+**Why:** the old `seed-all` was ambiguous (did not actually seed
+everything — clinical metadata and admin-dev were separate scripts).
+Renamed to reflect what each script actually does:
+
+- `seed:baseline` — destructive wipe + content + users (was `seed-all`).
+- `seed:clinical-metadata` — idempotent cutoff/delta/tier backfill.
+- `seed:admin-dev` — dev-only 12-month admin dataset.
+- `seed:all` — **new orchestrator**: chains baseline →
+  clinical-metadata → admin-dev as a fail-fast shell composition.
+
+Full workflow for a fresh dev DB: `npm run seed:all && npm run
+rollup-metrics:backfill`. Documented in
+`../cbt/src/seeds/CLAUDE.md`.
+
 ---
 
 ## 5. What exists on disk — BE (`/Users/milobedini/Documents/git/cbt`)
@@ -233,16 +367,28 @@ The blend:
   outcome, context? })`. Never throws; catches and logs errors so audit
   failures don't break callers.
 
-### 5.4 Rollup job
+### 5.4 Rollup job + scheduler
 
 - `src/jobs/rollupMetrics.ts` — `runRollupForBucket()` + `runNightlyRollup()`.
-  Within-bucket pairing (§4.8). Sources `instrument` / `clinicalCutoff` /
-  `reliableChangeDelta` from the **current** `Module` (not the attempt snapshot
-  — clinical definitions are stable). Sources `therapistTier` from the
-  **current** `User` (tier-at-time fidelity deferred).
-- `src/jobs/scheduler.ts` — `node-cron` wiring, `0 2 * * *` in Europe/London.
-  Disabled when `ROLLUP_JOB_ENABLED=false` (useful for tests).
-- `src/jobs/rollupMetricsCli.ts` — standalone CLI. Run via `npm run rollup-metrics`.
+  **Trailing-90d snapshot pairing** (§4.8 / §4.11): each bucket is a
+  snapshot point, the filter reads
+  `completedAt ∈ [bucket.endsAt − 90d, bucket.endsAt)`. Sources
+  `instrument` / `clinicalCutoff` / `reliableChangeDelta` from the
+  **current** `Module` (not the attempt snapshot — clinical definitions
+  are stable). Sources `therapistTier` from the **current** `User`
+  (tier-at-time fidelity deferred).
+- `src/jobs/scheduler.ts` — `node-cron` wiring, `0 2 * * *` in Europe/London,
+  disabled when `ROLLUP_JOB_ENABLED=false`. Also exports three helpers for
+  **on-boot catch-up** (§4.12): `mostRecentScheduledSlot(now)`,
+  `listMissedSlots(lastSuccessAt, now)`, and `catchUpIfMissed(now)`. `startScheduler()`
+  calls catch-up async after wiring the cron task. Catch-up replay is capped
+  at 60 slots.
+- `src/jobs/rollupMetricsCli.ts` — standalone CLI. Run via
+  `npm run rollup-metrics`. Fires `runNightlyRollup(now)` once.
+- `src/jobs/rollupBackfillCli.ts` — standalone historical-rebuild CLI. Run
+  via `npm run rollup-metrics:backfill [months] [weeks]` (defaults 12/12).
+  Walks back N months and M weeks writing one snapshot per bucket endpoint.
+  Idempotent via the same upsert as the nightly job.
 
 ### 5.5 Endpoints (new)
 
@@ -289,16 +435,25 @@ floor, the default is forced and a warning is logged.
 
 ### 5.8 Seeds
 
-- `src/seeds/seedBaseline.ts` — updated: GAD-7 moved from the Depression programme
-  into its own new "Generalised Anxiety" programme.
-- `src/seeds/seedClinicalMetadata.ts` — backfill for PHQ-9 (cutoff 10, Δ 6),
-  GAD-7 (cutoff 8, Δ 4), PDSS (cutoff 8, Δ null = reliable-improvement
-  suppressed for PDSS). Also backfills existing verified therapists to
-  `therapistTier: 'cbt'`. **Idempotent-ish.** `npm run seed:clinical-metadata`.
-- `src/seeds/seedAdminDev.ts` — **dev only**; creates 3 therapists + 30 patients
-  across Depression + GAD with ~8 weeks of PHQ-9 / GAD-7 attempts and a roughly
-  realistic recovery distribution (~40% cross threshold). `npm run seed:admin-dev`.
-  **Refuses to run in production.**
+See `../cbt/src/seeds/CLAUDE.md` for the full table. Short summary:
+
+- `src/seeds/seedBaseline.ts` — destructive baseline (wipe + content + 90
+  users). Renamed from `seedAll.ts` on 2026-04-21 (§4.14). GAD-7 has its
+  own "Generalised Anxiety" programme, split from Depression.
+  `npm run seed:baseline`.
+- `src/seeds/seedClinicalMetadata.ts` — idempotent. Backfill for PHQ-9
+  (cutoff 10, Δ 6), GAD-7 (cutoff 8, Δ 4), PDSS (cutoff 8, Δ null =
+  reliable-improvement suppressed for PDSS). Also backfills existing
+  verified therapists to `therapistTier: 'cbt'`. `npm run seed:clinical-metadata`.
+- `src/seeds/seedAdminDev.ts` — **dev only**; 3 therapists + 30 patients
+  with staggered 12-month PHQ-9 / GAD-7 histories across four lifecycle
+  archetypes (§4.13). Tuning constants at top of file.
+  **Refuses to run in production.** Not idempotent.
+  `npm run seed:admin-dev`.
+- **Orchestrator:** `npm run seed:all` chains baseline →
+  clinical-metadata → admin-dev as a fail-fast shell composition.
+
+**Fresh dev DB workflow:** `npm run seed:all && npm run rollup-metrics:backfill`.
 
 ### 5.9 Shared-types (`@milobedini/shared-types` on npm)
 
@@ -319,9 +474,23 @@ root. It auto-bumps patch + publishes. After publishing, FE runs
 
 ### 5.10 Tests (BE)
 
-Jest + ts-jest + `mongodb-memory-server` + supertest are all new to the BE repo
-this session. 12 test suites, 37 tests, all green. Lives alongside source files
-as `*.test.ts`. Run via `npm test`.
+Jest + ts-jest + `mongodb-memory-server` + supertest (all new to the BE
+repo this feature). Run via `npm test`. Current total: **13 suites, 51
+tests, all green** — up from 37 at initial build after the 2026-04-21
+refinement pass added coverage for the scheduler catch-up + slot list
+(`scheduler.test.ts`), cross-bucket pairing + 90d-window exclusion
+(`rollupMetrics.test.ts`), and `/overview` latest-snapshot reading
+(`adminController.test.ts`).
+
+### 5.11 Controllers — 2026-04-21 changes
+
+- `src/controllers/adminController.ts` — `/overview` programme outcomes
+  now read the **most recent snapshot row per metric** (via a `$sort` +
+  `$group` pipeline), not a sum across buckets. See §4.11 for why.
+- `src/controllers/adminProgrammesController.ts` — same change at
+  `/programmes/:id` for both the overall and per-care-tier outcome
+  breakdowns. Each metric × tier combo is one `findOne` sorted by
+  `bucket.endsAt` desc.
 
 ---
 
@@ -331,6 +500,11 @@ as `*.test.ts`. Run via `npm test`.
 
 - `hooks/useAdminOverview.ts` — single React Query hook for the landing
   dashboard. `queryKey: ['admin', 'overview']`, `staleTime: 5min`.
+- `hooks/useAdminOutcomes.ts` (2026-04-21) — wraps
+  `GET /admin/outcomes`, accepts `{ instrument, programmeId, careTier?,
+  granularity?, from?, to?, enabled? }` and defaults to monthly granularity
+  over the BE's default 12-month window. Drives the sparkline on
+  `LeadProgrammeCard`. 5-min staleTime.
 
 ### 6.2 Hooks (changed)
 
@@ -343,20 +517,34 @@ as `*.test.ts`. Run via `npm test`.
 - `utils/attentionScore.ts` — `computeAttentionScore(overview, now?)` derives a
   4-band composite from 4 contributors: verification-age > 7d, stalled > 5,
   orphaned > 0, rollup null or > 48h. Day-one posture is `'unknown'` (no false
-  all-clear before first rollup). 7 unit tests in `.test.ts`.
+  all-clear before first rollup). Contributor shape on 2026-04-21 grew to
+  `{ key, tripped, label, value, detail, ctaLabel? }` to feed the richer
+  banner rows.
 
-### 6.4 Components — new leaf atoms in `components/home/admin-dashboard/`
+### 6.4 Components — leaf atoms in `components/home/admin-dashboard/`
 
-- `AttentionBanner.tsx` + `.test.tsx` (5 tests) — borrowed-from-compliance-gauge
-  banner with contributor rows. Verification-row tap opens the picker.
+- `AttentionBanner.tsx` + `.test.tsx` (7 tests) — blended-from-compliance-gauge
+  banner. **Rebuilt 2026-04-21** (§4.10) as an SVG ring-gauge (circumference
+  314, stroke-dasharray sweep sized to `trippedCount / totalChecks`; dashed
+  when `band === 'unknown'`) with MDI icons per contributor. Verification-row
+  tap opens the picker; `ctaLabel` renders inline under the detail when set.
 - `FreshnessRow.tsx` — `asOf` + `rollupAsOf` + optional reduced-privacy chip.
 - `LeadProgrammeCard.tsx` — hero card with the giant recovery % + the triplet.
+  **Wired to `OutcomesSparkline`** on 2026-04-21 below the triplet when trend
+  data is available.
 - `OutcomeTriplet.tsx` + `.test.tsx` (4 tests) — the three-rate atom (recovery /
   reliable improvement / reliable recovery) with inline definitions + suppressed
   states.
+- `OutcomesSparkline.tsx` + `.test.tsx` (6 tests) — **new 2026-04-21**.
+  12-bar trailing-90d trend chart with a delta chip (`trending-up` /
+  `trending-down` / `trending-neutral` MDI icons). Caps at 12 buckets via
+  `maxBuckets` prop so mid-month 13-bucket BE responses render truthfully.
+  Suppressed cells are drawn as pale notches so the axis stays contiguous.
 - `CareTierBreakdown.tsx` — per-tier rows (self-help / CBT / PWP) for a
   programme. Currently a pure component; not yet wired into the home (a
-  programme-detail screen would use it).
+  programme-detail screen would use it — see `admin-future.md §1.1`). The
+  2026-04-21 session explicitly ratified this deferral (compact mobile
+  rows lose the visual coherence of the deck's inline breakdown).
 - `ProgrammeRow.tsx` — compact row for non-lead programmes; handles
   non-clinical programmes (no instrument → enrolment shown, no %).
 - `OpsFooter.tsx` — bottom grid of 4 operational metrics (active 30d /
@@ -373,11 +561,19 @@ as `*.test.ts`. Run via `npm test`.
 
 ### 6.6 Test coverage (FE)
 
-854 tests, 103 suites, all green. New:
+**868 tests, 104 suites, all green** after the 2026-04-21 refinement pass.
+New suites added by the admin work:
 
-- `utils/attentionScore.test.ts` — 7 tests
-- `components/home/admin-dashboard/AttentionBanner.test.tsx` — 5 tests
-- `components/home/admin-dashboard/OutcomeTriplet.test.tsx` — 4 tests
+- `utils/attentionScore.test.ts` — 12 tests (7 original + 5 added for the
+  new `value`, `detail`, `ctaLabel` shape + day-zero / one-day copy + relative
+  rollup age formatting).
+- `components/home/admin-dashboard/AttentionBanner.test.tsx` — 7 tests
+  (5 original + 2 added for the stateful rollup icon flip and the
+  concept-stable verification / stalled / orphaned icons).
+- `components/home/admin-dashboard/OutcomeTriplet.test.tsx` — 4 tests.
+- `components/home/admin-dashboard/OutcomesSparkline.test.tsx` — 6 tests
+  (delta chip direction + axis labels + suppressed → "Not enough data" path
+  + 12-bucket cap against BE returning 13).
 
 No top-level `AdminHome.test.tsx` — follows the existing pattern where tests
 live on the atomic components, not the screen wrapper.
@@ -396,6 +592,27 @@ All commits on `feat/admin-overhaul` (FE) — run `git log --oneline main..feat/
 Key anchors, most-recent first:
 
 ```
+# 2026-04-21 refinement pass
+f106fb7 docs(admin): recommend rollup-metrics:backfill after seed:all
+06b5d7e docs(admin): update seed references for baseline/all rename
+498d9d1 docs(admin): adopt trailing-90d snapshot pairing across spec + plans
+3f6eb88 docs(admin-future): reflect shipped UI + scheduler catch-up work
+4bfbe2f docs(claude): prefer MDI icons and SVGs over unicode glyphs
+9c65f14 refactor(admin): swap sparkline delta arrows for trending icons
+9b6c302 refactor(admin): swap attention banner glyphs for MDI icons
+7d950e9 fix(admin): soften verification copy for day-zero and one-day waits
+51a7d9f fix(admin): flip rollup glyph to cycle icon when stale
+1d054bc fix(admin): cap outcomes sparkline to trailing 12 buckets
+18b035b feat(admin): wire outcomes sparkline into LeadProgrammeCard
+b52fe23 feat(admin): add OutcomesSparkline with suppression-aware bars
+297ffd4 feat(admin): add useAdminOutcomes query hook
+238cad9 feat(admin): rebuild attention banner as SVG ring-gauge
+164a74d feat(admin): enrich attention contributor with value, detail and CTA
+
+# 2026-04-20 initial build
+98b9c8c docs(admin): catalogue deferred + future work in admin-future.md
+c73c1f6 chore(deps): bump @milobedini/shared-types to 1.0.101
+b3e5ea6 docs(admin): add session handoff README for admin overhaul
 9f04390 fix(admin): drop HomeScreen wrapper for full-screen dashboard
 aa6c4b8 chore(prettier): ignore prototype HTML decks
 119a5bc feat(admin): rebuild AdminHome as clinical-outcomes dashboard
@@ -424,6 +641,18 @@ fbd6c34 docs(brief): prototype brief for admin overhaul
 BE recent anchors (on `main`):
 
 ```
+# 2026-04-21 refinement pass
+91e0cf7 docs(claude): document rollup jobs, admin metrics, current seeds
+032cb33 feat(rollup): add backfill CLI for historical snapshot rebuild
+e14ace4 feat(seed): extend admin-dev to 12 months with staggered lifecycles
+c235c40 refactor(seeds): rename seedAll→seedBaseline, add seed:all orchestrator
+6221806 feat(admin): read latest snapshot for /programmes/:id outcomes
+4f9e53f feat(admin): read latest rollup snapshot for /overview outcomes
+1d000a1 feat(rollup): snapshot trailing-90d pairing at bucket endpoint
+dc508df feat(scheduler): replay every missed slot in catch-up (cap 60)
+672ffd7 feat(scheduler): catch up missed rollup on boot
+
+# 2026-04-20 initial build
 d52f68d fix(jobrun): rename errors field to failures to avoid mongoose reserved path
 8d852a4 chore(shared-types): publish v1.0.101 with tier+unverify inputs
 a3c0ff6 feat(shared-types): require therapistTier on verify; add unverify types
@@ -484,18 +713,22 @@ The biggest MVP gaps worth calling out:
 
 - **Programme detail screen** — the BE endpoint `GET /api/admin/programmes/:id`
   exists but there's no FE route. Tapping a programme on the home doesn't
-  navigate anywhere today.
-- **Outcomes time-series / sparkline** — on-home sparkline is not built.
-  `/api/admin/outcomes` returns the data; the FE would need a small chart
-  component (BarSparkline already exists and could be adapted).
+  navigate anywhere today. See `admin-future.md §1.1`.
 - **Audit log list view** — the BE endpoint exists; no FE route.
+  See `admin-future.md §1.3`.
 - **System health view** — the BE endpoint exists; not surfaced in the UI.
-- **Navigation from banner contributors** — the `AttentionBanner` wires
+  See `admin-future.md §1.4`.
+- **Navigation from banner contributors** — `AttentionBanner` wires
   verification → `TherapistPicker`. Other contributors (stalled, orphaned,
-  rollup staleness) are informational only.
+  rollup staleness) are informational only. See `admin-future.md §1.5`.
 - **`CareTierBreakdown` is built but unused** — lives in the
-  `admin-dashboard/` folder; would be rendered by the programme-detail screen
-  once it's built.
+  `admin-dashboard/` folder; reserved for the programme-detail screen.
+  Inline-on-home was explicitly deferred on 2026-04-21. See
+  `admin-future.md §1.1`.
+- **Lead hero "—" when suppressed** — when `recovery.suppressed === true`,
+  `LeadProgrammeCard` renders a faint italic `—` above the triplet which
+  already says "< 5 patients", making the card feel empty. See
+  `admin-future.md §1.2`.
 - **Prototype decks still in-tree** — all 6 HTML decks are in this folder.
   The user explicitly had not decided whether to archive non-winners to
   `.archive/` or delete them. Either is fine per mb-development Stage 9
@@ -507,37 +740,40 @@ The biggest MVP gaps worth calling out:
 
 ### 10.1 Stage 10 — Test audit (optional)
 
-Not started. Would cover the new AdminHome surface + attentionScore util + the
-new components. Current coverage is already good (27 new tests on the
-high-value units). The gap is integration-level: an end-to-end test that
-renders AdminHome with a mocked `useAdminOverview` and confirms all five
-composition slots render for happy-path + empty-state. See `test-audit` skill.
+Not started. Would cover the new AdminHome surface + attentionScore util +
+the new components. Current coverage is good (45+ admin-area tests on the
+high-value units). The remaining gap is integration-level: an end-to-end
+test that renders AdminHome with mocked hooks and confirms all five
+composition slots render for happy-path + empty-state + suppressed-state.
+See `test-audit` skill.
 
 ### 10.2 Stage 11 — Finalise PR
 
-BE changes landed direct to `main` per project convention — no BE PR needed.
+BE changes landed direct to `main` per project convention — no BE PR
+needed. **Note before opening the FE PR:** deploy BE `main` (which now
+includes the trailing-90d rollup semantics and the on-boot catch-up)
+first, otherwise the FE will be reading stale within-bucket rollup rows
+until the next cron fires.
 
 FE PR: `feat/admin-overhaul` → `main`. Suggested title:
 
 > feat(admin): overhaul admin home with IAPT outcomes + audit
 
-Suggested PR body should cover: capabilities added (11 points in spec §2.1),
-BE additions (5 endpoints, 3 models, 6 utilities, 1 job, 3 seeds), FE additions
-(AdminHome + 7 components + 1 hook + 1 util + picker update), shared-types
-versions published (1.0.99, 1.0.100, 1.0.101), env vars added (K / MIN_N /
-ROLLUP_JOB_ENABLED).
+Suggested PR body should cover: capabilities added (11 points in spec
+§2.1), BE additions (5 endpoints, 3 models, 6 utilities, 1 nightly job
+with on-boot catch-up, 3 seeds + an orchestrator, backfill CLI), FE
+additions (AdminHome + 8 components + 2 hooks + 1 util + picker update),
+shared-types versions published (1.0.99, 1.0.100, 1.0.101), env vars
+added (K / MIN_N / ROLLUP_JOB_ENABLED), design conventions added
+(MDI-over-glyphs in FE CLAUDE.md, trailing-90d snapshot in spec §5.3).
 
-### 10.3 Future-plan notes doc
+### 10.3 Future-plan notes doc ✅
 
-Spec §2.2 enumerates 15+ deferred items (owner tier, impersonation, admin
-password reset, GDPR erasure, role change, per-therapist outcomes, data-quality
-dashboard, programme catalogue editor, export workflow, per-resource access
-restriction, episode-of-care model, tier-at-time fidelity, rollup archival,
-multi-role user handling, audit retention policy, additional instruments).
-
-Target path: `docs/plans/admin-future.md` (in FE repo). Not yet written.
-Should be a one-per-item list with: name, motivation, rough scope, any
-dependencies the current BE already satisfies.
+Written at `docs/plans/admin-future.md`. Captures §1 near-term follow-ups
+(programme detail, lead hero duplicate, audit log list, system health,
+banner drill-ins, archive decks) and §2 substantive features (owner
+tier, impersonation, role change, per-therapist outcomes, episode-of-care,
+scheduler runtime, etc.).
 
 ---
 

@@ -361,7 +361,10 @@ scoping questions that need answering before code is touched.
   - Rollups run inline on the wake-up request path. If Mongo is slow and
     60 slots are being replayed, the first user request competes with the
     backfill (it's fire-and-forget async, but the DB is the same).
-  - A truly ≥60-day outage silently drops older history.
+  - A truly ≥60-day outage silently drops older history. Escape hatch for
+    today: run `npm run rollup-metrics:backfill [months] [weeks]` in the BE
+    repo to rebuild historical snapshots beyond the catch-up cap. Manual
+    but explicit; idempotent via the existing upsert.
 - **Options to promote:**
   - **(a)** Render Cron Jobs — a separate service type that runs on a
     guaranteed schedule regardless of web-service traffic. Extra small
