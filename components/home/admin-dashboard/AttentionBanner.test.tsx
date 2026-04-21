@@ -111,6 +111,29 @@ describe('AttentionBanner', () => {
     expect(onPressVerification).toHaveBeenCalledTimes(1);
   });
 
+  it('renders a cycle glyph on the rollup row when the rollup is stale', () => {
+    const score = buildScore({
+      band: 'red',
+      trippedCount: 3,
+      headline: 'Escalation — review now',
+      contributors: [
+        baseContributors[0],
+        { ...baseContributors[1], tripped: true, value: '24 stalled', detail: '24 attempts untouched.' },
+        { ...baseContributors[2], tripped: true, value: '45 assignments', detail: 'Orphaned.' },
+        { ...baseContributors[3], tripped: true, value: 'Never run', detail: 'Rollup has not run.' }
+      ]
+    });
+    const { getByText, queryByText } = render(<AttentionBanner score={score} />);
+    expect(getByText('⟳')).toBeTruthy();
+    // No stray fresh tick on the rollup row when it's stale.
+    expect(queryByText('✓')).toBeNull();
+  });
+
+  it('renders a tick on the rollup row when the rollup is fresh', () => {
+    const { getByText } = render(<AttentionBanner score={buildScore()} />);
+    expect(getByText('✓')).toBeTruthy();
+  });
+
   it('does not invoke onPressVerification when verification is not tripped', () => {
     const onPressVerification = jest.fn();
     const { getByText } = render(<AttentionBanner score={buildScore()} onPressVerification={onPressVerification} />);

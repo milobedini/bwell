@@ -44,12 +44,19 @@ const BAND_STYLES: Record<AttentionScore['band'], BandStyle> = {
   }
 };
 
-// Stable glyph vocabulary per contributor type — colour-blind friendly paired with colour.
-const CONTRIBUTOR_GLYPH: Record<AttentionContributorKey, string> = {
-  verification: '▲',
-  stalled: '◆',
-  orphaned: '✕',
-  rollup: '✓'
+// Per-contributor glyph vocabulary — colour-blind friendly paired with colour.
+// The rollup glyph flips with state: ⟳ when stale or never run, ✓ when fresh.
+// Every other glyph stays stable because it represents the concept, not the state.
+const glyphFor = ({ key, tripped }: { key: AttentionContributorKey; tripped: boolean }): string => {
+  if (key === 'rollup') return tripped ? '⟳' : '✓';
+  switch (key) {
+    case 'verification':
+      return '▲';
+    case 'stalled':
+      return '◆';
+    case 'orphaned':
+      return '✕';
+  }
 };
 
 type RingProps = {
@@ -124,7 +131,7 @@ const ContributorRow = memo(({ contributor, accent, onPress }: ContributorRowPro
     <View className="flex-row items-start gap-3 px-4 py-3">
       <View className="size-8 items-center justify-center rounded-full" style={{ backgroundColor: glyphBg }}>
         <ThemedText type="smallBold" style={{ color: glyphColour, fontSize: 14, lineHeight: 16 }}>
-          {CONTRIBUTOR_GLYPH[contributor.key]}
+          {glyphFor({ key: contributor.key, tripped: contributor.tripped })}
         </ThemedText>
       </View>
       <View className="flex-1">
