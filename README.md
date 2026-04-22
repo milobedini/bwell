@@ -42,12 +42,17 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 
 ### Admin
 
-- Dashboard with user counts, weekly completions, and platform stats
+- IAPT-shaped overview: outcomes triplet (access, recovery, reliable improvement) paired with 90-day movement, lead programme card, and per-programme rows
+- Drill into any programme for a tier × triplet breakdown (self-help, CBT, PWP), enrolment and active-work snapshots
+- Attention banner and outcomes sparkline surface freshness, recovery suppression, and trends at a glance
+- Ops footer and freshness indicators flag stale rollups so seed/backfill gaps are obvious
+- Audit log screen with infinite scroll, action/actor filter drawer, outcome-aware rows and expand-in-place context
 - Verify new therapist accounts
 - Search, filter, and sort all registered users with infinite scroll
 
 ## Recent Milestones
 
+- **Admin dashboard overhaul** — IAPT outcomes triplet with 90-day snapshot pairing, lead programme card, per-programme rows drilling into tier × triplet detail screens, care tier breakdown table, attention banner and outcomes sparkline, ops/freshness indicators, and a cursor-paginated audit log with action/actor filter drawer and expand-in-place context (2026-04-21)
 - **Weekly Goals module** — new presenter with moment cards, week rail, reflection thread and coach message; tap-anchored Skia bloom on goal completion; reusable `TypewriterText` and `BloomBurst` UI primitives; bloom teal colour tokens (2026-04-20)
 - **Jest test coverage expansion** — 47 new test files across components, hooks and utils, global mocks (AsyncStorage, material-design-icons) in `jest.setup.ts`, `clearMocks: true` replacing per-test reset boilerplate, shared `test-utils/` wrappers for React Query and presenter mocks (2026-04-17)
 - **Profile redesign** — role-aware dashboard layout with identity header, therapist/client relationship cards, stats strip, iOS-style grouped settings, shared initials utility and new colour tokens (2026-04-16)
@@ -57,7 +62,6 @@ BWell connects **patients**, **therapists**, and **admins** in a mental health p
 - **Maestro E2E testing** — login flow with reusable subflows, full pipeline script with BE healthcheck, iOS simulator build with LogBox suppression, testID conventions (2026-04-04)
 - **Therapist dashboard UX improvements** — overdue chips, relative dates, progress bars on client detail cards, reason tags on attention cards, week-scoped assignment framing (2026-04-04)
 - **Unified practice model** — merged assignments and attempts into a single practice concept, new journey/practice/review tabs, BarSparkline component, server-side client search/sort (2026-04-01)
-- **Reading module type** — replaced psychoeducation/exercise with unified reading presenter, markdown rendering, scroll progress bar, reader notes (2026-04-01)
 
 ## Tech Stack
 

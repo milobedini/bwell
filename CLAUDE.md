@@ -53,7 +53,7 @@ These bias toward caution over speed. For trivial tasks, use judgement.
 - `constants/` — Colors, shared constants
 - `stores/` — Zustand stores
 - `types/` — local TypeScript types
-- `utils/` — helper functions (date formatting, severity colours, role checks, debounce, shared chip styles, module icons, initials)
+- `utils/` — helper functions (date formatting, severity colours, role checks, debounce, shared chip styles, module icons, initials, admin labels, attention scoring)
 
 - Query defaults (1-hour staleTime, refetchOnWindowFocus/refetchOnReconnect disabled) are centralized in `QueryClient` in `app/_layout.tsx` — only override in hooks when a shorter staleTime is needed
 - Use `invalidateQueries` (not `refetchQueries`) in mutation `onSuccess` callbacks for consistency
@@ -70,7 +70,7 @@ These bias toward caution over speed. For trivial tasks, use judgement.
 - **Infinite scroll:** Use `useInfiniteQuery` with `initialPageParam: 1` and `getNextPageParam` from `page`/`totalPages`. Flatten pages via `data.pages.flatMap(p => p.items)`. See `useAllUsers` for reference.
 - **Infinite scroll + search:** Use `keepPreviousData` with `useInfiniteQuery` to prevent full-screen flashes on param changes. Use `isLoading` (not `isPending`) for initial full-screen loaders. Guard empty states with `!isFetching && items.length === 0`. See `useAllUsers` + `AllUsersList` for reference.
 - **Value debounce:** Use `useDebounce(value, delay)` from `hooks/useDebounce.ts` for search inputs. Distinct from callback-based `useDebouncedCallback` in `utils/debounce.ts`.
-- **Filter drawers:** Slide-in from right using `Animated.View` + `useWindowDimensions()`. See `AttemptFilterDrawer` (timeline), `UserFilterDrawer` (admin users), and `ReviewFilterDrawer` (therapist review). Shared chip styles extracted to `utils/chipStyles.ts`.
+- **Filter drawers:** Slide-in from right using `Animated.View` + `useWindowDimensions()`. See `AttemptFilterDrawer` (timeline), `UserFilterDrawer` (admin users), `ReviewFilterDrawer` (therapist review), and `AuditFilterDrawer` (admin audit log). Shared chip styles extracted to `utils/chipStyles.ts`.
 - **Destructive action confirmation:** `ActionMenu` has a built-in confirmation step for destructive actions. Set `variant: 'destructive'` on an action item and optionally provide `confirmTitle`, `confirmDescription`, and `confirmLabel` props for custom confirmation UI.
 - **Cross-tab navigation with back button:** When navigating from one tab to a nested screen in another tab's stack (e.g. dashboard → client detail), use `<Link push withAnchor asChild>` instead of `router.push`. The `withAnchor` prop forces the target stack's `initialRouteName` to load first, ensuring a proper back button. Requires `export const unstable_settings = { initialRouteName: 'index' }` in the target stack's layout file. See `ClientCard.tsx` → `patients/[id]` for reference. Docs: <https://docs.expo.dev/router/basics/navigation/>
 - **Prop → state syncing:** Don't use `useEffect` to sync state from props. Use React's "adjust state during render" pattern with a `prev<Prop>` state tracker. See `MoodSlider`, the filter drawers, and `useFiveAreasState` for reference. Enforced by `eslint-plugin-react-you-might-not-need-an-effect`.
