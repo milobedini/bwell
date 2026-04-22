@@ -12,6 +12,9 @@ export default function HomeStack() {
       <Stack.Screen name="practice/[id]" options={withHeaderFromParams()} />
       <Stack.Screen name="programmes/[id]" options={withHeaderFromParams()} />
       <Stack.Screen name="audit" options={nestedScreenOptionsWithTitle('Audit log')} />
+      <Stack.Screen name="system" options={nestedScreenOptionsWithTitle('System health')} />
+      <Stack.Screen name="stalled-attempts" options={nestedScreenOptionsWithTitle('Stalled attempts')} />
+      <Stack.Screen name="orphaned-assignments" options={nestedScreenOptionsWithTitle('Orphaned assignments')} />
     </Stack>
   );
 }
