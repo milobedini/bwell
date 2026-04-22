@@ -96,7 +96,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@milobedini/shared-types": "^1.0.102",
+    "@milobedini/shared-types": "^1.0.103",
     "@tanstack/eslint-plugin-query": "^5.81.2",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "29.5.14",
