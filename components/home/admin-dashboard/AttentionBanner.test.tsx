@@ -18,7 +18,9 @@ const baseContributors: AttentionScore['contributors'] = [
     tripped: false,
     label: 'Clinical rollup',
     value: '14m ago',
-    detail: 'Nightly aggregates are current.'
+    detail: 'Nightly aggregates are current.',
+    // Rollup always surfaces a CTA — System Health is useful regardless of freshness.
+    ctaLabel: 'Open system health'
   }
 ];
 
@@ -141,11 +143,32 @@ describe('AttentionBanner', () => {
     expect(getByText('link-variant-off')).toBeTruthy();
   });
 
-  it('does not invoke onPressVerification when verification is not tripped', () => {
+  it('does not invoke onPressVerification when the queue is empty (no ctaLabel)', () => {
     const onPressVerification = jest.fn();
     const { getByText } = render(<AttentionBanner score={buildScore()} onPressVerification={onPressVerification} />);
     fireEvent.press(getByText('Verification backlog'));
     expect(onPressVerification).not.toHaveBeenCalled();
+  });
+
+  it('invokes onPressVerification when the queue is non-empty but not yet tripped', () => {
+    const onPressVerification = jest.fn();
+    const score = buildScore({
+      contributors: [
+        {
+          ...baseContributors[0],
+          value: '3 waiting',
+          detail: 'Oldest therapist has waited 1 day.',
+          // Softer "Verify therapists" CTA — row must still be tappable.
+          ctaLabel: 'Verify therapists'
+        },
+        baseContributors[1],
+        baseContributors[2],
+        baseContributors[3]
+      ]
+    });
+    const { getByText } = render(<AttentionBanner score={score} onPressVerification={onPressVerification} />);
+    fireEvent.press(getByText('Verification backlog'));
+    expect(onPressVerification).toHaveBeenCalledTimes(1);
   });
 
   it('invokes stalled and orphaned drill-ins when their rows are tripped', () => {
@@ -157,8 +180,20 @@ describe('AttentionBanner', () => {
       headline: 'Escalation — review now',
       contributors: [
         baseContributors[0],
-        { ...baseContributors[1], tripped: true, value: '12 stalled', detail: '12 attempts untouched.' },
-        { ...baseContributors[2], tripped: true, value: '3 assignments', detail: 'Some orphaned.' },
+        {
+          ...baseContributors[1],
+          tripped: true,
+          value: '12 stalled',
+          detail: '12 attempts untouched.',
+          ctaLabel: 'View stalled attempts'
+        },
+        {
+          ...baseContributors[2],
+          tripped: true,
+          value: '3 assignments',
+          detail: 'Some orphaned.',
+          ctaLabel: 'View orphaned assignments'
+        },
         baseContributors[3]
       ]
     });

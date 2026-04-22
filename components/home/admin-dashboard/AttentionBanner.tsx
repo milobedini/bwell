@@ -214,16 +214,15 @@ const AttentionBanner = memo(
         </View>
 
         <View className="border-t" style={{ borderColor: Colors.divider.light }}>
-          {score.contributors.map((c) => (
-            <ContributorRow
-              key={c.key}
-              contributor={c}
-              accent={style.accent}
-              // Rollup row is always interactive — System Health is useful regardless of
-              // staleness. All other rows require the contributor to be tripped.
-              onPress={c.key === 'rollup' || c.tripped ? handlers[c.key] : undefined}
-            />
-          ))}
+          {score.contributors.map((c) => {
+            // A row is interactive if the score has surfaced a ctaLabel for it
+            // (and a handler has been wired). This lets attentionScore decide
+            // when a contributor earns a drill-in — rollup is always on,
+            // verification opens whenever the queue is non-empty, and
+            // stalled / orphaned only light up when tripped.
+            const handler = c.ctaLabel ? handlers[c.key] : undefined;
+            return <ContributorRow key={c.key} contributor={c} accent={style.accent} onPress={handler} />;
+          })}
         </View>
       </View>
     );
