@@ -1,6 +1,6 @@
 # Admin — Future Plan
 
-**Last updated:** 2026-04-21 (evening refinement pass — §1.1, §1.2, §1.3 shipped on `feat/admin-overhaul`)
+**Last updated:** 2026-04-22 (§1.1 System Health FE, §1.2 drill-ins, §1.3 archive all shipped on `feat/admin-near-term-followups`)
 **Companion to:** [`docs/superpowers/specs/2026-04-20-admin-overhaul-design.md`](../superpowers/specs/2026-04-20-admin-overhaul-design.md) and [`docs/prototypes/admin-overhaul/README.md`](../prototypes/admin-overhaul/README.md)
 
 This document catalogues everything deliberately **not** shipped in the
@@ -20,22 +20,22 @@ sections:
 
 ---
 
-## 1. Near-term follow-ups
+## 1. Near-term follow-ups — shipped
 
-These are pending work items from the current admin overhaul. The BE
-contract supports each of them already. Pick any order.
+All six near-term follow-ups from the original §1 list are now shipped.
+Listed here for provenance; the surfaces live in the admin home stack.
 
-> **Shipped 2026-04-21 (evening pass, all on `feat/admin-overhaul`):**
+> **Shipped 2026-04-21 (evening pass, on `feat/admin-overhaul`):**
 >
-> - Programme detail screen (was §1.1) — route `home/programmes/[id]`,
+> - Programme detail screen — route `home/programmes/[id]`,
 >   `useAdminProgrammeDetail` hook, `ProgrammeDetailScreen` composing
 >   `FreshnessRow` + enrolment stat cards + per-instrument `OutcomeTriplet` +
 >   refactored `CareTierBreakdown` as a tier × triplet table + work section.
 >   `LeadProgrammeCard` and `ProgrammeRow` now navigate on press.
-> - Lead programme hero when suppressed (was §1.2) — `LeadProgrammeCard` drops
+> - Lead programme hero when suppressed — `LeadProgrammeCard` drops
 >   the 56pt `—` and shows a header-weight "Awaiting data · needs N+ paired
 >   assessments" line. Populated rendering unchanged.
-> - Audit log list view (was §1.3) — route `home/audit`, `useAdminAudit`
+> - Audit log list view — route `home/audit`, `useAdminAudit`
 >   infinite-query hook (cursor pagination), `AuditRow` with outcome-aware
 >   colour + expand-in-place context JSON, `AuditFilterDrawer` with action +
 >   actor chips, and an entry link-row on `AdminHome` below the ops footer.
@@ -45,42 +45,77 @@ contract supports each of them already. Pick any order.
 >   returns `facets.actors` on `/admin/audit` with counts, keyed off the
 >   current non-actor filter. Shared-types published as `1.0.102`.
 
-### 1.1 System health view (FE)
+> **Shipped 2026-04-22 (on `feat/admin-near-term-followups`):**
+>
+> - **System health FE view (was §1.1).** New route `home/system` +
+>   `AdminSystemHealthScreen` rendering a status-tinted rollup panel
+>   (`startedAt` / `completedAt` / duration / rowsWritten + colour-coded
+>   success/partial/failure pill) and an audit-events-total card. Copy note
+>   explains the nightly 02:00 Europe/London schedule + 60-slot on-boot
+>   catch-up. A second link-row ("System health · heart-pulse icon") sits
+>   directly under the Audit log row on `AdminHome`. `useAdminSystemHealth`
+>   query hook with 1-min staleTime.
+> - **Attention-banner drill-ins (was §1.2).** `AttentionBanner` now takes
+>   `onPressStalled`, `onPressOrphaned`, `onPressRollup` callbacks alongside
+>   the existing `onPressVerification`. `attentionScore` surfaces
+>   per-contributor `ctaLabel`s ("View stalled attempts" / "View orphaned
+>   assignments" when tripped; "Open system health" always). The rollup row
+>   is tappable regardless of freshness — System Health is a useful
+>   destination either way.
+> - **Stalled attempts list (new).** Route `home/stalled-attempts`,
+>   `AdminStalledAttemptsScreen`, `StalledAttemptRow` (module-icon circle,
+>   patient username, module title, therapist-or-self-help label, compact
+>   stalled-since time). Cursor-paginated, oldest first.
+>   `useAdminStalledAttempts` infinite-query hook.
+> - **Orphaned assignments list (new).** Route `home/orphaned-assignments`,
+>   `AdminOrphanedAssignmentsScreen`, `OrphanedAssignmentRow` with an
+>   inline reason pill ("Therapist @user is unverified" vs "Therapist account
+>   deleted") coloured amber / red, plus optional due-date chip. Cursor-
+>   paginated, newest first. `useAdminOrphanedAssignments` infinite-query
+>   hook.
+> - **Non-winning prototype decks archived (was §1.3).** Four non-winners
+>   moved to `docs/prototypes/admin-overhaul/.archive/` with their own
+>   short README-of-why; `clinical-outcomes-first.html` (winner),
+>   `compliance-gauge.html` (blend source), and the shipped handoff README
+>   remain at the top of `docs/prototypes/admin-overhaul/`.
 
-- **Status:** BE endpoint shipped (`GET /api/admin/system/health`). No FE route.
-- **Scope:** small ops-oriented panel — last rollup run (`startedAt`,
-  `completedAt`, `status`, `rowsWritten`), total audit events.
-- **Placement:** low priority for day-one admin; maybe a "System"
-  sub-section within the admin tab. Not required on the home. Natural
-  destination for the banner's `rollup` contributor drill-in (see §1.2).
-- **Effort:** trivial (~0.5 day).
+### 1.x New BE endpoints for the drill-ins
 
-### 1.2 Attention-banner drill-ins
+Two small list endpoints ship alongside the FE work:
 
-- **Status:** banner contributors for `stalled`, `orphaned`, `rollup` are
-  informational only. Only `verification` has an action (opens `TherapistPicker`).
-- **Scope:** decide a destination for each:
-  - `stalled` → a list of stalled attempts (would need a new endpoint or a
-    query-shaped extension to existing attempt endpoints).
-  - `orphaned` → a list of orphaned assignments (same — new endpoint or
-    extension).
-  - `rollup` stale → either a manual-trigger button (runs the CLI equivalent)
-    or a link to the System Health view (§1.1).
-- **Dependencies:** first two need BE additions; third doesn't (once §1.1 ships).
-- **Effort:** small each, but need BE scoping first for the first two. Treat
-  as a mini-brainstorm (see §2 — could graduate).
+- `GET /api/admin/attempts/stalled?cursor=&limit=&moduleType=` — base filter
+  `{ status: 'started', lastInteractionAt < now − 7d }`, matching the
+  `/overview` stalled count exactly. Cursor on `lastInteractionAt` asc,
+  oldest first. Response includes `facets.moduleTypes` keyed off the
+  unfiltered base set (so the count per type is stable across scroll and
+  across filter selections, matching the `/admin/audit` facet convention).
+- `GET /api/admin/assignments/orphaned?cursor=&limit=&reason=` — base filter
+  `{ therapist: { $exists, $ne: null, $nin: verifiedTherapistIds } }`,
+  matching the `/overview` orphaned count exactly. Cursor on `createdAt`
+  desc, newest first. Row-level `reason` is derived (`therapist_missing`
+  vs `therapist_unverified`) by comparing the therapist id against the
+  current unverified-therapist set. Response includes `facets.reasons`
+  with per-reason counts.
 
-### 1.3 Archive non-winning prototype decks
+Both are guarded by `authenticateUser + authorizeAdmin` like the other
+admin surfaces. Published in shared-types `1.0.103` as
+`AdminStalledAttemptsResponse`, `AdminStalledAttemptRow`,
+`AdminOrphanedAssignmentsResponse`, `AdminOrphanedAssignmentRow`, plus
+`OrphanReason`.
 
-- **Status:** all 6 HTML decks still live in
-  `docs/prototypes/admin-overhaul/`. mb-development Stage 9 cleanup guidance
-  suggests moving non-winners under `.archive/` or deleting.
-- **Recommendation:** archive under
-  `docs/prototypes/admin-overhaul/.archive/` so the design thinking is
-  preserved for future reference (useful when comparing against a new angle).
-- **Keep in place:** `clinical-outcomes-first.html` (winner),
-  `compliance-gauge.html` (blend source), plus `README.md`.
-- **Effort:** trivial (~5 min).
+**Deliberately deferred in this pass:**
+
+- No **nudge** or **reassign** mutations. The non-winning `compliance-gauge`
+  deck flagged `POST /api/admin/attempts/:id/nudge` +
+  `POST /api/admin/assignments/:id/reassign` — both have real product
+  decisions attached (what a "nudge" does, reassignment UX / audit shape,
+  step-up auth). Left to §3 below.
+- No row-tap-to-user-detail on the new list rows. There is no admin-side
+  user-detail route yet (only therapist-side `patients/[id]`). When an
+  admin user-profile surface ships, wire both list rows into it.
+- No filter drawers on the new list screens. Both lists are self-filtered
+  by definition. The BE returns facets already so a drawer can be added
+  without an endpoint change.
 
 ---
 

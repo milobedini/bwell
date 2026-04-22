@@ -1,15 +1,16 @@
 # Admin Overhaul — Session Handoff
 
-**Last updated:** 2026-04-21 (evening pass)
-**Branch (FE):** `feat/admin-overhaul`
+**Last updated:** 2026-04-22 (near-term follow-up pass)
+**Branch (FE):** `feat/admin-overhaul` (merged) / `feat/admin-near-term-followups` (active)
 **Branch (BE):** `main` (BE commits land direct-to-main per project convention)
-**Status:** Stages 1–9 complete, plus two 2026-04-21 refinement passes. The
-morning pass covered visual fidelity, the data-pairing model, scheduler
-resilience, and seed realism. The evening pass worked through the first three
-near-term items from `docs/plans/admin-future.md` (programme detail screen,
-suppressed-hero collapse, audit log list view) and corrected a sort/filter/facet
-convention slip that surfaced during the audit work. Stages 10 (test audit) +
-11 (finalise PR) still pending.
+**Status:** Stages 1–9 complete, plus three 2026-04-21 refinement passes and a
+2026-04-22 near-term-follow-up pass (System Health FE, attention-banner
+drill-ins for stalled / orphaned / rollup, plus archival of non-winning
+prototype decks). The 2026-04-21 morning pass covered visual fidelity, the
+data-pairing model, scheduler resilience, and seed realism. The evening pass
+covered programme detail, suppressed-hero collapse, audit log list view, and a
+sort/filter/facet convention correction. Stages 10 (test audit) + 11
+(finalise PR) still pending.
 
 This document is a self-contained handoff. A future session can pick up from here
 without any of the conversational context. Everything material lives in the
@@ -128,6 +129,47 @@ convention slip that surfaced along the way:
    `AdminAuditActorFacet` + `AdminAuditFacets` types added to shared-types.
    FE swapped to reading `data.pages[0].facets.actors`. Matches the
    `UsersFacets` precedent on `/user/users`.
+
+A fourth refinement pass on 2026-04-22 walked through the remaining
+near-term items from `admin-future.md` (§1.1 System Health FE, §1.2 banner
+drill-ins, §1.3 archive non-winners):
+
+1. **System Health FE (was `admin-future.md §1.1`)** — new route
+   `home/system` + `AdminSystemHealthScreen` composed of a status-tinted
+   rollup panel (colour-coded SUCCESS / PARTIAL / FAILURE pill +
+   started / completed / duration / rowsWritten rows) and an audit-total
+   card. Copy note explains the nightly 02:00 Europe/London schedule and
+   the 60-slot on-boot catch-up. A second link-row (heart-pulse icon,
+   "System health") sits directly under the Audit log row on `AdminHome`.
+   `useAdminSystemHealth` query hook.
+2. **Attention-banner drill-ins (was `admin-future.md §1.2`)** — banner now
+   takes `onPressStalled`, `onPressOrphaned`, `onPressRollup` alongside the
+   existing `onPressVerification`. `attentionScore` surfaces per-contributor
+   `ctaLabel`s ("View stalled attempts", "View orphaned assignments" when
+   tripped; "Open system health" always). Rollup row is tappable
+   regardless of freshness. Banner contributor rows now call the matching
+   handler when the contributor is tripped (or always, for rollup).
+3. **Stalled + Orphaned list screens (BE + FE)** — two new `/api/admin/*`
+   endpoints: `GET /admin/attempts/stalled` and `GET /admin/assignments/
+   orphaned`, each with inline response facets (`moduleTypes` /
+   `reasons`). Both cursor-paginated via `lastInteractionAt` (ASC,
+   oldest first) / `createdAt` (DESC, newest first). Non-clinical rows —
+   username, module title + icon, therapist / unverified / self-help
+   label, relative time. `StalledAttemptsScreen` /
+   `OrphanedAssignmentsScreen` + their row components + `useAdmin*`
+   infinite-query hooks. No row-tap destination yet (no admin
+   user-detail surface exists).
+4. **Non-winning prototype decks archived (was `admin-future.md §1.3`)** —
+   `command-centre.html`, `kpi-dashboard.html`, `mission-control.html`,
+   `narrative-brief.html` moved to
+   `docs/prototypes/admin-overhaul/.archive/` with a short archive README
+   explaining why each was rejected. Winner + blend source + this handoff
+   README remain at the top level.
+
+Shared-types published as `1.0.103` with
+`AdminStalledAttemptsResponse`, `AdminStalledAttemptRow`,
+`AdminOrphanedAssignmentsResponse`, `AdminOrphanedAssignmentRow`, plus
+`OrphanReason`.
 
 ---
 
