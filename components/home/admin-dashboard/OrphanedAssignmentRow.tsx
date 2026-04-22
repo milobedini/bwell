@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
-import { formatCompactTimeAgo } from '@/utils/dates';
+import { dueLabel, formatCompactTimeAgo } from '@/utils/dates';
 import { getModuleIcon } from '@/utils/moduleIcons';
 import type { AdminOrphanedAssignmentRow as AdminOrphanedAssignmentRowType } from '@milobedini/shared-types';
 import Icon from '@react-native-vector-icons/material-design-icons';
@@ -24,7 +24,7 @@ const reasonCopy = (row: AdminOrphanedAssignmentRowType): { label: string; accen
 
 const OrphanedAssignmentRow = memo(({ row, isLast }: Props) => {
   const { label: reasonLabel, accent } = reasonCopy(row);
-  const dueText = row.dueAt ? `Due ${formatCompactTimeAgo(row.dueAt)}` : null;
+  const dueText = row.dueAt ? dueLabel(row.dueAt) : null;
 
   return (
     <View

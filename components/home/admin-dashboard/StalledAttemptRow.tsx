@@ -12,12 +12,14 @@ type Props = {
   isLast?: boolean;
 };
 
+const therapistLabelFor = (therapist: AdminStalledAttemptRowType['therapist']): string => {
+  if (!therapist) return 'Self-help';
+  if (therapist.isVerifiedTherapist) return `Therapist ${therapist.username}`;
+  return `Therapist ${therapist.username} · unverified`;
+};
+
 const StalledAttemptRow = memo(({ row, isLast }: Props) => {
-  const therapistLabel = row.therapist
-    ? row.therapist.isVerifiedTherapist
-      ? `Therapist ${row.therapist.username}`
-      : `Therapist ${row.therapist.username} · unverified`
-    : 'Self-help';
+  const therapistLabel = therapistLabelFor(row.therapist);
 
   return (
     <View
