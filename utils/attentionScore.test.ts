@@ -145,7 +145,7 @@ describe('computeAttentionScore', () => {
     }
   });
 
-  it('attaches a CTA label only when verification is tripped', () => {
+  it('escalates verification CTA copy when tripped, shows a softer one when queue is non-empty but fresh', () => {
     const tripped = computeAttentionScore(
       buildOverview({
         verificationQueue: {
@@ -165,8 +165,53 @@ describe('computeAttentionScore', () => {
     );
     expect(tripped.contributors.find((c) => c.key === 'verification')?.ctaLabel).toBe('Resolve verify queue');
 
+    // Queue has therapists waiting but none over the 7-day threshold yet — softer CTA.
+    const fresh = computeAttentionScore(
+      buildOverview({
+        verificationQueue: {
+          count: 3,
+          oldest: [
+            {
+              userId: 't1',
+              username: 'tnew',
+              email: 't@test.bwell',
+              createdAt: '2026-04-19T00:00:00.000Z',
+              therapistTier: null
+            }
+          ]
+        }
+      }),
+      now
+    );
+    expect(fresh.contributors.find((c) => c.key === 'verification')?.ctaLabel).toBe('Verify therapists');
+
+    // Empty queue — no CTA.
     const clear = computeAttentionScore(buildOverview(), now);
     expect(clear.contributors.find((c) => c.key === 'verification')?.ctaLabel).toBeUndefined();
+  });
+
+  it('attaches drill-in CTAs to stalled / orphaned only when tripped, and always to rollup', () => {
+    const clear = computeAttentionScore(buildOverview(), now);
+    expect(clear.contributors.find((c) => c.key === 'stalled')?.ctaLabel).toBeUndefined();
+    expect(clear.contributors.find((c) => c.key === 'orphaned')?.ctaLabel).toBeUndefined();
+    expect(clear.contributors.find((c) => c.key === 'rollup')?.ctaLabel).toBe('Open system health');
+
+    const tripped = computeAttentionScore(
+      buildOverview({
+        operational: {
+          ...buildOverview().operational,
+          work: {
+            ...buildOverview().operational.work,
+            stalledAttempts7d: 10,
+            orphanedAssignments: 2
+          }
+        }
+      }),
+      now
+    );
+    expect(tripped.contributors.find((c) => c.key === 'stalled')?.ctaLabel).toBe('View stalled attempts');
+    expect(tripped.contributors.find((c) => c.key === 'orphaned')?.ctaLabel).toBe('View orphaned assignments');
+    expect(tripped.contributors.find((c) => c.key === 'rollup')?.ctaLabel).toBe('Open system health');
   });
 
   it('formats rollup value as relative age when fresh', () => {

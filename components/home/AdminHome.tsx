@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -28,6 +28,10 @@ const AdminHome = () => {
   const insets = useSafeAreaInsets();
 
   const score = useMemo(() => (data ? computeAttentionScore(data) : null), [data]);
+
+  const pushStalled = useCallback(() => router.push('/(main)/(tabs)/home/stalled-attempts'), []);
+  const pushOrphaned = useCallback(() => router.push('/(main)/(tabs)/home/orphaned-assignments'), []);
+  const pushSystem = useCallback(() => router.push('/(main)/(tabs)/home/system'), []);
 
   // Adapt /overview's verification queue preview into AuthUser shape for the picker.
   const unverifiedTherapists = useMemo<AuthUser[]>(
@@ -76,7 +80,13 @@ const AdminHome = () => {
 
           {score && (
             <View className="mt-4">
-              <AttentionBanner score={score} onPressVerification={togglePickerVisible} />
+              <AttentionBanner
+                score={score}
+                onPressVerification={togglePickerVisible}
+                onPressStalled={pushStalled}
+                onPressOrphaned={pushOrphaned}
+                onPressRollup={pushSystem}
+              />
             </View>
           )}
 
@@ -117,6 +127,26 @@ const AdminHome = () => {
                 </ThemedText>
                 <ThemedText type="caption" style={{ color: Colors.sway.darkGrey, marginTop: 2 }}>
                   {data.operational.audit.eventsLast7d} events in the last 7 days
+                </ThemedText>
+              </View>
+            </View>
+            <Icon name="chevron-right" size={20} color={Colors.sway.darkGrey} />
+          </Pressable>
+
+          <Pressable
+            onPress={pushSystem}
+            className="mt-3 flex-row items-center justify-between rounded-xl bg-chip-darkCardDeep px-4 py-3 active:opacity-80"
+            accessibilityRole="button"
+            accessibilityLabel="View system health"
+          >
+            <View className="flex-row items-center gap-3">
+              <Icon name="heart-pulse" size={18} color={Colors.sway.darkGrey} />
+              <View>
+                <ThemedText type="smallBold" style={{ color: Colors.sway.lightGrey }}>
+                  System health
+                </ThemedText>
+                <ThemedText type="caption" style={{ color: Colors.sway.darkGrey, marginTop: 2 }}>
+                  {data.rollupAsOf ? 'Rollup job status + audit volume' : 'Nightly rollup has not run yet'}
                 </ThemedText>
               </View>
             </View>
