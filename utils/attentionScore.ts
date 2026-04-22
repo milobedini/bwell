@@ -57,7 +57,9 @@ export const computeAttentionScore = (data: AdminOverviewResponse, now: Date = n
     label: 'Verification backlog',
     value: oldest ? `${queueCount} waiting` : 'Empty',
     detail: verifyDetail,
-    ctaLabel: verifyTripped ? 'Resolve verify queue' : undefined
+    // CTA shows whenever there is anyone in the queue — the row is tappable even
+    // before the 7-day threshold trips. Copy escalates when tripped.
+    ctaLabel: verifyTripped ? 'Resolve verify queue' : oldest ? 'Verify therapists' : undefined
   };
 
   // Stalled attempts above threshold.

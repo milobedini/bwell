@@ -145,7 +145,7 @@ describe('computeAttentionScore', () => {
     }
   });
 
-  it('attaches a CTA label only when verification is tripped', () => {
+  it('escalates verification CTA copy when tripped, shows a softer one when queue is non-empty but fresh', () => {
     const tripped = computeAttentionScore(
       buildOverview({
         verificationQueue: {
@@ -165,6 +165,27 @@ describe('computeAttentionScore', () => {
     );
     expect(tripped.contributors.find((c) => c.key === 'verification')?.ctaLabel).toBe('Resolve verify queue');
 
+    // Queue has therapists waiting but none over the 7-day threshold yet — softer CTA.
+    const fresh = computeAttentionScore(
+      buildOverview({
+        verificationQueue: {
+          count: 3,
+          oldest: [
+            {
+              userId: 't1',
+              username: 'tnew',
+              email: 't@test.bwell',
+              createdAt: '2026-04-19T00:00:00.000Z',
+              therapistTier: null
+            }
+          ]
+        }
+      }),
+      now
+    );
+    expect(fresh.contributors.find((c) => c.key === 'verification')?.ctaLabel).toBe('Verify therapists');
+
+    // Empty queue — no CTA.
     const clear = computeAttentionScore(buildOverview(), now);
     expect(clear.contributors.find((c) => c.key === 'verification')?.ctaLabel).toBeUndefined();
   });
