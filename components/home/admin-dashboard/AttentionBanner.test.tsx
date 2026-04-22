@@ -147,4 +147,34 @@ describe('AttentionBanner', () => {
     fireEvent.press(getByText('Verification backlog'));
     expect(onPressVerification).not.toHaveBeenCalled();
   });
+
+  it('invokes stalled and orphaned drill-ins when their rows are tripped', () => {
+    const onPressStalled = jest.fn();
+    const onPressOrphaned = jest.fn();
+    const score = buildScore({
+      band: 'red',
+      trippedCount: 2,
+      headline: 'Escalation — review now',
+      contributors: [
+        baseContributors[0],
+        { ...baseContributors[1], tripped: true, value: '12 stalled', detail: '12 attempts untouched.' },
+        { ...baseContributors[2], tripped: true, value: '3 assignments', detail: 'Some orphaned.' },
+        baseContributors[3]
+      ]
+    });
+    const { getByText } = render(
+      <AttentionBanner score={score} onPressStalled={onPressStalled} onPressOrphaned={onPressOrphaned} />
+    );
+    fireEvent.press(getByText('Stalled patient work'));
+    fireEvent.press(getByText('Orphaned assignments'));
+    expect(onPressStalled).toHaveBeenCalledTimes(1);
+    expect(onPressOrphaned).toHaveBeenCalledTimes(1);
+  });
+
+  it('invokes onPressRollup regardless of tripped state (always available)', () => {
+    const onPressRollup = jest.fn();
+    const { getByText } = render(<AttentionBanner score={buildScore()} onPressRollup={onPressRollup} />);
+    fireEvent.press(getByText('Clinical rollup'));
+    expect(onPressRollup).toHaveBeenCalledTimes(1);
+  });
 });

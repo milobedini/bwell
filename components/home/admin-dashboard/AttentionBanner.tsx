@@ -1,4 +1,4 @@
-import { type ComponentProps, memo, useCallback } from 'react';
+import { type ComponentProps, memo } from 'react';
 import { Pressable, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { ThemedText } from '@/components/ThemedText';
@@ -172,53 +172,63 @@ ContributorRow.displayName = 'ContributorRow';
 export type AttentionBannerProps = {
   score: AttentionScore;
   onPressVerification?: () => void;
+  onPressStalled?: () => void;
+  onPressOrphaned?: () => void;
+  onPressRollup?: () => void;
 };
 
-const AttentionBanner = memo(({ score, onPressVerification }: AttentionBannerProps) => {
-  const style = BAND_STYLES[score.band];
-  const handleVerificationPress = useCallback(() => {
-    onPressVerification?.();
-  }, [onPressVerification]);
+const AttentionBanner = memo(
+  ({ score, onPressVerification, onPressStalled, onPressOrphaned, onPressRollup }: AttentionBannerProps) => {
+    const style = BAND_STYLES[score.band];
+    const handlers: Record<AttentionContributorKey, (() => void) | undefined> = {
+      verification: onPressVerification,
+      stalled: onPressStalled,
+      orphaned: onPressOrphaned,
+      rollup: onPressRollup
+    };
 
-  return (
-    <View
-      accessibilityRole="summary"
-      className="overflow-hidden rounded-2xl border"
-      style={{ backgroundColor: style.bg, borderColor: style.border }}
-    >
-      <View className="items-center px-4 pb-3 pt-5">
-        <AttentionRing
-          band={score.band}
-          trippedCount={score.trippedCount}
-          totalChecks={score.totalChecks}
-          accent={style.accent}
-        />
-        <ThemedText type="smallTitle" style={{ color: Colors.sway.lightGrey, marginTop: 12, textAlign: 'center' }}>
-          {score.headline}
-        </ThemedText>
-        <ThemedText
-          type="small"
-          style={{ color: Colors.sway.darkGrey, marginTop: 4, textAlign: 'center', fontSize: 12 }}
-        >
-          {score.band === 'unknown'
-            ? 'The nightly rollup has not completed yet'
-            : `${score.trippedCount} of ${score.totalChecks} checks tripped`}
-        </ThemedText>
-      </View>
-
-      <View className="border-t" style={{ borderColor: Colors.divider.light }}>
-        {score.contributors.map((c) => (
-          <ContributorRow
-            key={c.key}
-            contributor={c}
+    return (
+      <View
+        accessibilityRole="summary"
+        className="overflow-hidden rounded-2xl border"
+        style={{ backgroundColor: style.bg, borderColor: style.border }}
+      >
+        <View className="items-center px-4 pb-3 pt-5">
+          <AttentionRing
+            band={score.band}
+            trippedCount={score.trippedCount}
+            totalChecks={score.totalChecks}
             accent={style.accent}
-            onPress={c.key === 'verification' && c.tripped ? handleVerificationPress : undefined}
           />
-        ))}
+          <ThemedText type="smallTitle" style={{ color: Colors.sway.lightGrey, marginTop: 12, textAlign: 'center' }}>
+            {score.headline}
+          </ThemedText>
+          <ThemedText
+            type="small"
+            style={{ color: Colors.sway.darkGrey, marginTop: 4, textAlign: 'center', fontSize: 12 }}
+          >
+            {score.band === 'unknown'
+              ? 'The nightly rollup has not completed yet'
+              : `${score.trippedCount} of ${score.totalChecks} checks tripped`}
+          </ThemedText>
+        </View>
+
+        <View className="border-t" style={{ borderColor: Colors.divider.light }}>
+          {score.contributors.map((c) => (
+            <ContributorRow
+              key={c.key}
+              contributor={c}
+              accent={style.accent}
+              // Rollup row is always interactive — System Health is useful regardless of
+              // staleness. All other rows require the contributor to be tripped.
+              onPress={c.key === 'rollup' || c.tripped ? handlers[c.key] : undefined}
+            />
+          ))}
+        </View>
       </View>
-    </View>
-  );
-});
+    );
+  }
+);
 
 AttentionBanner.displayName = 'AttentionBanner';
 
