@@ -169,6 +169,30 @@ describe('computeAttentionScore', () => {
     expect(clear.contributors.find((c) => c.key === 'verification')?.ctaLabel).toBeUndefined();
   });
 
+  it('attaches drill-in CTAs to stalled / orphaned only when tripped, and always to rollup', () => {
+    const clear = computeAttentionScore(buildOverview(), now);
+    expect(clear.contributors.find((c) => c.key === 'stalled')?.ctaLabel).toBeUndefined();
+    expect(clear.contributors.find((c) => c.key === 'orphaned')?.ctaLabel).toBeUndefined();
+    expect(clear.contributors.find((c) => c.key === 'rollup')?.ctaLabel).toBe('Open system health');
+
+    const tripped = computeAttentionScore(
+      buildOverview({
+        operational: {
+          ...buildOverview().operational,
+          work: {
+            ...buildOverview().operational.work,
+            stalledAttempts7d: 10,
+            orphanedAssignments: 2
+          }
+        }
+      }),
+      now
+    );
+    expect(tripped.contributors.find((c) => c.key === 'stalled')?.ctaLabel).toBe('View stalled attempts');
+    expect(tripped.contributors.find((c) => c.key === 'orphaned')?.ctaLabel).toBe('View orphaned assignments');
+    expect(tripped.contributors.find((c) => c.key === 'rollup')?.ctaLabel).toBe('Open system health');
+  });
+
   it('formats rollup value as relative age when fresh', () => {
     const s = computeAttentionScore(buildOverview(), now);
     const rollup = s.contributors.find((c) => c.key === 'rollup');

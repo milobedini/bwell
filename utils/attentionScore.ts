@@ -70,7 +70,8 @@ export const computeAttentionScore = (data: AdminOverviewResponse, now: Date = n
     value: `${stalledCount} stalled`,
     detail: stalledTripped
       ? `${stalledCount} attempts untouched for 7+ days — over ${STALLED_THRESHOLD} threshold.`
-      : 'Attempts started but not touched for 7+ days.'
+      : 'Attempts started but not touched for 7+ days.',
+    ctaLabel: stalledTripped ? 'View stalled attempts' : undefined
   };
 
   // Any orphaned assignments (zero tolerance).
@@ -84,7 +85,8 @@ export const computeAttentionScore = (data: AdminOverviewResponse, now: Date = n
     detail:
       orphanedCount === 0
         ? 'Every assignment is held by a verified therapist.'
-        : 'An assignment is held by a therapist who is no longer verified.'
+        : 'An assignment is held by a therapist who is no longer verified.',
+    ctaLabel: orphanedTripped ? 'View orphaned assignments' : undefined
   };
 
   // Rollup staleness: null or older than threshold.
@@ -99,7 +101,8 @@ export const computeAttentionScore = (data: AdminOverviewResponse, now: Date = n
       ? 'The nightly rollup has not completed yet.'
       : rollupStale
         ? 'Nightly aggregates are more than 48 hours old.'
-        : 'Nightly aggregates are current.'
+        : 'Nightly aggregates are current.',
+    ctaLabel: 'Open system health'
   };
 
   const contributors: AttentionContributor[] = [verification, stalled, orphaned, rollup];
